@@ -1,9 +1,8 @@
-<head>
+<p><head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<link rel="stylesheet" type="text/css" href="bc.css">
+<link rel="stylesheet" type="text/css" href="bc.css"></p>
 <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
-</head>
-
+<p></head></p>
 <!---
 
 - BRepBuilder fails on very simple example
@@ -70,20 +69,14 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### BRepBuilder, gbXML and CPython
-
-
-
-####<a name="2"></a>
-
-Very illuminating insights on using the BRepBuilder from
-Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas
-and Luiz Henrique [@ricaun](https://github.com/ricaun) Cassettari addressing
-why [BRepBuilder fails on very simple example](https://forums.autodesk.com/t5/revit-api-forum/brepbuilder-fails-on-very-simple-example/m-p/12015942):
-
-**Question:** I get a "Failure" result on a very simple BRepBuilder example when I try to build a (4-sided triangle pyramid) Tetrahedron.
-I know about `TessellatedShapeBuilder`, but it fails for a quite complex object, and I hope to bypass this using the BREP instead.
-
+<h3>BRepBuilder, gbXML and CPython</h3>
+<h4><a name="2"></a></h4>
+<p>Very illuminating insights on using the BRepBuilder from
+Richard <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859">RPThomas108</a> Thomas
+and Luiz Henrique <a href="https://github.com/ricaun">@ricaun</a> Cassettari addressing
+why <a href="https://forums.autodesk.com/t5/revit-api-forum/brepbuilder-fails-on-very-simple-example/m-p/12015942">BRepBuilder fails on very simple example</a>:</p>
+<p><strong>Question:</strong> I get a "Failure" result on a very simple BRepBuilder example when I try to build a (4-sided triangle pyramid) Tetrahedron.
+I know about <code>TessellatedShapeBuilder</code>, but it fails for a quite complex object, and I hope to bypass this using the BREP instead.</p>
 <pre class="prettyprint">
 public class Test{
 
@@ -150,26 +143,17 @@ public class Test{
 }
 </pre>
 
-**Answer:** [DirectShape from BrepBuilder and Boolean](https://thebuildingcoder.typepad.com/blog/2018/02/directshape-from-brepbuilder-and-boolean.html) provides
-an example that does work.
-
-However, please note that BRepBuilder wasn’t really meant for 'manually' constructing geometry. Its interface is rather cumbersome for that purpose. It was meant for translating existing geometry into Revit, with rather thorough validation of the input geometry.
-
-**Response:** I implemented a workaround using `TesselatedShapeBuilder`, but it's strange that I can't get the simplest example working with the BREP commands. Also, the error message is not very helpful.
-
-Later: I experienced the same error when try to create a simple pyramid shape as a prototype for recreating geometry from linked IFC file. I would like to use some external algorithm the geometry and convert the external data to a mesh and rebuilt the new shape. The API documentation does not provide much of information about why it failed.
-
-**Answer:** It takes a bit of organisation but it does work.
-
-It isn't ideal for manual creation since (1) you need to arrange the edges so they are compatible and (2) the edges need to sit on the surface.
-
-I organised the above original into the below edge orders and directions and it worked fine. Each co-edge should be reversed on one face and not reversed on the other. Outer loops for a face should be anticlockwise with respect to the face normal (pointing outwards for a solid). So the edge is indicated as reversed on the face if it can't satisfy that e.g. the edge of two adjoining faces needs to be reversed on one of them.
-
-
-<center>
+<p><strong>Answer:</strong> <a href="https://thebuildingcoder.typepad.com/blog/2018/02/directshape-from-brepbuilder-and-boolean.html">DirectShape from BrepBuilder and Boolean</a> provides
+an example that does work.</p>
+<p>However, please note that BRepBuilder wasn’t really meant for 'manually' constructing geometry. Its interface is rather cumbersome for that purpose. It was meant for translating existing geometry into Revit, with rather thorough validation of the input geometry.</p>
+<p><strong>Response:</strong> I implemented a workaround using <code>TesselatedShapeBuilder</code>, but it's strange that I can't get the simplest example working with the BREP commands. Also, the error message is not very helpful.</p>
+<p>Later: I experienced the same error when try to create a simple pyramid shape as a prototype for recreating geometry from linked IFC file. I would like to use some external algorithm the geometry and convert the external data to a mesh and rebuilt the new shape. The API documentation does not provide much of information about why it failed.</p>
+<p><strong>Answer:</strong> It takes a bit of organisation but it does work.</p>
+<p>It isn't ideal for manual creation since (1) you need to arrange the edges so they are compatible and (2) the edges need to sit on the surface.</p>
+<p>I organised the above original into the below edge orders and directions and it worked fine. Each co-edge should be reversed on one face and not reversed on the other. Outer loops for a face should be anticlockwise with respect to the face normal (pointing outwards for a solid). So the edge is indicated as reversed on the face if it can't satisfy that e.g. the edge of two adjoining faces needs to be reversed on one of them.</p>
+<p><center>
 <img src="img/rpt_brep_organisation.png" alt="BRep organisation" title="BRep organisation" width="500"/> <!-- Pixel Height: 572 Pixel Width: 729 -->
-</center>
-
+</center></p>
 <pre class="prettyprint">
   Private Function Obj_230606a( _
     ByVal commandData As ExternalCommandData,
@@ -427,5 +411,3 @@ receives a clear and succinct solution
 **Question:**
 
 **Answer:**
-
-
