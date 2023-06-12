@@ -331,7 +331,7 @@ I organised the above original into the below edge orders and directions and it 
 
     End Sub
   End Class
-<pre>
+</pre>
 
 **Response:** It took me a while to figure out how the edges and faces should be added before the detail explanation and sample code reaches me.
 Thank you very much for your effort.
