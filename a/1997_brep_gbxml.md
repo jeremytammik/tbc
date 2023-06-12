@@ -10,29 +10,8 @@
   https://forums.autodesk.com/t5/revit-api-forum/brepbuilder-fails-on-very-simple-example/m-p/12015942#M71909
   /Users/jta/a/doc/revit/tbc/git/a/img/rpt_brep_organisation.png
 
-- [Ripcord Engineering](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/3926242) shares
-  a possible solution to DLL Hell in certain circumstances, using the Python `subprocess` module for disentanglement without need for any IPC:
-  CPython and PyRevit
-  https://forums.autodesk.com/t5/revit-api-forum/cpython-and-pyrevit/m-p/12011805
-  pyRevit - Dynamo Incompatibility: Two versions of Same DLL #1731
-  https://github.com/eirannejad/pyRevit/issues/1731
-  Python Module subprocess — Subprocess management
-  https://docs.python.org/3/library/subprocess.html
-
-- Export of multiple GBXML models
-  https://forums.autodesk.com/t5/revit-api-forum/export-of-multiple-gbxml-models/m-p/12011838#M71878
-
-- gbXml export using energy settings
-  https://forums.autodesk.com/t5/revit-api-forum/gbxml-export-using-energy-settings/m-p/12011894#M71881
-
 - Toposurface - Change interior point to boundary point?
   https://forums.autodesk.com/t5/revit-api-forum/toposurface-change-interior-point-to-boundary-point/m-p/12015969#M71911
-
-- Conceptual Energy Analysis - MassEnergyAnalyticalModel by Dynamo Python script
-  https://forums.autodesk.com/t5/revit-api-forum/conceptual-energy-analysis-massenergyanalyticalmodel-by-dynamo/m-p/12020958#M71959
-
-- Import/Link CAD Event
-  https://forums.autodesk.com/t5/revit-api-forum/import-link-cad-event/m-p/12021086#M71961
 
 - https://twitter.com/advany/status/1664451798793584642?s=20
   https://twitter.com/advany/status/1664451798793584642?s=20
@@ -97,173 +76,105 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ####<a name="2"></a>
 
+Very illuminating insights on using the BRepBuilder from
 Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas
+and Luiz Henrique [@ricaun](https://github.com/ricaun) Cassettari addressing
+why [BRepBuilder fails on very simple example](https://forums.autodesk.com/t5/revit-api-forum/brepbuilder-fails-on-very-simple-example/m-p/12015942):
 
-Gernot Frisch
+**Question:** I get "Failure" result on a very simple BRepBuilder example, when I try to build a (4-sided triangle pyramid) Tetrahedron.
+I know about `TessellatedShapeBuilder`, but it fails for a quite complex object here, so I hope to bypass this with the BREP.
 
-BRepBuilder fails on very simple example
-I get "Failure" result on a very simple BRepBuilder example, when I try to build a (4-sided triangle pyramid) Tetrahedron. I know about TessellatedShapeBuilder, but it fails for a quite complex object here, so I hope to bypass this with the BREP.
-
+<pre class="prettyprint">
 public class Test{
 
-    public Test(){}
+  public Test(){}
 
-    // Keep track of already created edges and their orientation
-    struct BrepEdge {
-        public BRepBuilderGeometryId id;
-        public XYZ p1, p2;
+  // Keep track of already created edges and their orientation
+  struct BrepEdge {
+    public BRepBuilderGeometryId id;
+    public XYZ p1, p2;
+  }
+  List&lt;BrepEdge&gt; brep_edges = new List&lt;BrepEdge&gt;();
+
+  // add edge to face loop
+  void AddEdgeToBREP( BRepBuilder brep, BRepBuilderGeometryId loop, XYZ a, XYZ b) {
+    foreach(var be in brep_edges) {
+      // ab is p1-p2
+      if(be.p1.DistanceTo(a) &lt; 1e-7 && be.p2.DistanceTo(b) &lt; 1e-7) { brep.AddCoEdge(loop, be.id, false);return; }
+      // ab is p2-p1 (reversed edge)
+      if(be.p1.DistanceTo(b) &lt; 1e-7 && be.p2.DistanceTo(a) &lt; 1e-7) { brep.AddCoEdge(loop, be.id, true); return; }
     }
-    List<BrepEdge> brep_edges = new List<BrepEdge>();
+    // must create a new edge
+    BRepBuilderGeometryId edge = brep.AddEdge(BRepBuilderEdgeGeometry.Create(a, b));
+    brep.AddCoEdge(loop, edge, false);
+    var bed = new BrepEdge();
+    bed.p1 = a;
+    bed.p2 = b;
+    bed.id = edge;
+    brep_edges.Add(bed);
+  }
 
-    // add edge to face loop
-    void AddEdgeToBREP( BRepBuilder brep, BRepBuilderGeometryId loop, XYZ a, XYZ b) {
-        foreach(var be in brep_edges) {
-            // ab is p1-p2
-            if(be.p1.DistanceTo(a) < 1e-7 && be.p2.DistanceTo(b) < 1e-7) { brep.AddCoEdge(loop, be.id, false);return; }
-            // ab is p2-p1 (reversed edge)
-            if(be.p1.DistanceTo(b) < 1e-7 && be.p2.DistanceTo(a) < 1e-7) { brep.AddCoEdge(loop, be.id, true); return; }
-        }
-        // must create a new edge
-        BRepBuilderGeometryId edge = brep.AddEdge(BRepBuilderEdgeGeometry.Create(a, b));
-        brep.AddCoEdge(loop, edge, false);
-        var bed = new BrepEdge();
-        bed.p1 = a;
-        bed.p2 = b;
-        bed.id = edge;
-        brep_edges.Add(bed);
-    }
-
-    // add triangle face to solid
-    private void AddTriangleToBREP( BRepBuilder brep, XYZ a, XYZ b, XYZ c ) {
-        Plane plane = Plane.CreateByThreePoints(a, b, c);
-        BRepBuilderGeometryId face = brep.AddFace(BRepBuilderSurfaceGeometry.Create(plane, null), true);
-        var loop = brep.AddLoop(face);
-        AddEdgeToBREP(brep, loop, a, b);
-        AddEdgeToBREP(brep, loop, b, c);
-        AddEdgeToBREP(brep, loop, c, a);
-        brep.FinishLoop(loop);
-        brep.FinishFace(face);
-    }
+  // add triangle face to solid
+  private void AddTriangleToBREP( BRepBuilder brep, XYZ a, XYZ b, XYZ c ) {
+    Plane plane = Plane.CreateByThreePoints(a, b, c);
+    BRepBuilderGeometryId face = brep.AddFace(BRepBuilderSurfaceGeometry.Create(plane, null), true);
+    var loop = brep.AddLoop(face);
+    AddEdgeToBREP(brep, loop, a, b);
+    AddEdgeToBREP(brep, loop, b, c);
+    AddEdgeToBREP(brep, loop, c, a);
+    brep.FinishLoop(loop);
+    brep.FinishFace(face);
+  }
 
 
-    ///////////////////////////////////////////////////////////////////////////
-    public void run() {
-        BRepBuilder brep = new BRepBuilder(BRepType.Solid);
+  ///////////////////////////////////////////////////////////////////////////
+  public void run() {
+    BRepBuilder brep = new BRepBuilder(BRepType.Solid);
 
-        var points = new List<XYZ>(4);
-        points.Add(new XYZ(0, 0, 0)); // 0 origin
-        points.Add(new XYZ(1, 0, 0)); // 1 right
-        points.Add(new XYZ(0, 1, 0)); // 2 back
-        points.Add(new XYZ(0, 0, 1)); // 3 top
+    var points = new List&lt;XYZ&gt;(4);
+    points.Add(new XYZ(0, 0, 0)); // 0 origin
+    points.Add(new XYZ(1, 0, 0)); // 1 right
+    points.Add(new XYZ(0, 1, 0)); // 2 back
+    points.Add(new XYZ(0, 0, 1)); // 3 top
 
-        AddTriangleToBREP(brep, points[2], points[1], points[0]); // bottom face
-        AddTriangleToBREP(brep, points[0], points[1], points[3]); // front face
-        AddTriangleToBREP(brep, points[1], points[2], points[3]); // diagonal face
-        AddTriangleToBREP(brep, points[2], points[0], points[3]); // left face
+    AddTriangleToBREP(brep, points[2], points[1], points[0]); // bottom face
+    AddTriangleToBREP(brep, points[0], points[1], points[3]); // front face
+    AddTriangleToBREP(brep, points[1], points[2], points[3]); // diagonal face
+    AddTriangleToBREP(brep, points[2], points[0], points[3]); // left face
 
-        var outcome = brep.Finish(); // <<<<< Failure
+    var outcome = brep.Finish(); // &lt;&lt;&lt;&lt;&lt; Failure
 
-        // throws: "This BRepBuilder object hasn't completed building data or was unsuccessful building it.
-        // Built Geometry is unavailable. In order to access the built Geometry,
-        // Finish() must be called first. That will set the state to completed."
-        var res = brep.GetResult();
-    }
+    // throws: "This BRepBuilder object hasn't completed building data or was unsuccessful building it.
+    // Built Geometry is unavailable. In order to access the built Geometry,
+    // Finish() must be called first. That will set the state to completed."
+    var res = brep.GetResult();
+  }
 }
-Tags (0)
-Add tags
-Report
-Labels (2)
-Geometry REVIT API
-5 REPLIES
-Sort:
-MESSAGE 2 OF 6
-jeremytammik
- Autodesk jeremytammik in reply to: GFric
-2020-07-30 03:36 AM
-I cannot say why your code does not work.
+</pre>
 
+**Answer:** Here is an example that does work:
+[DirectShape from BrepBuilder and Boolean](https://thebuildingcoder.typepad.com/blog/2018/02/directshape-from-brepbuilder-and-boolean.html).
 
+However: Please note that BRepBuilder wasn’t really meant for 'manually' constructing geometry. Its interface is very cumbersome for that purpose. It was meant for translating existing geometry into Revit, with rather thorough validation of the input geometry.
 
-Here is an example that does work:
+**Response:** I got another workaround using `TesselatedShapeBuilder`, but it's strange that I can't get the simplest example working with the BREP commands. Also, the error message is not very helpful.
 
-
-
-https://thebuildingcoder.typepad.com/blog/2018/02/directshape-from-brepbuilder-and-boolean.html
-
-
-
-However:
-
-
-
-Please note that BRepBuilder wasn’t really meant for 'manually' constructing geometry. Its interface is very cumbersome for that purpose. It was meant for translating existing geometry into Revit, with rather thorough validation of the input geometry.
-
-
-
-
-
-Jeremy Tammik
-Developer Technical Services
-Autodesk Developer Network, ADN Open
-The Building Coder
-
-Tags (0)
-Add tags
-Report
-MESSAGE 3 OF 6
-GFric
- Observer GFric in reply to: jeremytammik
-2020-08-04 01:41 AM
-I got another workaround using TesselatedShapeBuilder, but it's strange that I can't get the simplest example working with the BREP commands. Also, the error message is not very helpful.
-
-Tags (0)
-Add tags
-Report
-MESSAGE 4 OF 6
-longt61
- Advocate longt61 in reply to: jeremytammik
-2023-06-06 12:41 AM
-Hi @jeremytammik , it has been a while since the question was posted, I am wondering if there is any good news or further details on the topic?
+Later: it has been a while since the question was posted, I am wondering if there is any good news or further details on the topic?
 
 I experienced the same error when try to create a simple pyramid shape as a prototype for recreating geometry from linked IFC file. I would like to use some external algorithm the geometry and convert the external data to a mesh and rebuilt the new shape. The API documentation does not provide much of information about why it failed.
 
-Would you have any suggestion for my problem? Thank you very much.
-
-Tags (0)
-Add tags
-Report
-MESSAGE 5 OF 6
-jeremy.tammik
- Autodesk jeremy.tammik in reply to: longt61
-2023-06-06 05:24 AM
-No news, just the same advice as above: try using the TesselatedShapeBuilder instead of the BRepBuilder.
-
-
-
-Jeremy Tammik,  Developer Advocacy and Support, The Building Coder, Autodesk Developer Network, ADN Open
-Tags (0)
-Add tags
-Report
-MESSAGE 6 OF 6
-RPTHOMAS108
- Mentor RPTHOMAS108 in reply to: longt61
-2023-06-06 04:43 PM
-It takes a bit of organisation but it does work.
-
-
+**Answer:** It takes a bit of organisation but it does work.
 
 It isn't ideal for manual creation since (1) you need to arrange the edges so they are compatible and (2) the edges need to sit on the surface.
-
-
 
 I organised the above original into the below edge orders and directions and it worked fine. Each co-edge should be reversed on one face and not reversed on the other. Outer loops for a face should be anticlockwise with respect to the face normal (pointing outwards for a solid). So the edge is indicated as reversed on the face if it can't satisfy that e.g. the edge of two adjoining faces needs to be reversed on one of them.
 
 
+<center>
+<img src="img/rpt_brep_organisation.png" alt="BRep organisation" title="BRep organisation" width="500"/> <!-- Pixel Height: 572 Pixel Width: 729 -->
+</center>
 
-230607_A.PNG
-
-
-
+<pre class="prettyprint">
 Private Function Obj_230606a(ByVal commandData As Autodesk.Revit.UI.ExternalCommandData,
 ByRef message As String, ByVal elements As Autodesk.Revit.DB.ElementSet) As Result
         Dim UIApp As UIApplication = commandData.Application
@@ -404,28 +315,18 @@ ByRef message As String, ByVal elements As Autodesk.Revit.DB.ElementSet) As Resu
             S2 = Side2
             S3 = Side3
 
-            If Reversed.Length <> 3 Then
+            If Reversed.Length &lt;&gt; 3 Then
                 Throw New ArgumentOutOfRangeException
             End If
             Sides_Reversed = Reversed
 
         End Sub
     End Class
+<pre
 
- longt61 in reply to: GFric
-2023-06-07 03:16 AM
-It took me a while to figure out how the edges and faces should be added before the detail explanation and sample code reaches me. Thank you very much for your effort.
+**Response:** It took me a while to figure out how the edges and faces should be added before the detail explanation and sample code reaches me. Thank you very much for your effort.
 
-Tags (0)
-Add tags
-Report
-MESSAGE 8 OF 9
-ricaun
- Collaborator ricaun in reply to: RPTHOMAS108
-2023-06-07 07:04 AM
-That's a really cool image, did you create it or you found in some Revit API presentation?
-
-
+That's a really cool image; did you create it or you found in some Revit API presentation?
 
 Is kinda missing a Four-sided dice in that image 😀
 
@@ -433,23 +334,7 @@ Is kinda missing a Four-sided dice in that image 😀
 
 Another thing that is good to mention, is if your BRepType is Void, all the face normals must point into the void.
 
-
-
-
-
-Luiz Henrique Cassettari
-
-ricaun.com - Revit API Developer
-
-AppLoader EasyConduit WireInConduit ConduitMaterial CircuitName ElectricalUtils
-Tags (0)
-Add tags
-Report
-MESSAGE 9 OF 9
-RPTHOMAS108
- Mentor RPTHOMAS108 in reply to: ricaun
-2023-06-07 09:04 AM
-Thanks @ricaun I drew it with AutoCAD after a couple of attempts at what I wanted to get across using pencil, paper and eraser (more eraser than pencil and paper).
+**Answer:** Thanks @ricaun I drew it with AutoCAD after a couple of attempts at what I wanted to get across using pencil, paper and eraser (more eraser than pencil and paper).
 
 
 
@@ -480,9 +365,9 @@ In this D4 is much simpler to use TessellatedFace.
 
 
 
-var shapeBuilder = TessellatedShapeCreatorUtils.Create(builder =>
+var shapeBuilder = TessellatedShapeCreatorUtils.Create(builder =&gt;
 {
-    var points = new List<XYZ>(4);
+    var points = new List&lt;XYZ&gt;(4);
     points.Add(new XYZ(0, 0, 0)); // 0 origin
     points.Add(new XYZ(1, 0, 0)); // 1 right
     points.Add(new XYZ(0, 1, 0)); // 2 back
@@ -504,7 +389,7 @@ Here is the full code: https://gist.github.com/ricaun/35baa2ed9f33de3487e46e4217
 
 public static class TessellatedShapeCreatorUtils
 {
-    public static TessellatedShapeBuilderResult Create(Action<TessellatedShapeBuilder> actionBuilder)
+    public static TessellatedShapeBuilderResult Create(Action&lt;TessellatedShapeBuilder&gt; actionBuilder)
     {
         TessellatedShapeBuilder builder = new TessellatedShapeBuilder();
         builder.Target = TessellatedShapeBuilderTarget.AnyGeometry;
@@ -537,13 +422,6 @@ receives a clear and succinct solution
 
 **Answer:** Use a subregion and hide it
 
-
-
-**Question:**
-
-<center>
-<img src="img/.jpg" alt="" title="" width="100"/> <!-- Pixel Height: 354 Pixel Width: 313 -->
-</center>
 
 
 **Question:**
