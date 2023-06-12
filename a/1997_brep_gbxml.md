@@ -72,8 +72,11 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### BRepBuilder
 
-####<a name="2"></a> BRepBuilder Analysis, Tips and Tricks
-####<a name="3"></a> Modify View Workset Editable
+An in-depth discussion of Revit geometry generation, Toposurface issue and a look at where the softeware development industry may be headed:
+
+- [BRepBuilder analysis, tips and tricks](#2)
+- [Modify view workset editable](#3)
+- [To code or not to code, that is the question](#4)
 
 ####<a name="2"></a> BRepBuilder Analysis, Tips and Tricks
 
