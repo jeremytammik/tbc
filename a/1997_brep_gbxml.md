@@ -362,7 +362,7 @@ In my code, the boundaries of the surfaces are null as well, never have a proble
 
 For a simple face, it is possible to use `TessellatedShapeBuilder`: you can create a Solid, or a Mesh if that fails.
 
-In this D4 is much simpler to use TessellatedFace.
+In this `D4` is much simpler to use than TessellatedFace &ndash; `D4` as in tetrahedron, a shape with 4 flat faces, a dice with 4 faces, or a `D4` if you are familiar with dice and RPG. 😀
 
 <pre class="prettyprint">
 var shapeBuilder
@@ -448,7 +448,7 @@ Supervised a project 2 week ago.
 Two programmers were hired to create an MVP.
 I have worked with both before:
 
-- Alex from Germany. 100% code. 19 years' experience.
+- Alex from Germany. 100% code. 19 years experience.
 - Hamid from Pakistan. Code + Copilot + GPT-4 + no-code. 4 years experience.
 
 What do you think happened?
