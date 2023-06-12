@@ -386,7 +386,7 @@ var shapeBuilder
     builder.AddFace(new TessellatedFace(new[] {
       points[2], points[0], points[3] }, materialId));
   });
-<pre>
+</pre>
 
 Here is
 the [full code of TessellatedShapeCreatorUtils.cs implementing this utility class](https://gist.github.com/ricaun/35baa2ed9f33de3487e46e4217b5e8bd)
@@ -408,7 +408,7 @@ public static class TessellatedShapeCreatorUtils
     return result;
   }
 }
-<pre>
+</pre>
 
 If you are working with a Revit surface, `BRepBuilder` is the way to go.
 
@@ -421,11 +421,4 @@ receives a clear and succinct solution
 **Question:** Is there any way to change an interior point to a boundary point or vise versa using Revit's API? I want to do this so I can display the boundary of the topography I have generated correctly. I can't seem to find any resources discussing this topic.
 
 **Answer:** Use a subregion and hide it
-
-
-
-**Question:**
-
-**Answer:**
-
 

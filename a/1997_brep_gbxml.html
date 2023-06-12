@@ -315,36 +315,27 @@ an example that does work.</p>
 
     End Sub
   End Class
-<pre>
+</pre>
 
-**Response:** It took me a while to figure out how the edges and faces should be added before the detail explanation and sample code reaches me.
-Thank you very much for your effort.
-
-That is a really cool image; did you create it or you found in some Revit API presentation?
-
-Is kinda missing a Four-sided dice in that image 😀
-
-Another thing that is good to mention, is if your BRepType is Void, all the face normals must point into the void.
-
-**Answer:** Thanks @ricaun I drew it with AutoCAD after a couple of attempts at what I wanted to get across using pencil, paper and eraser (more eraser than pencil and paper).
-
-I'll have to check how important it is to set the boundaries of the surfaces.
-I'm sure I noticed previously and the other day that just specifying null may create a performance issue in Revit after the direct shape exists.
-
-The best thing about the BRepBuilder in my view is that you can create single face solids. So all those API functions specific to the face class can be used on such.
-
-**Answer:** Regarding the boundaries, you say:
-
-> I'll have to check how important it is to set the boundaries of the surfaces. I'm sure I noticed previously and the other day that just specifying null may create a performance issue in Revit after the direct shape exists.
-
-In my code, the boundaries of the surfaces are null as well, never have a problem but the most complex thing I did was create a copy of a Solid to change the Material. Works, but reordering and reversing each edge is painful.
-
-> @RPTHOMAS108 wrote: The best thing about the BRepBuilder in my view is that you can create single face solids. So all those API functions specific to the face class can be used on such.
-
-For a simple face, it is possible to use `TessellatedShapeBuilder`: you can create a Solid, or a Mesh if that fails.
-
-In this D4 is much simpler to use TessellatedFace.
-
+<p><strong>Response:</strong> It took me a while to figure out how the edges and faces should be added before the detail explanation and sample code reaches me.
+Thank you very much for your effort.</p>
+<p>That is a really cool image; did you create it or you found in some Revit API presentation?</p>
+<p>Is kinda missing a Four-sided dice in that image 😀</p>
+<p>Another thing that is good to mention, is if your BRepType is Void, all the face normals must point into the void.</p>
+<p><strong>Answer:</strong> Thanks @ricaun I drew it with AutoCAD after a couple of attempts at what I wanted to get across using pencil, paper and eraser (more eraser than pencil and paper).</p>
+<p>I'll have to check how important it is to set the boundaries of the surfaces.
+I'm sure I noticed previously and the other day that just specifying null may create a performance issue in Revit after the direct shape exists.</p>
+<p>The best thing about the BRepBuilder in my view is that you can create single face solids. So all those API functions specific to the face class can be used on such.</p>
+<p><strong>Answer:</strong> Regarding the boundaries, you say:</p>
+<blockquote>
+<p>I'll have to check how important it is to set the boundaries of the surfaces. I'm sure I noticed previously and the other day that just specifying null may create a performance issue in Revit after the direct shape exists.</p>
+</blockquote>
+<p>In my code, the boundaries of the surfaces are null as well, never have a problem but the most complex thing I did was create a copy of a Solid to change the Material. Works, but reordering and reversing each edge is painful.</p>
+<blockquote>
+<p>@RPTHOMAS108 wrote: The best thing about the BRepBuilder in my view is that you can create single face solids. So all those API functions specific to the face class can be used on such.</p>
+</blockquote>
+<p>For a simple face, it is possible to use <code>TessellatedShapeBuilder</code>: you can create a Solid, or a Mesh if that fails.</p>
+<p>In this D4 is much simpler to use TessellatedFace.</p>
 <pre class="prettyprint">
 var shapeBuilder
   = TessellatedShapeCreatorUtils.Create(
@@ -370,11 +361,10 @@ var shapeBuilder
     builder.AddFace(new TessellatedFace(new[] {
       points[2], points[0], points[3] }, materialId));
   });
-<pre>
+</pre>
 
-Here is
-the [full code of TessellatedShapeCreatorUtils.cs implementing this utility class](https://gist.github.com/ricaun/35baa2ed9f33de3487e46e4217b5e8bd)
-
+<p>Here is
+the <a href="https://gist.github.com/ricaun/35baa2ed9f33de3487e46e4217b5e8bd">full code of TessellatedShapeCreatorUtils.cs implementing this utility class</a></p>
 <pre class="prettyprint">
 public static class TessellatedShapeCreatorUtils
 {
@@ -392,22 +382,12 @@ public static class TessellatedShapeCreatorUtils
     return result;
   }
 }
-<pre>
+</pre>
 
-If you are working with a Revit surface, `BRepBuilder` is the way to go.
-
-####<a name="3"></a> Modify View Workset Editable
-
-The long-standing question
-on [Toposurface &ndash Change interior point to boundary point](https://forums.autodesk.com/t5/revit-api-forum/toposurface-change-interior-point-to-boundary-point/m-p/12015969) finally
-receives a clear and succinct solution
-
-**Question:** Is there any way to change an interior point to a boundary point or vise versa using Revit's API? I want to do this so I can display the boundary of the topography I have generated correctly. I can't seem to find any resources discussing this topic.
-
-**Answer:** Use a subregion and hide it
-
-
-
-**Question:**
-
-**Answer:**
+<p>If you are working with a Revit surface, <code>BRepBuilder</code> is the way to go.</p>
+<h4><a name="3"></a> Modify View Workset Editable</h4>
+<p>The long-standing question
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/toposurface-change-interior-point-to-boundary-point/m-p/12015969">Toposurface &amp;ndash Change interior point to boundary point</a> finally
+receives a clear and succinct solution</p>
+<p><strong>Question:</strong> Is there any way to change an interior point to a boundary point or vise versa using Revit's API? I want to do this so I can display the boundary of the topography I have generated correctly. I can't seem to find any resources discussing this topic.</p>
+<p><strong>Answer:</strong> Use a subregion and hide it</p>
