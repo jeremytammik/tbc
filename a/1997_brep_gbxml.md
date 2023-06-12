@@ -6,6 +6,8 @@
 
 <!---
 
+brepbuilder
+
 - BRepBuilder fails on very simple example
   https://forums.autodesk.com/t5/revit-api-forum/brepbuilder-fails-on-very-simple-example/m-p/12015942#M71909
   /Users/jta/a/doc/revit/tbc/git/a/img/rpt_brep_organisation.png
@@ -27,11 +29,12 @@ twitter:
 
  the @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS
 
-&ndash;
-...
+An in-depth discussion of Revit geometry generation, a Toposurface issue and a look at where the software development industry may be headed
+&ndash; BRepBuilder analysis, tips and tricks
+&ndash; Modify view workset editable
+&ndash; To code or not to code, that is the question...
 
 linkedin:
-
 
 #BIM #DynamoBIM #AutodeskAPS #Revit #API #IFC #SDK #Autodesk #AEC #adsk
 
@@ -44,7 +47,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### BRepBuilder
+### BRepBuilder and Toposurface Interior
 
 An in-depth discussion of Revit geometry generation, a Toposurface issue and a look at where the software development industry may be headed:
 
