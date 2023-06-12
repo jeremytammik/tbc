@@ -175,198 +175,194 @@ I organised the above original into the below edge orders and directions and it 
 </center>
 
 <pre class="prettyprint">
-Private Function Obj_230606a(ByVal commandData As Autodesk.Revit.UI.ExternalCommandData,
-ByRef message As String, ByVal elements As Autodesk.Revit.DB.ElementSet) As Result
-        Dim UIApp As UIApplication = commandData.Application
-        Dim UIDoc As UIDocument = commandData.Application.ActiveUIDocument
-        If UIDoc Is Nothing Then Return Result.Cancelled Else
-        Dim IntDoc As Document = UIDoc.Document
+  Private Function Obj_230606a( _
+    ByVal commandData As ExternalCommandData,
+    ByRef message As String,
+    ByVal elements As ElementSet) As Result
 
-        'Only needs 6 edges
-        'Set on triangle if an edge of that triangle is reversed or not
-        'Each edge has two faces the edge should be reversed on one face and not on the other
-        'Outer loops should be anticlockwise with respect to normal
+    Dim UIApp As UIApplication = commandData.Application
+    Dim UIDoc As UIDocument = commandData.Application.ActiveUIDocument
+    If UIDoc Is Nothing Then Return Result.Cancelled Else
+    Dim IntDoc As Document = UIDoc.Document
 
-        Dim A As New TriangleSide(1, 0)
-        Dim B As New TriangleSide(0, 2)
-        Dim C As New TriangleSide(2, 1)
-        Dim D As New TriangleSide(1, 3)
-        Dim E As New TriangleSide(3, 0)
-        Dim F As New TriangleSide(3, 2)
+    'Only needs 6 edges
+    'Set on triangle if an edge of that triangle is reversed or not
+    'Each edge has two faces the edge should be reversed on one face and not on the other
+    'Outer loops should be anticlockwise with respect to normal
 
-        Dim T_ABC As New Triangle(A, B, C, New Boolean(2) {False, False, False})
-        Dim T_ADE As New Triangle(A, D, E, New Boolean(2) {True, False, False})
-        Dim T_BEF As New Triangle(B, E, F, New Boolean(2) {True, True, False})
-        Dim T_CFD As New Triangle(C, F, D, New Boolean(2) {True, True, True})
+    Dim A As New TriangleSide(1, 0)
+    Dim B As New TriangleSide(0, 2)
+    Dim C As New TriangleSide(2, 1)
+    Dim D As New TriangleSide(1, 3)
+    Dim E As New TriangleSide(3, 0)
+    Dim F As New TriangleSide(3, 2)
 
-        Dim Triangles As Triangle() = New Triangle(3) {T_ABC, T_ADE, T_BEF, T_CFD}
-        Dim Edges As TriangleSide() = New TriangleSide(5) {A, B, C, D, E, F}
+    Dim T_ABC As New Triangle(A, B, C, New Boolean(2) {False, False, False})
+    Dim T_ADE As New Triangle(A, D, E, New Boolean(2) {True, False, False})
+    Dim T_BEF As New Triangle(B, E, F, New Boolean(2) {True, True, False})
+    Dim T_CFD As New Triangle(C, F, D, New Boolean(2) {True, True, True})
 
-        'The coords
-        Dim X As Double = 1
-        Dim Y As Double = 1
-        Dim Z As Double = 1
+    Dim Triangles As Triangle() = New Triangle(3) {T_ABC, T_ADE, T_BEF, T_CFD}
+    Dim Edges As TriangleSide() = New TriangleSide(5) {A, B, C, D, E, F}
 
-        Dim Points As XYZ() = New XYZ(3) {New XYZ(0, 0, 0),
-                                          New XYZ(X, 0, 0),
-                                          New XYZ(0, Y, 0),
-                                          New XYZ(0, 0, Z)}
+    'The coords
+    Dim X As Double = 1
+    Dim Y As Double = 1
+    Dim Z As Double = 1
 
-        Dim BrepB As New BRepBuilder(BRepType.Solid)
-        'Faces
-        For i = 0 To Triangles.Length - 1
-            Dim T As Triangle = Triangles(i)
-            Dim P As Plane = T.GetPlane(Points)
-            Triangles(i).FaceId = BrepB.AddFace(BRepBuilderSurfaceGeometry.Create(P, Nothing), False)
-        Next
+    Dim Points As XYZ() = New XYZ(3) {
+      New XYZ(0, 0, 0),
+      New XYZ(X, 0, 0),
+      New XYZ(0, Y, 0),
+      New XYZ(0, 0, Z)}
 
-        'Edges
-        For i = 0 To Edges.Length - 1
-            Dim ed As TriangleSide = Edges(i)
-            Edges(i).EdgeId = BrepB.AddEdge(BRepBuilderEdgeGeometry.Create(ed.GetXYZ(0, Points), ed.GetXYZ(1, Points)))
-        Next
+    Dim BrepB As New BRepBuilder(BRepType.Solid)
+    'Faces
+    For i = 0 To Triangles.Length - 1
+      Dim T As Triangle = Triangles(i)
+      Dim P As Plane = T.GetPlane(Points)
+      Triangles(i).FaceId = BrepB.AddFace(BRepBuilderSurfaceGeometry.Create(P, Nothing), False)
+    Next
 
-        'Face loops
-        For i = 0 To Triangles.Length - 1
-            Dim T As Triangle = Triangles(i)
-            Triangles(i).LoopId = BrepB.AddLoop(T.FaceId)
-        Next
+    'Edges
+    For i = 0 To Edges.Length - 1
+      Dim ed As TriangleSide = Edges(i)
+      Edges(i).EdgeId = BrepB.AddEdge(BRepBuilderEdgeGeometry.Create(ed.GetXYZ(0, Points), ed.GetXYZ(1, Points)))
+    Next
 
-        'co-edges
-        For i = 0 To Triangles.Length - 1
-            Dim T As Triangle = Triangles(i)
+    'Face loops
+    For i = 0 To Triangles.Length - 1
+      Dim T As Triangle = Triangles(i)
+      Triangles(i).LoopId = BrepB.AddLoop(T.FaceId)
+    Next
 
-            For ia = 0 To 2
-                Dim ed As TriangleSide = T(ia)
-                BrepB.AddCoEdge(T.LoopId, ed.EdgeId, T.Sides_Reversed(ia))
-            Next
-            BrepB.FinishLoop(T.LoopId)
-            BrepB.FinishFace(T.FaceId)
-        Next
+    'co-edges
+    For i = 0 To Triangles.Length - 1
+      Dim T As Triangle = Triangles(i)
 
-        Dim Outcome As BRepBuilderOutcome = BrepB.Finish
+      For ia = 0 To 2
+        Dim ed As TriangleSide = T(ia)
+        BrepB.AddCoEdge(T.LoopId, ed.EdgeId, T.Sides_Reversed(ia))
+      Next
+      BrepB.FinishLoop(T.LoopId)
+      BrepB.FinishFace(T.FaceId)
+    Next
 
-        Using Tx As New Transaction(IntDoc, "DS")
-            If Tx.Start = TransactionStatus.Started Then
+    Dim Outcome As BRepBuilderOutcome = BrepB.Finish
 
-                Dim DS As DirectShape = DirectShape.CreateElement(IntDoc, New ElementId(BuiltInCategory.OST_GenericModel))
-                Dim S As Solid = BrepB.GetResult()
-                DS.SetShape(New GeometryObject() {S}.ToList)
+    Using Tx As New Transaction(IntDoc, "DS")
+      If Tx.Start = TransactionStatus.Started Then
 
-                Tx.Commit()
-            End If
-        End Using
+        Dim DS As DirectShape = DirectShape.CreateElement(IntDoc, New ElementId(BuiltInCategory.OST_GenericModel))
+        Dim S As Solid = BrepB.GetResult()
+        DS.SetShape(New GeometryObject() {S}.ToList)
 
-        Return Result.Succeeded
+        Tx.Commit()
+      End If
+    End Using
+
+    Return Result.Succeeded
+  End Function
+
+  Public Class TriangleSide
+    Public Property EdgeId As BRepBuilderGeometryId
+    Public ReadOnly Property N1 As Integer
+    Public ReadOnly Property N2 As Integer
+    Public Function GetXYZ(Idx As Integer, Points As XYZ()) As XYZ
+      If Idx = 0 Then
+        Return Points(N1)
+      ElseIf Idx = 1 Then
+        Return Points(N2)
+      Else
+        Throw New ArgumentOutOfRangeException
+      End If
+    End Function
+    Public Sub New(Node1 As Integer, Node2 As Integer)
+      N1 = Node1
+      N2 = Node2
+    End Sub
+  End Class
+
+  Public Class Triangle
+    Public Property LoopId As BRepBuilderGeometryId
+    Public Property FaceId As BRepBuilderGeometryId
+    Public ReadOnly Property Sides_Reversed As Boolean()
+    Public ReadOnly Property S1 As TriangleSide
+    Public ReadOnly Property S2 As TriangleSide
+    Public ReadOnly Property S3 As TriangleSide
+
+    Public Function GetPlane(Points As XYZ()) As Plane
+
+      'The edge ends could be reversed for a triangles so use mid points to ensure points are unique
+      'and no colinear
+      Dim Mid1 As XYZ = (Points(S1.N1) + Points(S1.N2)) / 2
+      Dim Mid2 As XYZ = (Points(S2.N1) + Points(S2.N2)) / 2
+      Dim Mid3 As XYZ = (Points(S3.N1) + Points(S3.N2)) / 2
+
+      Return Plane.CreateByThreePoints(Mid1, Mid2, Mid3)
     End Function
 
+    Default Public ReadOnly Property Side(Idx As Integer) As TriangleSide
+      Get
+        If Idx = 0 Then
+          Return S1
+        ElseIf Idx = 1 Then
+          Return S2
+        ElseIf Idx = 2 Then
+          Return S3
+        Else
+          Throw New ArgumentOutOfRangeException
+        End If
+      End Get
+    End Property
 
-    Public Class TriangleSide
-        Public Property EdgeId As BRepBuilderGeometryId
-        Public ReadOnly Property N1 As Integer
-        Public ReadOnly Property N2 As Integer
-        Public Function GetXYZ(Idx As Integer, Points As XYZ()) As XYZ
-            If Idx = 0 Then
-                Return Points(N1)
-            ElseIf Idx = 1 Then
-                Return Points(N2)
-            Else
-                Throw New ArgumentOutOfRangeException
-            End If
-        End Function
-        Public Sub New(Node1 As Integer, Node2 As Integer)
-            N1 = Node1
-            N2 = Node2
-        End Sub
-    End Class
-    Public Class Triangle
-        Public Property LoopId As BRepBuilderGeometryId
-        Public Property FaceId As BRepBuilderGeometryId
-        Public ReadOnly Property Sides_Reversed As Boolean()
-        Public ReadOnly Property S1 As TriangleSide
-        Public ReadOnly Property S2 As TriangleSide
-        Public ReadOnly Property S3 As TriangleSide
+    Public Sub New(Side1 As TriangleSide, Side2 As TriangleSide, Side3 As TriangleSide, Reversed As Boolean())
+      S1 = Side1
+      S2 = Side2
+      S3 = Side3
 
-        Public Function GetPlane(Points As XYZ()) As Plane
+      If Reversed.Length &lt;&gt; 3 Then
+        Throw New ArgumentOutOfRangeException
+      End If
+      Sides_Reversed = Reversed
 
-            'The edge ends could be reversed for a triangles so use mid points to ensure points are unique
-            'and no colinear
-            Dim Mid1 As XYZ = (Points(S1.N1) + Points(S1.N2)) / 2
-            Dim Mid2 As XYZ = (Points(S2.N1) + Points(S2.N2)) / 2
-            Dim Mid3 As XYZ = (Points(S3.N1) + Points(S3.N2)) / 2
+    End Sub
+  End Class
+<pre>
 
-            Return Plane.CreateByThreePoints(Mid1, Mid2, Mid3)
-        End Function
-        Default Public ReadOnly Property Side(Idx As Integer) As TriangleSide
-            Get
-                If Idx = 0 Then
-                    Return S1
-                ElseIf Idx = 1 Then
-                    Return S2
-                ElseIf Idx = 2 Then
-                    Return S3
-                Else
-                    Throw New ArgumentOutOfRangeException
-                End If
-            End Get
-        End Property
-        Public Sub New(Side1 As TriangleSide, Side2 As TriangleSide, Side3 As TriangleSide, Reversed As Boolean())
-            S1 = Side1
-            S2 = Side2
-            S3 = Side3
-
-            If Reversed.Length &lt;&gt; 3 Then
-                Throw New ArgumentOutOfRangeException
-            End If
-            Sides_Reversed = Reversed
-
-        End Sub
-    End Class
-<pre
-
-**Response:** It took me a while to figure out how the edges and faces should be added before the detail explanation and sample code reaches me. Thank you very much for your effort.
+**Response:** It took me a while to figure out how the edges and faces should be added before the detail explanation and sample code reaches me.
+Thank you very much for your effort.
 
 That's a really cool image; did you create it or you found in some Revit API presentation?
 
 Is kinda missing a Four-sided dice in that image 😀
 
-
-
 Another thing that is good to mention, is if your BRepType is Void, all the face normals must point into the void.
 
 **Answer:** Thanks @ricaun I drew it with AutoCAD after a couple of attempts at what I wanted to get across using pencil, paper and eraser (more eraser than pencil and paper).
 
-
-
-I'll have to check how important it is to set the boundaries of the surfaces. I'm sure I noticed previously and the other day that just specifying null may create a performance issue in Revit after the direct shape exists.
-
-
+I'll have to check how important it is to set the boundaries of the surfaces.
+I'm sure I noticed previously and the other day that just specifying null may create a performance issue in Revit after the direct shape exists.
 
 The best thing about the BRepBuilder in my view is that you can create single face solids. So all those API functions specific to the face class can be used on such.
 
+**Answer:** Regarding the boundaries, you say:
 
- ricaun in reply to: RPTHOMAS108
-2023-06-07 01:49 PM
-@RPTHOMAS108 wrote:
-I'll have to check how important it is to set the boundaries of the surfaces. I'm sure I noticed previously and the other day that just specifying null may create a performance issue in Revit after the direct shape exists.
+> I'll have to check how important it is to set the boundaries of the surfaces. I'm sure I noticed previously and the other day that just specifying null may create a performance issue in Revit after the direct shape exists.
 
 In my code, the boundaries of the surfaces are null as well, never have a problem but the most complex thing I did was create a copy of a Solid to change the Material. Works, but reordering and reversing each edge is painful.
 
+> @RPTHOMAS108 wrote: The best thing about the BRepBuilder in my view is that you can create single face solids. So all those API functions specific to the face class can be used on such.
 
-
-@RPTHOMAS108 wrote:
-The best thing about the BRepBuilder in my view is that you can create single face solids. So all those API functions specific to the face class can be used on such.
-
-For a simple face is possible to use TessellatedShapeBuilder, you can create a Solid or Mesh is fails.
+For a simple face, it is possible to use `TessellatedShapeBuilder`: you can create a Solid, or a Mesh if that fails.
 
 In this D4 is much simpler to use TessellatedFace.
 
-
-
-
-
-var shapeBuilder = TessellatedShapeCreatorUtils.Create(builder =&gt;
-{
+<pre class="prettyprint">
+var shapeBuilder
+  = TessellatedShapeCreatorUtils.Create(
+    builder =&gt;
+  {
     var points = new List&lt;XYZ&gt;(4);
     points.Add(new XYZ(0, 0, 0)); // 0 origin
     points.Add(new XYZ(1, 0, 0)); // 1 right
@@ -374,45 +370,46 @@ var shapeBuilder = TessellatedShapeCreatorUtils.Create(builder =&gt;
     points.Add(new XYZ(0, 0, 1)); // 3 top
 
     var materialId = ElementId.InvalidElementId;
-    builder.AddFace(new TessellatedFace(new[] { points[2], points[1], points[0] }, materialId)); // bottom face
-    builder.AddFace(new TessellatedFace(new[] { points[0], points[1], points[3] }, materialId)); // front face
-    builder.AddFace(new TessellatedFace(new[] { points[1], points[2], points[3] }, materialId)); // diagonal face
-    builder.AddFace(new TessellatedFace(new[] { points[2], points[0], points[3] }, materialId)); // left face
-});
+    // bottom face
+    builder.AddFace(new TessellatedFace(new[] {
+      points[2], points[1], points[0] }, materialId));
+    // front face
+    builder.AddFace(new TessellatedFace(new[] {
+      points[0], points[1], points[3] }, materialId));
+    // diagonal face
+    builder.AddFace(new TessellatedFace(new[] {
+      points[1], points[2], points[3] }, materialId));
+    // left face
+    builder.AddFace(new TessellatedFace(new[] {
+      points[2], points[0], points[3] }, materialId));
+  });
+<pre>
 
+Here is
+the [full code of TessellatedShapeCreatorUtils.cs implementing this utility class](https://gist.github.com/ricaun/35baa2ed9f33de3487e46e4217b5e8bd)
 
-
-
-Here is the full code: https://gist.github.com/ricaun/35baa2ed9f33de3487e46e4217b5e8bd with the TessellatedShapeCreatorUtils util.
-
-
-
+<pre class="prettyprint">
 public static class TessellatedShapeCreatorUtils
 {
-    public static TessellatedShapeBuilderResult Create(Action&lt;TessellatedShapeBuilder&gt; actionBuilder)
-    {
-        TessellatedShapeBuilder builder = new TessellatedShapeBuilder();
-        builder.Target = TessellatedShapeBuilderTarget.AnyGeometry;
-        builder.Fallback = TessellatedShapeBuilderFallback.Mesh;
-        builder.OpenConnectedFaceSet(true);
-        actionBuilder?.Invoke(builder);
-        builder.CloseConnectedFaceSet();
-        builder.Build();
-        TessellatedShapeBuilderResult result = builder.GetBuildResult();
-        return result;
-    }
+  public static TessellatedShapeBuilderResult Create(
+    Action&lt;TessellatedShapeBuilder&gt; actionBuilder)
+  {
+    TessellatedShapeBuilder builder = new TessellatedShapeBuilder();
+    builder.Target = TessellatedShapeBuilderTarget.AnyGeometry;
+    builder.Fallback = TessellatedShapeBuilderFallback.Mesh;
+    builder.OpenConnectedFaceSet(true);
+    actionBuilder?.Invoke(builder);
+    builder.CloseConnectedFaceSet();
+    builder.Build();
+    TessellatedShapeBuilderResult result = builder.GetBuildResult();
+    return result;
+  }
 }
+<pre>
 
+If you are working with a Revit surface, `BRepBuilder` is the way to go.
 
-If you are working with a Revit surface BRepBuilder is the way to go.
-
-
-
-####<a name="3"></a>
-
-####<a name="4"></a>
-
-####<a name="5"></a> Modify View Workset Editable
+####<a name="3"></a> Modify View Workset Editable
 
 The long-standing question
 on [Toposurface &ndash Change interior point to boundary point](https://forums.autodesk.com/t5/revit-api-forum/toposurface-change-interior-point-to-boundary-point/m-p/12015969) finally
