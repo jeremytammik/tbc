@@ -30,7 +30,7 @@ twitter:
  the @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS
 
 An in-depth discussion of Revit geometry generation, a Toposurface issue and a look at where the software development industry may be headed
-&ndash; BRepBuilder analysis, tips and tricks
+&ndash; BRepBuilder organisation
 &ndash; Modify view workset editable
 &ndash; To code or not to code, that is the question...
 
@@ -51,11 +51,11 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 An in-depth discussion of Revit geometry generation, a Toposurface issue and a look at where the software development industry may be headed:
 
-- [BRepBuilder analysis, tips and tricks](#2)
+- [BRepBuilder organisation](#2)
 - [Modify view workset editable](#3)
 - [To code or not to code, that is the question](#4)
 
-####<a name="2"></a> BRepBuilder Analysis, Tips and Tricks
+####<a name="2"></a> BRepBuilder Organisation
 
 Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas
 and Luiz Henrique [@ricaun](https://github.com/ricaun) Cassettari
