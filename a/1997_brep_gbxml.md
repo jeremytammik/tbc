@@ -61,7 +61,9 @@ An updated Revit SDK, an in-depth discussion of Revit geometry generation, a Top
 
 The age-old `developrevit` [Revit Developer Centre](http://autodesk.com/developrevit) shortcut
 now redirects to a new target aligned with the rest of the Autodesk Platform Service APS APIs,
-to [aps.autodesk.com/developer/overview/revit](https://aps.autodesk.com/developer/overview/revit).
+to
+
+- [aps.autodesk.com/developer/overview/revit](https://aps.autodesk.com/developer/overview/revit)
 
 We also updated the Revit SDK for Revit 2024 on May 30, 2023, to fix some of the issues I
 described in April [compiling the Revit 2024 SDK samples](https://thebuildingcoder.typepad.com/blog/2023/04/nice-accelerator-and-compiling-the-revit-2024-sdk.html#3) and
