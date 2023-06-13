@@ -27,12 +27,13 @@ brepbuilder
 
 twitter:
 
+
  the @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS
 
 An update for the Revit SDK, an in-depth discussion of Revit geometry generation, a Toposurface issue and a hint at where the software development industry may be headed
 &ndash; Revit SDK update
 &ndash; BRepBuilder organisation
-&ndash; Modify view workset editable
+&ndash; Change Toposurface interior point to boundary
 &ndash; To code or not to code, that is the question...
 
 linkedin:
@@ -54,7 +55,7 @@ An updated Revit SDK, an in-depth discussion of Revit geometry generation, a Top
 
 - [Revit SDK Update](#1)
 - [BRepBuilder organisation](#2)
-- [Modify view workset editable](#3)
+- [Change Toposurface interior point to boundary](#3)
 - [To code or not to code, that is the question](#4)
 
 ####<a name="1"></a> Revit SDK Update
