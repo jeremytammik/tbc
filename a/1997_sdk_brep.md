@@ -27,8 +27,7 @@ brepbuilder
 
 twitter:
 
-
- the @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS
+An update for the @AutodeskRevit #RevitAPI SDK, an in-depth discussion of BRepBuilder organisation for  geometry generation, a Toposurface issue and a hint at where the software development industry may be headed #BIM @DynamoBIM @AutodeskAPS https://bit.ly/breporganisation
 
 An update for the Revit SDK, an in-depth discussion of Revit geometry generation, a Toposurface issue and a hint at where the software development industry may be headed
 &ndash; Revit SDK update
@@ -37,6 +36,15 @@ An update for the Revit SDK, an in-depth discussion of Revit geometry generation
 &ndash; To code or not to code, that is the question...
 
 linkedin:
+
+An update for the #RevitAPI SDK, an in-depth discussion of BRepBuilder organisation for geometry generation, a Toposurface issue and a hint at where the software development industry may be headed
+
+https://bit.ly/breporganisation
+
+- Revit SDK update
+- BRepBuilder organisation
+- Change Toposurface interior point to boundary
+- To code or not to code, that is the question...
 
 #BIM #DynamoBIM #AutodeskAPS #Revit #API #IFC #SDK #Autodesk #AEC #adsk
 
