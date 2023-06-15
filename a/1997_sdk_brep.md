@@ -74,7 +74,7 @@ to
 
 - [aps.autodesk.com/developer/overview/revit](https://aps.autodesk.com/developer/overview/revit)
 
-We also updated the Revit SDK for Revit 2024 on May 30, 2023, to fix some of the issues I
+There, you can now find the new Revit SDK for Revit 2024 updated on May 30, 2023, to fix some of the issues I
 described in April [compiling the Revit 2024 SDK samples](https://thebuildingcoder.typepad.com/blog/2023/04/nice-accelerator-and-compiling-the-revit-2024-sdk.html#3) and
 subsequently reported in the ticket REVIT-206304 *Update RvtSamples.txt for Revit 2024 SDK*.
 
