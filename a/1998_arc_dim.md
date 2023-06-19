@@ -217,7 +217,7 @@ In summary, the tests above include:
 
 My interpretation is that the chain dimensioning does not use the specified endpoint reference in the way I expect.
 
-Rather, the most extreme endpoint towards the start or end of the curve is dynamically determined, resulting in the endpoint in one direction and the midpoint in the other.
+Rather, the most extreme endpoint towards the start or end of the curve is dynamically determined depending on the dimension line orientation, resulting in the endpoint in one direction and the midpoint in the other.
 
 
 ####<a name="3"></a>
