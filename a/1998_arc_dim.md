@@ -7,65 +7,6 @@
 <!---
 
 - dimension arc endpoint references
-/Users/jta/a/doc/revit/tbc/git/a/img/dim_180_deg_arc_end_point_ref_0_1.png
-<pre class="code">
-  XYZ vw2 = r * vz;
-  XYZ vh2 = r * fnwcs.CrossProduct(vz);
-  Arc arc = Arc.Create(p - vw2, p + vh2, p + vw2);
-  curve = doc.Create.NewModelCurve( arc, sketchPlaneForTap);
-
-  // Vertical
-
-  ra.Clear();
-  ra.Append(mc_front_left.GeometryCurve.GetEndPointReference(0));
-  ra.Append(curve.GeometryCurve.GetEndPointReference(0));
-  ra.Append(curve.GeometryCurve.GetEndPointReference(1));
-  ra.Append(mc_front_left.GeometryCurve.GetEndPointReference(1));
-  doc.Create.NewDimension(viewForDimension, Line.CreateUnbound(pForVerticalDimension, vz), ra);
-
-  // Horizontal
-
-  ra.Clear();
-  ra.Append(ductEdgeForDimHor.GeometryCurve.GetEndPointReference(0));
-  ra.Append(curve.GeometryCurve.GetEndPointReference(0));
-  ra.Append(curve.GeometryCurve.GetEndPointReference(1));
-  ra.Append(ductEdgeForDimHor.GeometryCurve.GetEndPointReference(1));
-  doc.Create.NewDimension(viewForDimension, Line.CreateUnbound(pForHorDim, vForHorDim), ra);
-</pre>
-dim_two_180_deg_arcs_arc0ref0_arc1ref0.png
-vertical ok, horizontal ref0 collapse into the same point
-<pre>
-          XYZ vw2 = r * vz;
-          XYZ vh2 = r * fnwcs.CrossProduct(vz);
-          Arc arc = Arc.Create(p - vw2, p + vh2, p + vw2);
-          curve = doc.Create.NewModelCurve( arc, sketchPlaneForTap);
-          Reference r1 = curve.GeometryCurve.GetEndPointReference(0);
-          arc = Arc.Create(p + vw2, p - vh2, p - vw2);
-          curve = doc.Create.NewModelCurve(arc, sketchPlaneForTap);
-          Reference r2 = curve.GeometryCurve.GetEndPointReference(0);
-
-          // Vertical
-
-          ra.Clear();
-          ra.Append(mc_front_left.GeometryCurve.GetEndPointReference(0));
-          ra.Append(r1);
-          ra.Append(r2);
-          ra.Append(mc_front_left.GeometryCurve.GetEndPointReference(1));
-          doc.Create.NewDimension(viewForDimension, Line.CreateUnbound(pForVerticalDimension, vz), ra);
-
-          // Horizontal
-
-          ra.Clear();
-          ra.Append(ductEdgeForDimHor.GeometryCurve.GetEndPointReference(0));
-          ra.Append(r1);
-          ra.Append(r2);
-          ra.Append(ductEdgeForDimHor.GeometryCurve.GetEndPointReference(1));
-          doc.Create.NewDimension(viewForDimension, Line.CreateUnbound(pForHorDim, vForHorDim), ra);
-</pre>
-a0r0 a1r0 for vertical + a0r1 a1r1 for horizontal works:
-image + code
-
-
 
 
 twitter:
@@ -109,8 +50,8 @@ Chain dimensioning model line segments was straightforward, by simply adding all
 I attempted the same approach with arcs like this:
 
 <pre class="prettyprint">
-  Arc arc = Arc.Create(p - vw2, p + vh2, p + vw2);
-  curve = doc.Create.NewModelCurve( arc, sketchPlaneForTap);
+  arc = Arc.Create(p - vw2, p + vh2, p + vw2);
+  curve = doc.Create.NewModelCurve( arc, sketchPlane);
 
   // Vertical
 
@@ -140,11 +81,11 @@ To my surprise, this code creates dimensions to one endpoint and one midpoint of
 To obtain the other endpoint, I need to grab a reference from the second arc as well, like this:
 
 <pre class="prettyprint">
-  Arc arc = Arc.Create(p - vw2, p + vh2, p + vw2);
-  curve = doc.Create.NewModelCurve( arc, sketchPlaneForTap);
+  arc = Arc.Create(p - vw2, p + vh2, p + vw2);
+  curve = doc.Create.NewModelCurve( arc, sketchPlane);
   Reference r1 = curve.GeometryCurve.GetEndPointReference(0);
   arc = Arc.Create(p + vw2, p - vh2, p - vw2);
-  curve = doc.Create.NewModelCurve(arc, sketchPlaneForTap);
+  curve = doc.Create.NewModelCurve(arc, sketchPlane);
   Reference r2 = curve.GeometryCurve.GetEndPointReference(0);
 
   // Vertical
@@ -172,35 +113,36 @@ With this code, the vertical dimension correctly dimensions the circle diameter,
 <img src="img/dim_two_180_deg_arcs_a01_r0.png" alt="Arc dimensioning" title="Arc dimensioning" width="300"/>
 </center>
 
-So, finally, we arrive at the final solution with successful diameter chain dimensioning both horizontal and vertical by using both endpoint references of both arcs, specifying different endpoints for the horizontal and vertical direction:
+So, finally, we arrive at the working solution with successful diameter chain dimensioning both horizontal and vertical by using both endpoint references of both arcs, specifying different endpoints for the horizontal and vertical direction:
 
 <pre class="prettyprint">
-          Arc arc = Arc.Create(p - vw2, p + vh2, p + vw2);
-          curve = doc.Create.NewModelCurve( arc, sketchPlaneForTap);
-          Reference a0r0 = curve.GeometryCurve.GetEndPointReference(0);
-          Reference a0r1 = curve.GeometryCurve.GetEndPointReference(1);
-          arc = Arc.Create(p + vw2, p - vh2, p - vw2);
-          curve = doc.Create.NewModelCurve(arc, sketchPlaneForTap);
-          Reference a1r0 = curve.GeometryCurve.GetEndPointReference(0);
-          Reference a1r1 = curve.GeometryCurve.GetEndPointReference(1);
+  arc = Arc.Create(p - vw2, p + vh2, p + vw2);
+  curve = doc.Create.NewModelCurve( arc, sketchPlane);
+  Reference a0r0 = curve.GeometryCurve.GetEndPointReference(0);
+  Reference a0r1 = curve.GeometryCurve.GetEndPointReference(1);
 
-          // Vertical
+  arc = Arc.Create(p + vw2, p - vh2, p - vw2);
+  curve = doc.Create.NewModelCurve(arc, sketchPlane);
+  Reference a1r0 = curve.GeometryCurve.GetEndPointReference(0);
+  Reference a1r1 = curve.GeometryCurve.GetEndPointReference(1);
 
-          ra.Clear();
-          ra.Append(mc_front_left.GeometryCurve.GetEndPointReference(0));
-          ra.Append(a0r0);
-          ra.Append(a1r0);
-          ra.Append(mc_front_left.GeometryCurve.GetEndPointReference(1));
-          doc.Create.NewDimension(viewForDimension, Line.CreateUnbound(pForVerticalDimension, vz), ra);
+  // Vertical
 
-          // Horizontal
+  ra.Clear();
+  ra.Append(mc_front_left.GeometryCurve.GetEndPointReference(0));
+  ra.Append(a0r0);
+  ra.Append(a1r0);
+  ra.Append(mc_front_left.GeometryCurve.GetEndPointReference(1));
+  doc.Create.NewDimension(viewForDimension, Line.CreateUnbound(pForVerticalDimension, vz), ra);
 
-          ra.Clear();
-          ra.Append(ductEdgeForDimHor.GeometryCurve.GetEndPointReference(0));
-          ra.Append(a0r1);
-          ra.Append(a1r1);
-          ra.Append(ductEdgeForDimHor.GeometryCurve.GetEndPointReference(1));
-          doc.Create.NewDimension(viewForDimension, Line.CreateUnbound(pForHorDim, vForHorDim), ra);
+  // Horizontal
+
+  ra.Clear();
+  ra.Append(ductEdgeForDimHor.GeometryCurve.GetEndPointReference(0));
+  ra.Append(a0r1);
+  ra.Append(a1r1);
+  ra.Append(ductEdgeForDimHor.GeometryCurve.GetEndPointReference(1));
+  doc.Create.NewDimension(viewForDimension, Line.CreateUnbound(pForHorDim, vForHorDim), ra);
 </pre>
 
 The result is as desired:
