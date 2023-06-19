@@ -209,10 +209,15 @@ The result is as desired:
 <img src="img/dim_two_180_deg_arcs_a01_r01.png" alt="Arc dimensioning" title="Arc dimensioning" width="300"/>
 </center>
 
+In summary, the tests above include:
+
+- Arc 0, references 0 + 1
+- Arc 0 + 1, reference 0 on each
+- Arc 0 + 1, references 0 + 1, depending on the dimensioning orientation
+
 My interpretation is that the chain dimensioning does not use the specified endpoint reference in the way I expect.
 
 Rather, the most extreme endpoint towards the start or end of the curve is dynamically determined, resulting in the endpoint in one direction and the midpoint in the other.
-
 
 
 ####<a name="3"></a>
