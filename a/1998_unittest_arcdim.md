@@ -103,9 +103,7 @@ As said, OEM is a different situation altogether, where the product itself usual
 
 The Navisworks SDK is another example of a mixture of all the above.
 
-**Response:** This was a very helpful explanation.
-Thank you.
-
+Many thanks to Mikako and Kevin for the helpful explanation.
 
 ####<a name="4"></a> Arc Dimensioning
 
@@ -228,7 +226,7 @@ The result is as desired:
 In summary, the tests above include:
 
 - Arc 0, references 0 + 1 &ndash; both endpioints of one single arc
-- Arc 0 + 1, reference 0 &ndash; the start point of two arcs
+- Arc 0 + 1, reference 0 &ndash; the start points of two arcs
 - Arc 0 + 1, references 0 + 1 &ndash; start and end point of both arcs, depending on the dimensioning orientation
 
 My interpretation is that the chain dimensioning does not use the specified endpoint reference in the way I expect.
@@ -238,10 +236,10 @@ Rather, the most extreme endpoint towards the start or end of the curve is dynam
 
 ####<a name="5"></a> Rotate Your File
 
-[Rotate Your File](https://funct.app/) provides a handy little service to Safely send someone a file:
+[Rotate Your File](https://funct.app/) provides a handy little service to safely send someone a file:
 
 - [Start here](https://funct.app/start)
 - [Frequently asked questions](https://funct.app/faq)
 
-The FAQ is pleasantly readable, succinct, and includes nice descriptions of the design philosophy, GDPR, data collection, security and encryption aspects.
+The FAQ is pleasantly readable and succinct, including nice descriptions of the design philosophy, GDPR, data collection, security and encryption aspects.
 
