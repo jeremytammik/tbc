@@ -16,8 +16,12 @@ twitter:
 
 the @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS
 
-&ndash;
-...
+Revit add-in unit testing is becoming much more assessible, and now yet another toolkit is here.
+We clarify function and accessability of various Autodesk APIs and SDKs, look at programmatic dimensioning of circles in Revit and a minimalist secure file sharing tool
+&ndash; Revit add-in unit testing
+&ndash; API versus SDK
+&ndash; Arc dimensioning
+&ndash; Rotate your file...
 
 linkedin:
 
@@ -35,7 +39,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 ### Unit Testing and Arc Dimensioning
 
 Revit add-in unit testing is becoming much more assessible, and now yet another toolkit is here.
-We clarify function and accessability of various Autodesk APIs and SDKs, look at programmatic dimensioning of circles in Revit and a minimalist secure file sharing tool:
+We also clarify function and accessability of various Autodesk APIs and SDKs, look at programmatic dimensioning of circles in Revit and a minimalist secure file sharing tool:
 
 - [Revit add-in unit testing](#2)
 - [API versus SDK](#3)
@@ -65,7 +69,7 @@ For example, the AutoCAD C++ API ObjectARX requires a separate DLL separately, w
 For some other APIs, such as OMF and ReCap, you need to be a member of ADN.
 
 OEM is completely separate offering that you need to license
-from [Tech Soft 3D](https://www.techsoft3d.com/,.
+from [Tech Soft 3D](https://www.techsoft3d.com).
 
 **Answer 2:** It really varies a lot depending on the product.
 In the desktop world, the SDK usually provides the "access" and full "experience" to the API.
@@ -132,7 +136,7 @@ I attempted a similar approach with the arcs like this:
   ra.Append(curve.GeometryCurve.GetEndPointReference(0));
   ra.Append(curve.GeometryCurve.GetEndPointReference(1));
   ra.Append(mc_front_left.GeometryCurve.GetEndPointReference(1));
-  doc.Create.NewDimension(viewForDimension, Line.CreateUnbound(pForVerticalDimension, vz), ra);
+  doc.Create.NewDimension(viewForDimension, Line.CreateUnbound(pVert, vz), ra);
 
   // Horizontal
 
@@ -141,7 +145,7 @@ I attempted a similar approach with the arcs like this:
   ra.Append(curve.GeometryCurve.GetEndPointReference(0));
   ra.Append(curve.GeometryCurve.GetEndPointReference(1));
   ra.Append(ductEdgeForDimHor.GeometryCurve.GetEndPointReference(1));
-  doc.Create.NewDimension(viewForDimension, Line.CreateUnbound(pForHorDim, vForHorDim), ra);
+  doc.Create.NewDimension(viewForDimension, Line.CreateUnbound(pHor, vHor), ra);
 </pre>
 
 To my surprise, this code creates dimensions to one endpoint and one midpoint of the arc:
@@ -167,7 +171,7 @@ To obtain the other endpoint, I need to grab a reference from the second arc as 
   ra.Append(r1);
   ra.Append(r2);
   ra.Append(mc_front_left.GeometryCurve.GetEndPointReference(1));
-  doc.Create.NewDimension(viewForDimension, Line.CreateUnbound(pForVerticalDimension, vz), ra);
+  doc.Create.NewDimension(viewForDimension, Line.CreateUnbound(pVert, vz), ra);
 
   // Horizontal
 
@@ -176,7 +180,7 @@ To obtain the other endpoint, I need to grab a reference from the second arc as 
   ra.Append(r1);
   ra.Append(r2);
   ra.Append(ductEdgeForDimHor.GeometryCurve.GetEndPointReference(1));
-  doc.Create.NewDimension(viewForDimension, Line.CreateUnbound(pForHorDim, vForHorDim), ra);
+  doc.Create.NewDimension(viewForDimension, Line.CreateUnbound(pHor, vHor), ra);
 </pre>
 
 With this code, the vertical dimension correctly dimensions the circle diameter, but the horizontal dimensioning collapses the two endpoints into one:
@@ -205,7 +209,7 @@ So, finally, we arrive at the working solution with successful diameter chain di
   ra.Append(a0r0);
   ra.Append(a1r0);
   ra.Append(mc_front_left.GeometryCurve.GetEndPointReference(1));
-  doc.Create.NewDimension(viewForDimension, Line.CreateUnbound(pForVerticalDimension, vz), ra);
+  doc.Create.NewDimension(viewForDimension, Line.CreateUnbound(pVert, vz), ra);
 
   // Horizontal
 
@@ -214,7 +218,7 @@ So, finally, we arrive at the working solution with successful diameter chain di
   ra.Append(a0r1);
   ra.Append(a1r1);
   ra.Append(ductEdgeForDimHor.GeometryCurve.GetEndPointReference(1));
-  doc.Create.NewDimension(viewForDimension, Line.CreateUnbound(pForHorDim, vForHorDim), ra);
+  doc.Create.NewDimension(viewForDimension, Line.CreateUnbound(pHor, vHor), ra);
 </pre>
 
 The result is as desired:
