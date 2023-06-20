@@ -8,6 +8,9 @@
 
 - dimension arc endpoint references
 
+- API versus SDK
+  https://autodesk.slack.com/archives/C0PLC20PP/p1686249893898359
+  Erica Beffert
 
 twitter:
 
@@ -37,6 +40,64 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 [Speckle](https://speckle.systems/) shared
 [xUnitRevit: a test runner for Revit](https://speckle.systems/blog/xunitrevit) that
 looks very promising.
+
+####<a name="3"></a> API versus SDK
+
+My colleagues Mikako Harada and Kevin Vandecar answered a fundamental question comparing
+the [API](https://en.wikipedia.org/wiki/API) or application programming interface of a product with
+its [SDK](https://en.wikipedia.org/wiki/Software_development_kit) or software development kit:
+
+**Question:** I have a question about desktop APIs and SDKs &ndash; I'm more familiar with the cloud world, so apologies if this is a really dumb question.
+For our desktop products that offer an API, my understanding is that the API is part of the code that is downloaded, but that the SDK is downloaded separately.
+Is that correct?
+I am also assuming that I could use the API without the SDK, is that correct?
+
+**Answer 1:** It depends on the product.
+For example, the AutoCAD C++ API ObjectARX requires a separate DLL separately, while the AutoCAD.NET API and AutoLISP are included in the product.
+
+For some other APIs, such as OMF and ReCap, you need to be a member of ADN.
+
+OEM is completely separate offering that you need to license
+from [Tech Soft 3D](https://www.techsoft3d.com/,.
+
+**Answer 2:** It really varies a lot depending on the product.
+In the desktop world, the SDK usually provides the "access" and full "experience" to the API.
+Docs, samples, and necessary tools to produce a plugin/addin.
+Depending on on the product and development environment, it can vary.
+
+For example, AutoCAD ObjectARX, 3ds Max SDK, and Maya DevKit, are fundamentally C++ oriented and requires minimally headers and libraries.
+In Maya, those are included with the product, but that's it.
+The ObjectARX and 3ds Max SDKs contain those header and libraries, plus samples, docs, etc.
+The Maya devkit further enhances the developer experience, but is not absolutely necessary.
+In 3ds Max through 2023, for example, the SDK was included by a separate installer task; for convenience it was also posted to the developer center and ADN extranet. In 2024, due to installer changes, it is only available through the developer center.
+The additional benefit of including the SDK separately from the product is so developers can "build" without needing to fully install the product.
+For example, if they have build machines that do not need the full product, this helps them.
+
+So, the assumption "I am also assuming that I could use the API without the SDK, is that correct?" is definitely not true for C++ environments, and would be questionable for others, depending on API environment and product.
+In Autodesk context, the .NET APIs are usually a wrapper around or interface into the internals of the product (and may "wrap" the C++ interfaces).
+In AutoCAD and 3ds Max, for example, these are just wrapper DLLs and are included with the product to enable plugins/addins to actually run against it.
+But the SDK there may include again docs, samples, and other supporting aspects.
+One example exception is AutoCAD ACA/AMEP.
+Those are completely included (along with API reference docs and samples) within the product.
+Additionally, the "API reference" in a .NET environment is not usually necessary, because it can be replaced by Reflection and Visual Studio IntelliSense.
+A "developer's guide" is typically helpful, but that can also vary.
+Another contradiction is the Vault API, where they do not even have much online docs.
+So, even though the SDK is included with the product, you must install it, to get a local CHM file for API reference docs.
+
+In Revit, as another example, the .NET environment is still sort of a "wrapper" but has a more integrated approach internally for software development.
+A proprietary definition language (RIDL) is used to produce the .NET API during compilation of Revit source code.
+The SDK includes the samples, docs, etc., so it provides a lot of useful information for anyone getting started with the API.
+
+unless a seasoned developer and just updating a existing addin, it is necessary.
+Some desktop apps also have a COM API. Inventor is a good example here where the COM AP is used to develop .NET and C++ applications, and through it's COM/ActiveX interfaces also allows VBA. VBA is included with Inventor and allows "macro" style development (much like the MS Office apps). I
+As Mikako says OEM is a different situation altogether where the product itself usually includes everything (including a way to stamp/brand it into the licensees tools.)
+hope it helps!
+
+Mikako Harada
+Navisworks SDK is another example of mixture of all.
+
+Erica Beffert
+This was a very helpful explanation. Thank you.
 
 
 ####<a name="3"></a> Arc Dimensioning
