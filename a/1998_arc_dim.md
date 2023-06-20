@@ -170,3 +170,13 @@ Rather, the most extreme endpoint towards the start or end of the curve is dynam
 
 **Response:**
 
+
+####<a name="6"></a> Rotate Your File
+
+[Rotate Your File](https://funct.app/) provides a handy little service to Safely send someone a file:
+
+- [Start here](https://funct.app/start)
+- [Frequently asked questions](https://funct.app/faq)
+
+The FAQ is pleasantly readable, succinct, and includes nice descriptions of the design philosophy, GDPR, data collection, security and encryption aspects.
+
