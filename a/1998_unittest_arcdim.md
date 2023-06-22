@@ -18,9 +18,9 @@ A new Revit add-in unit testing tool,
 [xUnitRevit: a test runner for Revit](https://speckle.systems/blog/xunitrevit)
 by [Speckle](https://speckle.systems/)
 
-Revit add-in unit testing is becoming much more assessible, we clarify function and accessability of various Autodesk APIs and SDKs, look at a minimalist secure file sharing tool and programmatic dimensioning of circles in the @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS
+Accessible Revit add-in unit testing, function and accessibility of Autodesk APIs and SDKs, a minimalist secure file sharing tool and programmatic dimensioning of circles in the @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS https://autode.sk/unittest_arcdim
 
-Revit add-in unit testing is becoming much more assessible, and now yet another toolkit is here.
+Revit add-in unit testing is becoming much more accessible, and now yet another toolkit is here.
 We also clarify function and accessability of various Autodesk APIs and SDKs, look at programmatic dimensioning of circles in Revit and a minimalist secure file sharing tool
 &ndash; Revit add-in unit testing
 &ndash; API versus SDK
