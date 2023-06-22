@@ -29,6 +29,15 @@ We also clarify function and accessability of various Autodesk APIs and SDKs, lo
 
 linkedin:
 
+Accessible Revit add-in unit testing, function and accessibility of Autodesk APIs and SDKs, a minimalist secure file sharing tool and programmatic dimensioning of circles in the #RevitAPI
+
+https://autode.sk/unittest_arcdim
+
+- Revit add-in unit testing
+- API versus SDK
+- Arc dimensioning
+- Rotate your file...
+
 #BIM #DynamoBIM #AutodeskAPS #Revit #API #IFC #SDK #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
