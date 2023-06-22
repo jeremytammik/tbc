@@ -14,9 +14,9 @@
 
 twitter:
 
-A new Revit add-in unit testing tool,
-[xUnitRevit: a test runner for Revit](https://speckle.systems/blog/xunitrevit)
-by [Speckle](https://speckle.systems/)
+@SpeckleSystems share a new Revit add-in unit testing tool, xUnitRevit, a test runner for @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS https://speckle.systems/blog/xunitrevit
+
+/Users/jta/a/doc/revit/tbc/git/a/img/xunitrevit.gif
 
 Accessible Revit add-in unit testing, function and accessibility of Autodesk APIs and SDKs, a minimalist secure file sharing tool and programmatic dimensioning of circles in the @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS https://autode.sk/unittest_arcdim
 
