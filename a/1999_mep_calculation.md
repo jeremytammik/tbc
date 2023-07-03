@@ -92,7 +92,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ####<a name="2"></a> APS DevCon in Munich and SF
 
-- devcon email Marnee Dupont <marnee.dupont@autodesk.com>
+devcon email Marnee Dupont <marnee.dupont@autodesk.com>
 Registration for Munich DevCon on September 11th and 12th is now OPEN. Attendees can now register for both San Francisco and Munich.
 All the information you need to know as well as both registration links are in this blog post.
 We would love your help in promoting these events. We’ve created these Promo cheat sheets that have social posts, email drafts, and much more to help you spread the word. Please reach out to your customers, reshare our social media posts, and I’ve also posted on Bonfire as well.
@@ -103,6 +103,26 @@ At this time, this event is for customers and partners ONLY. We do not have capa
 If you are an employee who is working or speaking at the event, we have a Staff link that will be shared with you to register. Please do NOT use the registration link in the blog.
 
 ####<a name="3"></a> Forma Video
+
+
+<ul>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2022/09/aps-au-and-miter-wall-join-for-full-face.html">APS, AU, and Miter Wall Join for Full Face</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2023/06/sustainability-lookup-sub-elements-and-wall-types.html">Sustainability, Lookup, Sub-Elements and Wall Types</a></li>
+</ul>
+
+[Forma for AEC]()
+
+- [AU 2022 announcement](https://thebuildingcoder.typepad.com/blog/2022/09/aps-au-and-miter-wall-join-for-full-face.html#3)
+- [ustainability flyer](/Users/jta/a/doc/revit/tbc/git/a/zip/forma_sustainability_flyer.pdf):
+
+> [Design a Better Future with Forma’s Suite of Sustainability Solutions](https://blogs.autodesk.com/forma/2023/05/08/sustainability-solutions):
+
+> Cities consume more than two-thirds of the world’s energy and account for over 70% of global carbon emissions
+([source](https://unfccc.int/news/urban-climate-action-is-crucial-to-bend-the-emissions-curve#:~:text=Cities%20consume%20over%20two%2Dthirds,Asia%20and%20Sub%2DSaharan%20Africa)).
+This means architects, real estate developers, and urban planners have an exceptional opportunity to mitigate the environmental impact of our cities by designing buildings and communities with sustainable outcomes in mind.
+
+> Sustainable outcomes are best achieved through a proactive, data-driven approach that starts at the earliest stages of design before it becomes costly and difficult to make changes.
+Autodesk Forma’s powerful suite of real-time analyses equips design teams with the quick, visual insights needed to prioritize sustainability from day one of a project.
 
 - forma
 3-minute video
@@ -116,6 +136,61 @@ Visit the blog: http://blogs.autodesk.com/forma/
 ####<a name="4"></a> RevitLookup 2024.0.8
 
 - email [jeremytammik/RevitLookup] Release 2024.0.8 - 2024.0.8
+
+Features
+
+Core
+
+Computing Time Tracking
+
+This feature includes the ability to monitor the computing time taken to invoke a member, such as methods or properties.
+By tracking the execution time, you can identify and analyze slow-performing methods or properties, gaining insights into their overall performance.
+The computing time is displayed in a separate column and a tooltip, providing you with detailed information. This feature is optional and disabled by default
+
+image
+
+User interface
+
+Context Menu
+
+A convenient context menu has been added to the table, providing you with additional options to manage columns and update contents.
+This menu enables you to customize your table view and effortlessly perform actions to enhance your experience.
+
+image
+
+Enhanced Visualization
+
+Icons have been added to the context menu, making it more visually appealing and intuitive for users to navigate and interact with the available options.
+
+image
+
+Improvements
+
+Added async support for unit dialogs
+Added API for external programs #171
+Added FamilyParameter support by @CADBIMDeveloper in #174
+Added FamilyManager.GetAssociatedFamilyParameter extension by @CADBIMDeveloper in #175
+Bugs
+
+Fixed shortcuts reloading leading to incorrect ribbon update #177
+Full changelog: 2024.0.7...2024.0.8
+
+—
+This release has 10 assets:
+
+RevitLookup-2021.2.8-MultiUser.msi
+RevitLookup-2021.2.8-SingleUser.msi
+RevitLookup-2022.2.8-MultiUser.msi
+RevitLookup-2022.2.8-SingleUser.msi
+RevitLookup-2023.2.8-MultiUser.msi
+RevitLookup-2023.2.8-SingleUser.msi
+RevitLookup-2024.0.8-MultiUser.msi
+RevitLookup-2024.0.8-SingleUser.msi
+Source code (zip)
+Source code (tar.gz)
+Visit the release page to download them.
+
+
 
 ####<a name="5"></a> Comparing Parameters
 
