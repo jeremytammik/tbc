@@ -6,6 +6,30 @@
 
 <!---
 
+- devcon email Marnee Dupont <marnee.dupont@autodesk.com>
+  Registration for Munich DevCon on September 11th and 12th is now OPEN. Attendees can now register for both San Francisco and Munich.
+  All the information you need to know as well as both registration links are in this blog post.
+  We would love your help in promoting these events. We’ve created these Promo cheat sheets that have social posts, email drafts, and much more to help you spread the word. Please reach out to your customers, reshare our social media posts, and I’ve also posted on Bonfire as well.
+  docx icon Munich DevCon Promo Cheat Sheet .docx
+  docx icon San Francisco DevCon Promo Cheat Sheet.docx
+  A couple notes:
+  At this time, this event is for customers and partners ONLY. We do not have capacity to open this up to Autodesk employees at this time.
+  If you are an employee who is working or speaking at the event, we have a Staff link that will be shared with you to register. Please do NOT use the registration link in the blog.
+
+- forma
+  3-minute video
+  Autodesk Forma: Make tomorrow's cities
+  https://youtu.be/6iKM0fsk_Jw
+  <iframe width="560" height="315" src="https://www.youtube.com/embed/6iKM0fsk_Jw" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+  Start a free 30-day trial: https://www.autodesk.com/products/forma/free-trial
+  Find out more about Autodesk Forma: https://www.autodesk.com/forma
+  Visit the blog: http://blogs.autodesk.com/forma/
+
+- email [jeremytammik/RevitLookup] Release 2024.0.8 - 2024.0.8
+
+- how to compare parameters in different environments by rpthomas
+  https://forums.autodesk.com/t5/revit-api-forum/how-to-determine-if-a-parameter-value-is-derived-from-a-formula/m-p/12069026#M72402
+
 - User MEP Calculation error
   https://forums.autodesk.com/t5/revit-api-forum/user-mep-calculation-error/td-p/12063928
   tamsann  149 Views, 4 Replies
@@ -44,30 +68,6 @@
   Jeremy Tammik
   nice game! my 11th rule seems to be different from yours. i gave up at this point too...
 
-- how to compare parameters in different environments by rpthomas
-  https://forums.autodesk.com/t5/revit-api-forum/how-to-determine-if-a-parameter-value-is-derived-from-a-formula/m-p/12069026#M72402
-
-- email [jeremytammik/RevitLookup] Release 2024.0.8 - 2024.0.8
-
-- devcon email Marnee Dupont <marnee.dupont@autodesk.com>
-  Registration for Munich DevCon on September 11th and 12th is now OPEN. Attendees can now register for both San Francisco and Munich.
-  All the information you need to know as well as both registration links are in this blog post.
-  We would love your help in promoting these events. We’ve created these Promo cheat sheets that have social posts, email drafts, and much more to help you spread the word. Please reach out to your customers, reshare our social media posts, and I’ve also posted on Bonfire as well.
-  docx icon Munich DevCon Promo Cheat Sheet .docx
-  docx icon San Francisco DevCon Promo Cheat Sheet.docx
-  A couple notes:
-  At this time, this event is for customers and partners ONLY. We do not have capacity to open this up to Autodesk employees at this time.
-  If you are an employee who is working or speaking at the event, we have a Staff link that will be shared with you to register. Please do NOT use the registration link in the blog.
-
-- forma
-  3-minute video
-  Autodesk Forma: Make tomorrow's cities
-  https://youtu.be/6iKM0fsk_Jw
-  <iframe width="560" height="315" src="https://www.youtube.com/embed/6iKM0fsk_Jw" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-  Start a free 30-day trial: https://www.autodesk.com/products/forma/free-trial
-  Find out more about Autodesk Forma: https://www.autodesk.com/forma
-  Visit the blog: http://blogs.autodesk.com/forma/
-
 twitter:
 
  @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS
@@ -88,7 +88,41 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### MEP Calculation
+### MEP Calculation and APS DevCon
+
+####<a name="2"></a> APS DevCon in Munich and SF
+
+- devcon email Marnee Dupont <marnee.dupont@autodesk.com>
+Registration for Munich DevCon on September 11th and 12th is now OPEN. Attendees can now register for both San Francisco and Munich.
+All the information you need to know as well as both registration links are in this blog post.
+We would love your help in promoting these events. We’ve created these Promo cheat sheets that have social posts, email drafts, and much more to help you spread the word. Please reach out to your customers, reshare our social media posts, and I’ve also posted on Bonfire as well.
+docx icon Munich DevCon Promo Cheat Sheet .docx
+docx icon San Francisco DevCon Promo Cheat Sheet.docx
+A couple notes:
+At this time, this event is for customers and partners ONLY. We do not have capacity to open this up to Autodesk employees at this time.
+If you are an employee who is working or speaking at the event, we have a Staff link that will be shared with you to register. Please do NOT use the registration link in the blog.
+
+####<a name="2"></a> Forma Video
+
+- forma
+3-minute video
+Autodesk Forma: Make tomorrow's cities
+https://youtu.be/6iKM0fsk_Jw
+<iframe width="560" height="315" src="https://www.youtube.com/embed/6iKM0fsk_Jw" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+Start a free 30-day trial: https://www.autodesk.com/products/forma/free-trial
+Find out more about Autodesk Forma: https://www.autodesk.com/forma
+Visit the blog: http://blogs.autodesk.com/forma/
+
+####<a name="2"></a> RevitLookup 2024.0.8
+
+- email [jeremytammik/RevitLookup] Release 2024.0.8 - 2024.0.8
+
+####<a name="2"></a> Comparing Parameters
+
+- how to compare parameters in different environments by rpthomas
+https://forums.autodesk.com/t5/revit-api-forum/how-to-determine-if-a-parameter-value-is-derived-from-a-formula/m-p/12069026#M72402
+
+####<a name="2"></a>
 
 - User MEP Calculation error
 https://forums.autodesk.com/t5/revit-api-forum/user-mep-calculation-error/td-p/12063928
@@ -112,8 +146,12 @@ however, the Revit SDK 2024 has a Complement (Addin) called NetworkPressureLossR
 > This addin sample shows how to access the MEP analytical model data and traverse the network. The flow and pressure loss results are exported to a csv file or displayed in Analysis Visualization Framework (AVF).
 I hope it helps you, and good luck
 
+####<a name="2"></a>
+
 - Wastewater pipe calculation
 https://forums.autodesk.com/t5/revit-api-forum/watsewater-pipe-calculation/m-p/12075059
+
+####<a name="2"></a>
 
 - The Password Game
 https://neal.fun/password-game/
@@ -127,30 +165,6 @@ Phillip Doup
 I made it to the whole "find a youtube video of X mins and Y seconds" one and gave up.
 Jeremy Tammik
 nice game! my 11th rule seems to be different from yours. i gave up at this point too...
-
-- how to compare parameters in different environments by rpthomas
-https://forums.autodesk.com/t5/revit-api-forum/how-to-determine-if-a-parameter-value-is-derived-from-a-formula/m-p/12069026#M72402
-
-- email [jeremytammik/RevitLookup] Release 2024.0.8 - 2024.0.8
-
-- devcon email Marnee Dupont <marnee.dupont@autodesk.com>
-Registration for Munich DevCon on September 11th and 12th is now OPEN. Attendees can now register for both San Francisco and Munich.
-All the information you need to know as well as both registration links are in this blog post.
-We would love your help in promoting these events. We’ve created these Promo cheat sheets that have social posts, email drafts, and much more to help you spread the word. Please reach out to your customers, reshare our social media posts, and I’ve also posted on Bonfire as well.
-docx icon Munich DevCon Promo Cheat Sheet .docx
-docx icon San Francisco DevCon Promo Cheat Sheet.docx
-A couple notes:
-At this time, this event is for customers and partners ONLY. We do not have capacity to open this up to Autodesk employees at this time.
-If you are an employee who is working or speaking at the event, we have a Staff link that will be shared with you to register. Please do NOT use the registration link in the blog.
-
-- forma
-3-minute video
-Autodesk Forma: Make tomorrow's cities
-https://youtu.be/6iKM0fsk_Jw
-<iframe width="560" height="315" src="https://www.youtube.com/embed/6iKM0fsk_Jw" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-Start a free 30-day trial: https://www.autodesk.com/products/forma/free-trial
-Find out more about Autodesk Forma: https://www.autodesk.com/forma
-Visit the blog: http://blogs.autodesk.com/forma/
 
 
 
