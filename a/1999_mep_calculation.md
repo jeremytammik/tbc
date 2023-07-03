@@ -102,7 +102,7 @@ A couple notes:
 At this time, this event is for customers and partners ONLY. We do not have capacity to open this up to Autodesk employees at this time.
 If you are an employee who is working or speaking at the event, we have a Staff link that will be shared with you to register. Please do NOT use the registration link in the blog.
 
-####<a name="2"></a> Forma Video
+####<a name="3"></a> Forma Video
 
 - forma
 3-minute video
@@ -113,16 +113,16 @@ Start a free 30-day trial: https://www.autodesk.com/products/forma/free-trial
 Find out more about Autodesk Forma: https://www.autodesk.com/forma
 Visit the blog: http://blogs.autodesk.com/forma/
 
-####<a name="2"></a> RevitLookup 2024.0.8
+####<a name="4"></a> RevitLookup 2024.0.8
 
 - email [jeremytammik/RevitLookup] Release 2024.0.8 - 2024.0.8
 
-####<a name="2"></a> Comparing Parameters
+####<a name="5"></a> Comparing Parameters
 
 - how to compare parameters in different environments by rpthomas
 https://forums.autodesk.com/t5/revit-api-forum/how-to-determine-if-a-parameter-value-is-derived-from-a-formula/m-p/12069026#M72402
 
-####<a name="2"></a>
+####<a name="6"></a> User MEP Calculation 2024
 
 - User MEP Calculation error
 https://forums.autodesk.com/t5/revit-api-forum/user-mep-calculation-error/td-p/12063928
@@ -146,12 +146,12 @@ however, the Revit SDK 2024 has a Complement (Addin) called NetworkPressureLossR
 > This addin sample shows how to access the MEP analytical model data and traverse the network. The flow and pressure loss results are exported to a csv file or displayed in Analysis Visualization Framework (AVF).
 I hope it helps you, and good luck
 
-####<a name="2"></a>
+####<a name="7"></a> Wastewater Pipe Calculation
 
 - Wastewater pipe calculation
 https://forums.autodesk.com/t5/revit-api-forum/watsewater-pipe-calculation/m-p/12075059
 
-####<a name="2"></a>
+####<a name="8"></a> The Password Game
 
 - The Password Game
 https://neal.fun/password-game/
@@ -168,26 +168,14 @@ nice game! my 11th rule seems to be different from yours. i gave up at this poin
 
 
 
-####<a name="2"></a>
-
-####<a name="3"></a>
-
 **Question:**
 
 **Answer 1:**
-
-####<a name="4"></a>
 
 <pre class="prettyprint">
 
 </pre>
 
-
 <center>
 <img src="img/.png" alt="" title="" width="100"/> <!-- Pixel Height: 1,064 Pixel Width: 1,026 -->
 </center>
-
-
-
-
-####<a name="5"></a>
