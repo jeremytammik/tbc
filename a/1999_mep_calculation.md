@@ -135,67 +135,34 @@ Visit the blog: http://blogs.autodesk.com/forma/
 
 ####<a name="4"></a> RevitLookup 2024.0.8
 
-- email [jeremytammik/RevitLookup] Release 2024.0.8 - 2024.0.8
+Another RevitLookup update is available, now
+for [RevitLookup release 2024.0.8](https://github.com/jeremytammik/RevitLookup/releases/tag/2024.0.8):
 
-Features
-
-Core
-
-Computing Time Tracking
-
+- Computing Time Tracking &ndash;
 This feature includes the ability to monitor the computing time taken to invoke a member, such as methods or properties.
 By tracking the execution time, you can identify and analyze slow-performing methods or properties, gaining insights into their overall performance.
 The computing time is displayed in a separate column and a tooltip, providing you with detailed information. This feature is optional and disabled by default
-
-image
-
-User interface
-
-Context Menu
-
+- Context Menu &ndash;
 A convenient context menu has been added to the table, providing you with additional options to manage columns and update contents.
 This menu enables you to customize your table view and effortlessly perform actions to enhance your experience.
-
-image
-
-Enhanced Visualization
-
+- Enhanced Visualization &ndash;
 Icons have been added to the context menu, making it more visually appealing and intuitive for users to navigate and interact with the available options.
+- Added async support for unit dialogs
+- Added API for external programs https://github.com/jeremytammik/RevitLookup/issues/171
+- Added FamilyParameter support by @CADBIMDeveloper in https://github.com/jeremytammik/RevitLookup/pull/174
+- Added FamilyManager.GetAssociatedFamilyParameter extension by @CADBIMDeveloper in https://github.com/jeremytammik/RevitLookup/pull/175
+- Fixed shortcuts reloading leading to incorrect ribbon update https://github.com/jeremytammik/RevitLookup/issues/177
+- [Full changelog](https://github.com/jeremytammik/RevitLookup/compare/2024.0.7...2024.0.8)
 
-image
+<center>
+<img src="img/revitlookup_2024_0_8_01.png" alt="Computing time tracking" title="Computing time tracking" width="500"/> <!-- Pixel Height: 555 Pixel Width: 1,016 -->
+<p style="font-size: 80%; font-style:italic">Computing time tracking</p>
+<img src="img/revitlookup_2024_0_8_02.png" alt="Context menu" title="Context menu" width="500"/> <!-- Pixel Height: 555 Pixel Width: 1,016 -->
+<p style="font-size: 80%; font-style:italic">Context menu</p>
+<img src="img/revitlookup_2024_0_8_03.png" alt="Enhanced visualization" title="Enhanced visualization" width="192"/> <!-- Pixel Height: 102 Pixel Width: 192 -->
+<p style="font-size: 80%; font-style:italic">Enhanced visualization</p>
+</center>
 
-Improvements
-
-Added async support for unit dialogs
-Added API for external programs #171
-Added FamilyParameter support by @CADBIMDeveloper in #174
-Added FamilyManager.GetAssociatedFamilyParameter extension by @CADBIMDeveloper in #175
-Bugs
-
-Fixed shortcuts reloading leading to incorrect ribbon update #177
-Full changelog: 2024.0.7...2024.0.8
-
-—
-This release has 10 assets:
-
-RevitLookup-2021.2.8-MultiUser.msi
-RevitLookup-2021.2.8-SingleUser.msi
-RevitLookup-2022.2.8-MultiUser.msi
-RevitLookup-2022.2.8-SingleUser.msi
-RevitLookup-2023.2.8-MultiUser.msi
-RevitLookup-2023.2.8-SingleUser.msi
-RevitLookup-2024.0.8-MultiUser.msi
-RevitLookup-2024.0.8-SingleUser.msi
-Source code (zip)
-Source code (tar.gz)
-Visit the release page to download them.
-
-
-
-####<a name="5"></a> Comparing Parameters
-
-- how to compare parameters in different environments by rpthomas
-https://forums.autodesk.com/t5/revit-api-forum/how-to-determine-if-a-parameter-value-is-derived-from-a-formula/m-p/12069026#M72402
 
 ####<a name="6"></a> User MEP Calculation 2024
 
