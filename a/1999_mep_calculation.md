@@ -182,12 +182,36 @@ You will have to find another way to do this.
 
 **Answer 2:** I have updated
 
-Hello, here I leave you UserMepCalculation2024:
-UserMepCalculation2024.rar
-/Users/jta/a/doc/revit/tbc/git/a/zip/UserMepCalculation2024.rar
-however, the Revit SDK 2024 has a Complement (Addin) called NetworkPressureLossReport, which can also be useful for you:
+Hello, here I leave you [UserMepCalculation](https://github.com/jeremytammik/UserMepCalculation) for Revit 2024:
+
+- [UserMepCalculation2024.rar](/a/zip/UserMepCalculation2024.rar)
+
+However, the Revit SDK 2024 also includes a new add-in named NetworkPressureLossReport that might also be useful for you:
+
 > This addin sample shows how to access the MEP analytical model data and traverse the network. The flow and pressure loss results are exported to a csv file or displayed in Analysis Visualization Framework (AVF).
+
 I hope it helps you, and good luck
+
+**Response:** Thank you very much for sharing. It's helping me a lot.
+
+**Answer 3:** While editing this blog post, I found three previous related  articles:
+
+I am in the process of editing this thread for a blog post. I found three existing related blog posts:
+
+- [User MEP Calculation Sample](http://thebuildingcoder.typepad.com/blog/2013/07/user-mep-calculation-sample.html)
+- [User MEP Calculation Sample on GitHub](http://thebuildingcoder.typepad.com/blog/2013/11/user-mep-calculation-sample-on-github.html)
+- [External Services](http://thebuildingcoder.typepad.com/blog/2015/12/external-services.html)
+
+The third of these on Arnošt Löbel's class SD10752 on Revit External Services at Autodesk University 2015 is especially interesting:
+
+It includes another Revit MEP calculation external service sample for a pressure drop calculation.
+It was implemented specifically for this AU class and uses external commands to add and remove the calculator.
+A proper calculator would be implemented as an `ExternalDBApplication` with no external commands involved.
+Apparently, at the time, the Revit 2014 UserMepCalculation sample was superseded by this one and should be replaced.
+However, I have not compared them myself, nor looked at the new SDK sample that Reynaldo points out.
+
+Many thanks to Reynaldo for his very kind and competent support in this area!
+
 
 ####<a name="7"></a> Wastewater Pipe Calculation
 
