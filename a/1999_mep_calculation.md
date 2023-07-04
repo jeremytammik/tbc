@@ -166,21 +166,22 @@ Icons have been added to the context menu, making it more visually appealing and
 
 ####<a name="6"></a> User MEP Calculation 2024
 
-- User MEP Calculation error
-https://forums.autodesk.com/t5/revit-api-forum/user-mep-calculation-error/td-p/12063928
-tamsann  149 Views, 4 Replies
-I am researching User MEP calculation, and when I tried to run the program, I encountered some errors:
-Error: "FormatUtils doesn't exist in the current context."
-Error: "CS1061 'Selection' does not contain a definition for 'Elements' and no accessible extension method 'Elements' accepting a first argument of type 'Selection' could be found (are you missing a using directive or an assembly reference?)"
-Could someone with experience in fixing these errors please help me? I'm new to this and would greatly appreciate your assistance.
-sragan  in reply to: tamsann
-Formatutils is an obsolete command that "Formats a number with units into a string based on the units formatting settings for a document."
+Reynaldo Lorente, Ingeniero Hidraulico of the Centro de Ingeneria e Investigaciones Quimicas in Cuba has been very helpful with several tricky MEP issues, e.g.,
+on a [User MEP Calculation error](https://forums.autodesk.com/t5/revit-api-forum/user-mep-calculation-error/td-p/12063928):
+
+**Question:** Researching User MEP calculation, I encountered some errors:
+
+- Error: "FormatUtils doesn't exist in the current context."
+- Error: "CS1061 'Selection' does not contain a definition for 'Elements' and no accessible extension method 'Elements' accepting a first argument of type 'Selection' could be found (are you missing a using directive or an assembly reference?)"
+
+Could someone with experience in this area please help?
+I'm new to this and would greatly appreciate your assistance.
+
+**Answer 1:** `Formatutils` is an obsolete command that "Formats a number with units into a string based on the units formatting settings for a document."
 You will have to find another way to do this.
-FormatUtils Members (revitapidocs.com)
-https://www.revitapidocs.com/2015/b4779336-e429-0b51-8c0e-63b5657f1810.htm
-reylorente1  in reply to: sragan
-Hola,aqui te dejo UserMepCalculation2024,no obtante, el Revit SDK 2024,tiene un Complemento(Addin) llamado NetworkPressureLossReport, que te puede servir tambien.
-Espero que te ayude,y suerte
+
+**Answer 2:** I have updated
+
 Hello, here I leave you UserMepCalculation2024:
 UserMepCalculation2024.rar
 /Users/jta/a/doc/revit/tbc/git/a/zip/UserMepCalculation2024.rar
