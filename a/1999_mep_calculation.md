@@ -140,11 +140,11 @@ The Revit 2024 API has been added to the [online Revit API documentation](https:
 Many thanks to [Gui Talarico](https://twitter.com/gtalarico) for his untiring and invaluable maintainance work!
 
 
-####<a name="2"></a> RevitApiDocs Support for Revit 2024
+####<a name="2"></a> RevitApiDocs Supports Revit 2024
 
 [Gui Talarico](https://twitter.com/gtalarico) updated the online Revit API documentation for Revit 2024, both:
 
-- [apidocs](https://apidocs.co/apps/revit/2023/d4648875-d41a-783b-d5f4-638df39ee413.htm) and
+- [apidocs](https://apidocs.co) and
 - [revitapidocs](https://www.revitapidocs.com)
 
 Notifications of new features are pubished on twitter at:
