@@ -133,6 +133,32 @@ Start a free 30-day trial: https://www.autodesk.com/products/forma/free-trial
 Find out more about Autodesk Forma: https://www.autodesk.com/forma
 Visit the blog: http://blogs.autodesk.com/forma/
 
+####<a name="4"></a> RevitApiDocs 2024
+
+The Revit 2024 API has been added to the [online Revit API documentation](https://www.revitapidocs.com).
+
+Many thanks to [Gui Talarico](https://twitter.com/gtalarico) for his untiring and invaluable maintainance work!
+
+
+####<a name="2"></a> RevitApiDocs Support for Revit 2024
+
+[Gui Talarico](https://twitter.com/gtalarico) updated the online Revit API documentation for Revit 2024, both:
+
+- [apidocs](https://apidocs.co/apps/revit/2023/d4648875-d41a-783b-d5f4-638df39ee413.htm) and
+- [revitapidocs](https://www.revitapidocs.com)
+
+Notifications of new features are pubished on twitter at:
+
+- [@ApiDocsCo](https://twitter.com/ApiDocsCo) and
+- [@RevitApiDocs](https://twitter.com/RevitApiDocs)
+
+Very many thanks to Gui for his maintenance of these invaluable resources!
+
+<center>
+<img src="img/revitapidoc2024.png" alt="Revit API Docs 2024" title="Revit API Docs 2024" width="600"/> <!-- Pixel Height: 600 Pixel Width: 1,200 -->
+</center>
+
+
 ####<a name="4"></a> RevitLookup 2024.0.8
 
 Another RevitLookup update is available, now
@@ -162,8 +188,6 @@ Icons have been added to the context menu, making it more visually appealing and
 <img src="img/revitlookup_2024_0_8_03.png" alt="Enhanced visualization" title="Enhanced visualization" width="192"/> <!-- Pixel Height: 102 Pixel Width: 192 -->
 <p style="font-size: 80%; font-style:italic">Enhanced visualization</p>
 </center>
-
-
 
 
 
