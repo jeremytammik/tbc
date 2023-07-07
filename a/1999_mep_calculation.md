@@ -234,7 +234,7 @@ on [wastewater pipe calculation](https://forums.autodesk.com/t5/revit-api-forum/
 However, it only deals with water supply calculations.
 I would greatly appreciate it if someone could suggest a method for wastewater pipe calculation.
 
-**Answer:** The Sewage and Rainwater Drainage System add-in might help.
+**Answer:** The SRwD Sewage and Rainwater Drainage System add-in might help.
 Its last year of edition is 2023, but it might serve, at least a guide.
 
 **Response:** I feel very grateful because you always provide me with valuable answers.
@@ -245,76 +245,48 @@ Another question on water supply calculations because I am currently working on 
 When calculating the flow rate of a pipe, flow rate depends on the `FlowConversionMode`.
 How can Revit understand whether the project is "predominantly flush valves" or "predominantly flush tanks"?
 
-**Answer:** I send you the answer with an image, since it helped me with google translator to be able to translate and help you.
+**Answer:** Here are some images that helped me formulate an answer:
 
-Ejemplo de un sistema
-Ejemplo de un sistema
-Captura de pantalla 2023-07-02 212929.pngCaptura de pantalla 2023-07-02 212946.pngCaptura de pantalla 2023-07-02 213059.pngCaptura de pantalla 2023-07-02 213114.png
-Si observas, en las zonas de las tab, una de ella se puso de color amarillo o naranja. Dale clic a esa pestaña  se abre otro menu y en la tabla de propiedades ,vuelve a darle click a Edit Type, se abre un cuadro (Type Properties) y donde dice Flow Conversion method, lo cambias Predominantly Flush Tanks(Tambien lo puedes hacer por System browser para llegar a al cuadro (Type Properties).Recuerda que tienes que cambiar en Mechanical Setting, en Pipe Settings, donde tienes las pestaña Flow en adicionar el  Addin que hiciste o por ejemplo el que te mande UserMepCalculation  2024.
-Aqui te mando las imágenes.
-Espero que hayas entendido y suerte
+<center>
+<img src="img/wastewater_pipe_calc_1.png" alt="Ejemplo de un sistema &ndash; example system" title="Ejemplo de un sistema &ndash; example system" width="600"/>
+<p style="font-size: 80%; font-style:italic">Ejemplo de un sistema &ndash; example system</p>
+<img src="img/wastewater_pipe_calc_2.png" alt="Wastewater Pipe Calculation" title="Wastewater Pipe Calculation" width="600"/>
+<img src="img/wastewater_pipe_calc_3.png" alt="Wastewater Pipe Calculation" title="Wastewater Pipe Calculation" width="600"/>
+<img src="img/wastewater_pipe_calc_4.png" alt="Wastewater Pipe Calculation" title="Wastewater Pipe Calculation" width="600"/>
+<img src="img/wastewater_pipe_calc_5.png" alt="Wastewater Pipe Calculation" title="Wastewater Pipe Calculation" width="600"/>
+</center>
 
-If you look, in the tab areas, one of them turned yellow or orange. Click on that tab another menu opens and in the properties table, click Edit Type again, a box opens (Type Properties) and where it says Flow Conversion method, you change it Predominantly Flush Tanks (You can also do it by System browser to get to the box (Type Properties). Remember that you have to change in Mechanical Setting, in Pipe Settings, where you have the Flow tab to add the Addin that you made or for example the one that UserMepCalculation 2024 sends you.
-Here I send you the images.
-I hope you understand and good luck
+If you look at the tab areas, one of them turned yellow or orange.
+Click on that tab; another menu opens; in the properties table, click Edit Type again; a box opens (Type Properties); where it says Flow Conversion method, you can change it to Predominantly Flush Tanks (you can also do it in the System browser to get to the box (Type Properties).
+Remember that you have to change it in Mechanical Setting, in Pipe Settings, where you have the Flow tab, to add the Addin that you made or, alternatively, another one such as the UserMepCalculation 2024 that I sent you.
 
+You have to create a system first to execute these steps.
 
+**Response:** I was able to do it because you provided me with an incredibly detailed guide.
+Thank you very much for dedicating your valuable time to me.
 
-reylorente1
-
-Se me olvido escribirte, que tienes que crear un sistema ,para realizar ,todo  lo que expuse anteriormente
-
-I forgot to write to you, that you have to create a system, to carry out, everything that I exposed previously
-
-tamsann
-
-@reylorente1 I was able to do it because you provided me with an incredibly detailed guide. Thank you very much for dedicating your valuable time to me. 👍🙏
-
-jeremy.tammik
-
-Wow, thank you very much @reylorente1  for the detailed in-depth explanation!
-
-Do you mean an add-in in the Revit AppStore? I see several different possible Revit add-ins searching for Revit Sewage and Rainwater Drainage System:
-
-https://duckduckgo.com/?q=revit+Sewage+and+Rainwater+Drainage+System
-
-Jeremy Tammik,  Developer Advocacy and Support, The Building Coder, Autodesk Developer Network, ADN Open
-
-reylorente1
-
-Me alegra mucho que te haya servido. Una pregunta, esta teniendo en cuenta, la altura de la toma de agua del mueble o la presión con que llega?,a que en el USERMEPCalculation, no lo asume, si vas en los cálculos de los sistemas de tubería en Fontanería
-
-I am very glad that it has served you. One question, is taking into account the height of the water intake of the furniture(Plumbing Fixture) or the pressure with which it arrives?, which in the USERMEPCalculation, it does not assume, if you go into the calculations of the Plumbing systems
-
-reylorente1
-
-Hola Jeremy, es el mismo Complemento (Addin), llamado SRwD(Sewage and Rainwater Drainage System)
-
-Hi Jeremy, it's the same Addin, called SRwD(Sewage and Rainwater Drainage System)
+**Answer:** I am very glad that it has served you.
+One question, are you taking into account the height of the water intake of the Plumbing Fixtures or the pressure with which it arrives?
+The UserMepCalculation makes no assumptions in the calculations of the Plumbing system.
 
 ####<a name="8"></a> The Password Game
 
-- The Password Game
-https://neal.fun/password-game/
-/Users/jta/a/doc/revit/tbc/git/a/img/passwordgame.png
-https://autodesk.slack.com/archives/C02NW42JP/p1688127875185579
-Chris Blocher
-A little Friday frustration fun, in a geeky sort of way. https://neal.fun/password-game/. I made it to the 11th rule before I gave up:wink: (edited)
-Please choose a password (68 kB)
-https://neal.fun/password-game/
-Phillip Doup
-I made it to the whole "find a youtube video of X mins and Y seconds" one and gave up.
-Jeremy Tammik
-nice game! my 11th rule seems to be different from yours. i gave up at this point too...
-
-**Question:**
-
-**Answer 1:**
-
-<pre class="prettyprint">
-
-</pre>
+Let's close
+with [The Password Game](https://neal.fun/password-game).
 
 <center>
-<img src="img/.png" alt="" title="" width="100"/> <!-- Pixel Height: 1,064 Pixel Width: 1,026 -->
+<img src="img/passwordgame.png" alt="The Password Game" title="The Password Game" width="500"/> <!-- Pixel Height: 1,930 Pixel Width: 1,172 -->
 </center>
+
+> A little Friday frustration fun, in a geeky sort of way.
+
+> I made it to the whole "find a youtube video of X mins and Y seconds" one and gave up.
+
+> Nice game! My 11th rule seems to be different from yours. I gave up at this point.
+
+> I got to 18, but I just can't from there....
+
+<center>
+<img src="img/passwordgame_18.png" alt="The Password Game" title="The Password Game" width="360"/> <!-- Pixel Height: 608 Pixel Width: 719 -->
+</center>
+
