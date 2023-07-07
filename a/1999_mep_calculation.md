@@ -278,13 +278,15 @@ Thank you very much for dedicating your valuable time to me.
 One question, are you taking into account the height of the water intake of the Plumbing Fixtures or the pressure with which it arrives?
 The UserMepCalculation makes no assumptions in the calculations of the Plumbing system.
 
+Thank you again, Reynaldo!
+
 ####<a name="8"></a> The Password Game
 
 Let's close
 with [The Password Game](https://neal.fun/password-game).
 
 <center>
-<img src="img/passwordgame.png" alt="The Password Game" title="The Password Game" width="360"/> <!-- Pixel Height: 1,930 Pixel Width: 1,172 -->
+<img src="img/passwordgame.png" alt="The Password Game" title="The Password Game" width="40"/> <!-- Pixel Height: 1,930 Pixel Width: 1,172 -->
 </center>
 
 > A little Friday frustration fun, in a geeky sort of way.
@@ -296,6 +298,6 @@ with [The Password Game](https://neal.fun/password-game).
 > I got to 18, but I just can't from there....
 
 <center>
-<img src="img/passwordgame_18.png" alt="The Password Game" title="The Password Game" width="360"/> <!-- Pixel Height: 608 Pixel Width: 719 -->
+<img src="img/passwordgame_18.png" alt="The Password Game" title="The Password Game" width="40"/> <!-- Pixel Height: 608 Pixel Width: 719 -->
 </center>
 
