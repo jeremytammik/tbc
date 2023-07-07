@@ -102,20 +102,14 @@ A couple notes:
 At this time, this event is for customers and partners ONLY. We do not have capacity to open this up to Autodesk employees at this time.
 If you are an employee who is working or speaking at the event, we have a Staff link that will be shared with you to register. Please do NOT use the registration link in the blog.
 
-####<a name="3"></a> Forma Video
+####<a name="3"></a> Forma for AEC
 
+Autodesk is also clarifying its vision
+of [Forma for AEC](https://www.autodesk.com/company/autodesk-platform/aec)
+and [sustainability](/Users/jta/a/doc/revit/tbc/git/a/zip/forma_sustainability_flyer.pdf) announced
+at [AU 2022](https://thebuildingcoder.typepad.com/blog/2022/09/aps-au-and-miter-wall-join-for-full-face.html#3):
 
-<ul>
-<li><a href="https://thebuildingcoder.typepad.com/blog/2022/09/aps-au-and-miter-wall-join-for-full-face.html">APS, AU, and Miter Wall Join for Full Face</a></li>
-<li><a href="https://thebuildingcoder.typepad.com/blog/2023/06/sustainability-lookup-sub-elements-and-wall-types.html">Sustainability, Lookup, Sub-Elements and Wall Types</a></li>
-</ul>
-
-[Forma for AEC]()
-
-- [AU 2022 announcement](https://thebuildingcoder.typepad.com/blog/2022/09/aps-au-and-miter-wall-join-for-full-face.html#3)
-- [ustainability flyer](/Users/jta/a/doc/revit/tbc/git/a/zip/forma_sustainability_flyer.pdf):
-
-> [Design a Better Future with Forma’s Suite of Sustainability Solutions](https://blogs.autodesk.com/forma/2023/05/08/sustainability-solutions):
+- [Design a better future with Forma’s suite of sustainability solutions](https://blogs.autodesk.com/forma/2023/05/08/sustainability-solutions):
 
 > Cities consume more than two-thirds of the world’s energy and account for over 70% of global carbon emissions
 ([source](https://unfccc.int/news/urban-climate-action-is-crucial-to-bend-the-emissions-curve#:~:text=Cities%20consume%20over%20two%2Dthirds,Asia%20and%20Sub%2DSaharan%20Africa)).
@@ -124,27 +118,22 @@ This means architects, real estate developers, and urban planners have an except
 > Sustainable outcomes are best achieved through a proactive, data-driven approach that starts at the earliest stages of design before it becomes costly and difficult to make changes.
 Autodesk Forma’s powerful suite of real-time analyses equips design teams with the quick, visual insights needed to prioritize sustainability from day one of a project.
 
-- forma
-3-minute video
-Autodesk Forma: Make tomorrow's cities
-https://youtu.be/6iKM0fsk_Jw
+Take a quick look at
+the 3-minute video [Autodesk Forma: Make tomorrow's cities](https://youtu.be/6iKM0fsk_Jw):
+
+<center>
 <iframe width="560" height="315" src="https://www.youtube.com/embed/6iKM0fsk_Jw" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-Start a free 30-day trial: https://www.autodesk.com/products/forma/free-trial
-Find out more about Autodesk Forma: https://www.autodesk.com/forma
-Visit the blog: http://blogs.autodesk.com/forma/
+</center>
 
-####<a name="4"></a> RevitApiDocs 2024
+- [Free 30-day trial](https://www.autodesk.com/products/forma/free-trial)
+- [More about Autodesk Forma](https://www.autodesk.com/forma)
+- [Visit the Forma blog](http://blogs.autodesk.com/forma/)
 
-The Revit 2024 API has been added to the [online Revit API documentation](https://www.revitapidocs.com).
-
-Many thanks to [Gui Talarico](https://twitter.com/gtalarico) for his untiring and invaluable maintainance work!
-
-
-####<a name="2"></a> RevitApiDocs Supports Revit 2024
+####<a name="4"></a> RevitApiDocs Supports Revit 2024
 
 [Gui Talarico](https://twitter.com/gtalarico) updated the online Revit API documentation for Revit 2024, both:
 
-- [apidocs](https://apidocs.co) and
+- [apidocs](https://apidocs.co/apps/revit/2024/d4648875-d41a-783b-d5f4-638df39ee413.htm#) and
 - [revitapidocs](https://www.revitapidocs.com)
 
 Notifications of new features are pubished on twitter at:
@@ -158,8 +147,7 @@ Very many thanks to Gui for his maintenance of these invaluable resources!
 <img src="img/revitapidoc2024.png" alt="Revit API Docs 2024" title="Revit API Docs 2024" width="600"/> <!-- Pixel Height: 600 Pixel Width: 1,200 -->
 </center>
 
-
-####<a name="4"></a> RevitLookup 2024.0.8
+####<a name="5"></a> RevitLookup 2024.0.8
 
 Another RevitLookup update is available, now
 for [RevitLookup release 2024.0.8](https://github.com/jeremytammik/RevitLookup/releases/tag/2024.0.8):
@@ -188,8 +176,6 @@ Icons have been added to the context menu, making it more visually appealing and
 <img src="img/revitlookup_2024_0_8_03.png" alt="Enhanced visualization" title="Enhanced visualization" width="192"/> <!-- Pixel Height: 102 Pixel Width: 192 -->
 <p style="font-size: 80%; font-style:italic">Enhanced visualization</p>
 </center>
-
-
 
 ####<a name="6"></a> User MEP Calculation 2024
 
@@ -239,11 +225,70 @@ However, I have not compared them myself, nor looked at the new SDK sample that 
 
 Many thanks to Reynaldo for his very kind and competent support in this area!
 
+Reynaldo also solved another MEP question
+on [wastewater pipe calculation](https://forums.autodesk.com/t5/revit-api-forum/watsewater-pipe-calculation/m-p/12075059):
 
-####<a name="7"></a> Wastewater Pipe Calculation
+**Question:** I am researching plumbing calculations and discovered a method called "User MEP Calculation".
+However, it only deals with water supply calculations.
+I would greatly appreciate it if someone could suggest a method for wastewater pipe calculation.
 
-- Wastewater pipe calculation
-https://forums.autodesk.com/t5/revit-api-forum/watsewater-pipe-calculation/m-p/12075059
+**Answer:** The Sewage and Rainwater Drainage System add-in might help.
+Its last year of edition is 2023, but it might serve, at least a guide.
+
+**Response:** I feel very grateful because you always provide me with valuable answers.
+You seem to be an expert in this field, while I am just a beginner.
+
+Another question on water supply calculations because I am currently working on that:
+
+When calculating the flow rate of a pipe, flow rate depends on the `FlowConversionMode`.
+How can Revit understand whether the project is "predominantly flush valves" or "predominantly flush tanks"?
+
+**Answer:** I send you the answer with an image, since it helped me with google translator to be able to translate and help you.
+
+Ejemplo de un sistema
+Ejemplo de un sistema
+Captura de pantalla 2023-07-02 212929.pngCaptura de pantalla 2023-07-02 212946.pngCaptura de pantalla 2023-07-02 213059.pngCaptura de pantalla 2023-07-02 213114.png
+Si observas, en las zonas de las tab, una de ella se puso de color amarillo o naranja. Dale clic a esa pestaña  se abre otro menu y en la tabla de propiedades ,vuelve a darle click a Edit Type, se abre un cuadro (Type Properties) y donde dice Flow Conversion method, lo cambias Predominantly Flush Tanks(Tambien lo puedes hacer por System browser para llegar a al cuadro (Type Properties).Recuerda que tienes que cambiar en Mechanical Setting, en Pipe Settings, donde tienes las pestaña Flow en adicionar el  Addin que hiciste o por ejemplo el que te mande UserMepCalculation  2024.
+Aqui te mando las imágenes.
+Espero que hayas entendido y suerte
+
+If you look, in the tab areas, one of them turned yellow or orange. Click on that tab another menu opens and in the properties table, click Edit Type again, a box opens (Type Properties) and where it says Flow Conversion method, you change it Predominantly Flush Tanks (You can also do it by System browser to get to the box (Type Properties). Remember that you have to change in Mechanical Setting, in Pipe Settings, where you have the Flow tab to add the Addin that you made or for example the one that UserMepCalculation 2024 sends you.
+Here I send you the images.
+I hope you understand and good luck
+
+
+
+reylorente1
+
+Se me olvido escribirte, que tienes que crear un sistema ,para realizar ,todo  lo que expuse anteriormente
+
+I forgot to write to you, that you have to create a system, to carry out, everything that I exposed previously
+
+tamsann
+
+@reylorente1 I was able to do it because you provided me with an incredibly detailed guide. Thank you very much for dedicating your valuable time to me. 👍🙏
+
+jeremy.tammik
+
+Wow, thank you very much @reylorente1  for the detailed in-depth explanation!
+
+Do you mean an add-in in the Revit AppStore? I see several different possible Revit add-ins searching for Revit Sewage and Rainwater Drainage System:
+
+https://duckduckgo.com/?q=revit+Sewage+and+Rainwater+Drainage+System
+
+Jeremy Tammik,  Developer Advocacy and Support, The Building Coder, Autodesk Developer Network, ADN Open
+
+reylorente1
+
+Me alegra mucho que te haya servido. Una pregunta, esta teniendo en cuenta, la altura de la toma de agua del mueble o la presión con que llega?,a que en el USERMEPCalculation, no lo asume, si vas en los cálculos de los sistemas de tubería en Fontanería
+
+I am very glad that it has served you. One question, is taking into account the height of the water intake of the furniture(Plumbing Fixture) or the pressure with which it arrives?, which in the USERMEPCalculation, it does not assume, if you go into the calculations of the Plumbing systems
+
+reylorente1
+
+Hola Jeremy, es el mismo Complemento (Addin), llamado SRwD(Sewage and Rainwater Drainage System)
+
+Hi Jeremy, it's the same Addin, called SRwD(Sewage and Rainwater Drainage System)
 
 ####<a name="8"></a> The Password Game
 
@@ -259,8 +304,6 @@ Phillip Doup
 I made it to the whole "find a youtube video of X mins and Y seconds" one and gave up.
 Jeremy Tammik
 nice game! my 11th rule seems to be different from yours. i gave up at this point too...
-
-
 
 **Question:**
 
