@@ -90,6 +90,16 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### MEP Calculation and APS DevCon
 
+Lots of good news on APS and the Revit API to keep you busy for the weekend:
+
+- [APS DevCon in Munich and SF](#2)
+- [Forma for AEC](#3)
+- [RevitApiDocs Supports Revit 2024](#4)
+- [RevitLookup 2024.0.8](#5)
+- [User MEP calculation 2024](#6)
+- [Wastewater Pipe Calculation](#7)
+- [The Password Game](#8)
+
 ####<a name="2"></a> APS DevCon in Munich and SF
 
 devcon email Marnee Dupont <marnee.dupont@autodesk.com>
