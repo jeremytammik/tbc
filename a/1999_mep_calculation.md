@@ -102,12 +102,12 @@ Lots of good news on APS and the Revit API to keep us busy for the weekend:
 
 ####<a name="2"></a> APS DevCon in Munich and SF
 
-Registration for Munich DevCon on September 11th and 12th is now open.
+Registration for the Munich APS DevCon on September 11th and 12th is now open.
 Attendees can register for both San Francisco and Munich.
-All information on how
-to
+Here is all information on how
+to:
 
-- [register for Autodesk DevCon 2023](https://aps.autodesk.com/blog/register-autodesk-devcon-2023)
+- [Register for Autodesk DevCon 2023](https://aps.autodesk.com/blog/register-autodesk-devcon-2023)
 
 ####<a name="3"></a> Forma for AEC
 
@@ -258,15 +258,17 @@ How can Revit understand whether the project is "predominantly flush valves" or 
 <img src="img/wastewater_pipe_calc_1.png" alt="Ejemplo de un sistema &ndash; example system" title="Ejemplo de un sistema &ndash; example system" width="600"/>
 <p style="font-size: 80%; font-style:italic">Ejemplo de un sistema &ndash; example system</p>
 <img src="img/wastewater_pipe_calc_2.png" alt="Wastewater Pipe Calculation" title="Wastewater Pipe Calculation" width="600"/>
+<p></p>
 <img src="img/wastewater_pipe_calc_3.png" alt="Wastewater Pipe Calculation" title="Wastewater Pipe Calculation" width="600"/>
+<p></p>
 <img src="img/wastewater_pipe_calc_4.png" alt="Wastewater Pipe Calculation" title="Wastewater Pipe Calculation" width="600"/>
+<p></p>
 <img src="img/wastewater_pipe_calc_5.png" alt="Wastewater Pipe Calculation" title="Wastewater Pipe Calculation" width="600"/>
 </center>
 
 If you look at the tab areas, one of them turned yellow or orange.
 Click on that tab; another menu opens; in the properties table, click Edit Type again; a box opens (Type Properties); where it says Flow Conversion method, you can change it to Predominantly Flush Tanks (you can also do it in the System browser to get to the box (Type Properties).
 Remember that you have to change it in Mechanical Setting, in Pipe Settings, where you have the Flow tab, to add the Addin that you made or, alternatively, another one such as the UserMepCalculation 2024 that I sent you.
-
 You have to create a system first to execute these steps.
 
 **Response:** I was able to do it because you provided me with an incredibly detailed guide.
@@ -282,7 +284,7 @@ Let's close
 with [The Password Game](https://neal.fun/password-game).
 
 <center>
-<img src="img/passwordgame.png" alt="The Password Game" title="The Password Game" width="500"/> <!-- Pixel Height: 1,930 Pixel Width: 1,172 -->
+<img src="img/passwordgame.png" alt="The Password Game" title="The Password Game" width="360"/> <!-- Pixel Height: 1,930 Pixel Width: 1,172 -->
 </center>
 
 > A little Friday frustration fun, in a geeky sort of way.
