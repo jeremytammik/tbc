@@ -90,7 +90,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### MEP Calculation and APS DevCon
 
-Lots of good news on APS and the Revit API to keep you busy for the weekend:
+Lots of good news on APS and the Revit API to keep us busy for the weekend:
 
 - [APS DevCon in Munich and SF](#2)
 - [Forma for AEC](#3)
@@ -102,15 +102,12 @@ Lots of good news on APS and the Revit API to keep you busy for the weekend:
 
 ####<a name="2"></a> APS DevCon in Munich and SF
 
-devcon email Marnee Dupont <marnee.dupont@autodesk.com>
-Registration for Munich DevCon on September 11th and 12th is now OPEN. Attendees can now register for both San Francisco and Munich.
-All the information you need to know as well as both registration links are in this blog post.
-We would love your help in promoting these events. We’ve created these Promo cheat sheets that have social posts, email drafts, and much more to help you spread the word. Please reach out to your customers, reshare our social media posts, and I’ve also posted on Bonfire as well.
-docx icon Munich DevCon Promo Cheat Sheet .docx
-docx icon San Francisco DevCon Promo Cheat Sheet.docx
-A couple notes:
-At this time, this event is for customers and partners ONLY. We do not have capacity to open this up to Autodesk employees at this time.
-If you are an employee who is working or speaking at the event, we have a Staff link that will be shared with you to register. Please do NOT use the registration link in the blog.
+Registration for Munich DevCon on September 11th and 12th is now open.
+Attendees can register for both San Francisco and Munich.
+All information on how
+to
+
+- [register for Autodesk DevCon 2023](https://aps.autodesk.com/blog/register-autodesk-devcon-2023)
 
 ####<a name="3"></a> Forma for AEC
 
