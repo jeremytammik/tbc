@@ -72,8 +72,15 @@ twitter:
 
  @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS
 
-&ndash;
-...
+
+Good news on APS and the Revit API for the weekend
+&ndash; APS DevCon in Munich and SF
+&ndash; Forma for AEC
+&ndash; RevitApiDocs supports Revit 2024
+&ndash; RevitLookup 2024.0.8
+&ndash; User MEP calculation 2024
+&ndash; Wastewater pipe calculation
+&ndash; The password game...
 
 linkedin:
 
@@ -94,11 +101,11 @@ Lots of good news on APS and the Revit API to keep us busy for the weekend:
 
 - [APS DevCon in Munich and SF](#2)
 - [Forma for AEC](#3)
-- [RevitApiDocs Supports Revit 2024](#4)
+- [RevitApiDocs supports Revit 2024](#4)
 - [RevitLookup 2024.0.8](#5)
 - [User MEP calculation 2024](#6)
-- [Wastewater Pipe Calculation](#7)
-- [The Password Game](#8)
+- [Wastewater pipe calculation](#7)
+- [The password game](#8)
 
 ####<a name="2"></a> APS DevCon in Munich and SF
 
@@ -293,11 +300,11 @@ with [The Password Game](https://neal.fun/password-game).
 <img src="img/passwordgame.png" alt="The Password Game" title="The Password Game" width="400"/> <!-- Pixel Height: 1,930 Pixel Width: 1,172 -->
 </center>
 
-> A little Friday frustration fun, in a geeky sort of way.
+> - A little Friday frustration fun, in a geeky sort of way.
 
-> I made it to the whole "find a youtube video of X mins and Y seconds" one and gave up.
+> - I made it to the whole "find a youtube video of X mins and Y seconds" one and gave up.
 
-> I got to 18, but I just can't from there....
+> - I got to 18, but I just can't from there....
 
 <center>
 <img src="img/passwordgame_18.png" alt="The Password Game" title="The Password Game" width="400"/> <!-- Pixel Height: 608 Pixel Width: 719 -->
