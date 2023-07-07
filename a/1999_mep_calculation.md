@@ -88,7 +88,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### MEP Calculation and APS DevCon
+### Docs, Lookup, MEP Calculation and APS DevCon
 
 Lots of good news on APS and the Revit API to keep us busy for the weekend:
 
@@ -107,7 +107,10 @@ Attendees can register for both San Francisco and Munich.
 Here is all information on how
 to:
 
-- [Register for Autodesk DevCon 2023](https://aps.autodesk.com/blog/register-autodesk-devcon-2023)
+<center>
+<a href="https://aps.autodesk.com/blog/register-autodesk-devcon-2023">Register for Autodesk DevCon 2023</a>
+<p></p>
+</center>
 
 ####<a name="3"></a> Forma for AEC
 
@@ -143,7 +146,7 @@ the 3-minute video [Autodesk Forma: Make tomorrow's cities](https://youtu.be/6iK
 - [apidocs](https://apidocs.co/apps/revit/2024/d4648875-d41a-783b-d5f4-638df39ee413.htm#) and
 - [revitapidocs](https://www.revitapidocs.com)
 
-Notifications of new features are pubished on twitter at:
+Notifications of new features are published on twitter at:
 
 - [@ApiDocsCo](https://twitter.com/ApiDocsCo) and
 - [@RevitApiDocs](https://twitter.com/RevitApiDocs)
@@ -161,7 +164,7 @@ for [RevitLookup release 2024.0.8](https://github.com/jeremytammik/RevitLookup/r
 
 - Computing Time Tracking &ndash;
 This feature includes the ability to monitor the computing time taken to invoke a member, such as methods or properties.
-By tracking the execution time, you can identify and analyze slow-performing methods or properties, gaining insights into their overall performance.
+By tracking the execution time, you can identify and analyse slow-performing methods or properties, gaining insights into their overall performance.
 The computing time is displayed in a separate column and a tooltip, providing you with detailed information. This feature is optional and disabled by default
 - Context Menu &ndash;
 A convenient context menu has been added to the table, providing you with additional options to manage columns and update contents.
@@ -206,9 +209,10 @@ Hello, here I leave you [UserMepCalculation](https://github.com/jeremytammik/Use
 
 - [UserMepCalculation2024.rar](/a/zip/UserMepCalculation2024.rar)
 
-However, the Revit SDK 2024 also includes a new add-in named NetworkPressureLossReport that might also be useful for you:
+However, the Revit SDK 2024 also includes a new add-in named `NetworkPressureLossReport` that might also be useful for you:
 
-> This addin sample shows how to access the MEP analytical model data and traverse the network. The flow and pressure loss results are exported to a csv file or displayed in Analysis Visualization Framework (AVF).
+> This add-in sample shows how to access the MEP analytical model data and traverse the network.
+The flow and pressure loss results are exported to a csv file or displayed in Analysis Visualization Framework (AVF).
 
 I hope it helps you, and good luck
 
@@ -292,8 +296,6 @@ with [The Password Game](https://neal.fun/password-game).
 > A little Friday frustration fun, in a geeky sort of way.
 
 > I made it to the whole "find a youtube video of X mins and Y seconds" one and gave up.
-
-> Nice game! My 11th rule seems to be different from yours. I gave up at this point.
 
 > I got to 18, but I just can't from there....
 
