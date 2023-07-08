@@ -72,7 +72,6 @@ twitter:
 
  @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS
 
-
 Good news on APS and the Revit API for the weekend
 &ndash; APS DevCon in Munich and SF
 &ndash; Forma for AEC
