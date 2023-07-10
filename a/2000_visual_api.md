@@ -70,23 +70,23 @@ So I created an option to import one of each schema type into the current docume
 I still don't know the actual source of these assets since they don't match any of the Revit libraries (and I still don't understand why we can't access any material libraries via the API) but I did find something else that is unusual: the only PrismWoodSchema that is contained in that library
 
 <center>
-<img src="img/go_visual_api_1.png" alt="Materials and Visual API" title="Materials and Visual API" width="500"/> <!-- Pixel Height: 600 Pixel Width: 1,200 -->
+<img src="img/go_visual_api_1.png" alt="Materials and Visual API" title="Materials and Visual API" width="500"/> <!-- Pixel Height: 143 Pixel Width: 610 -->
 </center>
 
 shows as being an "Old Style" rendering Asset once it has been imported into the document:
 
 <center>
-<img src="img/go_visual_api_2.png" alt="Materials and Visual API" title="Materials and Visual API" width="500"/> <!-- Pixel Height: 600 Pixel Width: 1,200 -->
+<img src="img/go_visual_api_2.png" alt="Materials and Visual API" title="Materials and Visual API" width="500"/> <!-- Pixel Height: 382 Pixel Width: 894 -->
 </center>
 
 Yet, Assets using the PrismOpaqueSchema show as "New Style" Asset types (as would be expected for the above):
 
 <center>
-<img src="img/go_visual_api_3.png" alt="Materials and Visual API" title="Materials and Visual API" width="500"/> <!-- Pixel Height: 600 Pixel Width: 1,200 -->
+<img src="img/go_visual_api_3.png" alt="Materials and Visual API" title="Materials and Visual API" width="500"/> <!-- Pixel Height: 578 Pixel Width: 1,298 -->
 </center>
 
 <center>
-<img src="img/go_visual_api_4.png" alt="Materials and Visual API" title="Materials and Visual API" width="500"/> <!-- Pixel Height: 600 Pixel Width: 1,200 -->
+<img src="img/go_visual_api_4.png" alt="Materials and Visual API" title="Materials and Visual API" width="500"/> <!-- Pixel Height: 591 Pixel Width: 1,191 -->
 </center>
 
 Just another glitch?
