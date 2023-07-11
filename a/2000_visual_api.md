@@ -24,9 +24,15 @@
 
 twitter:
 
+Two very different aspects of BIM materials, GetMaterialArea behaviour, material assets and the Visual API, filtering for annotations and a powerful batch processor utility:
+
  with the @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS
 
-&ndash; ...
+Two very different aspects of BIM materials, filtering for annotations and a powerful batch processor utility:
+&ndash; GetMaterialArea behaviour varies
+&ndash; Material assets and the Visual API
+&ndash; Filter for annotation families
+&ndash; Revit batch processor RBP...
 
 linkedin:
 
