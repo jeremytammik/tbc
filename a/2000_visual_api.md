@@ -243,5 +243,5 @@ Thank you very much for your help!
 Let's wrap up with a pointer to
 the [Revit Batch Processor RBP](https://github.com/bvn-architecture/RevitBatchProcessor).
 It looks like a very powerful and full-fledged utility; it came up in the StackOverflow question
-asking [is there a way to change the workset configuration of a Revit file without opening Revit?](https://stackoverflow.com/questions/76630229/is-there-a-way-to-change-the-workset-configuration-of-a-revit-file-without-openi()
+asking [is there a way to change the workset configuration of a Revit file without opening Revit?](https://stackoverflow.com/questions/76630229/is-there-a-way-to-change-the-workset-configuration-of-a-revit-file-without-openi)
 
