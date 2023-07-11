@@ -13,6 +13,9 @@
 - Materials, Material Assets (Appearance, Structural, Thermal) and the Visual API
   https://forums.autodesk.com/t5/revit-api-forum/materials-material-assets-appearance-structural-thermal-and-the/td-p/12088469
 
+- filter for annotation families
+  https://autodesk.slack.com/archives/C0SR6NAP8/p1688664085416909
+
 - Revit Batch Processor (RBP)
   https://github.com/bvn-architecture/RevitBatchProcessor
   came up in
@@ -43,8 +46,9 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ####<a name="2"></a> GetMaterialArea Behaviour Varies
 
-[Method GetMaterialArea() appears to use different formulas for computing the area depending on the element category](https://forums.autodesk.com/t5/revit-api-forum/method-getmaterialarea-appears-to-use-different-formulas-for/td-p/11988215)
-
+GetMaterialArea returns different results for different kinds of elements, as explaind in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on the [method `GetMaterialArea` appears to use different formulas for computing the area depending on the element category](https://forums.autodesk.com/t5/revit-api-forum/method-getmaterialarea-appears-to-use-different-formulas-for/td-p/11988215):
 
 **Question:** How does the method GetMaterialArea compute the area depending on the element category? It appears to use different formulas for different categories. For a wall, it is the area of one of the side faces for a layer (which probably makes sense); for a window, however, the method returns the sum over all 6 faces (assuming a simple cuboid). Please provide documentation on how the method functions on different elements
 or a unified way of computing the area.
@@ -57,10 +61,12 @@ GetMaterialArea(matId) and GetMaterialVolume(matId) returns 0 for these categori
 
 **Answern 1:** You should check Category.HasMaterialQuantities for that, some categories don't support material quantities.
 
-Regarding the other thing I'm waiting to hear in slightly more detail also.
-However it is noted that such material quantities are calculated either from compound structure layers or geometry. Since the Window isn't a compound structure area will be taken from faces of geometry I suspect (Wall on the other hand has compound structure). The geometry of the wall would at the same time be lacking the layers detail.
+However, it is noted that such material quantities are calculated either from compound structure layers or geometry.
+Since the `Window` isn't a compound structure, area will be taken from faces of geometry I suspect; `Wall`, on the other hand, has compound structure.
+The geometry of the wall would at the same time be lacking the layers detail.
 
-**Answer 2:** I think the customer is referring mostly to the difference between system families and loaded families in Revit itself. The API is probably returning the same values.
+**Answer 2:** I think the customer is referring mostly to the difference between system families and loaded families in Revit itself.
+The API is probably returning the same values.
 
 - Hosts will return 1 face, because in construction, you would refer to the area of a wall material (for example) as the area to be covered when looking at the wall.
 - Stairs, railing, ramps, site, and curtain wall also have special behavior.
@@ -68,7 +74,6 @@ However it is noted that such material quantities are calculated either from com
 
 This is confirmed and workarounds are posted in the Revit Clinic article
 on [Material Takeoff Area Schedule](https://revitclinic.typepad.com/my_weblog/2009/10/material-takeoff-area.html).
-
 Some other special cases are listed in the Autodesk Support article
 on [Material Takeoff shows incorrect values of areas and/or volumes in Revit](https://www.autodesk.com/support/technical/article/caas/sfdcarticles/sfdcarticles/Material-Takeoff-shows-incorrect-areas-in-Revit.html).
 
@@ -93,11 +98,11 @@ Note that the volumes and areas computed by Revit may be approximate in some cas
 For example, for individual layers within a wall, minor discrepancies might appear between the volumes visible in the model and those shown in the material takeoff schedule.
 These discrepancies tend to occur when you use the wall sweep tool to add a sweep or a reveal to a wall, or under certain join conditions.
 
-
 ####<a name="3"></a> Material Assets and the Visual API
 
-Gary J. Orr of [MBI Companies Inc.](https://www.mbicompanies.com/) shares
-a nice VB.NET sample in
+A completely different aspect of materials is addressed by
+Gary J. Orr of [MBI Companies Inc.](https://www.mbicompanies.com/),
+who shares a nice VB.NET sample in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 demonstrating the interaction
 with [Materials, Material Assets (Appearance, Structural, Thermal) and the Visual API](https://forums.autodesk.com/t5/revit-api-forum/materials-material-assets-appearance-structural-thermal-and-the/m-p/12089438).
@@ -132,7 +137,7 @@ That is fixed now.
 Along the way I decided to actually do something with that massive volume of returns from GatRevitAppearanceAssets ie: application.GetAssets(AssetType.Appearance).
 So I created an option to import one of each schema type into the current document.
 
-I still don't know the actual source of these assets since they don't match any of the Revit libraries (and I still don't understand why we can't access any material libraries via the API) but I did find something else that is unusual: the only PrismWoodSchema that is contained in that library
+I still don't know the actual source of these assets since they don't match any of the Revit libraries (and I still don't understand why we can't access any material libraries via the API) but I did find something else that is unusual: the only PrismWoodSchema that is contained in that library,
 
 <center>
 <img src="img/go_visual_api_1.png" alt="Materials and Visual API" title="Materials and Visual API" width="500"/> <!-- Pixel Height: 143 Pixel Width: 610 -->
@@ -148,38 +153,95 @@ Yet, Assets using the PrismOpaqueSchema show as "New Style" Asset types (as woul
 
 <center>
 <img src="img/go_visual_api_3.png" alt="Materials and Visual API" title="Materials and Visual API" width="500"/> <!-- Pixel Height: 578 Pixel Width: 1,298 -->
-</center>
-
-<center>
+<br/>
 <img src="img/go_visual_api_4.png" alt="Materials and Visual API" title="Materials and Visual API" width="500"/> <!-- Pixel Height: 591 Pixel Width: 1,191 -->
 </center>
 
 Just another glitch?
 
+Here are the main problems I struggled with:
+
+One biggie (in my opinion) is the lack of any direct correlation between the return values when you read Appearance Asset Properties to the Visual API Classes and their properties that should be used to work with them. This is a big complication and makes it really hard to avoid using strings and thereby keep your code language neutral. The descriptions in the API help do not help with that mapping the least little bit.
+
+Another big one would be the absence of any clear and concise method to differentiate between Physical Property Sets... Structural vs Thermal.
+
+We need a firm method of being able to differentiate Structural and Thermal Property Sets.
+PSE elements will often return both a thermal and a structural Property Set, and EVERY PSE element will return a structural (RevitLookup Snoop shows that pretty well)... yet they can only be used for the correct Property type, so something somewhere knows which one is which; we need that information in the API as well.
+
+Then, we have: where does application.GetAssets draw from?
+There is nothing that matches what is found in that return list of assets anywhere that I can find in the system.
+The PrismWoodSchema returned from that list shows as an "Old style" rendering Asset once pulled into a document, even though it is clearly a procedural Asset.
+
+We need access to the the AEC material Library as well as any user created libraries (as can be browsed to in the Material Browser.
+
+We need access to the Asset libraries (as can be browsed to in the Assets dialog).
+
+There are a few other requirements in my comments within the code, but most end up boiling down to one of these.
+
+Will that help get the development team started?
+
+BTW: this was written to the 2023 API, I haven't tested it for compatibility beyond that.
+
 Many thanks to Gary for sharing the results of his research!
 
+####<a name="4"></a> Filter for Annotation Families
 
+A quick note on filtering for annotation families:
 
-####<a name="3"></a> Revit Batch Processor RBP
+**Question:** Is there an identifier which I can use to sort out annotation families vs other types of families using the Revit API?
+I'd like to iterate over the `IEnumerable` to then group items as I need them.
+The code I'm currently using and would like to modify:
 
-The [Revit Batch Processor RBP](https://github.com/bvn-architecture/RevitBatchProcessor) looks
-like a very powerfull full-fledged utility; it was mentioned in the StackOverflow question
+<pre class="prettyprint">
+  var families = new FilteredElementCollector(doc)
+    .OfClass(typeof(ElementType))
+    .Cast&lt;ElementType&gt;();
+</pre>
+
+**Answer:** See if this works for you:
+https://forum.dynamobim.com/t/how-can-i-collect-all-family-types-that-are-considered-annotation-symbols-in-revit/37480/10
+
+It shows you that you need [`FamilySymbol`](https://www.revitapidocs.com/2024/a1acaed0-6a62-4c1d-94f5-4e27ce0923d3.htm) instead of `ElementType`.
+
+Then, filter for:
+
+<pre class="prettyprint">
+  fs.Family.FamilyCategory.CategoryType
+    == CategoryType.Annotation
+</pre>
+
+**Response:** For some added context,
+I am hoping to first get all system families, then iterate over the collection of all system families and separate out the annotation families from that list.
+Ultimately, I will end up with two CSV's, one with Annotation Families only, and the other CSV file with all system families minus annotation families which is why I think I was using `ElementType` instead of `FamilySymbol`.
+
+**Answer:** `FamilySymbol` should be fine in your case &ndash; it is derived from `ElementType`.
+ElementTypes are more general.
+For example, a `Wall` element can have a `WallType` which is also derived from `ElementType`.
+
+**Response:** I gave it a try, but now system families I was hoping to extract (prior to filtering out annotation families), like a basic wall, do not come through in my filter.
+
+**Answer:** Sorry my bad. You are right.
+For element types that are not family symbols you will not be able to do
+
+<pre class="prettyprint">
+  elem.Family.FamilyCategory.CategoryType
+</pre>
+
+You may check it’s own category I guess.
+
+**Response:** That got me on the right track.
+I ended up having to filter out items which have null category information:
+
+<pre class="prettyprint">
+  Category.CategoryType != CategoryType.Annotation
+</pre>
+
+Thank you very much for your help!
+
+####<a name="5"></a> Revit Batch Processor RBP
+
+Let's wrap up with a pointer to
+the [Revit Batch Processor RBP](https://github.com/bvn-architecture/RevitBatchProcessor).
+It looks like a very powerful and full-fledged utility; it came up in the StackOverflow question
 asking [is there a way to change the workset configuration of a Revit file without opening Revit?](https://stackoverflow.com/questions/76630229/is-there-a-way-to-change-the-workset-configuration-of-a-revit-file-without-openi()
-
-
-####<a name="4"></a>
-
-<center>
-<img src="img/.png" alt="Rev" title="" width="100"/> <!-- Pixel Height: 600 Pixel Width: 1,200 -->
-</center>
-
-####<a name="5"></a>
-
-
-####<a name="6"></a>
-
-####<a name="7"></a>
-
-
-####<a name="8"></a>
 
