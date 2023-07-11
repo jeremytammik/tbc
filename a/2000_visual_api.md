@@ -267,7 +267,9 @@ This blog post is The Building Coder's 2000th.
 You can check out the entire chronological list in
 the [GitHub tbc repository](https://github.com/jeremytammik/tbc).
 
-All in all, The Building Coder has published over four hundred thousand lines of text, two-and-a-half million words and over 22 million characters since its inception in 2008:
+All in all, The Building Coder has published over four hundred thousand lines of text, two-and-a-half million words and over 22 million characters since its inception in 2008.
+
+It is also interesting to see what topics we started out covering back then; several are equally relevant and still recurring today:
 
 <pre>
 % wc *htm *md
@@ -291,3 +293,5 @@ All in all, The Building Coder has published over four hundred thousand lines of
      259    2335   16834 2000_visual_api.md
   417722 2480900 22669323 total
 </pre>
+
+Long live The Building Coder!
