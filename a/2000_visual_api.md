@@ -43,7 +43,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### RBP, Materials, Assets and the Visual API
 
-Two different aspects of BIM materials, filtering for annotations and a batch processor utility:
+Two very different aspects of BIM materials, filtering for annotations and a powerful batch processor utility:
 
 - [GetMaterialArea behaviour varies](#2)
 - [Material assets and the Visual API](#3)
@@ -52,7 +52,7 @@ Two different aspects of BIM materials, filtering for annotations and a batch pr
 
 ####<a name="2"></a> GetMaterialArea Behaviour Varies
 
-GetMaterialArea returns different results for different kinds of elements, as explaind in
+GetMaterialArea returns different results for different kinds of elements, as explained in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on the [method `GetMaterialArea` appears to use different formulas for computing the area depending on the element category](https://forums.autodesk.com/t5/revit-api-forum/method-getmaterialarea-appears-to-use-different-formulas-for/td-p/11988215):
 
@@ -65,7 +65,7 @@ I also noticed that GetMaterialIds returns null for elements of (at least) these
 
 GetMaterialArea(matId) and GetMaterialVolume(matId) returns 0 for these categories.
 
-**Answern 1:** You should check Category.HasMaterialQuantities for that, some categories don't support material quantities.
+**Answer 1:** You should check Category.HasMaterialQuantities for that, some categories don't support material quantities.
 
 However, it is noted that such material quantities are calculated either from compound structure layers or geometry.
 Since the `Window` isn't a compound structure, area will be taken from faces of geometry I suspect; `Wall`, on the other hand, has compound structure.
@@ -75,7 +75,7 @@ The geometry of the wall would at the same time be lacking the layers detail.
 The API is probably returning the same values.
 
 - Hosts will return 1 face, because in construction, you would refer to the area of a wall material (for example) as the area to be covered when looking at the wall.
-- Stairs, railing, ramps, site, and curtain wall also have special behavior.
+- Stairs, railing, ramps, site, and curtain wall also have special behaviour.
 - Loaded families (like windows) will report an area including all faces.
 
 This is confirmed and workarounds are posted in the Revit Clinic article
@@ -83,10 +83,10 @@ on [Material Takeoff Area Schedule](https://revitclinic.typepad.com/my_weblog/20
 Some other special cases are listed in the Autodesk Support article
 on [Material Takeoff shows incorrect values of areas and/or volumes in Revit](https://www.autodesk.com/support/technical/article/caas/sfdcarticles/sfdcarticles/Material-Takeoff-shows-incorrect-areas-in-Revit.html).
 
-As far as the API goes, check out these 2 resources from The Building Coder and Scott Conover that may help confirm the API designed behavior:
+As far as the API goes, check out these 2 resources from The Building Coder and Scott Conover that may help confirm the API designed behaviour:
 
 - [Material Quantity Extraction](https://thebuildingcoder.typepad.com/blog/2010/02/material-quantity-extraction.html)
-- [Analyze Geometry of Buildings Using the Revit API](https://thebuildingcoder.typepad.com/au/2009/AU09_CP222-3_Analyze_Geometry_Revit_API.pdf) at AU 2009 by Scott Conover, Autodesk
+- [Analyse Geometry of Buildings Using the Revit API](https://thebuildingcoder.typepad.com/au/2009/AU09_CP222-3_Analyze_Geometry_Revit_API.pdf) at AU 2009 by Scott Conover, Autodesk
 
 This is from Scott's presentation:
 
@@ -137,13 +137,13 @@ Another would be the absence of any clear and concise method to differentiate be
 Of course, this may all just be an exercise in vanity from a wanna-be but perhaps some may find some of it helpful.
 
 Later: Oops,
-The Asset Property type "List" was supposed to recurse to get the values of the list items but I had forgotten to get back and actually make it do so.
+The Asset Property type "List" was supposed to recurse to get the values of the list items, but I had forgotten to get back and actually make it do so.
 
 That is fixed now.
-Along the way I decided to actually do something with that massive volume of returns from GatRevitAppearanceAssets ie: application.GetAssets(AssetType.Appearance).
-So I created an option to import one of each schema type into the current document.
+Along the way I decided to actually do something with that massive volume of returns from GetRevitAppearanceAssets, i.e.: application.GetAssets(AssetType.Appearance).
+So, I created an option to import one of each schema type into the current document.
 
-I still don't know the actual source of these assets since they don't match any of the Revit libraries (and I still don't understand why we can't access any material libraries via the API) but I did find something else that is unusual: the only PrismWoodSchema that is contained in that library,
+I still don't know the actual source of these assets since they don't match any of the Revit libraries (and I still don't understand why we can't access any material libraries via the API), but I did find something else that is unusual: the only PrismWoodSchema that is contained in that library,
 
 <center>
 <img src="img/go_visual_api_1.png" alt="Materials and Visual API" title="Materials and Visual API" width="500"/> <!-- Pixel Height: 143 Pixel Width: 610 -->
@@ -178,7 +178,7 @@ Then, we have: where does application.GetAssets draw from?
 There is nothing that matches what is found in that return list of assets anywhere that I can find in the system.
 The PrismWoodSchema returned from that list shows as an "Old style" rendering Asset once pulled into a document, even though it is clearly a procedural Asset.
 
-We need access to the the AEC material Library as well as any user created libraries (as can be browsed to in the Material Browser.
+We need access to the AEC material Library as well as any user created libraries (as can be browsed to in the Material Browser.
 
 We need access to the Asset libraries (as can be browsed to in the Assets dialog).
 
@@ -233,7 +233,7 @@ For element types that are not family symbols you will not be able to do
   elem.Family.FamilyCategory.CategoryType
 </pre>
 
-You may check it’s own category I guess.
+You may check its own category I guess.
 
 **Response:** That got me on the right track.
 I ended up having to filter out items which have null category information:

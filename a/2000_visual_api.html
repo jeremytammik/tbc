@@ -41,7 +41,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 -->
 
 <h3>RBP, Materials, Assets and the Visual API</h3>
-<p>Two different aspects of BIM materials, filtering for annotations and a batch processor utility:</p>
+<p>Two very different aspects of BIM materials, filtering for annotations and a powerful batch processor utility:</p>
 <ul>
 <li><a href="#2">GetMaterialArea behaviour varies</a></li>
 <li><a href="#3">Material assets and the Visual API</a></li>
@@ -49,7 +49,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 <li><a href="#5">Revit batch processor RBP</a></li>
 </ul>
 <h4><a name="2"></a> GetMaterialArea Behaviour Varies</h4>
-<p>GetMaterialArea returns different results for different kinds of elements, as explaind in
+<p>GetMaterialArea returns different results for different kinds of elements, as explained in
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
 on the <a href="https://forums.autodesk.com/t5/revit-api-forum/method-getmaterialarea-appears-to-use-different-formulas-for/td-p/11988215">method <code>GetMaterialArea</code> appears to use different formulas for computing the area depending on the element category</a>:</p>
 <p><strong>Question:</strong> How does the method GetMaterialArea compute the area depending on the element category? It appears to use different formulas for different categories. For a wall, it is the area of one of the side faces for a layer (which probably makes sense); for a window, however, the method returns the sum over all 6 faces (assuming a simple cuboid). Please provide documentation on how the method functions on different elements
@@ -59,7 +59,7 @@ or a unified way of computing the area.</p>
 <li>Pipe, Flex Pipe, Duct, Flex Duct, Duct Insulation, Ramp</li>
 </ul>
 <p>GetMaterialArea(matId) and GetMaterialVolume(matId) returns 0 for these categories.</p>
-<p><strong>Answern 1:</strong> You should check Category.HasMaterialQuantities for that, some categories don't support material quantities.</p>
+<p><strong>Answer 1:</strong> You should check Category.HasMaterialQuantities for that, some categories don't support material quantities.</p>
 <p>However, it is noted that such material quantities are calculated either from compound structure layers or geometry.
 Since the <code>Window</code> isn't a compound structure, area will be taken from faces of geometry I suspect; <code>Wall</code>, on the other hand, has compound structure.
 The geometry of the wall would at the same time be lacking the layers detail.</p>
@@ -67,17 +67,17 @@ The geometry of the wall would at the same time be lacking the layers detail.</p
 The API is probably returning the same values.</p>
 <ul>
 <li>Hosts will return 1 face, because in construction, you would refer to the area of a wall material (for example) as the area to be covered when looking at the wall.</li>
-<li>Stairs, railing, ramps, site, and curtain wall also have special behavior.</li>
+<li>Stairs, railing, ramps, site, and curtain wall also have special behaviour.</li>
 <li>Loaded families (like windows) will report an area including all faces.</li>
 </ul>
 <p>This is confirmed and workarounds are posted in the Revit Clinic article
 on <a href="https://revitclinic.typepad.com/my_weblog/2009/10/material-takeoff-area.html">Material Takeoff Area Schedule</a>.
 Some other special cases are listed in the Autodesk Support article
 on <a href="https://www.autodesk.com/support/technical/article/caas/sfdcarticles/sfdcarticles/Material-Takeoff-shows-incorrect-areas-in-Revit.html">Material Takeoff shows incorrect values of areas and/or volumes in Revit</a>.</p>
-<p>As far as the API goes, check out these 2 resources from The Building Coder and Scott Conover that may help confirm the API designed behavior:</p>
+<p>As far as the API goes, check out these 2 resources from The Building Coder and Scott Conover that may help confirm the API designed behaviour:</p>
 <ul>
 <li><a href="https://thebuildingcoder.typepad.com/blog/2010/02/material-quantity-extraction.html">Material Quantity Extraction</a></li>
-<li><a href="https://thebuildingcoder.typepad.com/au/2009/AU09_CP222-3_Analyze_Geometry_Revit_API.pdf">Analyze Geometry of Buildings Using the Revit API</a> at AU 2009 by Scott Conover, Autodesk</li>
+<li><a href="https://thebuildingcoder.typepad.com/au/2009/AU09_CP222-3_Analyze_Geometry_Revit_API.pdf">Analyse Geometry of Buildings Using the Revit API</a> at AU 2009 by Scott Conover, Autodesk</li>
 </ul>
 <p>This is from Scott's presentation:</p>
 <p>Material quantity extraction One common analytical requirement is to extract material quantities of elements in the document.  Revit 2010 introduced methods to directly obtain the material volumes and areas computed by Revit for material takeoff schedules:</p>
@@ -114,11 +114,11 @@ One biggie (in my opinion) is the lack of any direct correlation between the ret
 Another would be the absence of any clear and concise method to differentiate between Physical Property Sets... Structural vs Thermal.</p>
 <p>Of course, this may all just be an exercise in vanity from a wanna-be but perhaps some may find some of it helpful.</p>
 <p>Later: Oops,
-The Asset Property type "List" was supposed to recurse to get the values of the list items but I had forgotten to get back and actually make it do so.</p>
+The Asset Property type "List" was supposed to recurse to get the values of the list items, but I had forgotten to get back and actually make it do so.</p>
 <p>That is fixed now.
-Along the way I decided to actually do something with that massive volume of returns from GatRevitAppearanceAssets ie: application.GetAssets(AssetType.Appearance).
-So I created an option to import one of each schema type into the current document.</p>
-<p>I still don't know the actual source of these assets since they don't match any of the Revit libraries (and I still don't understand why we can't access any material libraries via the API) but I did find something else that is unusual: the only PrismWoodSchema that is contained in that library,</p>
+Along the way I decided to actually do something with that massive volume of returns from GetRevitAppearanceAssets, i.e.: application.GetAssets(AssetType.Appearance).
+So, I created an option to import one of each schema type into the current document.</p>
+<p>I still don't know the actual source of these assets since they don't match any of the Revit libraries (and I still don't understand why we can't access any material libraries via the API), but I did find something else that is unusual: the only PrismWoodSchema that is contained in that library,</p>
 <p><center>
 <img src="img/go_visual_api_1.png" alt="Materials and Visual API" title="Materials and Visual API" width="500"/> <!-- Pixel Height: 143 Pixel Width: 610 -->
 </center></p>
@@ -141,7 +141,7 @@ PSE elements will often return both a thermal and a structural Property Set, and
 <p>Then, we have: where does application.GetAssets draw from?
 There is nothing that matches what is found in that return list of assets anywhere that I can find in the system.
 The PrismWoodSchema returned from that list shows as an "Old style" rendering Asset once pulled into a document, even though it is clearly a procedural Asset.</p>
-<p>We need access to the the AEC material Library as well as any user created libraries (as can be browsed to in the Material Browser.</p>
+<p>We need access to the AEC material Library as well as any user created libraries (as can be browsed to in the Material Browser.</p>
 <p>We need access to the Asset libraries (as can be browsed to in the Assets dialog).</p>
 <p>There are a few other requirements in my comments within the code, but most end up boiling down to one of these.</p>
 <p>Will that help get the development team started?</p>
@@ -180,7 +180,7 @@ For element types that are not family symbols you will not be able to do</p>
   elem.Family.FamilyCategory.CategoryType
 </pre>
 
-<p>You may check it’s own category I guess.</p>
+<p>You may check its own category I guess.</p>
 <p><strong>Response:</strong> That got me on the right track.
 I ended up having to filter out items which have null category information:</p>
 <pre class="prettyprint">
