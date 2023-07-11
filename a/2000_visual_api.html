@@ -1,0 +1,134 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css"></p>
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+<p></head></p>
+<!---
+
+- GetMaterialArea
+  https://autodesk.slack.com/archives/C0SR6NAP8/p1685384981134679
+  https://forums.autodesk.com/t5/revit-api-forum/method-getmaterialarea-appears-to-use-different-formulas-for/td-p/11988215
+
+- Materials, Material Assets (Appearance, Structural, Thermal) and the Visual API
+  https://forums.autodesk.com/t5/revit-api-forum/materials-material-assets-appearance-structural-thermal-and-the/td-p/12088469
+
+- Revit Batch Processor (RBP)
+  https://github.com/bvn-architecture/RevitBatchProcessor
+  came up in
+  Is there a way to change the workset configuration of a revit file without opening revit?
+  https://stackoverflow.com/questions/76630229/is-there-a-way-to-change-the-workset-configuration-of-a-revit-file-without-openi
+
+twitter:
+
+ with the @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS
+
+&ndash; ...
+
+linkedin:
+
+#BIM #DynamoBIM #AutodeskAPS #Revit #API #IFC #SDK #Autodesk #AEC #adsk
+
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+
+<center>
+<img src="img/" alt="" title="" width="600"/>
+<p style="font-size: 80%; font-style:italic"></p>
+</center>
+
+-->
+
+<h3>RBP, Materials, Assets and the Visual API</h3>
+<h4><a name="2"></a> GetMaterialArea Behaviour Varies</h4>
+<p><a href="https://forums.autodesk.com/t5/revit-api-forum/method-getmaterialarea-appears-to-use-different-formulas-for/td-p/11988215">Method GetMaterialArea() appears to use different formulas for computing the area depending on the element category</a></p>
+<p><strong>Question:</strong> How does the method GetMaterialArea compute the area depending on the element category? It appears to use different formulas for different categories. For a wall, it is the area of one of the side faces for a layer (which probably makes sense); for a window, however, the method returns the sum over all 6 faces (assuming a simple cuboid). Please provide documentation on how the method functions on different elements
+or a unified way of computing the area.</p>
+<p>I also noticed that GetMaterialIds returns null for elements of (at least) these categories:</p>
+<ul>
+<li>Pipe, Flex Pipe, Duct, Flex Duct, Duct Insulation, Ramp</li>
+</ul>
+<p>GetMaterialArea(matId) and GetMaterialVolume(matId) returns 0 for these categories.</p>
+<p><strong>Answern 1:</strong> You should check Category.HasMaterialQuantities for that, some categories don't support material quantities.</p>
+<p>Regarding the other thing I'm waiting to hear in slightly more detail also.
+However it is noted that such material quantities are calculated either from compound structure layers or geometry. Since the Window isn't a compound structure area will be taken from faces of geometry I suspect (Wall on the other hand has compound structure). The geometry of the wall would at the same time be lacking the layers detail.</p>
+<p><strong>Answer 2:</strong> I think the customer is referring mostly to the difference between system families and loaded families in Revit itself. The API is probably returning the same values.</p>
+<ul>
+<li>Hosts will return 1 face, because in construction, you would refer to the area of a wall material (for example) as the area to be covered when looking at the wall.</li>
+<li>Stairs, railing, ramps, site, and curtain wall also have special behavior.</li>
+<li>Loaded families (like windows) will report an area including all faces.</li>
+</ul>
+<p>This is confirmed and workarounds are posted in the Revit Clinic article
+on <a href="https://revitclinic.typepad.com/my_weblog/2009/10/material-takeoff-area.html">Material Takeoff Area Schedule</a>.</p>
+<p>Some other special cases are listed in the Autodesk Support article
+on <a href="https://www.autodesk.com/support/technical/article/caas/sfdcarticles/sfdcarticles/Material-Takeoff-shows-incorrect-areas-in-Revit.html">Material Takeoff shows incorrect values of areas and/or volumes in Revit</a>.</p>
+<p>As far as the API goes, check out these 2 resources from The Building Coder and Scott Conover that may help confirm the API designed behavior:</p>
+<ul>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2010/02/material-quantity-extraction.html">Material Quantity Extraction</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/au/2009/AU09_CP222-3_Analyze_Geometry_Revit_API.pdf">Analyze Geometry of Buildings Using the Revit API</a> at AU 2009 by Scott Conover, Autodesk</li>
+</ul>
+<p>This is from Scott's presentation:</p>
+<p>Material quantity extraction One common analytical requirement is to extract material quantities of elements in the document.  Revit 2010 introduced methods to directly obtain the material volumes and areas computed by Revit for material takeoff schedules:</p>
+<ul>
+<li>Element.Materials &ndash; obtains a list of materials within an element</li>
+<li>Element.GetMaterialVolume() &ndash; obtains the volume of a particular material in an element</li>
+<li>Element.GetMaterialArea() &ndash; obtains the area of a particular material in an element</li>
+</ul>
+<p>The methods apply to categories of elements where Category.HasMaterialQuantities property is true.
+In practice, this is limited to elements that use compound structure, like walls, roofs, floors, ceilings, a few other basic 3D elements like stairs, plus 3D families where materials can be assigned to geometry of the family, like windows, doors, columns, MEP equipment and fixtures, and generic model families.
+Note that within these categories there are further restrictions about how material quantities can be extracted.
+For example, curtain walls and curtain roofs will not report any material quantities themselves; the materials used by these constructs can be extracted from the individual panel elements that make up the curtain system.
+Note that the volumes and areas computed by Revit may be approximate in some cases.
+For example, for individual layers within a wall, minor discrepancies might appear between the volumes visible in the model and those shown in the material takeoff schedule.
+These discrepancies tend to occur when you use the wall sweep tool to add a sweep or a reveal to a wall, or under certain join conditions.</p>
+<h4><a name="3"></a> Material Assets and the Visual API</h4>
+<p>Gary J. Orr of <a href="https://www.mbicompanies.com/">MBI Companies Inc.</a> shares
+a nice VB.NET sample in
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
+demonstrating the interaction
+with <a href="https://forums.autodesk.com/t5/revit-api-forum/materials-material-assets-appearance-structural-thermal-and-the/m-p/12089438">Materials, Material Assets (Appearance, Structural, Thermal) and the Visual API</a>.
+In his own words:</p>
+<p>This has been a journey. The past few weeks have seen me spending all the time that I can spare reading the API help, reading posts going back years, reading blogs (which get really hard to pull targeted information out of sometimes).</p>
+<p>Then came trying to put it all together, Snippets of code from the API, some of which can cause just as much confusion as the help that they provide, translating snippets of code that I can barely understand because I don't speak that particular coding language, which is made even worse by the fact that it is usually written by programming professionals that use code shortcuts (which makes reading their examples even harder) and often refer to advanced coding techniques that I simply haven't ever learned since none of this is my real occupation...</p>
+<p>But hey, I did it.</p>
+<p>I can now take materials and their related Assets apart and I can create/recreate them.</p>
+<p>You are welcome to the <a href="zip/go_materials_visual_api.zip">attached VB file <code>MaterialTools.vb</code></a> if you are struggling with these same issues (dump it into a VS project with the appropriate references or copy the subs/functions into a VB macro with the appropriate mods for launching the included tools).</p>
+<p>It has functions for collecting and logging the Properties of the Application resident Appearance Assets; the Assets within a Document; the materials within a document and their associated Properties and connected assets; and one for creating a new material with all new assets. Those functions will generate TXT and XML log files that can be used to further examine all of the above.</p>
+<p>I have attempted to document (with in line comments) the steps required and/or taken, along with why one method may have been chosen over another when such applied, as well as some cautions and some still outstanding questions and/or shortcomings that had to be worked around.</p>
+<p>If you're well versed in Materials, and have both the time and desire, perhaps you can take a look and see if you have any answers for the commented questions that I still have and have left in the code.</p>
+<p>There are still plenty of issues, some may just be because I haven't learned all I need to learn yet, but the bigger ones seem to be common from what I have found:
+One biggie (in my opinion) is the lack of any direct correlation between the return values when you read Appearance Asset Properties to the Visual API Classes and their properties that should be used to work with them. This is a big complication and makes it really hard to avoid using strings and thereby keep your code language neutral. The descriptions in the API help do not help with that mapping the least little bit.
+Another would be the absence of any clear and concise method to differentiate between Physical Property Sets... Structural vs Thermal.</p>
+<p>Of course, this may all just be an exercise in vanity from a wanna-be but perhaps some may find some of it helpful.</p>
+<p>Later: Oops,
+The Asset Property type "List" was supposed to recurse to get the values of the list items but I had forgotten to get back and actually make it do so.</p>
+<p>That is fixed now.
+Along the way I decided to actually do something with that massive volume of returns from GatRevitAppearanceAssets ie: application.GetAssets(AssetType.Appearance).
+So I created an option to import one of each schema type into the current document.</p>
+<p>I still don't know the actual source of these assets since they don't match any of the Revit libraries (and I still don't understand why we can't access any material libraries via the API) but I did find something else that is unusual: the only PrismWoodSchema that is contained in that library</p>
+<p><center>
+<img src="img/go_visual_api_1.png" alt="Materials and Visual API" title="Materials and Visual API" width="500"/> <!-- Pixel Height: 143 Pixel Width: 610 -->
+</center></p>
+<p>shows as being an "Old Style" rendering Asset once it has been imported into the document:</p>
+<p><center>
+<img src="img/go_visual_api_2.png" alt="Materials and Visual API" title="Materials and Visual API" width="500"/> <!-- Pixel Height: 382 Pixel Width: 894 -->
+</center></p>
+<p>Yet, Assets using the PrismOpaqueSchema show as "New Style" Asset types (as would be expected for the above):</p>
+<p><center>
+<img src="img/go_visual_api_3.png" alt="Materials and Visual API" title="Materials and Visual API" width="500"/> <!-- Pixel Height: 578 Pixel Width: 1,298 -->
+</center></p>
+<p><center>
+<img src="img/go_visual_api_4.png" alt="Materials and Visual API" title="Materials and Visual API" width="500"/> <!-- Pixel Height: 591 Pixel Width: 1,191 -->
+</center></p>
+<p>Just another glitch?</p>
+<p>Many thanks to Gary for sharing the results of his research!</p>
+<h4><a name="3"></a> Revit Batch Processor RBP</h4>
+<p>The <a href="https://github.com/bvn-architecture/RevitBatchProcessor">Revit Batch Processor RBP</a> looks
+like a very powerfull full-fledged utility; it was mentioned in the StackOverflow question
+asking [is there a way to change the workset configuration of a Revit file without opening Revit?](https://stackoverflow.com/questions/76630229/is-there-a-way-to-change-the-workset-configuration-of-a-revit-file-without-openi()</p>
+<h4><a name="4"></a></h4>
+<p><center>
+<img src="img/.png" alt="Rev" title="" width="100"/> <!-- Pixel Height: 600 Pixel Width: 1,200 -->
+</center></p>
+<h4><a name="5"></a></h4>
+<h4><a name="6"></a></h4>
+<h4><a name="7"></a></h4>
+<h4><a name="8"></a></h4>
