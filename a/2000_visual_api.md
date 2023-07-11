@@ -6,6 +6,18 @@
 
 <!---
 
+- GetMaterialArea
+  https://autodesk.slack.com/archives/C0SR6NAP8/p1685384981134679
+  https://forums.autodesk.com/t5/revit-api-forum/method-getmaterialarea-appears-to-use-different-formulas-for/td-p/11988215
+
+- Materials, Material Assets (Appearance, Structural, Thermal) and the Visual API
+  https://forums.autodesk.com/t5/revit-api-forum/materials-material-assets-appearance-structural-thermal-and-the/td-p/12088469
+
+- Revit Batch Processor (RBP)
+  https://github.com/bvn-architecture/RevitBatchProcessor
+  came up in
+  Is there a way to change the workset configuration of a revit file without opening revit?
+  https://stackoverflow.com/questions/76630229/is-there-a-way-to-change-the-workset-configuration-of-a-revit-file-without-openi
 
 twitter:
 
@@ -26,10 +38,63 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Visual API and Materials Sample
+### RBP, Materials, Assets and the Visual API
 
 
-####<a name="2"></a> Material Assets and the Visual API
+####<a name="2"></a> GetMaterialArea Behaviour Varies
+
+[Method GetMaterialArea() appears to use different formulas for computing the area depending on the element category](https://forums.autodesk.com/t5/revit-api-forum/method-getmaterialarea-appears-to-use-different-formulas-for/td-p/11988215)
+
+
+**Question:** How does the method GetMaterialArea compute the area depending on the element category? It appears to use different formulas for different categories. For a wall, it is the area of one of the side faces for a layer (which probably makes sense); for a window, however, the method returns the sum over all 6 faces (assuming a simple cuboid). Please provide documentation on how the method functions on different elements
+or a unified way of computing the area.
+
+I also noticed that GetMaterialIds returns null for elements of (at least) these categories:
+
+- Pipe, Flex Pipe, Duct, Flex Duct, Duct Insulation, Ramp
+
+GetMaterialArea(matId) and GetMaterialVolume(matId) returns 0 for these categories.
+
+**Answern 1:** You should check Category.HasMaterialQuantities for that, some categories don't support material quantities.
+
+Regarding the other thing I'm waiting to hear in slightly more detail also.
+However it is noted that such material quantities are calculated either from compound structure layers or geometry. Since the Window isn't a compound structure area will be taken from faces of geometry I suspect (Wall on the other hand has compound structure). The geometry of the wall would at the same time be lacking the layers detail.
+
+**Answer 2:** I think the customer is referring mostly to the difference between system families and loaded families in Revit itself. The API is probably returning the same values.
+
+- Hosts will return 1 face, because in construction, you would refer to the area of a wall material (for example) as the area to be covered when looking at the wall.
+- Stairs, railing, ramps, site, and curtain wall also have special behavior.
+- Loaded families (like windows) will report an area including all faces.
+
+This is confirmed and workarounds are posted in the Revit Clinic article
+on [Material Takeoff Area Schedule](https://revitclinic.typepad.com/my_weblog/2009/10/material-takeoff-area.html).
+
+Some other special cases are listed in the Autodesk Support article
+on [Material Takeoff shows incorrect values of areas and/or volumes in Revit](https://www.autodesk.com/support/technical/article/caas/sfdcarticles/sfdcarticles/Material-Takeoff-shows-incorrect-areas-in-Revit.html).
+
+As far as the API goes, check out these 2 resources from The Building Coder and Scott Conover that may help confirm the API designed behavior:
+
+- [Material Quantity Extraction](https://thebuildingcoder.typepad.com/blog/2010/02/material-quantity-extraction.html)
+- [Analyze Geometry of Buildings Using the Revit API](https://thebuildingcoder.typepad.com/au/2009/AU09_CP222-3_Analyze_Geometry_Revit_API.pdf) at AU 2009 by Scott Conover, Autodesk
+
+This is from Scott's presentation:
+
+Material quantity extraction One common analytical requirement is to extract material quantities of elements in the document.  Revit 2010 introduced methods to directly obtain the material volumes and areas computed by Revit for material takeoff schedules:
+
+- Element.Materials &ndash; obtains a list of materials within an element
+- Element.GetMaterialVolume() &ndash; obtains the volume of a particular material in an element
+- Element.GetMaterialArea() &ndash; obtains the area of a particular material in an element
+
+The methods apply to categories of elements where Category.HasMaterialQuantities property is true.
+In practice, this is limited to elements that use compound structure, like walls, roofs, floors, ceilings, a few other basic 3D elements like stairs, plus 3D families where materials can be assigned to geometry of the family, like windows, doors, columns, MEP equipment and fixtures, and generic model families.
+Note that within these categories there are further restrictions about how material quantities can be extracted.
+For example, curtain walls and curtain roofs will not report any material quantities themselves; the materials used by these constructs can be extracted from the individual panel elements that make up the curtain system.
+Note that the volumes and areas computed by Revit may be approximate in some cases.
+For example, for individual layers within a wall, minor discrepancies might appear between the volumes visible in the model and those shown in the material takeoff schedule.
+These discrepancies tend to occur when you use the wall sweep tool to add a sweep or a reveal to a wall, or under certain join conditions.
+
+
+####<a name="3"></a> Material Assets and the Visual API
 
 Gary J. Orr of [MBI Companies Inc.](https://www.mbicompanies.com/) shares
 a nice VB.NET sample in
@@ -95,7 +160,12 @@ Many thanks to Gary for sharing the results of his research!
 
 
 
-####<a name="3"></a>
+####<a name="3"></a> Revit Batch Processor RBP
+
+The [Revit Batch Processor RBP](https://github.com/bvn-architecture/RevitBatchProcessor) looks
+like a very powerfull full-fledged utility; it was mentioned in the StackOverflow question
+asking [is there a way to change the workset configuration of a Revit file without opening Revit?](https://stackoverflow.com/questions/76630229/is-there-a-way-to-change-the-workset-configuration-of-a-revit-file-without-openi()
+
 
 ####<a name="4"></a>
 
