@@ -55,6 +55,7 @@ Two very different aspects of BIM materials, filtering for annotations and a pow
 - [Material assets and the Visual API](#3)
 - [Filter for annotation families](#4)
 - [Revit batch processor RBP](#5)
+- [The Building Coder Blog Post &#35;2000](#6)
 
 ####<a name="2"></a> GetMaterialArea Behaviour Varies
 
@@ -257,3 +258,36 @@ the [Revit Batch Processor RBP](https://github.com/bvn-architecture/RevitBatchPr
 It looks like a very powerful and full-fledged utility; it came up in the StackOverflow question
 asking [is there a way to change the workset configuration of a Revit file without opening Revit?](https://stackoverflow.com/questions/76630229/is-there-a-way-to-change-the-workset-configuration-of-a-revit-file-without-openi)
 
+####<a name="6"></a> The Building Coder Blog Post &#35;2000
+
+Actually, before closing, we have something to celebrate, a special issue, so to speak.
+
+This blog post is The Building Coder's 2000th.
+
+You can check out the entire chronological list in
+the [GitHub tbc repository](https://github.com/jeremytammik/tbc).
+
+All in all, The Building Coder has published over four hundred thousand lines of text, two-and-a-half million words and over 22 million characters since its inception in 2008:
+
+<pre>
+% wc *htm *md
+      12     301    1909 0001_welcome.htm
+       9     213    1366 0002_devtech.htm
+      69     553    4297 0003_getting_started.htm
+      68     756    5505 0004_revit_sdk_contents.htm
+      19     497    3322 0005_managing_sdk_samples.htm
+     122     916    6098 0006_sdk_samples_solution.htm
+     120     865    5890 0007_loading_sdk_samples.htm
+     125    1409    9349 0008_debugging.htm
+       8     376    2121 0009_what_next.htm
+     102    1062    8226 0010_selecting_all_walls.htm
+     447    3131   32490 0011_units.htm
+      66    1316    8954 0012_geometry_library.htm
+      44     524    3712 0013_geometry_viewers.htm
+...
+     491    2762   20716 1997_sdk_brep.md
+     267    1609   12882 1998_unittest_arcdim.md
+     323    2249   18196 1999_mep_calculation.md
+     259    2335   16834 2000_visual_api.md
+  417722 2480900 22669323 total
+</pre>
