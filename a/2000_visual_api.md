@@ -43,6 +43,12 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### RBP, Materials, Assets and the Visual API
 
+Two different aspects of BIM materials, filtering for annotations and a batch processor utility:
+
+- [GetMaterialArea behaviour varies](#2)
+- [Material assets and the Visual API](#3)
+- [Filter for annotation families](#4)
+- [Revit batch processor RBP](#5)
 
 ####<a name="2"></a> GetMaterialArea Behaviour Varies
 
