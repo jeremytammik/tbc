@@ -302,3 +302,16 @@ It is also interesting to see what topics we started out covering back then; sev
 </pre>
 
 Long live The Building Coder!
+
+####<a name="6.1"></a>
+
+[LinkedIn feedback from Mikhail Smirnov](https://www.linkedin.com/feed/update/urn:li:activity:7085118894100623361?commentUrn=urn%3Ali%3Acomment%3A%28activity%3A7085118894100623361%2C7085135341363347457%29):
+
+> Thanks a lot for the article, Jeremy! As always, you are at the peak of the research wave.
+
+Thank you for your appreciation!
+However, just to clarify: there is actually no research of mine in here at all.
+I am just as reporter, a librarian... there seems to be a greater lack of those than of researchers, programmers, and especially documenters...
+Researching, programming and documenting is much more fun!
+Still, someone has to do what I do, it seems...
+
