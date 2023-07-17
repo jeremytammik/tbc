@@ -55,7 +55,18 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### All Categories and Parameters
 
+Today we present ground-breaking research on accessing all built-in parameters and categories, thoughts on axis-aligned bounding boxes and AI news:
 
+- [All categories and parameters](#2)
+  - [Summary](#2.1)
+  - [Solution](#2.2)
+  - [Result](#2.3)
+  - [Limitations](#2.4)
+- [BoundingBox is axis-aligned](#3)
+- [BoundingBox transformation](#4)
+- [Interactive explanation of SVG path](#5)
+- [Claude.AI](#6)
+- [Relativating the impact of AI](#7)
 
 ####<a name="2"></a> All Categories and Parameters
 
@@ -287,7 +298,7 @@ implementing [2D SVG editing on mobile device with Raphael](http://thebuildingco
 If you would like to enjoy a much nicer explanation of the concepts of SVG paths than I had access to back then, take a quick dive
 into [understanding SVG paths](https://www.nan.fyi/svg-paths).
 
-####<a name="6"></a> Calude.AI
+####<a name="6"></a> Claude.AI
 
 ChatGPT has a new competitor,
 [claude.ai](https://claude.ai).
