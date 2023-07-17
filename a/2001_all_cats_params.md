@@ -254,7 +254,7 @@ I would suggest the following:
 - Create a new bounding box from the eight transformed results
 
 [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples/tree/master) includes
-the [method ExpandToContain](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/Util.cs#L2724-L2739) to
+the [method `ExpandToContain`](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/Util.cs#L2724-L2739) to
 create and enlarge a bounding box point by point that will come in handy for the last step:
 
 <pre class="prettyprint">
@@ -278,10 +278,14 @@ create and enlarge a bounding box point by point that will come in handy for the
 
 **Response:** Hi Jeremy, this solution works well, thanks.
 
-
 ####<a name="5"></a> Interactive Explanation of SVG Path
 
- nice svg path explanation --  https://www.nan.fyi/svg-paths
+I made good use of and learned to love SVG paths working on
+the [room polygon and furniture picker in SVG](http://thebuildingcoder.typepad.com/blog/2012/10/room-polygon-and-furniture-picker-in-svg.html) and
+implementing [2D SVG editing on mobile device with Raphael](http://thebuildingcoder.typepad.com/blog/2013/02/2d-svg-editing-on-mobile-device-with-rapha%C3%ABl.html).
+
+If you would like to enjoy a much nicer explanation of the concepts of SVG paths than I had access to back then, take a quick dive
+into [understanding SVG paths](https://www.nan.fyi/svg-paths).
 
 ####<a name="6"></a> Calude.AI
 
