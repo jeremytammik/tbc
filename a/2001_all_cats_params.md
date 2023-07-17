@@ -216,54 +216,48 @@ That question leads over nicely to the explanation why
 the [transform of linked element creates an empty outline](https://forums.autodesk.com/t5/revit-api-forum/transform-of-linked-element-creates-an-empty-outline/m-p/12089717),
 solved by appropriately transforming the bounding box:
 
+**Question:** I want to create an outline from a linked element's bounding box to use in a `BoundingBoxIntersectsFilter`.
+My approach below works for some cases, but where a link or element is rotated beyond a certain limit, the bounding box goes askew and the `Outline(XYZ, XYZ)` method returns an empty outline.
+I've tried scaling the bounding box up with an offset which fixes some cases, but not all of them.
+Some advice on solutions would be appreciated.
 
-I want to create an outline from a linked element's bounding box to use in a BoundingBoxIntersectsFilter. My approach bellow works for some cases but where a link or element is rotated beyond a certain limit, the bounding box goes askew and the Outline(xyz, xyz) method returns an empty outline. I've tried scaling the bounding box up with an offset which fixes some cases, but not all of them. Some advice on solutions would be appreciated.
-Screenshot (27).png
-non-rotated link
 
-xform_boundingbox_1.png  Pixel Height: 647
-Pixel Width: 793
-xform_boundingbox_2.png
-Pixel Height: 746
-Pixel Width: 961
+<center>
+<img src="img/xform_boundingbox_1.png" alt="Non-rotated link" title="Non-rotated link" width="600"/> <!-- Pixel Height: 647 Pixel Width: 793 -->
+<p style="font-size: 80%; font-style:italic">Non-rotated link</p>
 
-Screenshot (28).png
-rotated link
-#get the elements bounding box
+<img src="img/xform_boundingbox_2.png" alt="Rotated link" title="Rotated link" width="600"/> <!-- Pixel Height: 746 Pixel Width: 961 -->
+<p style="font-size: 80%; font-style:italic">Rotated link</p>
+</center>
+
+<pre class="prettyprint">
+# get the elements bounding box
 s_BBox = element.get_BoundingBox(doc.ActiveView)
 
-#apply the link documents transform
+# apply the link documents transform
 s_BBox_min = link_trans.OfPoint(s_BBox.Min)
 s_BBox_max = link_trans.OfPoint(s_BBox.Max)
 
-#make the outline
+# make the outline
 new_outline = Outline(s_BBox_min, s_BBox_max)
 
-#make the filter
+# make the filter
 bb_filter = BoundingBoxIntersectsFilter(new_outline)
+</pre>
 
+**Answer:** Yes.
+You can corrupt the bounding box by transforming it.
+I would suggest the following:
 
- Solved by jeremy.tammik. Go to Solution.
-Tags (3)
-Tags:bounding boxLink Transformoutline
+- Extract all eight corner vertices of the bounding box
+- Transform all eight vertices as individual points
+- Create a new bounding box from the eight transformed results
 
-Add tags
-Report
-2 REPLIES
-Sort:
-MESSAGE 2 OF 3
-jeremy.tammik
-  Autodesk jeremy.tammik  in reply to: dean.hayton
-‎2023-07-07 09:45 AM
+[The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples/tree/master) includes
+the [method ExpandToContain](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/Util.cs#L2724-L2739) to
+create and enlarge a bounding box point by point that will come in handy for the last step:
 
-Yes. You can corrupt the bounding box by transforming it. I would suggest the following:
-
-Extract all eight corner vertices of the bounding box
-Transform all eight vertices as individual points
-Create a new bounding box from the eight transformed results
-
-The Building Coder samples includes code to create and enlarge a bounding box point by point that will come in handy for the last step:
-
+<pre class="prettyprint">
   /// <summary>
   ///   Expand the given bounding box to include
   ///   and contain the given point.
@@ -280,19 +274,9 @@ The Building Coder samples includes code to create and enlarge a bounding box po
       Math.Max(bb.Max.Y, p.Y),
       Math.Max(bb.Max.Z, p.Z));
   }
+</pre>
 
-https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/Util.cs#L2724-L...
-
-Jeremy Tammik,  Developer Advocacy and Support, The Building Coder, Autodesk Developer Network, ADN Open
-Tags (0)
-Add tags
-Report
-MESSAGE 3 OF 3
-dean.hayton
-  Participant dean.hayton  in reply to: jeremy.tammik
-‎2023-07-09 03:35 PM
-Hi Jeremy, this solution works well, thanks
-
+**Response:** Hi Jeremy, this solution works well, thanks.
 
 
 ####<a name="5"></a> Interactive Explanation of SVG Path
