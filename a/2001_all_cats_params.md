@@ -8,6 +8,30 @@
 
 - roman [jeremytammik/RevitLookup] Revit api. Retrieve all parameters and categories (Discussion #183)
 
+- How to get the BoundingBox that corresponds to the shape of the Family
+  https://forums.autodesk.com/t5/revit-api-forum/how-to-get-the-boundingbox-that-corresponds-to-the-shape-of-the/m-p/12089970
+
+- nice svg path explanation --  https://www.nan.fyi/svg-paths
+
+- claude.ai
+  https://claude.ai/chats
+  You have to use a USA or UK VPN.
+  A competitor to OpenAI. Can upload big files. Any better for coding?
+  Video about it: https://www.youtube.com/watch?v=dofH3EBjK1o
+  Falls euch der aktuelle zustand der KI-Entwicklung interessieren sollte… ich habe nach der vertragsunterzeichnung andere arbeiten ausgefuehrt, und bin im laufe dessen auch auf eine neuen konkurrenten von ChatGPT gestossen, namens Claude.AI:
+  https://claude.ai
+  ChatGPT: bisher ueber 13 millarden $, Microsoft hauptsponsor
+  Claude.AI: bisher 1.5 millarden $, Google hauptsponsor.
+  [claude versus chatgpt](https://duckduckgo.com/?q=claude+versus+chatgpt)
+  Ich habe claude.ai gebeten, den kuri architektenvertrag auszuwerten, und dann nach sinn und unsinn von hoai gefragt.
+  Unten sind die antworten angehaengt.
+  /Users/jta/a/doc/revit/tbc/git/a/img/claudeai*
+  summarise my last blog post
+  You could batch that last one to summarize all of your blog posts programmatically for SEO.
+
+- Why transformative AI is really, really hard to achieve
+  https://zhengdongwang.com/2023/06/27/why-transformative-ai-is-really-really-hard-to-achieve.html
+
 twitter:
 
 
@@ -157,20 +181,75 @@ Created parameters have no binding to any element, and consequently have no valu
 
 Many thanks to Roman for this interesting in-depth research and documentation!
 
+####<a name="3"></a> BoundingBox is Axis-Aligned
 
-**Question:**
+Let's move on from this in-depth research to the more mundane question
+of [how to get the `BoundingBox` that corresponds to the shape of the family](https://forums.autodesk.com/t5/revit-api-forum/how-to-get-the-boundingbox-that-corresponds-to-the-shape-of-the/m-p/12089970):
 
-**Answer:**
+**Question:** I would like to inquire about `BoundingBox`.
 
-####<a name="3"></a>
+In the left image, the area of the BoundingBox is similar to the shape of the pipe;
+however, in the right one, the BoundingBox is much larger than its pipe:
+
+<img src="img/pipe_boundingbox.png" alt="Pipe bounding box" title="Pipe bounding box" width="600"/>
+
+It seems that this happens only for Pipes (probably for System Families).
+For FamilyInstance, it seems that they always have a same size for BoundingBox, even if they are rotated.
+
+Is there a way to know the area of the Family, which always corresponds to its shape, regardless of it being rotated or not?
+
+**Answer:**  No, this does not only happen for pipes.
+This happens for all kinds of objects that have different dimensions in different directions and are placed at an angle to the cardinal axes.
+For instance, a vertical wall at a 45 degree angle in the XY plane will exhibit the exact same behaviour.
+This behaviour is intentional.
+The Revit bounding box is always aligned with the cardinal axes.
+That makes it extremely fast and efficient to work with.
+In wikipedia, they call this
+an [axis-aligned bounding box](https://en.wikipedia.org/wiki/Minimum_bounding_box#Axis-aligned_minimum_bounding_box).
 
 
+####<a name="4"></a>
 
+- nice svg path explanation --  https://www.nan.fyi/svg-paths
 
-<pre class="prettyprint">
+####<a name="5"></a> Calude.AI
 
-</pre>
+ChatGPT has a new competitor,
+[claude.ai](https://claude.ai).
 
-**Response:**
+Eric Boehlke of [truevis BIM Consulting](https://truevis.com) pointed it out to me, saying:
 
+> You can create an account in the USA or UK, or use VPN to get there.
+A competitor to OpenAI. Can upload big files. Any better for coding?
+
+I tested it myself by asking it to summarise
+my [last blog post](https://thebuildingcoder.typepad.com/blog/2023/07/rbp-materials-their-assets-and-the-visual-api.html),
+evaluate a German architectural contract and discuss
+the German [HOAI](https://de.wikipedia.org/wiki/Honorarordnung_f%C3%BCr_Architekten_und_Ingenieure) without
+providing any hont of what that acronym might mean, or even that I was looking for anything German.
+The results were completely satisfying in all three cases:
+
+claudeai_archvertrag.png
+claudeai_hoai.png
+claudeai_tbc2000.png
+
+<center>
+<img src="img/claudeai_tbc2000.png" alt="Claude.AI analyses blog post" title="Claude.AI analyses blog post" width="600"/>
+<p style="font-size: 80%; font-style:italic">Claude.AI analyses blog post</p>
+
+<img src="img/claudeai_archvertrag.png" alt="Claude.AI analyses a German architectural contract" title="Claude.AI analyses a German architectural contract" width="600"/>
+<p style="font-size: 80%; font-style:italic">Claude.AI analyses a German architectural contract</p>
+
+<img src="img/claudeai_hoai.png" alt="Claude.AI discusses the HOAI" title="Claude.AI discusses the HOAI" width="600"/>
+<p style="font-size: 80%; font-style:italic">Claude.AI discusses the HOAI</p>
+</center>
+
+Eric suggests:
+
+> You could batch that blog post analysis to summarise all of your blog posts programmatically for SEO.
+
+####<a name="6"></a> Relativating the Impact of AI
+
+Let's close with some wise and pertinent thoughts &ndash; not following the hype &ndash; on the possible impact of AI on our life and economy, presented in the explaination
+of [why transformative AI is really, really hard to achieve](https://zhengdongwang.com/2023/06/27/why-transformative-ai-is-really-really-hard-to-achieve.html).
 
