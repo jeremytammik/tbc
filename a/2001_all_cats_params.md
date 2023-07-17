@@ -86,11 +86,16 @@ the [RevitLookup discussion 183 &ndash; retrieve all parameters and categories](
 
 I recently came across a problem from my business partner who wanted to get all the built-in Revit parameters to extract metadata such as data type, units, storage type, etc. As we know, this is not possible using the Autodesk Revit public API.
 
-Similar situation with categories, we can't get all the built-in categories; so far, the only known available way is to get them from the document settings, but it contains a very truncated list:
+Similar situation with categories; we can't get all the built-in categories; so far, the only known available way is to get them from the document settings, but it contains a very truncated list:
 
 <center>
 <img src="img/rk_get_all_bips_1_categories.png" alt="Only some categories" title="Only some categories" width="600"/> <!-- Pixel Height: 285 Pixel Width: 941 -->
 </center>
+
+By the way,
+[The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples/tree/master) include
+some related naive attempts in
+the [module `CmdCategories.cs`](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdCategories.cs).
 
 ####<a name="2.2"></a> Solution
 
@@ -199,11 +204,10 @@ Many thanks to Roman for this interesting in-depth research and documentation!
 
 ####<a name="3"></a> BoundingBox is Axis-Aligned
 
-Let's move on from this in-depth research to the more mundane question
+Let's move on to the more mundane question
 of [how to get the `BoundingBox` that corresponds to the shape of the family](https://forums.autodesk.com/t5/revit-api-forum/how-to-get-the-boundingbox-that-corresponds-to-the-shape-of-the/m-p/12089970):
 
 **Question:** I would like to inquire about `BoundingBox`.
-
 In the left image, the area of the BoundingBox is similar to the shape of the pipe;
 however, in the right one, the BoundingBox is much larger than its pipe:
 
@@ -236,10 +240,10 @@ Some advice on solutions would be appreciated.
 
 
 <center>
-<img src="img/xform_boundingbox_1.png" alt="Non-rotated link" title="Non-rotated link" width="600"/> <!-- Pixel Height: 647 Pixel Width: 793 -->
+<img src="img/xform_boundingbox_1.png" alt="Non-rotated link" title="Non-rotated link" width="400"/> <!-- Pixel Height: 647 Pixel Width: 793 -->
 <p style="font-size: 80%; font-style:italic">Non-rotated link</p>
 
-<img src="img/xform_boundingbox_2.png" alt="Rotated link" title="Rotated link" width="600"/> <!-- Pixel Height: 746 Pixel Width: 961 -->
+<img src="img/xform_boundingbox_2.png" alt="Rotated link" title="Rotated link" width="400"/> <!-- Pixel Height: 746 Pixel Width: 961 -->
 <p style="font-size: 80%; font-style:italic">Rotated link</p>
 </center>
 
@@ -266,15 +270,15 @@ I would suggest the following:
 - Transform all eight vertices as individual points
 - Create a new bounding box from the eight transformed results
 
-[The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples/tree/master) includes
+[The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples/tree/master) include
 the [method `ExpandToContain`](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/Util.cs#L2724-L2739) to
 create and enlarge a bounding box point by point that will come in handy for the last step:
 
 <pre class="prettyprint">
-  /// <summary>
+  /// &lt;summary&gt;
   ///   Expand the given bounding box to include
   ///   and contain the given point.
-  /// </summary>
+  /// &lt;/summary&gt;
   public static void ExpandToContain(
     this BoundingBoxXYZ bb,
     XYZ p)

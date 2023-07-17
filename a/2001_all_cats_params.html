@@ -80,10 +80,14 @@ the <a href="https://github.com/jeremytammik/RevitLookup/discussions/183">RevitL
 </center></p>
 <h4><a name="2.1"></a> Summary</h4>
 <p>I recently came across a problem from my business partner who wanted to get all the built-in Revit parameters to extract metadata such as data type, units, storage type, etc. As we know, this is not possible using the Autodesk Revit public API.</p>
-<p>Similar situation with categories, we can't get all the built-in categories; so far, the only known available way is to get them from the document settings, but it contains a very truncated list:</p>
+<p>Similar situation with categories; we can't get all the built-in categories; so far, the only known available way is to get them from the document settings, but it contains a very truncated list:</p>
 <p><center>
 <img src="img/rk_get_all_bips_1_categories.png" alt="Only some categories" title="Only some categories" width="600"/> <!-- Pixel Height: 285 Pixel Width: 941 -->
 </center></p>
+<p>By the way,
+<a href="https://github.com/jeremytammik/the_building_coder_samples/tree/master">The Building Coder samples</a> include
+some related naive attempts in
+the <a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdCategories.cs">module <code>CmdCategories.cs</code></a>.</p>
 <h4><a name="2.2"></a> Solution</h4>
 <p>We can use private code with reflection and pointers; we only need a document.
 The point of the method is not to get them but create it.</p>
@@ -180,10 +184,10 @@ public static List&lt;Category&gt; GetBuiltinCategories(
 <p>Created parameters have no binding to any element, and consequently have no value, only metadata.</p>
 <p>Many thanks to Roman for this interesting in-depth research and documentation!</p>
 <h4><a name="3"></a> BoundingBox is Axis-Aligned</h4>
-<p>Let's move on from this in-depth research to the more mundane question
+<p>Let's move on to the more mundane question
 of <a href="https://forums.autodesk.com/t5/revit-api-forum/how-to-get-the-boundingbox-that-corresponds-to-the-shape-of-the/m-p/12089970">how to get the <code>BoundingBox</code> that corresponds to the shape of the family</a>:</p>
-<p><strong>Question:</strong> I would like to inquire about <code>BoundingBox</code>.</p>
-<p>In the left image, the area of the BoundingBox is similar to the shape of the pipe;
+<p><strong>Question:</strong> I would like to inquire about <code>BoundingBox</code>.
+In the left image, the area of the BoundingBox is similar to the shape of the pipe;
 however, in the right one, the BoundingBox is much larger than its pipe:</p>
 <p><img src="img/pipe_boundingbox.png" alt="Pipe bounding box" title="Pipe bounding box" width="600"/></p>
 <p>It seems that this happens only for Pipes (probably for System Families).
@@ -206,10 +210,10 @@ My approach below works for some cases, but where a link or element is rotated b
 I've tried scaling the bounding box up with an offset which fixes some cases, but not all of them.
 Some advice on solutions would be appreciated.</p>
 <p><center>
-<img src="img/xform_boundingbox_1.png" alt="Non-rotated link" title="Non-rotated link" width="600"/> <!-- Pixel Height: 647 Pixel Width: 793 --></p>
+<img src="img/xform_boundingbox_1.png" alt="Non-rotated link" title="Non-rotated link" width="400"/> <!-- Pixel Height: 647 Pixel Width: 793 --></p>
 <p style="font-size: 80%; font-style:italic">Non-rotated link</p>
 
-<p><img src="img/xform_boundingbox_2.png" alt="Rotated link" title="Rotated link" width="600"/> <!-- Pixel Height: 746 Pixel Width: 961 --></p>
+<p><img src="img/xform_boundingbox_2.png" alt="Rotated link" title="Rotated link" width="400"/> <!-- Pixel Height: 746 Pixel Width: 961 --></p>
 <p style="font-size: 80%; font-style:italic">Rotated link</p>
 <p></center></p>
 <pre class="prettyprint">
@@ -235,14 +239,14 @@ I would suggest the following:</p>
 <li>Transform all eight vertices as individual points</li>
 <li>Create a new bounding box from the eight transformed results</li>
 </ul>
-<p><a href="https://github.com/jeremytammik/the_building_coder_samples/tree/master">The Building Coder samples</a> includes
+<p><a href="https://github.com/jeremytammik/the_building_coder_samples/tree/master">The Building Coder samples</a> include
 the <a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/Util.cs#L2724-L2739">method <code>ExpandToContain</code></a> to
 create and enlarge a bounding box point by point that will come in handy for the last step:</p>
 <pre class="prettyprint">
-  /// <summary>
+  /// &lt;summary&gt;
   ///   Expand the given bounding box to include
   ///   and contain the given point.
-  /// </summary>
+  /// &lt;/summary&gt;
   public static void ExpandToContain(
     this BoundingBoxXYZ bb,
     XYZ p)
