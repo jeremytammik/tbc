@@ -58,10 +58,10 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 Today we present ground-breaking research on accessing all built-in parameters and categories, thoughts on axis-aligned bounding boxes and AI news:
 
 - [All categories and parameters](#2)
-  - [Summary](#2.1)
-  - [Solution](#2.2)
-  - [Result](#2.3)
-  - [Limitations](#2.4)
+    - [Summary](#2.1)
+    - [Solution](#2.2)
+    - [Result](#2.3)
+    - [Limitations](#2.4)
 - [BoundingBox is axis-aligned](#3)
 - [BoundingBox transformation](#4)
 - [Interactive explanation of SVG path](#5)
@@ -79,7 +79,7 @@ By exploring private unmanaged code using reflection and pointers, I managed to 
 the [RevitLookup discussion 183 &ndash; retrieve all parameters and categories](https://github.com/jeremytammik/RevitLookup/discussions/183):
 
 <center>
-<img src="img/rk_get_all_bips_1.png" alt="Get all built-in parameters" title="Get all built-in parameters" width="600"/> <!-- Pixel Height: 915 Pixel Width: 1,469 -->
+<img src="img/rk_get_all_bips.png" alt="Get all built-in parameters" title="Get all built-in parameters" width="600"/> <!-- Pixel Height: 915 Pixel Width: 1,469 -->
 </center>
 
 ####<a name="2.1"></a> Summary
@@ -113,7 +113,9 @@ public static List&lt;Parameter&gt; GetBuiltinParameters(
   var elementIdType = assembly.GetType("ElementId");
   var elementIdIdType = elementIdType.GetField("&lt;alignment member&gt;", bindingFlags)!;
   var getADocumentType = documentType.GetMethod("getADocument", bindingFlags)!;
-  var parameterCtorType = parameterType.GetConstructor(bindingFlags, null, new[] {aDocumentType.MakePointerType(), elementIdType.MakePointerType()}, null)!;
+  var parameterCtorType = parameterType.GetConstructor(bindingFlags, null,
+    new[] {aDocumentType.MakePointerType(), elementIdType.MakePointerType()},
+    null)!;
 
   var builtinParameters = Enum.GetValues(typeof(BuiltInParameter));
   var parameters = new List&lt;Parameter&gt;(builtinParameters.Length);
@@ -127,8 +129,7 @@ public static List&lt;Parameter&gt; GetBuiltinParameters(
     Marshal.StructureToPtr(elementId, elementIdPointer, true);
 
     var parameter = (Parameter) parameterCtorType.Invoke(
-      new[] {getADocumentType.Invoke(document, null),
-        elementIdPointer});
+      new[] {getADocumentType.Invoke(document, null), elementIdPointer});
     parameters.Add(parameter);
     handle.Free();
   }
@@ -153,7 +154,9 @@ public static List&lt;Category&gt; GetBuiltinCategories(
   var elementIdType = assembly.GetType("ElementId");
   var elementIdIdType = elementIdType.GetField("&lt;alignment member&gt;", bindingFlags)!;
   var getADocumentType = documentType.GetMethod("getADocument", bindingFlags)!;
-  var categoryCtorType = categoryType.GetConstructor(bindingFlags, null, new[] {aDocumentType.MakePointerType(), elementIdType.MakePointerType()}, null)!;
+  var categoryCtorType = categoryType.GetConstructor(bindingFlags, null,
+    new[] {aDocumentType.MakePointerType(), elementIdType.MakePointerType()},
+    null)!;
 
   var builtInCategories = Enum.GetValues(typeof(BuiltInCategory));
   var categories = new List&lt;Category&gt;(builtInCategories.Length);
@@ -167,8 +170,7 @@ public static List&lt;Category&gt; GetBuiltinCategories(
     Marshal.StructureToPtr(elementId, elementIdPointer, true);
 
     var category = (Category) categoryCtorType.Invoke(
-      new[] {getADocumentType.Invoke(document, null),
-        elementIdPointer});
+      new[] {getADocumentType.Invoke(document, null), elementIdPointer});
     categories.Add(category);
     handle.Free();
   }
