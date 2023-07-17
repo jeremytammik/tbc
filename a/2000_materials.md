@@ -312,6 +312,6 @@ Long live The Building Coder!
 Thank you for your appreciation!
 However, just to clarify: there is actually no research of mine in here at all.
 I am just as reporter, a librarian... there seems to be a greater lack of those than of researchers, programmers, and especially documenters...
-Researching, programming and documenting is much more fun!
+Researching and programming is much more fun!
 Still, someone has to do what I do, it seems...
 
