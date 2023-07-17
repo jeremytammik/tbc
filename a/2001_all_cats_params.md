@@ -11,6 +11,9 @@
 - How to get the BoundingBox that corresponds to the shape of the Family
   https://forums.autodesk.com/t5/revit-api-forum/how-to-get-the-boundingbox-that-corresponds-to-the-shape-of-the/m-p/12089970
 
+- Transform of linked element creates an empty outline
+  https://forums.autodesk.com/t5/revit-api-forum/transform-of-linked-element-creates-an-empty-outline/m-p/12089717#M72649
+
 - nice svg path explanation --  https://www.nan.fyi/svg-paths
 
 - claude.ai
@@ -207,12 +210,17 @@ That makes it extremely fast and efficient to work with.
 In wikipedia, they call this
 an [axis-aligned bounding box](https://en.wikipedia.org/wiki/Minimum_bounding_box#Axis-aligned_minimum_bounding_box).
 
+####<a name="4"></a> BoundingBox Transformation
 
-####<a name="4"></a>
+Transform of linked element creates an empty outline
+  https://forums.autodesk.com/t5/revit-api-forum/transform-of-linked-element-creates-an-empty-outline/m-p/12089717#M72649
 
-- nice svg path explanation --  https://www.nan.fyi/svg-paths
 
-####<a name="5"></a> Calude.AI
+####<a name="5"></a> Interactive Explanation of SVG Path
+
+ nice svg path explanation --  https://www.nan.fyi/svg-paths
+
+####<a name="6"></a> Calude.AI
 
 ChatGPT has a new competitor,
 [claude.ai](https://claude.ai).
@@ -248,7 +256,7 @@ Eric suggests:
 
 > You could batch that blog post analysis to summarise all of your blog posts programmatically for SEO.
 
-####<a name="6"></a> Relativating the Impact of AI
+####<a name="7"></a> Relativating the Impact of AI
 
 Let's close with some wise and pertinent thoughts &ndash; not following the hype &ndash; on the possible impact of AI on our life and economy, presented in the explaination
 of [why transformative AI is really, really hard to achieve](https://zhengdongwang.com/2023/06/27/why-transformative-ai-is-really-really-hard-to-achieve.html).
