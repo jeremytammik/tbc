@@ -316,14 +316,9 @@ A competitor to OpenAI. Can upload big files. Any better for coding?
 
 I tested it myself by asking it to summarise
 my [last blog post](https://thebuildingcoder.typepad.com/blog/2023/07/rbp-materials-their-assets-and-the-visual-api.html),
-evaluate a German architectural contract and discuss
-the German [HOAI](https://de.wikipedia.org/wiki/Honorarordnung_f%C3%BCr_Architekten_und_Ingenieure) without
-providing any hont of what that acronym might mean, or even that I was looking for anything German.
+evaluate a German architectural contract without providing any hint of what it might be, and discuss
+the German [HOAI](https://de.wikipedia.org/wiki/Honorarordnung_f%C3%BCr_Architekten_und_Ingenieure).
 The results were completely satisfying in all three cases:
-
-claudeai_archvertrag.png
-claudeai_hoai.png
-claudeai_tbc2000.png
 
 <center>
 <img src="img/claudeai_tbc2000.png" alt="Claude.AI analyses blog post" title="Claude.AI analyses blog post" width="600"/>
