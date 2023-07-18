@@ -37,8 +37,13 @@
 
 twitter:
 
-
-&ndash; ...
+Ground-breaking research on accessing all built-in parameters and categories, thoughts on axis-aligned bounding boxes and AI news
+&ndash; All categories and parameters
+&ndash; BoundingBox is axis-aligned
+&ndash; BoundingBox transformation
+&ndash; Interactive explanation of SVG path
+&ndash; Claude.AI
+&ndash; Relativising the impact of AI...
 
 linkedin:
 
@@ -53,7 +58,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### All Categories and Parameters
+### Bounding Boxes, All Categories and Parameters
 
 Today we present ground-breaking research on accessing all built-in parameters and categories, thoughts on axis-aligned bounding boxes and AI news:
 
@@ -211,7 +216,9 @@ of [how to get the `BoundingBox` that corresponds to the shape of the family](ht
 In the left image, the area of the BoundingBox is similar to the shape of the pipe;
 however, in the right one, the BoundingBox is much larger than its pipe:
 
+<center>
 <img src="img/pipe_boundingbox.png" alt="Pipe bounding box" title="Pipe bounding box" width="600"/>
+</center>
 
 It seems that this happens only for Pipes (probably for System Families).
 For FamilyInstance, it seems that they always have a same size for BoundingBox, even if they are rotated.
