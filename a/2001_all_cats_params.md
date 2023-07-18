@@ -66,7 +66,7 @@ Today we present ground-breaking research on accessing all built-in parameters a
 - [BoundingBox transformation](#4)
 - [Interactive explanation of SVG path](#5)
 - [Claude.AI](#6)
-- [Relativating the impact of AI](#7)
+- [Relativising the impact of AI](#7)
 
 ####<a name="2"></a> All Categories and Parameters
 
@@ -220,11 +220,11 @@ Is there a way to know the area of the Family, which always corresponds to its s
 
 **Answer:**  No, this does not only happen for pipes.
 This happens for all kinds of objects that have different dimensions in different directions and are placed at an angle to the cardinal axes.
-For instance, a vertical wall at a 45 degree angle in the XY plane will exhibit the exact same behaviour.
+For instance, a vertical wall at a 45-degree angle in the XY plane will exhibit the exact same behaviour.
 This behaviour is intentional.
 The Revit bounding box is always aligned with the cardinal axes.
 That makes it extremely fast and efficient to work with.
-In wikipedia, they call this
+Wikipedia calls this
 an [axis-aligned bounding box](https://en.wikipedia.org/wiki/Minimum_bounding_box#Axis-aligned_minimum_bounding_box).
 
 ####<a name="4"></a> BoundingBox Transformation
@@ -335,8 +335,8 @@ Eric suggests:
 
 > You could batch that blog post analysis to summarise all of your blog posts programmatically for SEO.
 
-####<a name="7"></a> Relativating the Impact of AI
+####<a name="7"></a> Relativising the Impact of AI
 
-Let's close with some wise and pertinent thoughts &ndash; not following the hype &ndash; on the possible impact of AI on our life and economy, presented in the explaination
+Let's close with some wise and pertinent thoughts &ndash; not following the hype &ndash; on the possible impact of AI on our life and economy, presented in the explanation
 of [why transformative AI is really, really hard to achieve](https://zhengdongwang.com/2023/06/27/why-transformative-ai-is-really-really-hard-to-achieve.html).
 
