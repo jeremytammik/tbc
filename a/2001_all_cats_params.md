@@ -117,7 +117,7 @@ By exploring private unmanaged code using reflection and pointers, I managed to 
 the [RevitLookup discussion 183 &ndash; retrieve all parameters and categories](https://github.com/jeremytammik/RevitLookup/discussions/183):
 
 <center>
-<img src="img/rk_get_all_bips.png" alt="Get all built-in parameters" title="Get all built-in parameters" width="600"/> <!-- Pixel Height: 915 Pixel Width: 1,469 -->
+<img src="img/rk_get_all_bips.png" alt="Get all built-in parameters" title="Get all built-in parameters" width="600"/>
 </center>
 
 ####<a name="2.1"></a> Summary
@@ -127,7 +127,7 @@ I recently came across a problem from my business partner who wanted to get all 
 Similar situation with categories; we can't get all the built-in categories; so far, the only known available way is to get them from the document settings, but it contains a very truncated list:
 
 <center>
-<img src="img/rk_get_all_bips_1_categories.png" alt="Only some categories" title="Only some categories" width="600"/> <!-- Pixel Height: 285 Pixel Width: 941 -->
+<img src="img/rk_get_all_bips_1_categories.png" alt="Only some categories" title="Only some categories" width="600"/>
 </center>
 
 By the way,
@@ -227,10 +227,10 @@ public static List&lt;Category&gt; GetBuiltinCategories(
 As a result, we have created all the parameters and all the categories of the entire `Enum`:
 
 <center>
-<img src="img/rk_get_all_bips_2_all_params.png" alt="All built-in parameters" title="All built-in parameters" width="600"/> <!-- Pixel Height: 327 Pixel Width: 1,107 -->
+<img src="img/rk_get_all_bips_2_all_params.png" alt="All built-in parameters" title="All built-in parameters" width="600"/>
 <p style="font-size: 80%; font-style:italic">All built-in parameters</p>
 
-<img src="img/rk_get_all_bips_3_all_cats.png" alt="All built-in categories" title="All built-in categories" width="600"/> <!-- Pixel Height: 326 Pixel Width: 1,018 -->
+<img src="img/rk_get_all_bips_3_all_cats.png" alt="All built-in categories" title="All built-in categories" width="600"/>
 <p style="font-size: 80%; font-style:italic">All built-in categories</p>
 </center>
 
