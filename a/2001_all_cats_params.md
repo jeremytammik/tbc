@@ -35,7 +35,19 @@
 - Why transformative AI is really, really hard to achieve
   https://zhengdongwang.com/2023/06/27/why-transformative-ai-is-really-really-hard-to-achieve.html
 
-twitter:
+twitter 2:
+
+Aspects of axis-aligned bounding boxes and bounding box transformation with the @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS https://autode.sk/all_params_all_cats
+
+Aspects of axis-aligned bounding boxes and AI news
+&ndash; BoundingBox is axis-aligned
+&ndash; BoundingBox transformation
+&ndash; Interactive explanation of SVG path
+&ndash; Claude.AI
+&ndash; Relativising the impact of AI...
+
+
+twitter 1:
 
 Ground-breaking research on accessing all built-in parameters and categories, thoughts on axis-aligned bounding boxes and bounding box transformation with the @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS https://autode.sk/all_params_all_cats
 
@@ -47,7 +59,7 @@ Ground-breaking research on accessing all built-in parameters and categories, th
 &ndash; Claude.AI
 &ndash; Relativising the impact of AI...
 
-linkedin:
+linkedin 1:
 
 Ground-breaking research on accessing all built-in parameters and categories, thoughts on axis-aligned bounding boxes and bounding box transformation with the #RevitAPI
 
@@ -71,21 +83,29 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Bounding Boxes, All Categories and Parameters
+### Bounding Boxes Axis Alignment and Transformation
 
+<!--
 Today we present ground-breaking research on accessing all built-in parameters and categories, thoughts on axis-aligned bounding boxes and AI news:
+-->
 
+Today we look at some aspects axis-aligned bounding boxes, bounding box transformation and AI news:
+
+<!--
 - [All categories and parameters](#2)
     - [Summary](#2.1)
     - [Solution](#2.2)
     - [Result](#2.3)
     - [Limitations](#2.4)
+-->
+
 - [BoundingBox is axis-aligned](#3)
 - [BoundingBox transformation](#4)
 - [Interactive explanation of SVG path](#5)
 - [Claude.AI](#6)
 - [Relativising the impact of AI](#7)
 
+<!--
 ####<a name="2"></a> All Categories and Parameters
 
 Roman [Nice3point](https://github.com/Nice3point), principle maintained of RevitLookup, presents a new discovery; in his own words:
@@ -219,6 +239,8 @@ As a result, we have created all the parameters and all the categories of the en
 Created parameters have no binding to any element, and consequently have no value, only metadata.
 
 Many thanks to Roman for this interesting in-depth research and documentation!
+
+-->
 
 ####<a name="3"></a> BoundingBox is Axis-Aligned
 

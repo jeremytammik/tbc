@@ -34,7 +34,19 @@
 - Why transformative AI is really, really hard to achieve
   https://zhengdongwang.com/2023/06/27/why-transformative-ai-is-really-really-hard-to-achieve.html
 
-twitter:
+twitter 2:
+
+Aspects of axis-aligned bounding boxes and bounding box transformation with the @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS https://autode.sk/all_params_all_cats
+
+Aspects of axis-aligned bounding boxes and AI news
+&ndash; BoundingBox is axis-aligned
+&ndash; BoundingBox transformation
+&ndash; Interactive explanation of SVG path
+&ndash; Claude.AI
+&ndash; Relativising the impact of AI...
+
+
+twitter 1:
 
 Ground-breaking research on accessing all built-in parameters and categories, thoughts on axis-aligned bounding boxes and bounding box transformation with the @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS https://autode.sk/all_params_all_cats
 
@@ -46,7 +58,7 @@ Ground-breaking research on accessing all built-in parameters and categories, th
 &ndash; Claude.AI
 &ndash; Relativising the impact of AI...
 
-linkedin:
+linkedin 1:
 
 Ground-breaking research on accessing all built-in parameters and categories, thoughts on axis-aligned bounding boxes and bounding box transformation with the #RevitAPI
 
@@ -70,32 +82,41 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-<h3>Bounding Boxes, All Categories and Parameters</h3>
-<p>Today we present ground-breaking research on accessing all built-in parameters and categories, thoughts on axis-aligned bounding boxes and AI news:</p>
+<h3>Bounding Boxes Axis Alignment and Transformation</h3>
+<!--
+Today we present ground-breaking research on accessing all built-in parameters and categories, thoughts on axis-aligned bounding boxes and AI news:
+-->
+
+<p>Today we look at some aspects axis-aligned bounding boxes, bounding box transformation and AI news:</p>
+<!--
+- [All categories and parameters](#2)
+    - [Summary](#2.1)
+    - [Solution](#2.2)
+    - [Result](#2.3)
+    - [Limitations](#2.4)
+-->
+
 <ul>
-<li><a href="#2">All categories and parameters</a><ul>
-<li><a href="#2.1">Summary</a></li>
-<li><a href="#2.2">Solution</a></li>
-<li><a href="#2.3">Result</a></li>
-<li><a href="#2.4">Limitations</a></li>
-</ul>
-</li>
 <li><a href="#3">BoundingBox is axis-aligned</a></li>
 <li><a href="#4">BoundingBox transformation</a></li>
 <li><a href="#5">Interactive explanation of SVG path</a></li>
 <li><a href="#6">Claude.AI</a></li>
 <li><a href="#7">Relativising the impact of AI</a></li>
 </ul>
-<h4><a name="2"></a> All Categories and Parameters</h4>
-<p>Roman <a href="https://github.com/Nice3point">Nice3point</a>, principle maintained of RevitLookup, presents a new discovery; in his own words:</p>
-<p>I made a new discovery for me.
+<!--
+####<a name="2"></a> All Categories and Parameters
+
+Roman [Nice3point](https://github.com/Nice3point), principle maintained of RevitLookup, presents a new discovery; in his own words:
+
+I made a new discovery for me.
 As far as I know, it is impossible to get a list of all built-in parameters using the public Revit API.
-We are offered an <code>enum</code>, but we cannot get the <code>Parameter</code> itself from it.
+We are offered an `enum`, but we cannot get the `Parameter` itself from it.
 By exploring private unmanaged code using reflection and pointers, I managed to do it, as described in
-the <a href="https://github.com/jeremytammik/RevitLookup/discussions/183">RevitLookup discussion 183 &ndash; retrieve all parameters and categories</a>:</p>
-<p><center>
+the [RevitLookup discussion 183 &ndash; retrieve all parameters and categories](https://github.com/jeremytammik/RevitLookup/discussions/183):
+
+<center>
 <img src="img/rk_get_all_bips.png" alt="Get all built-in parameters" title="Get all built-in parameters" width="600"/> <!-- Pixel Height: 915 Pixel Width: 1,469 -->
-</center></p>
+<p></center></p>
 <h4><a name="2.1"></a> Summary</h4>
 <p>I recently came across a problem from my business partner who wanted to get all the built-in Revit parameters to extract metadata such as data type, units, storage type, etc. As we know, this is not possible using the Autodesk Revit public API.</p>
 <p>Similar situation with categories; we can't get all the built-in categories; so far, the only known available way is to get them from the document settings, but it contains a very truncated list:</p>
@@ -201,6 +222,7 @@ public static List&lt;Category&gt; GetBuiltinCategories(
 <h4><a name="2.4"></a> Limitations</h4>
 <p>Created parameters have no binding to any element, and consequently have no value, only metadata.</p>
 <p>Many thanks to Roman for this interesting in-depth research and documentation!</p>
+<p>--&gt;</p>
 <h4><a name="3"></a> BoundingBox is Axis-Aligned</h4>
 <p>Let's move on to the more mundane question
 of <a href="https://forums.autodesk.com/t5/revit-api-forum/how-to-get-the-boundingbox-that-corresponds-to-the-shape-of-the/m-p/12089970">how to get the <code>BoundingBox</code> that corresponds to the shape of the family</a>:</p>
