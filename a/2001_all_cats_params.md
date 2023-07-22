@@ -39,7 +39,7 @@ twitter 2:
 
 Aspects of axis-aligned bounding boxes and bounding box transformation with the @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS https://autode.sk/all_params_all_cats
 
-Aspects of axis-aligned bounding boxes and AI news
+Aspects of axis-aligned bounding boxes, SVG paths and AI news
 &ndash; BoundingBox is axis-aligned
 &ndash; BoundingBox transformation
 &ndash; Interactive explanation of SVG path
