@@ -189,18 +189,24 @@ opt.Tier=Analysis.EnergyAnalysisDetailModelTier.SecondLevelBoundaries
 
 ####<a name="4"></a> Automate FBX Export with SendKeys
 
-Idling, DialogBoxShowing, SendKeys
+We already shared a C# solution
+to [handle a Revit dialogue using `Idling`, `DialogBoxShowing` and `SendKeys`](https://thebuildingcoder.typepad.com/blog/2021/02/birthday-devdays-postcommand-sendkeys.html#4) to
+implement
+the [TwinMotion dynamic link export FBX automatically](https://forums.autodesk.com/t5/revit-api-forum/twinmotion-dynamic-link-export-fbx-automatically/m-p/12123438).
 
-TwinMotion Dynamic Link Export Fbx Automatically
-https://forums.autodesk.com/t5/revit-api-forum/twinmotion-dynamic-link-export-fbx-automatically/m-p/12123438#M72937
+Now [Onur Er](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/14209191) cleaned it up further in his updated answer:
 
+**Question:** I want to export FBX using TwinMotion Dynamic Link.
+I would like to export FBX files from many Revit files.
+How I can use `PostCommand` and then handle the Windows forms on the export panel?
 
- onurerMY3Q8  in reply to: developmentTA4RP
-‎2023-07-24 04:46 PM
-Thank you for sharing your solution. It saved me unbelievable amount of time, maybe days or weeks. Thank you VERY VERY MUCH!!!
+**Answer:** Thank you for sharing your solution.
+It saved me unbelievable amount of time, maybe days or weeks.
+Thank you VERY VERY MUCH!!!
+I cleaned the code and made it more readable in case someone needs it.
+My own Revit plugin calls this Twinmotion macro automatically after Revit starts up like this:
 
-I cleaned the code and made it more readable in case someone needs it. My own Revit plugin calls this Twinmotion macro automatically after Revit starts up.
-
+<pre class="prettyprint">
 using System.Threading.Tasks;
 using Autodesk.Revit.UI;
 using System.Windows.Forms;
@@ -208,80 +214,81 @@ using Autodesk.Revit.UI.Events;
 
 namespace YourNamespaceHere
 {
-    public class Class2 : IExternalApplication
+  public class Class2 : IExternalApplication
+  {
+    UIControlledApplication UIControlledApplication;
+
+    public Result OnStartup(UIControlledApplication Application)
     {
-        UIControlledApplication UIControlledApplication;
+      UIControlledApplication = Application;
+      UIControlledApplication.Idling += Application_Idling;
 
-        public Result OnStartup(UIControlledApplication Application)
-        {
-            UIControlledApplication = Application;
-            UIControlledApplication.Idling += Application_Idling;
-
-            return Result.Succeeded;
-        }
-
-        public Result OnShutdown(UIControlledApplication Application) => Result.Succeeded;
-
-        void Application_Idling(object Sender, IdlingEventArgs E)
-        {
-            UIControlledApplication.Idling -= Application_Idling;
-
-            var UIApplication = (UIApplication)Sender;
-
-            MyMacro(UIApplication);
-
-            //TaskDialog.Show("Application_Idling", Sender.GetType().FullName);
-        }
-
-        void OnDialogBoxShowing(object Sender, DialogBoxShowingEventArgs Args) => ((TaskDialogShowingEventArgs)Args).OverrideResult((int)TaskDialogResult.Ok);
-
-        static async void RunCommands(UIApplication UIapp, RevitCommandId Id_Addin)
-        {
-            UIapp.PostCommand(Id_Addin);
-            await Task.Delay(400);
-            SendKeys.Send("{ENTER}");
-            await Task.Delay(400);
-            SendKeys.Send("{ENTER}");
-            await Task.Delay(400);
-            SendKeys.Send("{ENTER}");
-            await Task.Delay(400);
-            SendKeys.Send("{ESCAPE}");
-            await Task.Delay(400);
-            SendKeys.Send("{ESCAPE}");
-        }
-
-        void MyMacro(UIApplication UIapp)
-        {
-            try
-            {
-                var Name = "CustomCtrl_%CustomCtrl_%Twinmotion 2020%Twinmotion Direct Link%ExportButton";
-                var Id_Addin = RevitCommandId.LookupCommandId(Name);
-
-                if (Id_Addin != null)
-                {
-                    UIapp.DialogBoxShowing += OnDialogBoxShowing;
-
-                    RunCommands(UIapp, Id_Addin);
-                }
-            }
-            catch
-            {
-                TaskDialog.Show("Test", "error");
-            }
-            finally
-            {
-                UIapp.DialogBoxShowing -= OnDialogBoxShowing;
-            }
-        }
+      return Result.Succeeded;
     }
+
+    public Result OnShutdown(UIControlledApplication Application) => Result.Succeeded;
+
+    void Application_Idling(object Sender, IdlingEventArgs E)
+    {
+      UIControlledApplication.Idling -= Application_Idling;
+
+      var UIApplication = (UIApplication)Sender;
+
+      MyMacro(UIApplication);
+
+      //TaskDialog.Show("Application_Idling", Sender.GetType().FullName);
+    }
+
+    void OnDialogBoxShowing(object Sender, DialogBoxShowingEventArgs Args) => ((TaskDialogShowingEventArgs)Args).OverrideResult((int)TaskDialogResult.Ok);
+
+    static async void RunCommands(UIApplication UIapp, RevitCommandId Id_Addin)
+    {
+      UIapp.PostCommand(Id_Addin);
+      await Task.Delay(400);
+      SendKeys.Send("{ENTER}");
+      await Task.Delay(400);
+      SendKeys.Send("{ENTER}");
+      await Task.Delay(400);
+      SendKeys.Send("{ENTER}");
+      await Task.Delay(400);
+      SendKeys.Send("{ESCAPE}");
+      await Task.Delay(400);
+      SendKeys.Send("{ESCAPE}");
+    }
+
+    void MyMacro(UIApplication UIapp)
+    {
+      try
+      {
+        var Name = "CustomCtrl_%CustomCtrl_%Twinmotion 2020%Twinmotion Direct Link%ExportButton";
+        var Id_Addin = RevitCommandId.LookupCommandId(Name);
+
+        if (Id_Addin != null)
+        {
+          UIapp.DialogBoxShowing += OnDialogBoxShowing;
+
+          RunCommands(UIapp, Id_Addin);
+        }
+      }
+      catch
+      {
+        TaskDialog.Show("Test", "error");
+      }
+      finally
+      {
+        UIapp.DialogBoxShowing -= OnDialogBoxShowing;
+      }
+    }
+  }
 }
-
-
+</pre>
 
 ####<a name="4"></a> RFA Export to MongoDB
 
 [Lalo Ibarra](https://www.linkedin.com/in/eduardo-ibarra91/) of Mexico City shares one
 of [his favorite classes built with #VSC and #MongoDB to facilitate the export of data from Revit families](https://www.linkedin.com/posts/activity-7089535064467795968-A5lj?utm_source=share&utm_medium=member_desktop):
+
+I guess the class implementation is encoded in the attached image files on LinkedIn.
 
 Assets:
 
