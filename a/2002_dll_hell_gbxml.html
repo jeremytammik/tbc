@@ -61,8 +61,8 @@ At the same time, I want to take advantage of pyRevit’s capabilities such as f
 As far as I understood, I can’t have both of these in a single script file.
 If I got this correctly, is there any way to do this?</p>
 <p>The numpy part is quite decoupled since it is meant to help me with the data exchange process from other data sources; after that point, everything would be focused on Revit APIs.</p>
-<p><strong>Answer:</strong> I dealt with the same challenge a little while back.</p>
-<p>Please look at
+<p><strong>Answer:</strong> I dealt with the same challenge a little while back.
+Please look at
 the <a href="https://github.com/eirannejad/pyRevit/issues/1731">pyRevit issue 1731 on Dynamo incompatibility: two versions of Same DLL</a>
 for a short discussion on using <a href="https://docs.python.org/3/library/subprocess.html">Python <code>subprocess</code> module for subprocess management</a> in
 the Revit/pyRevit context.</p>
@@ -141,7 +141,7 @@ on <a href="https://forums.autodesk.com/t5/revit-api-forum/gbxml-export-using-en
 <p><strong>Question:</strong> Sorry to revive a thread which has been solved more than one year ago, however the solution provided is not working for me as I am programming in Python.</p>
 <p>I am using pyRevit to program functions in Python.
 When I use the code presented above, I get the following error:</p>
-<pre>
+<pre class="prettyprint">
   EnergyAnalysisDetailModelOptions.ExportMullions = False
 
   Traceback (most recent call last):

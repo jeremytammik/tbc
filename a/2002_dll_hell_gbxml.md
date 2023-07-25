@@ -69,7 +69,6 @@ If I got this correctly, is there any way to do this?
 The numpy part is quite decoupled since it is meant to help me with the data exchange process from other data sources; after that point, everything would be focused on Revit APIs.
 
 **Answer:** I dealt with the same challenge a little while back.
-
 Please look at
 the [pyRevit issue 1731 on Dynamo incompatibility: two versions of Same DLL](https://github.com/eirannejad/pyRevit/issues/1731)
 for a short discussion on using [Python `subprocess` module for subprocess management](https://docs.python.org/3/library/subprocess.html) in
@@ -167,7 +166,7 @@ on [gbXml export using energy settings](https://forums.autodesk.com/t5/revit-api
 I am using pyRevit to program functions in Python.
 When I use the code presented above, I get the following error:
 
-<pre>
+<pre class="prettyprint">
   EnergyAnalysisDetailModelOptions.ExportMullions = False
 
   Traceback (most recent call last):
@@ -196,7 +195,6 @@ opt.IncludeShadingSurfaces=False
 opt.SimplifyCurtainSystems=True
 opt.Tier=Analysis.EnergyAnalysisDetailModelTier.SecondLevelBoundaries
 </pre>
-
 
 ####<a name="5"></a> Automate FBX Export with SendKeys
 
