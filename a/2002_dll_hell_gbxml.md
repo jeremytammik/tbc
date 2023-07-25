@@ -43,12 +43,23 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 ### GbXML and Python Tips
 
 
+- [DLL paradise in Python](#2)
+- [Multiple gbXML export](#3)
+- [GbXML energy settings](#4)
+- [Automate FBX export with `SendKeys`](#5)
+- [RFA export to MongoDB](#6)
+
+
 ####<a name="2"></a> DLL Paradise in Python
 
-Jake of [Ripcord Engineering](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/3926242) shares
-a possible solution to DLL Hell under certain circumstances in his solution
-for [CPython and pyRevit](https://forums.autodesk.com/t5/revit-api-forum/cpython-and-pyrevit/m-p/12011805) using
-the Python `subprocess` module for disentanglement without need for any IPC:
+Jake of [Ripcord Engineering](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/3926242) shared several
+useful [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) solutions recently.
+Many thanks to Jake for his support!
+
+One is a possible approach to
+handle [DLL Hell](https://en.wikipedia.org/wiki/DLL_Hell) using
+the Python `subprocess` module for disentanglement without need for any IPC, e.g.,
+for [CPython and pyRevit](https://forums.autodesk.com/t5/revit-api-forum/cpython-and-pyrevit/m-p/12011805):
 
 **Question:** I need to use CPython via pyRevit to have access to libraries such as `numpy` and `pandas`.
 At the same time, I want to take advantage of pyRevit’s capabilities such as forms etc.
@@ -73,7 +84,7 @@ Learning `subprocess` should be a productive use of time assuming the underlying
 
 ####<a name="3"></a> Multiple GbXML Export
 
-Jake also solved the question
+Jake also helped answer the question
 on [export of multiple gbXML models](https://forums.autodesk.com/t5/revit-api-forum/export-of-multiple-gbxml-models/m-p/12011838):
 
 **Question:** For my university thesis work I have to create a lot of different GBXML models (around 18000).
@@ -187,7 +198,7 @@ opt.Tier=Analysis.EnergyAnalysisDetailModelTier.SecondLevelBoundaries
 </pre>
 
 
-####<a name="4"></a> Automate FBX Export with SendKeys
+####<a name="5"></a> Automate FBX Export with SendKeys
 
 We already shared a C# solution
 to [handle a Revit dialogue using `Idling`, `DialogBoxShowing` and `SendKeys`](https://thebuildingcoder.typepad.com/blog/2021/02/birthday-devdays-postcommand-sendkeys.html#4) to
@@ -283,14 +294,23 @@ namespace YourNamespaceHere
 }
 </pre>
 
-####<a name="4"></a> RFA Export to MongoDB
+####<a name="6"></a> RFA Export to MongoDB
 
-[Lalo Ibarra](https://www.linkedin.com/in/eduardo-ibarra91/) of Mexico City shares one
+To wrap up, [Lalo Ibarra](https://www.linkedin.com/in/eduardo-ibarra91/) of Mexico City shares one
 of [his favorite classes built with #VSC and #MongoDB to facilitate the export of data from Revit families](https://www.linkedin.com/posts/activity-7089535064467795968-A5lj?utm_source=share&utm_medium=member_desktop):
 
-I guess the class implementation is encoded in the attached image files on LinkedIn.
+I guess the class implementation is encoded in the attached image files on LinkedIn:
 
-Assets:
+<center>
+<img src="img/li_mongodb_export_1.jpg" alt="MongoDB export" title="MongoDB export" width="400"/>
+<img src="img/li_mongodb_export_2.jpg" alt="MongoDB export" title="MongoDB export" width="400"/>
+<img src="img/li_mongodb_export_3.jpg" alt="MongoDB export" title="MongoDB export" width="400"/>
+<img src="img/li_mongodb_export_4.jpg" alt="MongoDB export" title="MongoDB export" width="400"/>
+<img src="img/li_mongodb_export_5.jpg" alt="MongoDB export" title="MongoDB export" width="400"/>
+</center>
+
+
+Here is his useful list of assets:
 
 - [MongoDB Documents](https://www.mongodb.com/docs/)
 - [Visual Studio Community 2022](https://visualstudio.microsoft.com/es/vs/community/)
