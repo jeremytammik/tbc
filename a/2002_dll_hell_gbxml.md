@@ -185,3 +185,113 @@ opt.IncludeShadingSurfaces=False
 opt.SimplifyCurtainSystems=True
 opt.Tier=Analysis.EnergyAnalysisDetailModelTier.SecondLevelBoundaries
 </pre>
+
+
+####<a name="4"></a> Automate FBX Export with SendKeys
+
+Idling, DialogBoxShowing, SendKeys
+
+TwinMotion Dynamic Link Export Fbx Automatically
+https://forums.autodesk.com/t5/revit-api-forum/twinmotion-dynamic-link-export-fbx-automatically/m-p/12123438#M72937
+
+
+ onurerMY3Q8  in reply to: developmentTA4RP
+‎2023-07-24 04:46 PM
+Thank you for sharing your solution. It saved me unbelievable amount of time, maybe days or weeks. Thank you VERY VERY MUCH!!!
+
+I cleaned the code and made it more readable in case someone needs it. My own Revit plugin calls this Twinmotion macro automatically after Revit starts up.
+
+using System.Threading.Tasks;
+using Autodesk.Revit.UI;
+using System.Windows.Forms;
+using Autodesk.Revit.UI.Events;
+
+namespace YourNamespaceHere
+{
+    public class Class2 : IExternalApplication
+    {
+        UIControlledApplication UIControlledApplication;
+
+        public Result OnStartup(UIControlledApplication Application)
+        {
+            UIControlledApplication = Application;
+            UIControlledApplication.Idling += Application_Idling;
+
+            return Result.Succeeded;
+        }
+
+        public Result OnShutdown(UIControlledApplication Application) => Result.Succeeded;
+
+        void Application_Idling(object Sender, IdlingEventArgs E)
+        {
+            UIControlledApplication.Idling -= Application_Idling;
+
+            var UIApplication = (UIApplication)Sender;
+
+            MyMacro(UIApplication);
+
+            //TaskDialog.Show("Application_Idling", Sender.GetType().FullName);
+        }
+
+        void OnDialogBoxShowing(object Sender, DialogBoxShowingEventArgs Args) => ((TaskDialogShowingEventArgs)Args).OverrideResult((int)TaskDialogResult.Ok);
+
+        static async void RunCommands(UIApplication UIapp, RevitCommandId Id_Addin)
+        {
+            UIapp.PostCommand(Id_Addin);
+            await Task.Delay(400);
+            SendKeys.Send("{ENTER}");
+            await Task.Delay(400);
+            SendKeys.Send("{ENTER}");
+            await Task.Delay(400);
+            SendKeys.Send("{ENTER}");
+            await Task.Delay(400);
+            SendKeys.Send("{ESCAPE}");
+            await Task.Delay(400);
+            SendKeys.Send("{ESCAPE}");
+        }
+
+        void MyMacro(UIApplication UIapp)
+        {
+            try
+            {
+                var Name = "CustomCtrl_%CustomCtrl_%Twinmotion 2020%Twinmotion Direct Link%ExportButton";
+                var Id_Addin = RevitCommandId.LookupCommandId(Name);
+
+                if (Id_Addin != null)
+                {
+                    UIapp.DialogBoxShowing += OnDialogBoxShowing;
+
+                    RunCommands(UIapp, Id_Addin);
+                }
+            }
+            catch
+            {
+                TaskDialog.Show("Test", "error");
+            }
+            finally
+            {
+                UIapp.DialogBoxShowing -= OnDialogBoxShowing;
+            }
+        }
+    }
+}
+
+
+
+####<a name="4"></a> RFA Export to MongoDB
+
+[Lalo Ibarra](https://www.linkedin.com/in/eduardo-ibarra91/) of Mexico City shares one
+of [his favorite classes built with #VSC and #MongoDB to facilitate the export of data from Revit families](https://www.linkedin.com/posts/activity-7089535064467795968-A5lj?utm_source=share&utm_medium=member_desktop):
+
+Assets:
+
+- [MongoDB Documents](https://www.mongodb.com/docs/)
+- [Visual Studio Community 2022](https://visualstudio.microsoft.com/es/vs/community/)
+- [Revit API docs](https://www.revitapidocs.com/)
+- [Revit SDK](https://aps.autodesk.com/developer/overview/revit)
+- [My First Revit Plug-in Overview](https://www.autodesk.com/support/technical/article/caas/tsarticles/ts/7I2bC1zUr4VjJ3U31uM66K.html)
+- [Create account in GitHub](https://github.com/)
+- [The Builder Coder](https://thebuildingcoder.typepad.com/)
+  [Visual Studio Revit Add-in Templates](https://github.com/jeremytammik/VisualStudioRevitAddinWizard)
+  &ndash; my recommendation: clone the repository
+
