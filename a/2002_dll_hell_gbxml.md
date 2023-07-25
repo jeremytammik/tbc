@@ -42,13 +42,13 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### GbXML and Python Tips
 
+Looking at several useful discussions on Python, handling DLLs, and various aspects of exporting to gbXML, FBX and MogoDB today:
 
 - [DLL paradise in Python](#2)
 - [Multiple gbXML export](#3)
 - [GbXML energy settings](#4)
 - [Automate FBX export with `SendKeys`](#5)
 - [RFA export to MongoDB](#6)
-
 
 ####<a name="2"></a> DLL Paradise in Python
 
