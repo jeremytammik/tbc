@@ -40,7 +40,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### GbXML and Python Tips
+### Various Export, gbXML and Python Tips
 
 Looking at several useful discussions on Python, handling DLLs, and various aspects of exporting to gbXML, FBX and MogoDB today:
 
@@ -318,5 +318,5 @@ Here is his useful list of assets:
 - [Create account in GitHub](https://github.com/)
 - [The Builder Coder](https://thebuildingcoder.typepad.com/)
   [Visual Studio Revit Add-in Templates](https://github.com/jeremytammik/VisualStudioRevitAddinWizard)
-  &ndash; my recommendation: clone the repository
+  &ndash; recommendation: clone the repository
 
