@@ -42,7 +42,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Various Export, gbXML and Python Tips
 
-Looking at several useful discussions on Python, handling DLLs, and various aspects of exporting to gbXML, FBX and MogoDB today:
+Looking at several useful discussions on Python, handling DLLs, and various aspects of exporting to gbXML, FBX and MongoDB today:
 
 - [DLL paradise in Python](#2)
 - [Multiple gbXML export](#3)
@@ -125,7 +125,7 @@ for i in range(len(FloorR)):
 </pre>
 
 This creates models, but I ran into a problem I don't fully understand: as the process continues, it slows down and stops at about 170-175 created models.
-Apparently, comething is taking up the memory.
+Apparently, something is taking up the memory.
 I tried calling `doc.Delete(model)` at the end of each `for` loop, but that didn't help either.
 
 What could be a solution?
@@ -295,7 +295,7 @@ namespace YourNamespaceHere
 ####<a name="6"></a> RFA Export to MongoDB
 
 To wrap up, [Lalo Ibarra](https://www.linkedin.com/in/eduardo-ibarra91/) of Mexico City shares one
-of [his favorite classes built with #VSC and #MongoDB to facilitate the export of data from Revit families](https://www.linkedin.com/posts/activity-7089535064467795968-A5lj?utm_source=share&utm_medium=member_desktop):
+of [his favourite classes built with #VSC and #MongoDB to facilitate the export of data from Revit families](https://www.linkedin.com/posts/activity-7089535064467795968-A5lj?utm_source=share&utm_medium=member_desktop):
 
 I guess the class implementation is encoded in the attached image files on LinkedIn:
 
