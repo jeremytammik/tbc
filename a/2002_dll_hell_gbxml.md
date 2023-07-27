@@ -292,12 +292,14 @@ namespace YourNamespaceHere
 }
 </pre>
 
+Thank you, Onur Er!
+
 ####<a name="6"></a> RFA Export to MongoDB
 
-To wrap up, [Lalo Ibarra](https://www.linkedin.com/in/eduardo-ibarra91/) of Mexico City shares one
+To wrap up, Eduardo [Lalo Ibarra](https://www.linkedin.com/in/eduardo-ibarra91/) of Mexico City shares one
 of [his favourite classes built with #VSC and #MongoDB to facilitate the export of data from Revit families](https://www.linkedin.com/posts/activity-7089535064467795968-A5lj?utm_source=share&utm_medium=member_desktop):
 
-I guess the class implementation is encoded in the attached image files on LinkedIn:
+The class implementation is encoded in the attached image files on LinkedIn:
 
 <center>
 <img src="img/li_mongodb_export_1.jpg" alt="MongoDB export" title="MongoDB export" width="400"/>
@@ -307,6 +309,13 @@ I guess the class implementation is encoded in the attached image files on Linke
 <img src="img/li_mongodb_export_5.jpg" alt="MongoDB export" title="MongoDB export" width="400"/>
 </center>
 
+Eduardo also provides it as a PDF, from which I extracted a text file:
+
+> I share the construction of the class.
+I will give myself some time to share the whole process.
+
+- [mongodb_export.pdf](li_mongodb_export.pdf)
+- [mongodb_export.txt](li_mongodb_export.txt)
 
 Here is his useful list of assets:
 
@@ -320,3 +329,4 @@ Here is his useful list of assets:
   [Visual Studio Revit Add-in Templates](https://github.com/jeremytammik/VisualStudioRevitAddinWizard)
   &ndash; recommendation: clone the repository
 
+Many thanks, Eduardo!
