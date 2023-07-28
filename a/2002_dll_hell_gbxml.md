@@ -23,7 +23,7 @@
 
 twitter:
 
- with the @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS
+Attaining DLL paradise in Python, Multiple gbXML export, gbXML energy settings, automate FBX export with SendKeys and RFA export to MongoDB with the @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS https://thebuildingcoder.typepad.com/blog/2023/07/export-gbxml-and-python-tips.html
 
 Discussions on Python, handling DLLs, and various aspects of exporting to gbXML, FBX and MongoDB
 &ndash; DLL paradise in Python
