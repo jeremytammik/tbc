@@ -40,18 +40,53 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ####<a name="2"></a> EU APS DevCon
 
+The Autodesk Developer Conference DevCon is coming up soon.
+The first event is taking place in San Francisco on September 6-7, followed by
+the European one in Munich on September 11-12.
+
+
+Both can be
+
+Autodesk DevCon San Francisco, California:
+
+- Venue: The Historic Klamath Ferry
+- Date: September 6-7, 2023
+- Time: Day 1 8A-6:30P; Day 2 8A-5P
+- Main link: https://aps.autodesk.com/devcon
+- Main blog: https://aps.autodesk.com/blog/register-autodesk-devcon-2023
+
+Autodesk DevCon Munich, Germany:
+
+- Venue: Holiday Inn Munich - Westpark, Albert-Rosshaupter-Strasse 45, Munich, 81369 Germany
+- Date: 11-12 September 2023
+- Time: Day 1 8:00-21:30; Day 2 8:00-16:15
+- Main link: https://cvent.autodesk.com/w9DQ5Q?rt=99uCmbte1U6VS9RyVp0Gnw&RefId=Generic
+- Main blog: https://aps.autodesk.com/blog/register-autodesk-devcon-2023
+
+All the informationn as well as both registration links are provided in
+the [main blog post](https://aps.autodesk.com/blog/register-autodesk-devcon-2023).
+
+This is a 2-day event which will provide deep technical training as well High-Level overview on Autodesk Platform Services and Autodesk APIs. If you want to learn about Autodesk applications to improve workflows, learn from Autodesk engineers and technology decision-makers as well as other industry professionals, this event will provide all the education and networking you need. You’ll bring back very valuable insights to apply to your work.
+
+The [European DevCon agenda](img/devcon_eu_2023_agenda.pdf) provides
+a detailed overview of the sessions planned.
+
+Space is limited and we expect this event to sell out.
+
+You still have a chance to save 50% on your ticket until August 6th (180 euro instead of 360).
+
+As always, please feel free to reach out if you have any questions.
+
+As [Kean Walmsley points out](https://www.keanw.com/2023/06/register-today-for-autodesk-devcon-2023-in-munich.html),
+it’s a special time to be in Munich,
+with [Oktoberfest starting the following weekend](https://www.oktoberfest.de/en/information/when-is-oktoberfest),
+on September 16th.
+
 <center>
 <img src="img/2023-08-01_eu_aps_devcon.png" alt="EU APS DevCon 2023" title="EU APS DevCon 2023" width="1100"/>
 </center>
 
-
-**Question:**
-
-**Answer:**
-
-**Response:**
-
-####<a name="3"></a>
+####<a name="3"></a> Resx Language Management
 
 [Geoff Jennings](https://www.linkedin.com/in/geoffrey-jennings-9984921/) ([@GJennings-BM](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/9888344)) of [BIModular](https://bimodular.com)
 brought up and solved an important Revit add-in localisation issue in
@@ -338,4 +373,11 @@ RVTLanguages.zip
 
 
 Many thanks, !
+
+
+**Question:**
+
+**Answer:**
+
+**Response:**
 
