@@ -95,113 +95,96 @@ on [Revit Add-in with Multiple Language Forms based on Current UI Culture](https
 
 **Question:**
 
-I am struggling to get my C# code correct to convert my user forms into each culture.   I have tried for days, but I cannot get my labels to change languages when opening Revit in different language versions.  I can get my Ribbon Panel button to change languages using a RibbonResources.resx file in my App.cs, but my FormExport.resx files are not providing language translation values.
+I am struggling to get my C# code correct to convert my user forms into each culture.
+I tried for days, but I cannot get my labels to change languages when opening Revit in different language versions.
+I can get my Ribbon Panel button to change languages using a RibbonResources.resx file in my App.cs, but my FormExport.resx files are not providing language translation values.
 
+<pre class="prettyprint">
 public FormExport(Autodesk.Revit.DB.Document doc)
 {
-CultureInfo cultureName = new CultureInfo(Thread.CurrentThread.CurrentUICulture.Name);
-string cultureRef = cultureName.Name;
-Thread.CurrentThread.CurrentCulture = CultureInfo.CreateSpecificCulture(cultureRef);
-Thread.CurrentThread.CurrentUICulture = CultureInfo.CreateSpecificCulture(cultureRef);
+  CultureInfo cultureName = new CultureInfo(Thread.CurrentThread.CurrentUICulture.Name);
+  string cultureRef = cultureName.Name;
+  Thread.CurrentThread.CurrentCulture = CultureInfo.CreateSpecificCulture(cultureRef);
+  Thread.CurrentThread.CurrentUICulture = CultureInfo.CreateSpecificCulture(cultureRef);
 
-InitializeComponent();
-familyDocument = doc;
+  InitializeComponent();
+  familyDocument = doc;
 
-// Get the localized label text from the resource .resx file
-string localizedLabelText = GetLocalizedTextFromResource("lblFamilyName.Text");
-string localizedHeaderText = GetLocalizedTextFromResource("lblHeader.Text");
+  // Get the localized label text from the resource .resx file
+  string localizedLabelText = GetLocalizedTextFromResource("lblFamilyName.Text");
+  string localizedHeaderText = GetLocalizedTextFromResource("lblHeader.Text");
 
-// Set the label text with the localized value
-lblFamilyName.Text = localizedLabelText;
-lblHeader.Text = localizedHeaderText;
-
+  // Set the label text with the localized value
+  lblFamilyName.Text = localizedLabelText;
+  lblHeader.Text = localizedHeaderText;
 }
+</pre>
 
-I have this function set below my form code :
+I have this function set below my form code:
+
+<pre class="prettyprint">
 private string GetLocalizedTextFromResource(string key)
 {
-try
-{
-// Load the appropriate resource file based on the user's selected language
-ResourceManager resourceManager = new ResourceManager("MyApp.FormExport", typeof(FormExport).Assembly);
-CultureInfo currentCulture = Thread.CurrentThread.CurrentUICulture;
-// Fetch the localized text for the given key from the resource
-string localizedText = resourceManager.GetString(key, currentCulture);
-// If the resource for the given key is not found in the selected culture,
-// explicitly load the default resource (English) using CultureInfo.InvariantCulture
-if (localizedText == null)
-{
-localizedText = resourceManager.GetString(key, CultureInfo.InvariantCulture);
+  try
+  {
+    // Load the appropriate resource file based on the user's selected language
+    ResourceManager resourceManager = new ResourceManager("MyApp.FormExport", typeof(FormExport).Assembly);
+    CultureInfo currentCulture = Thread.CurrentThread.CurrentUICulture;
+    // Fetch the localized text for the given key from the resource
+    string localizedText = resourceManager.GetString(key, currentCulture);
+    // If the resource for the given key is not found in the selected culture,
+    // explicitly load the default resource (English) using CultureInfo.InvariantCulture
+    if (localizedText == null)
+    {
+      localizedText = resourceManager.GetString(key, CultureInfo.InvariantCulture);
+    }
+    // If the resource is still not found, return the key itself as a fallback
+    return localizedText ?? key;
+  }
+  catch (MissingManifestResourceException ex)
+  {
+    // Log the exception
+    Console.WriteLine($"Resource file not found. Exception: {ex.Message}");
+    return key; // Return the key itself as a fallback
+  }
 }
-// If the resource is still not found, return the key itself as a fallback
-return localizedText ?? key;
-}
-catch (MissingManifestResourceException ex)
-{
-// Log the exception
-Console.WriteLine($"Resource file not found. Exception: {ex.Message}");
-return key; // Return the key itself as a fallback
-}
-}
+</pre>
 
-My form .resx files are:
-FormExport.resx
-FormExport.en.resx
-FormExport.fr.resx
-.....(continued)
+My form `.resx` files are:
 
-**Answer:**
+- FormExport.resx
+- FormExport.en.resx
+- FormExport.fr.resx
+- ... (continued)
 
-You don't say what research you have performed to optimise your setup. Searching around a bit for things like resx and .NET leads me to lots of interesting recommendations like this one:
+I am testing various options.
+Here is just a small list sites I have researched and tested against:
 
-https://stackoverflow.com/questions/373388/best-way-to-implement-multi-language-globalization-in-lar...
+- [Create the Multilingual .bundle file](https://adndevblog.typepad.com/aec/2013/08/localized-applications-for-the-revit-exchange-store.html)
+- [All Language Revit Versions](https://help.autodesk.com/view/RVT/2020/ENU/?guid=GUID-BD09C1B4-5520-475D-BE7E-773642EEBD6C)
+- [Language Tags](https://forums.autodesk.com/t5/revit-api-forum/localization-of-add-in-multilanguage/td-p/8936144)
+- [Get Revit Language](https://www.revitapidocs.com/2015/2b1d8b80-a11c-2a57-63bd-6c0d67691879.htm)
+- [Family Content Localization](https://thebuildingcoder.typepad.com/blog/2013/02/content-localisation.html)
+- [Another Resource for Creating Resx files and Revit UI Culture](https://thebuildingcoder.typepad.com/blog/2017/02/multiple-language-resx-resource-files.html)
+- [Label Control for BuiltIn Parameter Languages](https://www.revitapidocs.com/2022/c38e7823-31b3-9bcd-5ab0-d353e0d39fa8.htm)
+- [Localize Ribbon](https://help.autodesk.com/view/RVT/2022/ENU/?guid=Revit_API_Revit_API_Developers_Guide_Introduction_...)
 
-It includes so much advice that it is impossible to guess what you may or may not already be adhering to...
+It has become very confusing since everyone seems to have a different method.
+I am simply building a C# .Net app for Revit under the Add-in tab.
+I have five WinForms.
+One is a primary WinForms and the other WinForms support secondary operations.
+This is all been built in Visual Studio 2022 for Revit 2021-2024.
+The app has been submitted to the app store for publishing.
+Now, I just need to prepare the WinForms for a larger international base of users.
 
-Jeremy Tammik,  Developer Advocacy and Support, The Building Coder, Autodesk Developer Network, ADN Open
-Tags (0)
-Add tags
-Report
-MESSAGE 3 OF 5
-GJennings-BM
-  Contributor GJennings-BM  in reply to: jeremy.tammik
-‎2023-07-30 01:17 PM
+It should be extremely simple.
+Again, I have my ribbon panel working for any language, but the translations of my WinForms are my challenge.
+Beyond the sites listed below, I spent hours reviewing YouTube videos, ChatGPT, reading manuals, and website blogs.
+In Visual Studio, I have done the process of setting each form to 'Localizable' = true, then Language = "France, Spanish,...", customized the forms for .resx files.  I have tested with separate manual .resx files, and tons of programming methods.  Frustrating for something that is effectively a basic task.
 
-**Response:**
+I am hoping someone can provide c# .net guidance showing the code requirements of a single form that references the appropriate .resx based upon the user's Revit language version.
+I currently have a `Forms` folder for all of my WinForms and their associated `.resx` language files.
 
-Good evening and thank you Jeremy for your response.
-
-I am testing options mentioned in the link you sent.  Below is just a small list sites I have researched and tested against.  It has become very confusing since everyone seems to have a different method.   I am simply building a C# .Net app for Revit under the Add-in tab.  I have five WinForms.  One is a primary WinForms and the other WinForms support secondary operations.  This is all been built in Visual Studio 2022 for Revit 2021-2024.  The app has been submitted to the app store for publishing.  Now, I just need to prepare the WinForms for a larger international base of users.
-
-It should be extremely simple.  Again, I have my ribbon panel working for any language, but the translations of my WinForms are my challenge.  Beyond the sites listed below, I have spent hours reviewing YouTube videos, ChatGPT, reading manuals, and website blogs.  In visual studio, I have done the process of setting each form to 'Localizable' = true, then Language = "France, Spanish,...", customized the forms for .resx files.  I have tested with separate manual .resx files, and tons of programming methods.  Frustrating for something that is effectively a basic task.
-
-I am hoping someone can provide c# .net guidance showing the code requirements of a single form that references the appropriate .resx based upon the user's Revit language version.   I currently have a 'Forms" folder for all of my WinForms and their associated .resx language files.
-
-Create the Multilingual .bundle file
-https://adndevblog.typepad.com/aec/2013/08/localized-applications-for-the-revit-exchange-store.html
-
-All Language Revit Versions
-https://help.autodesk.com/view/RVT/2020/ENU/?guid=GUID-BD09C1B4-5520-475D-BE7E-773642EEBD6C
-
-Language Tags
-https://forums.autodesk.com/t5/revit-api-forum/localization-of-add-in-multilanguage/td-p/8936144
-
-Get Revit Language
-https://www.revitapidocs.com/2015/2b1d8b80-a11c-2a57-63bd-6c0d67691879.htm
-
-Family Content Localization
-https://thebuildingcoder.typepad.com/blog/2013/02/content-localisation.html
-
-Another Resource for Creating Resx files and Revit UI Culture
-https://thebuildingcoder.typepad.com/blog/2017/02/multiple-language-resx-resource-files.html
-
-Label Control for BuiltIn Parameter Languages
-https://www.revitapidocs.com/2022/c38e7823-31b3-9bcd-5ab0-d353e0d39fa8.htm
-
-Localize Ribbon
-https://help.autodesk.com/view/RVT/2022/ENU/?guid=Revit_API_Revit_API_Developers_Guide_Introduction_...
-
-Thank you. Geoff
 
 2023-07-30_22h15_16.png
 
