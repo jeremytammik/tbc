@@ -12,8 +12,6 @@
 - resx mnanagement language
   https://forums.autodesk.com/t5/revit-api-forum/revit-add-in-with-multiple-language-forms-based-on-current-ui/m-p/12140874#M73102
 
-
-
 twitter:
 
  with the @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS
@@ -93,9 +91,7 @@ brought up and solved an important Revit add-in localisation issue in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [Revit Add-in with Multiple Language Forms based on Current UI Culture](https://forums.autodesk.com/t5/revit-api-forum/revit-add-in-with-multiple-language-forms-based-on-current-ui/m-p/12140874):
 
-**Question:**
-
-I am struggling to get my C# code correct to convert my user forms into each culture.
+**Question:** I am struggling to get my C# code correct to convert my user forms into each culture.
 I tried for days, but I cannot get my labels to change languages when opening Revit in different language versions.
 I can get my Ribbon Panel button to change languages using a RibbonResources.resx file in my App.cs, but my FormExport.resx files are not providing language translation values.
 
@@ -185,45 +181,43 @@ In Visual Studio, I have done the process of setting each form to 'Localizable' 
 I am hoping someone can provide c# .net guidance showing the code requirements of a single form that references the appropriate .resx based upon the user's Revit language version.
 I currently have a `Forms` folder for all of my WinForms and their associated `.resx` language files.
 
+**Answer:** The `.resx` file should swap automatically when depending on the `CultureInfo`; if the resource is now changed automatically probably your key language is different from the CultureInfo in the application, like `en` is different from `en-US` and `fr` is different from `fr-FR`.
+Just update your resource file name to match the same `CultureInfo` that Revit uses.
+Here is a [table listing all the languages and keys](https://github.com/ricaun/RevitAddin.ResourcesExample).
 
-2023-07-30_22h15_16.png
-
-**Answer:**
-
-I remember in another post that someone has a similar problem with Form and multi-language.
-
-The .resx file should swap automatically when depending on the CultureInfo, if the resource is now changed automatically probably your key language is different from the CultureInfo in the application, like en is different from en-US and fr is different from fr-FR.
-
-Just update your resource file name to match the same CultureInfo that Revit uses.
-
-Here is a table with all the Langueges and keys: https://github.com/ricaun/RevitAddin.ResourcesExample
-
-**Response:**
-
-Thank you for your answer and excellent quality video of your .resx management.
+**Response:** Thank you for your answer and excellent quality video of your .resx management.
 Your methods will be useful on some other apps I plan to create.
 
-I was finally successful at getting my C# Winforms to show in any UICulture languages!  I want to share this information with others:
+I was finally successful at getting my C# Winforms to show in any UICulture languages!
+I want to share this information with others:
 
-RIBBON PANEL LOCALIZATION:
-I added a language switcher file based on Andrey Bushman' sample file.  This has been modified to 'RVTLanguages.cs'.  The file was placed in my root folder below my C# project name.
+####<a name="3.1"></a> Ribbon Panel Localization
+
+I added a language switcher file based on Andrey Bushman's sample file.
+This has been modified to `RVTLanguages.cs`.
+The file was placed in my root folder below my C# project name.
 In the same location, I also created three .resx files:
-RibbonResources.resx  (empty and set to 'Internal')
-RibbonResources.en-US.resx (all of my panel data - see image below)
-RibbonResources.fr-FR.resx (my french translations)
-To keep my panel button narrow and allow for wrapping of text, I created two lines in the .resx file
-Ribbon_EN_resx file.png
 
-In my App.cs :
+- RibbonResources.resx  (empty and set to 'Internal')
+- RibbonResources.en-US.resx (all of my panel data - see image below)
+- RibbonResources.fr-FR.resx (my french translations)
+
+To keep my panel button narrow and allow for wrapping of text, I created two lines in the .resx file:
+
+<center>
+<img src="img/ribbon_en_resx_file.png" alt="Ribbon panel resource file" title="Ribbon panel resource file" width="800"/> <!-- Pixel Height: 417 Pixel Width: 1,686 -->
+</center>
+
+In my `App.cs`:
 
 <pre class="prettyprint">
 public Result OnStartup(UIControlledApplication application)
 {
 
-  #region READ AND SET THE LANGUAGE ENVIRONMENT USING THE RVTLanguages.cs file
+#region READ AND SET THE LANGUAGE ENVIRONMENT USING THE RVTLanguages.cs file
   RVTLanguages.Cultures(application.ControlledApplication.Language);
   ResourceManager res_mng = new ResourceManager(typeof(RibbonResources));
-  #endregion
+#endregion
 
   RibbonPanel p = application.CreateRibbonPanel(RibbonResources.ResourceManager.GetString("PanelName"));
 
@@ -248,8 +242,12 @@ public Result OnStartup(UIControlledApplication application)
   p.AddItem(btnMyApp);
 </pre>
 
-This was all that was required for setting up a localized ribbon button.
-Ribbon_EN_and_FR.png
+This was all that was required for setting up a localized ribbon button:
+
+
+<center>
+<img src="img/ribbon_en_and_fr.png" alt="Ribbon panel localisation" title="Ribbon panel localisation" width="800"/> <!-- Pixel Height: 430 Pixel Width: 1,200 -->
+</center>
 
 CREATING THE LOCALIZED WINFORMS:
 
@@ -263,35 +261,35 @@ In my Winform code I did the following in MyForm.cs:
 <pre class="prettyprint">
 public sealed class UICultureSwitcher : IDisposable
 {
-    CultureInfo previous;
-    public UICultureSwitcher()
-    {
-        CultureInfo culture = new CultureInfo(Thread
-        .CurrentThread.CurrentCulture.Name);
+  CultureInfo previous;
+  public UICultureSwitcher()
+  {
+    CultureInfo culture = new CultureInfo(Thread
+    .CurrentThread.CurrentCulture.Name);
 
-        previous = Thread.CurrentThread.CurrentUICulture;
-        Thread.CurrentThread.CurrentUICulture = culture;
-     }
-     void IDisposable.Dispose()
-     {
-         Thread.CurrentThread.CurrentUICulture = previous;
-     }
+    previous = Thread.CurrentThread.CurrentUICulture;
+    Thread.CurrentThread.CurrentUICulture = culture;
+   }
+   void IDisposable.Dispose()
+   {
+     Thread.CurrentThread.CurrentUICulture = previous;
+   }
 }
 
 public MyForm(Autodesk.Revit.DB.Document doc)
 {
-      ResourceManager res_mng = new ResourceManager(typeof(MyForm));
-      ResourceSet resourceSet = res_mng.GetResourceSet(Thread.CurrentThread.CurrentUICulture, true, true);
+    ResourceManager res_mng = new ResourceManager(typeof(MyForm));
+    ResourceSet resourceSet = res_mng.GetResourceSet(Thread.CurrentThread.CurrentUICulture, true, true);
 
-      InitializeComponent();
-      familyDocument = doc;
+    InitializeComponent();
+    familyDocument = doc;
 
-      label1.Text = GetLocalizedTextFromResource("label1Text");
-      label2.Text = GetLocalizedTextFromResource("label2.Text");
-      label3.Text = GetLocalizedTextFromResource("label3.Text");
-      label4.Text = GetLocalizedTextFromResource("label4.Text");
+    label1.Text = GetLocalizedTextFromResource("label1Text");
+    label2.Text = GetLocalizedTextFromResource("label2.Text");
+    label3.Text = GetLocalizedTextFromResource("label3.Text");
+    label4.Text = GetLocalizedTextFromResource("label4.Text");
 
-      // rest of code ...
+    // rest of code ...
 }
 </pre>
 
@@ -300,31 +298,31 @@ Below I have a function that will collect the necessary language information in 
 <pre class="prettyprint">
 private string GetLocalizedTextFromResource(string key)
 {
-    try
+  try
+  {
+   // Load the appropriate resource file based on the user's selected language
+   ResourceManager resourceManager = new ResourceManager("MyApp.Forms.MyForm", typeof(MyForm).Assembly);
+        CultureInfo currentCulture = Thread.CurrentThread.CurrentUICulture;
+
+   // Fetch the localized text for the given key from the resource
+   string localizedText = resourceManager.GetString(key, currentCulture);
+
+   // If the resource for the given key is not found in the culture,
+   // explicitly load the default resource (English) using CultureInfo.InvariantCulture
+   if (localizedText == null)
     {
-     // Load the appropriate resource file based on the user's selected language
-     ResourceManager resourceManager = new ResourceManager("MyApp.Forms.MyForm", typeof(MyForm).Assembly);
-                CultureInfo currentCulture = Thread.CurrentThread.CurrentUICulture;
+    localizedText = resourceManager.GetString(key, CultureInfo.InvariantCulture);
+    }
 
-     // Fetch the localized text for the given key from the resource
-     string localizedText = resourceManager.GetString(key, currentCulture);
-
-     // If the resource for the given key is not found in the culture,
-     // explicitly load the default resource (English) using CultureInfo.InvariantCulture
-     if (localizedText == null)
-        {
-        localizedText = resourceManager.GetString(key, CultureInfo.InvariantCulture);
-        }
-
-       // If the resource is still not found, return the key itself as a fallback
-       return localizedText ?? key;
+     // If the resource is still not found, return the key itself as a fallback
+     return localizedText ?? key;
   }
   catch (MissingManifestResourceException ex)
   {
-       // Handle the exception if the resource file is not found
-       // Log the exception
-       Console.WriteLine($"Resource file not found. Exception: {ex.Message}");
-       return key; // Return the key itself as a fallback
+     // Handle the exception if the resource file is not found
+     // Log the exception
+     Console.WriteLine($"Resource file not found. Exception: {ex.Message}");
+     return key; // Return the key itself as a fallback
    }
 }
 </pre>
