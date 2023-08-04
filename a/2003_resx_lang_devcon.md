@@ -45,7 +45,7 @@ with [application localisation and i18n](https://en.wikipedia.org/wiki/Internati
 - [APS Developer Conferences](#2)
 - [Resx language management](#3)
 - [Ribbon panel localisation](#3.1)
-- [Creating the localised WinForms](#3.2)
+- [Creating localised WinForms](#3.2)
 
 ####<a name="2"></a> APS Developer Conferences
 
@@ -250,7 +250,7 @@ This was all that was required for setting up a localized ribbon button:
 <img src="img/ribbon_resx_en_and_fr.png" alt="Ribbon panel localisation" title="Ribbon panel localisation" width="800"/> <!-- Pixel Height: 430 Pixel Width: 1,200 -->
 </center>
 
-####<a name="3.2"></a> Creating the Localized WinForms
+####<a name="3.2"></a> Creating Localized WinForms
 
 I created a folder called `Forms` and then placed all of my WinForms under this folder.
 After my forms were created, I then manually created two new `.resx` files, for example, `MyForm.en-US.resx` and `MyForm.fr-FR.resx`.
