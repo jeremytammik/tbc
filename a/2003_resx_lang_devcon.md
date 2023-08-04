@@ -58,7 +58,7 @@ The two-day events will be hosted in:
 
 These events are a great opportunity for software developers and business innovators to learn about leading edge technology from Autodesk experts, network with other developers and business leaders, as well as see how our desktop APIs and cloud-based [Autodesk Platform Services APS](https://aps.autodesk.com/) (formerly Forge) can power their company’s growth and digital transformation. This is also a great opportunity for Autodesk to engage with its 3rd party development community, learn more about their projects and how they are using our APIs.
 
-All the up-to-date informationn as well as both registration links are provided in
+All the up to date information as well as both registration links are provided in
 the [main blog post](https://aps.autodesk.com/blog/register-autodesk-devcon-2023).
 
 This is a 2-day event which will provide deep technical training as well high-level overview on Autodesk Platform Services and Autodesk APIs. If you want to learn about Autodesk applications to improve workflows, learn from Autodesk engineers and technology decision-makers as well as other industry professionals, this event will provide all the education and networking you need. You’ll bring back very valuable insights to apply to your work.
@@ -86,7 +86,7 @@ on September 16th.
 [Geoff Jennings](https://www.linkedin.com/in/geoffrey-jennings-9984921/) ([@GJennings-BM](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/9888344)) of [BIModular](https://bimodular.com)
 brought up and with help
 from Luiz Henrique [@ricaun](https://ricaun.com/) Cassettari solved
-important spects of Revit add-in localisation in
+important aspects of Revit add-in localisation in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [Revit Add-in with Multiple Language Forms based on Current UI Culture](https://forums.autodesk.com/t5/revit-api-forum/revit-add-in-with-multiple-language-forms-based-on-current-ui/m-p/12140874):
 
@@ -197,9 +197,9 @@ This has been modified to `RVTLanguages.cs`.
 The file was placed in my root folder below my C# project name.
 In the same location, I also created three .resx files:
 
-- RibbonResources.resx  (empty and set to 'Internal')
-- RibbonResources.en-US.resx (all of my panel data - see image below)
-- RibbonResources.fr-FR.resx (my french translations)
+- RibbonResources.resx (empty &ndash; set to `Internal`)
+- RibbonResources.en-US.resx (my panel data &ndash; see image below)
+- RibbonResources.fr-FR.resx (my French translations)
 
 To keep my panel button narrow and allow for wrapping of text, I created two lines in the .resx file:
 
