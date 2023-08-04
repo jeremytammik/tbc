@@ -34,59 +34,46 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Resx Language Management and EU DevCon
 
+This year's [Autodesk Platform Services APS](https://aps.autodesk.com/) Developer Conferences are
+coming up soon, and we all (well, many of us) need to deal
+with [application localisation and i18n](https://en.wikipedia.org/wiki/Internationalization_and_localization) issues:
 
-
-San Francisco and Munich Events
-We are hosting two DevCons (Autodesk Developer Conference) in September. These events are a great opportunity for software developers and business innovators to learn about leading edge technology from Autodesk experts, network with other developers and business leaders, as well as see how our desktop APIs and cloud-based Autodesk Platform Services (formerly Forge) can power their company’s growth and digital transformation. This is also a great opportunity for Autodesk to engage with our 3rd party development community, learn more about their projects and how they are using our APIs.
-
-These two-day events will be hosted in:
-San Francisco, California: The Historic Klamath Ferry / Date: September 6-7, 2023
-Munich, Germany: Holiday Inn Munich - Westpark / Date: September 11-12, 2023
-  Spread the Word!
-
+- [EU APS DevCon](#2)
+- [Resx language management](#3)
+- [Ribbon panel localisation](#3.1)
+- [Creating the localised WinForms](#3.2)
 
 
 ####<a name="2"></a> EU APS DevCon
 
-The Autodesk Developer Conference DevCon is coming up soon.
-The first event is taking place in San Francisco on September 6-7, followed by
-the European one in Munich on September 11-12.
+The [Autodesk Developer Conference DevCon](https://aps.autodesk.com/blog/register-autodesk-devcon-2023) is
+coming up soon.
 
+The two-day events will be hosted in:
 
-Both can be
+- [San Francisco, California](https://aps.autodesk.com/devcon):
+  The Historic Klamath Ferry on September 6-7, 2023
+- [Munich, Germany](https://cvent.autodesk.com/w9DQ5Q?rt=99uCmbte1U6VS9RyVp0Gnw&RefId=Generic):
+  Holiday Inn Munich - Westpark on September 11-12, 2023
 
-Autodesk DevCon San Francisco, California:
+These events are a great opportunity for software developers and business innovators to learn about leading edge technology from Autodesk experts, network with other developers and business leaders, as well as see how our desktop APIs and cloud-based [Autodesk Platform Services APS](https://aps.autodesk.com/) (formerly Forge) can power their company’s growth and digital transformation. This is also a great opportunity for Autodesk to engage with its 3rd party development community, learn more about their projects and how they are using our APIs.
 
-- Venue: The Historic Klamath Ferry
-- Date: September 6-7, 2023
-- Time: Day 1 8A-6:30P; Day 2 8A-5P
-- Main link: https://aps.autodesk.com/devcon
-- Main blog: https://aps.autodesk.com/blog/register-autodesk-devcon-2023
-
-Autodesk DevCon Munich, Germany:
-
-- Venue: Holiday Inn Munich - Westpark, Albert-Rosshaupter-Strasse 45, Munich, 81369 Germany
-- Date: 11-12 September 2023
-- Time: Day 1 8:00-21:30; Day 2 8:00-16:15
-- Main link: https://cvent.autodesk.com/w9DQ5Q?rt=99uCmbte1U6VS9RyVp0Gnw&RefId=Generic
-- Main blog: https://aps.autodesk.com/blog/register-autodesk-devcon-2023
-
-All the informationn as well as both registration links are provided in
+All the up-to-date informationn as well as both registration links are provided in
 the [main blog post](https://aps.autodesk.com/blog/register-autodesk-devcon-2023).
 
-This is a 2-day event which will provide deep technical training as well High-Level overview on Autodesk Platform Services and Autodesk APIs. If you want to learn about Autodesk applications to improve workflows, learn from Autodesk engineers and technology decision-makers as well as other industry professionals, this event will provide all the education and networking you need. You’ll bring back very valuable insights to apply to your work.
+This is a 2-day event which will provide deep technical training as well high-level overview on Autodesk Platform Services and Autodesk APIs. If you want to learn about Autodesk applications to improve workflows, learn from Autodesk engineers and technology decision-makers as well as other industry professionals, this event will provide all the education and networking you need. You’ll bring back very valuable insights to apply to your work.
 
 The [European DevCon agenda](img/devcon_eu_2023_agenda.pdf) provides
 a detailed overview of the sessions planned.
 
 Space is limited and we expect this event to sell out.
 
-You still have a chance to save 50% on your ticket until August 6th (180 euro instead of 360).
+You still have a chance to save 50% on your EU ticket until this weekend: 180 euro instead of 360.
 
 As always, please feel free to reach out if you have any questions.
 
 As [Kean Walmsley points out](https://www.keanw.com/2023/06/register-today-for-autodesk-devcon-2023-in-munich.html),
-it’s a special time to be in Munich,
+it’s also a special time to be in Munich,
 with [Oktoberfest starting the following weekend](https://www.oktoberfest.de/en/information/when-is-oktoberfest),
 on September 16th.
 
@@ -338,38 +325,45 @@ private string GetLocalizedTextFromResource(string key)
 </pre>
 
 I then repeat the same methods for my other forms.
-I have included screenshots of the end results.
+Here are screenshots of the end results:
+
+<center>
+<img src="img/ribbon_resx_familytypeexporter_en.png" alt="FamilyType Exporter EN" title="FamilyType Exporter EN" width="600"/>
+<p style="font-size: 80%; font-style:italic">FamilyType Exporter EN</p>
+<br/>
+<img src="img/ribbon_resx_familytypeexporter_fr.png" alt="FamilyType Exporter FR" title="FamilyType Exporter FR" width="600"/>
+<p style="font-size: 80%; font-style:italic">FamilyType Exporter FR</p>
+</center>
+
 Now, I am updating the datagrid based upon a similar workflow.
 
 I truly hope this helps others.
 This has been a very confusing journey.
-Everything mentioned was done in Visual Studio 2022 and for Revit 2022-2024.
+Everything mentioned was done in Visual Studio 2022 and for Revit 2022-2024:
 
-FamilyTypeExporter_FR.png
-141 KB
+- [Source code module RVTLanguages.cs](zip/ribbon_resx_rvtlanguages.zip)
 
-FamilyTypeExporter_EN.png
-124 KB
+**Answer:** Neat!
 
-RVTLanguages.zip
+I believe setting the *Thread.CurrentThread.CurrentUICulture* and *Thread.CurrentThread.CurrentCulture* is not necessary to make multilanguage work, Revit already starts with the `CultureInfo` correctly set; the only reason to change it might be to test whether your Form is working in another `CurrentUICulture` language.
+Using your class `UICultureSwitcher` does the trick.
 
+And why are you using `CommandName1` and `CommandName2` to create the second line? Just one single `CommandName` entry with multiple lines should work, like your `CommandDescription` that has multiple lines.
 
+**Response:** You are correct about the CommandName1 and CommandName2.
+I originally created the two strings before I did the multiline commandDescription.
+Previously, I had tried the "\r\n" method in the .resx file and it was making it part of a single full string versus giving me two lines of strings.
+I changed the .resx files for my Ribbon code and generated the Spanish version.
+The single CommandName with a `shift`+`return` allows for the multiple lines in the ribbon button:
 
-**Answer:**
-
-Neat!
-
-I believe setting the Thread.CurrentThread.CurrentUICulture and Thread.CurrentThread.CurrentCulture is not necessary to make multilanguage works, Revit already starts with the CultureInfo correctly, the only reason to change should be to test if your Form is working in another CurrentUICulture language. Using your class UICultureSwitcher does the trick.
-
-And why are you using CommandName1 and CommandName2 to create the second line, only one CommandName with multiple lines should work, like your CommandDescription that has multiple lines.
-
-**Response:**
-
-You are correct about the CommandName1 and CommandName2.  I originally created the two strings before I did the multiline commandDescription.  Previously, I had tried the "\r\n" method in the .resx file and it was making it part of a single full string versus giving me two lines of strings.
-I change the .resx files for my Ribbon code and generated the Spanish version.  The single CommandName with a shift+return allows for the multiple lines in the ribbon button.
-Ribbon_ES.png
+<center>
+<img src="img/ribbon_resx_ribbon_es.png" alt="FamilyType Exporter ES" title="FamilyType Exporter ES" width="600"/>
+<p style="font-size: 80%; font-style:italic">FamilyType Exporter ES</p>
+<br/>
+</center>
 
 As for the language switcher, I have plans for expanding functionality for an upcoming Pro version of the app.
+
 Thanks again for your video and quick response.
 
 Many thanks to Geoff and Luiz for clarifying the confusion and sharing the solution!
