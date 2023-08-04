@@ -16,7 +16,11 @@ twitter:
 
  with the @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS
 
-&ndash;  ...
+The Autodesk Platform Services APS Developer Conferences are coming up, and we all need to deal
+with application localisation and i18n issues
+&ndash; Resx language management
+&ndash; Ribbon panel localisation
+&ndash; Creating the localised WinForms...
 
 linkedin:
 
@@ -32,24 +36,23 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Resx Language Management and EU DevCon
+### Resx Language Management and APS DevCons
 
 This year's [Autodesk Platform Services APS](https://aps.autodesk.com/) Developer Conferences are
 coming up soon, and we all (well, many of us) need to deal
 with [application localisation and i18n](https://en.wikipedia.org/wiki/Internationalization_and_localization) issues:
 
-- [EU APS DevCon](#2)
+- [APS Developer Conferences](#2)
 - [Resx language management](#3)
 - [Ribbon panel localisation](#3.1)
 - [Creating the localised WinForms](#3.2)
 
+####<a name="2"></a> APS Developer Conferences
 
-####<a name="2"></a> EU APS DevCon
-
-The [Autodesk Developer Conference DevCon](https://aps.autodesk.com/blog/register-autodesk-devcon-2023) is
+The [Autodesk Developer Conferences DevCon](https://aps.autodesk.com/blog/register-autodesk-devcon-2023) are
 coming up soon.
 
-The two-day events will be hosted in:
+These two-day events will be hosted in:
 
 - [San Francisco, California](https://aps.autodesk.com/devcon):
   The Historic Klamath Ferry on September 6-7, 2023
