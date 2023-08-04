@@ -36,6 +36,16 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 
 
+San Francisco and Munich Events
+We are hosting two DevCons (Autodesk Developer Conference) in September. These events are a great opportunity for software developers and business innovators to learn about leading edge technology from Autodesk experts, network with other developers and business leaders, as well as see how our desktop APIs and cloud-based Autodesk Platform Services (formerly Forge) can power their company’s growth and digital transformation. This is also a great opportunity for Autodesk to engage with our 3rd party development community, learn more about their projects and how they are using our APIs.
+
+These two-day events will be hosted in:
+San Francisco, California: The Historic Klamath Ferry / Date: September 6-7, 2023
+Munich, Germany: Holiday Inn Munich - Westpark / Date: September 11-12, 2023
+  Spread the Word!
+
+
+
 ####<a name="2"></a> EU APS DevCon
 
 The Autodesk Developer Conference DevCon is coming up soon.
@@ -81,13 +91,15 @@ with [Oktoberfest starting the following weekend](https://www.oktoberfest.de/en/
 on September 16th.
 
 <center>
-<img src="img/2023-08-01_eu_aps_devcon.png" alt="EU APS DevCon 2023" title="EU APS DevCon 2023" width="1100"/>
+<img src="img/2023-08-01_eu_aps_devcon.png" alt="EU APS DevCon 2023" title="EU APS DevCon 2023" width="600"/>
 </center>
 
 ####<a name="3"></a> Resx Language Management
 
 [Geoff Jennings](https://www.linkedin.com/in/geoffrey-jennings-9984921/) ([@GJennings-BM](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/9888344)) of [BIModular](https://bimodular.com)
-brought up and solved an important Revit add-in localisation issue in
+brought up and with help
+from Luiz Henrique [@ricaun](https://ricaun.com/) Cassettari solved
+important spects of Revit add-in localisation in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [Revit Add-in with Multiple Language Forms based on Current UI Culture](https://forums.autodesk.com/t5/revit-api-forum/revit-add-in-with-multiple-language-forms-based-on-current-ui/m-p/12140874):
 
@@ -205,7 +217,7 @@ In the same location, I also created three .resx files:
 To keep my panel button narrow and allow for wrapping of text, I created two lines in the .resx file:
 
 <center>
-<img src="img/ribbon_en_resx_file.png" alt="Ribbon panel resource file" title="Ribbon panel resource file" width="800"/> <!-- Pixel Height: 417 Pixel Width: 1,686 -->
+<img src="img/ribbon_resx_file_en.png" alt="Ribbon panel resource file" title="Ribbon panel resource file" width="800"/> <!-- Pixel Height: 417 Pixel Width: 1,686 -->
 </center>
 
 In my `App.cs`:
@@ -244,19 +256,17 @@ public Result OnStartup(UIControlledApplication application)
 
 This was all that was required for setting up a localized ribbon button:
 
-
 <center>
-<img src="img/ribbon_en_and_fr.png" alt="Ribbon panel localisation" title="Ribbon panel localisation" width="800"/> <!-- Pixel Height: 430 Pixel Width: 1,200 -->
+<img src="img/ribbon_resx_en_and_fr.png" alt="Ribbon panel localisation" title="Ribbon panel localisation" width="800"/> <!-- Pixel Height: 430 Pixel Width: 1,200 -->
 </center>
 
-CREATING THE LOCALIZED WINFORMS:
+####<a name="3.2"></a> Creating the Localized WinForms
 
-I created a folder called "Forms" and then placed all of my WinForms under this folder.
-After my forms were created, I then manually created two new .resx files.
-for example:  "MyForm.en-US.resx"  and "MyForm.fr-FR.resx"
+I created a folder called `Forms` and then placed all of my WinForms under this folder.
+After my forms were created, I then manually created two new `.resx` files, for example, `MyForm.en-US.resx` and `MyForm.fr-FR.resx`.
 These files were placed in the Forms folder along with my main WinForm.
 
-In my Winform code I did the following in MyForm.cs:
+In my Winform code I did the following in `MyForm.cs`:
 
 <pre class="prettyprint">
 public sealed class UICultureSwitcher : IDisposable
@@ -276,7 +286,7 @@ public sealed class UICultureSwitcher : IDisposable
    }
 }
 
-public MyForm(Autodesk.Revit.DB.Document doc)
+public MyForm( Autodesk.Revit.DB.Document doc)
 {
     ResourceManager res_mng = new ResourceManager(typeof(MyForm));
     ResourceSet resourceSet = res_mng.GetResourceSet(Thread.CurrentThread.CurrentUICulture, true, true);
@@ -300,36 +310,40 @@ private string GetLocalizedTextFromResource(string key)
 {
   try
   {
-   // Load the appropriate resource file based on the user's selected language
-   ResourceManager resourceManager = new ResourceManager("MyApp.Forms.MyForm", typeof(MyForm).Assembly);
-        CultureInfo currentCulture = Thread.CurrentThread.CurrentUICulture;
+    // Load the appropriate resource file based on the user's selected language
+    ResourceManager resourceManager = new ResourceManager("MyApp.Forms.MyForm", typeof(MyForm).Assembly);
+    CultureInfo currentCulture = Thread.CurrentThread.CurrentUICulture;
 
-   // Fetch the localized text for the given key from the resource
-   string localizedText = resourceManager.GetString(key, currentCulture);
+    // Fetch the localized text for the given key from the resource
+    string localizedText = resourceManager.GetString(key, currentCulture);
 
-   // If the resource for the given key is not found in the culture,
-   // explicitly load the default resource (English) using CultureInfo.InvariantCulture
-   if (localizedText == null)
+    // If the resource for the given key is not found in the culture,
+    // explicitly load the default resource (English) using CultureInfo.InvariantCulture
+    if (localizedText == null)
     {
-    localizedText = resourceManager.GetString(key, CultureInfo.InvariantCulture);
+      localizedText = resourceManager.GetString(key, CultureInfo.InvariantCulture);
     }
 
-     // If the resource is still not found, return the key itself as a fallback
-     return localizedText ?? key;
+    // If the resource is still not found, return the key itself as a fallback
+    return localizedText ?? key;
   }
   catch (MissingManifestResourceException ex)
   {
-     // Handle the exception if the resource file is not found
-     // Log the exception
-     Console.WriteLine($"Resource file not found. Exception: {ex.Message}");
-     return key; // Return the key itself as a fallback
+    // Handle the exception if the resource file is not found
+    // Log the exception
+    Console.WriteLine($"Resource file not found. Exception: {ex.Message}");
+    return key; // Return the key itself as a fallback
    }
 }
 </pre>
 
-I then repeat the same methods for my other forms.  I have included screenshots of the end results.  Now, I am updating the datagrid based upon a similar workflow.
+I then repeat the same methods for my other forms.
+I have included screenshots of the end results.
+Now, I am updating the datagrid based upon a similar workflow.
 
-I truly hope this helps others.  This has been a very confusing journey.  Everything mentioned was done in Visual Studio 2022 and for Revit 2022-2024.
+I truly hope this helps others.
+This has been a very confusing journey.
+Everything mentioned was done in Visual Studio 2022 and for Revit 2022-2024.
 
 FamilyTypeExporter_FR.png
 141 KB
@@ -340,25 +354,22 @@ FamilyTypeExporter_EN.png
 RVTLanguages.zip
 
 
-<pre class="prettyprint">
-
-</pre>
-
-
-
-
-####<a name="4"></a>
-
-
-####<a name="5"></a>
-
-
-Many thanks, !
-
-
-**Question:**
 
 **Answer:**
 
+Neat!
+
+I believe setting the Thread.CurrentThread.CurrentUICulture and Thread.CurrentThread.CurrentCulture is not necessary to make multilanguage works, Revit already starts with the CultureInfo correctly, the only reason to change should be to test if your Form is working in another CurrentUICulture language. Using your class UICultureSwitcher does the trick.
+
+And why are you using CommandName1 and CommandName2 to create the second line, only one CommandName with multiple lines should work, like your CommandDescription that has multiple lines.
+
 **Response:**
 
+You are correct about the CommandName1 and CommandName2.  I originally created the two strings before I did the multiline commandDescription.  Previously, I had tried the "\r\n" method in the .resx file and it was making it part of a single full string versus giving me two lines of strings.
+I change the .resx files for my Ribbon code and generated the Spanish version.  The single CommandName with a shift+return allows for the multiple lines in the ribbon button.
+Ribbon_ES.png
+
+As for the language switcher, I have plans for expanding functionality for an upcoming Pro version of the app.
+Thanks again for your video and quick response.
+
+Many thanks to Geoff and Luiz for clarifying the confusion and sharing the solution!
