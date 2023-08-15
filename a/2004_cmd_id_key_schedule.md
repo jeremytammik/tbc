@@ -44,6 +44,14 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Key Schedule
 
+Today we present a nice varied bouquet of interesting topics:
+
+- [GasTools](#2)
+- [Key schedule browser API](#3)
+- [Revit command id list](#4)
+- [AI generates 3D model from 2D drawings](#5)
+- [Careful with infant screen use](#6)
+- [Medieval typography in the digital world](#7)
 
 ####<a name="2"></a> GasTools
 
@@ -70,7 +78,7 @@ They automate repetitive tasks or provide a better way of visualizing the inform
 - Set by Index &ndash; Create a sheet set by selecting an a schedule like the one in your cover sheet instead of checking sheet by sheet.
 
 
-####<a name="3"></a> Key Schedule
+####<a name="3"></a> Key Schedule Browser API
 
 Jacob Small, Autodesk Implementation Consultant, chipped in with some new advice on how to control the hierarchy of the schedule in the project browser in the thread
 on [Key Schedule + Revit API](https://forums.autodesk.com/t5/revit-api-forum/key-schedule-revit-api/m-p/12143666):
@@ -156,7 +164,7 @@ Good luck! &nbsp;   :-)
 
 Mille Grazie, Jacob!
 
-####<a name="4"></a> Revit Command Ids
+####<a name="4"></a> Revit Command Id List
 
 One approach to retrieve a list of all [Revit command ids](https://forums.autodesk.com/t5/revit-api-forum/revit-command-ids/m-p/12154992):
 
@@ -166,7 +174,7 @@ One approach to retrieve a list of all [Revit command ids](https://forums.autode
 <img src="img/cmd_id_in_shortcut_xml.png" alt="Command id in shortcuts XML" title="Command id in shortcuts XML" width="390"/> <!-- Pixel Height: 458 Pixel Width: 2,017 -->
 </center>
 
-####<a name="5"></a> AI-Supported 3D View Generation from 2D Drawings
+####<a name="5"></a> AI Generates 3D Model from 2D Drawings
 
 Of special interest to CAD and BIM modelers, a new method to generate a 3D CAD model from 2D line drawings of three orthographic views is described in
 [PlankAssembly: robust 3D reconstruction from three orthographic views with learnt shape programs](https://manycore-research.github.io/PlankAssembly/).
@@ -177,7 +185,7 @@ Vital and life-changing effects are seen to correlate with infant interaction wi
 according to a study by the National University of Singapore and several other research labs,
 [infant screen use leads to reduced cognitive skills at age 9](https://www.uxtigers.com/post/infant-screen-use).
 
-####<a name="7"></a> Medieval Typography in the Digital World
+####<a name="7"></a> Renaissance Typography in the Digital World
 
 To close on a pleasant note, I very much enjoyed the explanation (and good taste) by Lin Yangchen in his article on
 using [a 17th-century font in a 21st-century thesis](https://www.linyangchen.com/Typography-Fell-Types-font).
