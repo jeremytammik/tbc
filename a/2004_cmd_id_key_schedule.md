@@ -77,7 +77,7 @@ They automate repetitive tasks or provide a better way of visualizing the inform
 
 ####<a name="3"></a> Key Schedule
 
-Jacob Small chipped in with some new insight on how to control the hierarchy of the schedule in the project browser in the thread
+Jacob Small, Autodesk Implementation Consultant, chipped in with some new advice on how to control the hierarchy of the schedule in the project browser in the thread
 on [Key Schedule + Revit API](https://forums.autodesk.com/t5/revit-api-forum/key-schedule-revit-api/m-p/12143666):
 
 **Question:** I have previously asked about using Revit API to create a Key Schedule and add bunch of new parameters to it. That questions is still out here somewhere so I am not going to repeat it here. Instead I just manually added bunch of parameters to Key Schedule and moved on to the next task.
@@ -88,213 +88,78 @@ Hence my question: How does one, using API, fill in the Key Schedule data?
 Any ideas/suggestions are welcome.
 
 <center>
-<img src="img/key_schedule_api.jpg" alt="" title="" width="100"/> <!-- Pixel Height: 460 Pixel Width: 460 -->
+<img src="img/key_schedule_api.jpg" alt="Key schedule API" title="Key schedule API" width="400"/> <!-- Pixel Height: 460 Pixel Width: 460 -->
 </center>
 
+**Answer:** A keyschedule behaves in most ways just like a normal schedule.
+The most important similarity being that they show a collection of elements.
+Confusion can arise when thinking about the elements in the keyschedule, because they do not physically exist in the Revit model.
+I like to think of them as 'ghost elements', who's image (= set of parameter values) can be imprinted on real elements.
 
-Snooping around in the Revit API help file RevitAPI.chm, I see the ViewSchedule.KeyScheduleParameterName property that provides the name of the parameter for choosing one of the keys in a key schedule.
+This being the case, the elements in the keyschedule can be simply retrieved by using a `FilteredElementCollector` with the `KeyScheduleID` as an argument.
+Parameters shown in the keyschedule can then be retrieved and set in the elements themselves.
+The newly set parameter values will then of course show up in the key schedule.
 
-Maybe you should snoop around a bit yourself as well.
+**Response:** This solution works pretty well!
 
-Cheers,
+Now just to make it clear for everyone here's what really happens:
 
-Jeremy
-
-
-Jeremy Tammik
-Developer Technical Services
-Autodesk Developer Network, ADN Open
-The Building Coder
-
-Tags (0)
-Add tags
-Report
-MESSAGE 3 OF 14
-sobon.konrad
-  Advocate sobon.konrad  in reply to: jeremytammik
-‎2014-12-23 10:22 AM
-Jeremy,
-
-Yes, I saw that too. I guess I fail to understand how to use KeyScheduleParameterName to select a Key and then write some information to it. Care for an example? I am sorry, if my question is a bit on a noob side, but I am not an experienced Revit API programmer, and you are far too nice of a person (we met before :-)) to give such dismissing answer. Also, Revit API is not the easiest thing on earth so please give me some leeway if my questions are not exactly challanging. Trust me, they are challanging enough for me.
-
-Thank you,
-
-Konrad
-Tags (0)
-Add tags
-Report
-MESSAGE 4 OF 14
-jeremytammik
-  Autodesk jeremytammik  in reply to: sobon.konrad
-‎2014-12-23 10:50 AM
-Dear Konrad,
-
-Thank you for your appreciation.
-
-My answers are often evasive because I am evading the question.
-
-I cannot answer this one myself without doing research.
-
-Let's wait until next year.
-
-If it is not solved by then, I will either take a closer look or pass it on to the development team.
-
-Thank you for your understanding.
-
-Cheers,
-
-Jeremy
-
-
-Jeremy Tammik
-Developer Technical Services
-Autodesk Developer Network, ADN Open
-The Building Coder
-
-Tags (0)
-Add tags
-Report
-MESSAGE 5 OF 14
-PaulusPresent_BB
-  Enthusiast PaulusPresent_BB  in reply to: jeremytammik
-‎2015-07-10 12:19 AM
-
-Dear Jeremy and Konrad,
-
-Maybe I can be off help. I just had to deal with this problem as well and wanted to share my findings with you.
-
-A keyschedule behaves in most ways just like a normal schedule. The most important similarity being that they show a collection of elements.
-Confusion can arise when thinking about the elements in the keyschedule, because they do not physically exist in the revit model. I like to think of them as 'ghost elements', who's image (= set of parameter values) can be imprinted on real elements.
-
-This being the case, the elements in the keyschedule can be simply retrieved by using a FilteredElementCollector with the KeyScheduleID as an argument. Parameters shown in the keyschedule can then be retrieved and set in the elements themselves. The newly set parametervalues will then ofcourse show up in the keyschedule.
-
-Kind regards and my excuses if this post is too obvious.
-I hope someone still has some use of this info.
-
-Paulus
-Tags (0)
-Add tags
-Report
-MESSAGE 6 OF 14
-JeffYao28
-  Enthusiast JeffYao28  in reply to: PaulusPresent_BB
-‎2016-04-22 10:01 AM
-This solution works pretty well!
-Tags (0)
-Add tags
-Report
-MESSAGE 7 OF 14
-sobon.konrad
-  Advocate sobon.konrad  in reply to: JeffYao28
-‎2016-04-22 12:24 PM
-Ah! I see. Now just to make it clear for everyone here's what reall happens:
-
-Each row in a Key Schedule is an Element that contains a set of Parameters. Parameters represent each column of the schedule.
+Each row in a Key Schedule is an Element that contains a set of Parameters.
+Parameters represent each column of the schedule.
 
 We can collect all "rows" (elements) just by doing this:
 
-elements = FilteredElementCollector(doc, viewSchedule.Id).ToElements()
+<pre class="prettyprint">
+  elements = FilteredElementCollector(doc, viewSchedule.Id).ToElements()
+</pre>
+
 Then we can query each element that is being returns for parameters:
 
-params = []
-for i in elements:
-   params.append(i.Parameters)
-Once you have the parameters you can just write values to them and they will appear in a schedule.
+<pre class="prettyprint">
+  params = []
+  for i in elements:
+    params.append(i.Parameters)
+</pre>
 
-Cheers!
-Tags (0)
-Add tags
-Report
-MESSAGE 8 OF 14
-JeffYao28
-  Enthusiast JeffYao28  in reply to: sobon.konrad
-‎2016-04-22 12:42 PM
-Thank you for making that clear!
-Not all parameters are representing a field in the key schedule, though. But that can be easily filtered out by checking the parameter's definition name toward scheduleable fields.
+Once you have the parameters, you can just write values to them and they will appear in a schedule.
+
+Not all parameters represent a field in the key schedule, though.
+But that can be easily filtered out by checking the parameter's definition name toward scheduleable fields.
+
 Maybe the Revit API SDK team can include some of the code in the schedule samples, before a more intrincit method for reaching this goal being created.
-Tags (0)
-Add tags
-Report
-MESSAGE 9 OF 14
-hishamodish
-  Community Visitor hishamodish  in reply to: sobon.konrad
-‎2017-05-02 08:34 AM
-Hi Konrad,
-Would you mind sharing with me your code?
-I’m new to the API but being able to stich codes that I’m finding here and there. However this one I’m failing so far. I’m able to filter my key schedule, able to get to the column I need. BUT NOT able to read the data of that column.
-Any help you can provide is much appreciated.
-Thanks
-hisham
-Tags (0)
-Add tags
-Report
-MESSAGE 10 OF 14
-ghaith.tishNS5ZX
-  Explorer ghaith.tishNS5ZX  in reply to: sobon.konrad
-‎2023-08-02 01:45 AM
 
-Which parameter is responsible of defining the herarchy of the scheduel in project browser ?.
-Where the question marks in the the loaded picture are.
+**Question:** Which parameter is responsible of defining the herarchy of the schedule in project browser, where the question marks in the the loaded picture are?
 
-e.JPG
-29 KB
+<center>
+<img src="img/key_schedule_in_browser.jpg" alt="Key schedule in browser" title="Key schedule in browser" width="390"/> <!-- Pixel Height: 306 Pixel Width: 390 -->
+</center>
 
-Tags (0)
-Add tags
-Report
-MESSAGE 11 OF 14
-ghaith.tishNS5ZX
-  Explorer ghaith.tishNS5ZX  in reply to: sobon.konrad
-‎2023-08-02 01:46 AM
+No elements are collected by this code:
 
-e.JPG
- 
-Tags (0)
-Add tags
-Report
-MESSAGE 12 OF 14
-ghaith.tishNS5ZX
-  Explorer ghaith.tishNS5ZX  in reply to: PaulusPresent_BB
-‎2023-08-02 02:30 AM
-I have used the concept but there are no elements collected in the
+<pre class="prettyprint">
+  Category category = Category.GetCategory(doc, BuiltInCategory.OST_Rooms);
+  viewSchedule = ViewSchedule.CreateKeySchedule(doc, category.Id);
+  FilteredElementCollector elementCollector = new FilteredElementCollector(doc, viewSchedule.Id);
+  IList&lt;Element&gt; rows = elementCollector.ToElements();
+</pre>
 
-Category category = Category.GetCategory(doc, BuiltInCategory.OST_Rooms);
-viewSchedule = ViewSchedule.CreateKeySchedule(doc, category.Id);
-FilteredElementCollector elementCollector = new FilteredElementCollector(doc, viewSchedule.Id);
-IList<Element> rows = elementCollector.ToElements();
+**Answer:** This is something I've taken a stab at in the past for a Dynamo project, so I'll weigh in.
 
+First thing to know: the project browser is a view of the model itself and can be organised in different ways per project.
+As always, you want to explore how things are in the UI before attempting to automate it, so first check info on managing it manually:
+[Organizing the Project Browser](https://help.autodesk.com/view/RVT/2024/ENU/?guid=GUID-96F9CDB5-C46D-4597-943B-DF231E8EC688)
 
-Tags (0)
-Add tags
-Report
-MESSAGE 13 OF 14
-jeremy.tammik
-  Autodesk jeremy.tammik  in reply to: ghaith.tishNS5ZX
-‎2023-08-02 02:33 AM
+From there we can look at managing it via the API.
+For that there is the
+handy [`BrowserOrganization` class](https://www.revitapidocs.com/2024/4fd57c3f-6127-efd9-f79e-70ad3e5dc1cc.htm).
 
-I asked the development team for you.
+So, while we could manage the setup, we don't know how your browser is organized on a given project (and if your code is intended to scale across orgs/projects you can't assume there is a single setup).
+As such, you likely want to start off by looking at
+[the GetCurrentBrowserOrganizationForSchedules method](https://www.revitapidocs.com/2024/b32365b9-54d0-08b3-ee34-4a2cde7fa1d8.htm)
 
-Jeremy Tammik,  Developer Advocacy and Support, The Building Coder, Autodesk Developer Network, ADN Open
-Tags (0)
-Add tags
-Report
-MESSAGE 14 OF 14
-jacob.small
-  Autodesk Support jacob.small  in reply to: ghaith.tishNS5ZX
-‎2023-08-02 03:26 AM
+Good luck! &nbsp;   :-)
 
-Not a Revit developer, but this is something I've taken a stab at in the past for a Dynamo project, so I'll weigh in.
-
-First thing to know: the project browser is a view of the model itself, and can be organized in different ways per project. As always, you want to explore how things are in the UI before attempting to automate it, so here's some info on managing it manually:
-https://help.autodesk.com/view/RVT/2022/ENU/?guid=GUID-96F9CDB5-C46D-4597-943B-DF231E8EC688
-
-From there we can look at managing it via the API. For that there is a handy class:
-https://www.revitapidocs.com/2024/4fd57c3f-6127-efd9-f79e-70ad3e5dc1cc.htm
-
-So while we could manage the setup, we don't know how your browser is organized on a given project (and if your code is intended to scale across orgs/projects you can't assume there is a single setup). As such you likely want to have a look at this method to start: https://www.revitapidocs.com/2024/b32365b9-54d0-08b3-ee34-4a2cde7fa1d8.htm
-
-Good luck. 🙂
-
+Mille Grazie, Jacob!
 
 ####<a name="3"></a>
 
