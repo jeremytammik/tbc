@@ -6,6 +6,8 @@
 
 <!---
 
+https://github.com/GastonBC/GasTools/wiki
+
 - Key Schedule + Revit API
   https://forums.autodesk.com/t5/revit-api-forum/key-schedule-revit-api/m-p/12143666
   control hierarchy of the schedule in project browser
@@ -47,6 +49,34 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Key Schedule
 
+
+
+Gastón Balparda CorsiGastón Balparda Corsi
+Architect | Project Developer at /slantis
+
+/slantis
+
+https://slantis.com/
+
+I'm lazy.
+
+When I notice I'm doing something repetitive or boring I default to look for a better way to do stuff.
+
+That mentality allowed me to make the jump from AutoCAD to Revit early and learn a couple of programming languages to help me on my everyday tasks.
+
+The same laziness led me to mix the two and develop my own addins to help my team and I be more efficient with our time.
+
+I have received positive feedback so I decided to share them and save more time in combined hours.
+
+I recommend you start by checking what Match Grid Extents and Outline Elevations do.
+
+You will find the downloads and a brief explanation for each tool in my GitHub account. Look for a tab in Revit called "Gas Tools" (subject to change).
+
+https://lnkd.in/dfghfukU
+
+I'm open to questions and suggestions so don't be afraid to hit me up! These are all independent to install so just download the ones you want. There is some nuance to the installation but nothing terrible.
+
+
 ####<a name="2"></a>
 
 <center>
@@ -80,7 +110,13 @@ How to check the exisiting of ribbon tab and ribbon panel? And how to get them?
 https://forums.autodesk.com/t5/revit-api-forum/how-to-check-the-exisiting-of-ribbon-tab-and-ribbon-panel-and/m-p/6859336
 http://forums.autodesk.com/t5/revit-api-forum/how-to-check-the-exisiting-of-ribbon-tab-and-ribbon-panel-and/m-p/6859336
 
-####<a name="5"></a> Careful with Infant Screen Use
+####<a name="5"></a> AI-Supported3D View Generation from 2D Drawings
+
+A new method to generate a 3D CAD model from 2D line drawings of three orthographic views:
+[PlankAssembly: Robust 3D Reconstruction from Three Orthographic Views with Learnt Shape Programs](https://manycore-research.github.io/PlankAssembly/)
+
+
+####<a name="6"></a> Careful with Infant Screen Use
 
 According to a study by ther National University of Singapore and several other research labs,
 [Infant Screen Use Leads to Reduced Cognitive Skills at Age 9](https://www.uxtigers.com/post/infant-screen-use).
