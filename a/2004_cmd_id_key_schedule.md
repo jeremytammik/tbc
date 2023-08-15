@@ -171,7 +171,7 @@ One approach to retrieve a list of all [Revit command ids](https://forums.autode
 > I found that exporting the keyboard shortcuts XML file gives you a list of all command names and ids (Revit 2022.1.3, I might add):
 
 <center>
-<img src="img/cmd_id_in_shortcut_xml.png" alt="Command id in shortcuts XML" title="Command id in shortcuts XML" width="390"/> <!-- Pixel Height: 458 Pixel Width: 2,017 -->
+<img src="img/cmd_id_in_shortcut_xml.png" alt="Command id in shortcuts XML" title="Command id in shortcuts XML" width="1000"/> <!-- Pixel Height: 458 Pixel Width: 2,017 -->
 </center>
 
 ####<a name="5"></a> AI Generates 3D Model from 2D Drawings
