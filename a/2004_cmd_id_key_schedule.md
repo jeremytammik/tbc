@@ -18,11 +18,6 @@ https://github.com/GastonBC/GasTools/wiki
   Yes it does (Revit 2022.1.3 I might add)
   cmd_id_in_shortcut_xml.png Pixel Height: 458 Pixel Width: 2,017
 
-- Revit Command Ids
-  How to check the exisiting of ribbon tab and ribbon panel? And how to get them?
-  https://forums.autodesk.com/t5/revit-api-forum/how-to-check-the-exisiting-of-ribbon-tab-and-ribbon-panel-and/m-p/6859336
-  http://forums.autodesk.com/t5/revit-api-forum/how-to-check-the-exisiting-of-ribbon-tab-and-ribbon-panel-and/m-p/6859336
-
 - Typography-Fell-Types-font
   https://www.linyangchen.com/Typography-Fell-Types-font
   A 17th-century font in a 21st-century thesis
@@ -161,40 +156,31 @@ Good luck! &nbsp;   :-)
 
 Mille Grazie, Jacob!
 
-####<a name="3"></a>
-
-
-<pre class="prettyprint">
-
-
-</pre>
-
-
-
-**Answer:**
-
-**Response:**
-
 ####<a name="4"></a> Revit Command Ids
 
-- Revit Command Ids
-https://forums.autodesk.com/t5/revit-api-forum/revit-command-ids/m-p/12154992
-I was looking for the same thing and found that exporting the keyboard shortcuts xml file gives you a list of all command names and ids.
-Yes it does (Revit 2022.1.3 I might add)
-cmd_id_in_shortcut_xml.png Pixel Height: 458 Pixel Width: 2,017
+One approach to retrieve a list of all [Revit command ids](https://forums.autodesk.com/t5/revit-api-forum/revit-command-ids/m-p/12154992):
 
-How to check the exisiting of ribbon tab and ribbon panel? And how to get them?
-https://forums.autodesk.com/t5/revit-api-forum/how-to-check-the-exisiting-of-ribbon-tab-and-ribbon-panel-and/m-p/6859336
-http://forums.autodesk.com/t5/revit-api-forum/how-to-check-the-exisiting-of-ribbon-tab-and-ribbon-panel-and/m-p/6859336
+> I found that exporting the keyboard shortcuts XML file gives you a list of all command names and ids (Revit 2022.1.3, I might add):
 
-####<a name="5"></a> AI-Supported3D View Generation from 2D Drawings
+<center>
+<img src="img/cmd_id_in_shortcut_xml.png" alt="Command id in shortcuts XML" title="Command id in shortcuts XML" width="390"/> <!-- Pixel Height: 458 Pixel Width: 2,017 -->
+</center>
 
-A new method to generate a 3D CAD model from 2D line drawings of three orthographic views:
-[PlankAssembly: Robust 3D Reconstruction from Three Orthographic Views with Learnt Shape Programs](https://manycore-research.github.io/PlankAssembly/)
+####<a name="5"></a> AI-Supported 3D View Generation from 2D Drawings
 
+Of special interest to CAD and BIM modelers, a new method to generate a 3D CAD model from 2D line drawings of three orthographic views is described in
+[PlankAssembly: robust 3D reconstruction from three orthographic views with learnt shape programs](https://manycore-research.github.io/PlankAssembly/).
 
 ####<a name="6"></a> Careful with Infant Screen Use
 
-According to a study by ther National University of Singapore and several other research labs,
-[Infant Screen Use Leads to Reduced Cognitive Skills at Age 9](https://www.uxtigers.com/post/infant-screen-use).
+Vital and life-changing effects are seen to correlate with infant interaction with digital devices:
+according to a study by the National University of Singapore and several other research labs,
+[infant screen use leads to reduced cognitive skills at age 9](https://www.uxtigers.com/post/infant-screen-use).
+
+####<a name="7"></a> Medieval Typography in the Digital World
+
+To close on a pleasant note, I very much enjoyed the explanation (and good taste) by Lin Yangchen in his article on
+using [a 17th-century font in a 21st-century thesis](https://www.linyangchen.com/Typography-Fell-Types-font).
+He seems like a special person in many ways, and I found his entire web site
+[linyangchen.com](https://www.linyangchen.com/) very interesting indeed.
 
