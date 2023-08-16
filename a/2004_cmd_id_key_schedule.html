@@ -42,7 +42,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 -->
 
 <h3>Key Schedule</h3>
-<p>Today we present a nice varied bouquet of interesting topics:</p>
+<p>Today we present a nice, varied bouquet of interesting topics:</p>
 <ul>
 <li><a href="#2">GasTools</a></li>
 <li><a href="#3">Key schedule browser API</a></li>
@@ -52,8 +52,8 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 <li><a href="#7">Medieval typography in the digital world</a></li>
 </ul>
 <h4><a name="2"></a> GasTools</h4>
-<p>Gastón Balparda CorsiGastón Balparda Corsi, Architect and Project Developer at <a href="https://slantis.com/">/slantis</a> announced
-his <a href="https://github.com/GastonBC/GasTools/wiki">GasTools</a>, saying:</p>
+<p>Gastón Balparda Corsi, Architect and Project Developer at <a href="https://slantis.com/">/slantis</a>,
+announced his <a href="https://github.com/GastonBC/GasTools/wiki">GasTools</a>, saying:</p>
 <blockquote>
 <p>I'm lazy.
 When I notice I'm doing something repetitive or boring I default to look for a better way to do stuff.
@@ -69,15 +69,17 @@ Look for a tab in Revit called "Gas Tools" (subject to change).</p>
 <li><a href="https://github.com/GastonBC/GasTools/wiki">GasTools</a> &ndash; tools I've developed over the years to make my life easier using Revit.
 They automate repetitive tasks or provide a better way of visualizing the information, like the location of linked and imported CADs, legends. Examples of use are in the referenced links.</li>
 <li>Match Grid Extents &ndash; This tool lets you copy the layout of the grids in a sheet (for example the elbows, 2D extents and bubble visibility) and transfer it to another view. It also reveals and hides grids according to the view chosen as template.</li>
-<li>Outline Elevations &ndash; If you've ever done elevations, you are used to making fill regions around the enclosing walls and giving it a pen thickness. This tool takes the crop region extent and overrides it's thickness to the desired number.</li>
+<li>Outline Elevations &ndash; If you've ever done elevations, you are used to making fill regions around the enclosing walls and giving it a pen thickness. This tool takes the crop region extent and overrides its thickness to the desired number.</li>
 <li>Auto Dimension Grids &ndash; Dimension your selected grids automatically to the top and the left.</li>
 <li>Smart Grid Bubbles &ndash; Turn the top and left grid bubbles on.</li>
-<li>Set by Index &ndash; Create a sheet set by selecting an a schedule like the one in your cover sheet instead of checking sheet by sheet.</li>
+<li>Set by Index &ndash; Create a sheet set by selecting a schedule like the one in your cover sheet instead of checking sheet by sheet.</li>
 </ul>
 <h4><a name="3"></a> Key Schedule Browser API</h4>
 <p>Jacob Small, Autodesk Implementation Consultant, chipped in with some new advice on how to control the hierarchy of the schedule in the project browser in the thread
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/key-schedule-revit-api/m-p/12143666">Key Schedule + Revit API</a>:</p>
-<p><strong>Question:</strong> I have previously asked about using Revit API to create a Key Schedule and add bunch of new parameters to it. That questions is still out here somewhere so I am not going to repeat it here. Instead I just manually added bunch of parameters to Key Schedule and moved on to the next task.
+<p><strong>Question:</strong> I have previously asked about using Revit API to create a Key Schedule and add bunch of new parameters to it.
+That question is still out here somewhere so I am not going to repeat it here.
+Instead, I just manually added bunch of parameters to Key Schedule and moved on to the next task.
 I was able to access Data Table and add more rows to the data.
 What I am trying to do now, is to fill the cells with data.
 Obviously, there is no clear method for that.
@@ -111,9 +113,9 @@ Parameters represent each column of the schedule.</p>
 
 <p>Once you have the parameters, you can just write values to them and they will appear in a schedule.</p>
 <p>Not all parameters represent a field in the key schedule, though.
-But that can be easily filtered out by checking the parameter's definition name toward scheduleable fields.</p>
-<p>Maybe the Revit API SDK team can include some of the code in the schedule samples, before a more intrincit method for reaching this goal being created.</p>
-<p><strong>Question:</strong> Which parameter is responsible of defining the herarchy of the schedule in project browser, where the question marks in the the loaded picture are?</p>
+But that can be easily filtered out by checking the parameter's definition name toward schedulable fields.</p>
+<p>Maybe the Revit API SDK team can include some of the code in the schedule samples, before a more intrinsic method for reaching this goal being created.</p>
+<p><strong>Question:</strong> Which parameter is responsible of defining the hierarchy of the schedule in project browser, at the question marks in this picture?</p>
 <p><center>
 <img src="img/key_schedule_in_browser.jpg" alt="Key schedule in browser" title="Key schedule in browser" width="390"/> <!-- Pixel Height: 306 Pixel Width: 390 -->
 </center></p>
@@ -136,14 +138,14 @@ handy <a href="https://www.revitapidocs.com/2024/4fd57c3f-6127-efd9-f79e-70ad3e5
 As such, you likely want to start off by looking at
 <a href="https://www.revitapidocs.com/2024/b32365b9-54d0-08b3-ee34-4a2cde7fa1d8.htm">the GetCurrentBrowserOrganizationForSchedules method</a></p>
 <p>Good luck! &nbsp;   :-)</p>
-<p>Mille Grazie, Jacob!</p>
+<p>Mille grazie, Jacob!</p>
 <h4><a name="4"></a> Revit Command Id List</h4>
 <p>One approach to retrieve a list of all <a href="https://forums.autodesk.com/t5/revit-api-forum/revit-command-ids/m-p/12154992">Revit command ids</a>:</p>
 <blockquote>
 <p>I found that exporting the keyboard shortcuts XML file gives you a list of all command names and ids (Revit 2022.1.3, I might add):</p>
 </blockquote>
 <p><center>
-<img src="img/cmd_id_in_shortcut_xml.png" alt="Command id in shortcuts XML" title="Command id in shortcuts XML" width="800"/> <!-- Pixel Height: 458 Pixel Width: 2,017 -->
+<img src="img/cmd_id_in_shortcut_xml.png" alt="Command id in shortcuts XML" title="Command id in shortcuts XML" width="1000"/> <!-- Pixel Height: 458 Pixel Width: 2,017 -->
 </center></p>
 <h4><a name="5"></a> AI Generates 3D Model from 2D Drawings</h4>
 <p>Of special interest to CAD and BIM modelers, a new method to generate a 3D CAD model from 2D line drawings of three orthographic views is described in

@@ -44,7 +44,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Key Schedule
 
-Today we present a nice varied bouquet of interesting topics:
+Today we present a nice, varied bouquet of interesting topics:
 
 - [GasTools](#2)
 - [Key schedule browser API](#3)
@@ -55,8 +55,8 @@ Today we present a nice varied bouquet of interesting topics:
 
 ####<a name="2"></a> GasTools
 
-Gastón Balparda CorsiGastón Balparda Corsi, Architect and Project Developer at [/slantis](https://slantis.com/) announced
-his [GasTools](https://github.com/GastonBC/GasTools/wiki), saying:
+Gastón Balparda Corsi, Architect and Project Developer at [/slantis](https://slantis.com/),
+announced his [GasTools](https://github.com/GastonBC/GasTools/wiki), saying:
 
 > I'm lazy.
 When I notice I'm doing something repetitive or boring I default to look for a better way to do stuff.
@@ -72,10 +72,10 @@ I'm open to questions and suggestions so don't be afraid to hit me up! These are
 - [GasTools](https://github.com/GastonBC/GasTools/wiki) &ndash; tools I've developed over the years to make my life easier using Revit.
 They automate repetitive tasks or provide a better way of visualizing the information, like the location of linked and imported CADs, legends. Examples of use are in the referenced links.
 - Match Grid Extents &ndash; This tool lets you copy the layout of the grids in a sheet (for example the elbows, 2D extents and bubble visibility) and transfer it to another view. It also reveals and hides grids according to the view chosen as template.
-- Outline Elevations &ndash; If you've ever done elevations, you are used to making fill regions around the enclosing walls and giving it a pen thickness. This tool takes the crop region extent and overrides it's thickness to the desired number.
+- Outline Elevations &ndash; If you've ever done elevations, you are used to making fill regions around the enclosing walls and giving it a pen thickness. This tool takes the crop region extent and overrides its thickness to the desired number.
 - Auto Dimension Grids &ndash; Dimension your selected grids automatically to the top and the left.
 - Smart Grid Bubbles &ndash; Turn the top and left grid bubbles on.
-- Set by Index &ndash; Create a sheet set by selecting an a schedule like the one in your cover sheet instead of checking sheet by sheet.
+- Set by Index &ndash; Create a sheet set by selecting a schedule like the one in your cover sheet instead of checking sheet by sheet.
 
 
 ####<a name="3"></a> Key Schedule Browser API
@@ -83,7 +83,9 @@ They automate repetitive tasks or provide a better way of visualizing the inform
 Jacob Small, Autodesk Implementation Consultant, chipped in with some new advice on how to control the hierarchy of the schedule in the project browser in the thread
 on [Key Schedule + Revit API](https://forums.autodesk.com/t5/revit-api-forum/key-schedule-revit-api/m-p/12143666):
 
-**Question:** I have previously asked about using Revit API to create a Key Schedule and add bunch of new parameters to it. That questions is still out here somewhere so I am not going to repeat it here. Instead I just manually added bunch of parameters to Key Schedule and moved on to the next task.
+**Question:** I have previously asked about using Revit API to create a Key Schedule and add bunch of new parameters to it.
+That question is still out here somewhere so I am not going to repeat it here.
+Instead, I just manually added bunch of parameters to Key Schedule and moved on to the next task.
 I was able to access Data Table and add more rows to the data.
 What I am trying to do now, is to fill the cells with data.
 Obviously, there is no clear method for that.
@@ -127,11 +129,11 @@ Then we can query each element that is being returns for parameters:
 Once you have the parameters, you can just write values to them and they will appear in a schedule.
 
 Not all parameters represent a field in the key schedule, though.
-But that can be easily filtered out by checking the parameter's definition name toward scheduleable fields.
+But that can be easily filtered out by checking the parameter's definition name toward schedulable fields.
 
-Maybe the Revit API SDK team can include some of the code in the schedule samples, before a more intrincit method for reaching this goal being created.
+Maybe the Revit API SDK team can include some of the code in the schedule samples, before a more intrinsic method for reaching this goal being created.
 
-**Question:** Which parameter is responsible of defining the herarchy of the schedule in project browser, where the question marks in the the loaded picture are?
+**Question:** Which parameter is responsible of defining the hierarchy of the schedule in project browser, at the question marks in this picture?
 
 <center>
 <img src="img/key_schedule_in_browser.jpg" alt="Key schedule in browser" title="Key schedule in browser" width="390"/> <!-- Pixel Height: 306 Pixel Width: 390 -->
@@ -162,7 +164,7 @@ As such, you likely want to start off by looking at
 
 Good luck! &nbsp;   :-)
 
-Mille Grazie, Jacob!
+Mille grazie, Jacob!
 
 ####<a name="4"></a> Revit Command Id List
 
