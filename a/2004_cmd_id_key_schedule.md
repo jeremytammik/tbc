@@ -27,7 +27,13 @@ twitter:
 
  @AutodeskAPS  @AutodeskRevit #RevitAPI  #BIM @DynamoBIM
 
-&ndash; ...
+A nice, varied bouquet of topics
+&ndash; GasTools
+&ndash; Key schedule browser API
+&ndash; Revit command id list
+&ndash; AI generates 3D model from 2D drawings
+&ndash; Careful with infant screen use
+&ndash; Renaissance typography in the digital world...
 
 linkedin:
 
@@ -42,7 +48,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Key Schedule
+### GasTools, Cmd Ids, Key Schedule et al
 
 Today we present a nice, varied bouquet of interesting topics:
 
@@ -51,7 +57,7 @@ Today we present a nice, varied bouquet of interesting topics:
 - [Revit command id list](#4)
 - [AI generates 3D model from 2D drawings](#5)
 - [Careful with infant screen use](#6)
-- [Medieval typography in the digital world](#7)
+- [Renaissance typography in the digital world](#7)
 
 ####<a name="2"></a> GasTools
 
