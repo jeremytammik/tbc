@@ -37,6 +37,19 @@ A nice, varied bouquet of topics
 
 linkedin:
 
+AI generates 3D model from 2D drawings, GasTools, key schedule browser API and Revit command id list for the #RevitAPI
+
+https://autode.sk/rvt_cmd_ids
+
+A nice, varied bouquet of topics
+
+- GasTools
+- Key schedule browser API
+- Revit command id list
+- AI generates 3D model from 2D drawings
+- Careful with infant screen use
+- Renaissance typography in the digital world...
+
 #BIM #DynamoBIM #AutodeskAPS #Revit #API #IFC #SDK #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
