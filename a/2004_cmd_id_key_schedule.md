@@ -25,7 +25,7 @@ https://github.com/GastonBC/GasTools/wiki
 
 twitter:
 
- @AutodeskAPS  @AutodeskRevit #RevitAPI  #BIM @DynamoBIM
+AI generates 3D model from 2D drawings, GasTools, key schedule browser API and @AutodeskRevit command id list for the #RevitAPI  #BIM @DynamoBIM @AutodeskAPS https://autode.sk/rvt_cmd_ids
 
 A nice, varied bouquet of topics
 &ndash; GasTools
