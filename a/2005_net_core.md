@@ -100,7 +100,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### 15 Yr TBC and .NET Core
+### 15 Years of TBC and .NET Core Coming Up
 
 
 
@@ -112,16 +112,14 @@ We celebrated The Building Coder's 15th birthday yesterday, August 22.
 <img src="img/" alt="tbc_15_years.jpg" title="tbc_15_years.jpg" width="1160"/> <!-- Pixel Height: 810 Pixel Width: 1,160 -->
 </center>
 
-It has almost passed its puberty by now and is almost a full grown-up blog now;
-time to stand on its own legs.
+It has soon passed its puberty now and is almost a full grown-up blog now, preparing to stand on its own legs.
+And, in case you didn't know, this is blog post number 2005.
+We silently crossed into the third millenium in July.
 
 ####<a name="3"></a>
 
 
 - .net core migration coming
-dropping macro support for document macros
-https://thebuildingcoder.typepad.com/blog/2022/05/analysis-of-macros-journals-and-add-in-manager.html#2
-how to convert form project to application macro
 
 - .net core 5
 https://autodesk.slack.com/archives/C0531NMR189/p1692239493644339
@@ -169,17 +167,23 @@ https://forums.autodesk.com/t5/revit-api-forum/has-anyone-been-successful-in-bui
 familiarise yourself with the Revit feedback portal now.
 then you will be ready to check out the new Revit API as soon as it becomes available
 
-####<a name="3"></a>
+####<a name="4"></a> Bye-Bye Document Macro
+
+dropping macro support for document macros
+https://thebuildingcoder.typepad.com/blog/2022/05/analysis-of-macros-journals-and-add-in-manager.html#2
+how to convert form project to application macro
+
+####<a name="5"></a> Polygon Area Algorithms
 
 - polygon area algorithms
 https://forums.autodesk.com/t5/revit-api-forum/area-of-a-wall-opening/m-p/12174104#M73476
 
-####<a name="3"></a>
+####<a name="6"></a> AI Recreates Pink Floyd from Brain Activity
 
 - AI recreates clip of Pink Floyd song from recordings of brain activity
 https://www.newscientist.com/article/2387343-ai-recreates-clip-of-pink-floyd-song-from-recordings-of-brain-activity/
 
-####<a name="3"></a>
+####<a name="7"></a> Create ML Model with one Sentence
 
 - Allie K. Miller on LinkedIn: You can now write one sentence to train an entire ML model.
 185 comments
@@ -188,7 +192,9 @@ How does it work?
 You just describe the ML model you want ... a chain of AI systems will take that ...
 https://www.linkedin.com/posts/alliekmiller_you-can-now-write-one-sentence-to-train-an-activity-7097974848001331200-DtJE?utm_source=share&utm_medium=member_desktop\
 
-####<a name="3"></a> Please Compress Stuff
+####<a name="8"></a> CO2 and Compression
+
+Please Compress Stuff
 
 Some people are starting to pay attention to the carbon footprint of today's widespread and growing usage of the Internet and digital devices.
 
@@ -230,9 +236,8 @@ internet_carbon_footprint.png
 97220 Aug 22 13:03 2023-09-01_nachbarschaftstreffen3.jpg compressed using https://compressjpeg.com/
 factor ca. 18.1
 
-####<a name="3"></a>
 
-
+**Question:**
 
 **Answer:**
 
@@ -242,7 +247,3 @@ factor ca. 18.1
 </pre>
 
 
-**Question:**
-
-
-####<a name="4"></a>
