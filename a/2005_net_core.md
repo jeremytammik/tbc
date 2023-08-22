@@ -106,8 +106,14 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ####<a name="2"></a> 15 Years of The Building Coder
 
-- tbc 15th birthday august 22, almost passed its puberty by now, soon a grown-up blog, assuminbg human time spans for maturilty
+We celebrated The Building Coder's 15th birthday yesterday, August 22.
 
+<center>
+<img src="img/" alt="tbc_15_years.jpg" title="tbc_15_years.jpg" width="1160"/> <!-- Pixel Height: 810 Pixel Width: 1,160 -->
+</center>
+
+It has almost passed its puberty by now and is almost a full grown-up blog now;
+time to stand on its own legs.
 
 ####<a name="3"></a>
 
@@ -227,9 +233,6 @@ factor ca. 18.1
 ####<a name="3"></a>
 
 
-<center>
-<img src="img/" alt="" title="" width="100"/> <!-- Pixel Height: 460 Pixel Width: 460 -->
-</center>
 
 **Answer:**
 
