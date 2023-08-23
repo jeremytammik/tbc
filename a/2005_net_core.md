@@ -102,7 +102,17 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### 15 Years of TBC and .NET Core Coming Up
 
+Birthday celebration,
+a [forward-looking statement](https://en.wikipedia.org/wiki/Forward-looking_statement) or two
+and observations on geometry, AI and emissions:
 
+- [15 years of The Building Coder](#2)
+- [Revit API with .NET Core](#3)
+- [Bye-bye document macro?](#4)
+- [Polygon area algorithms](#5)
+- [AI recreates Pink Floyd from brain activity](#6)
+- [Create ML model with one sentence?](#7)
+- [Compress greenhouse gas emissions](#8)
 
 ####<a name="2"></a> 15 Years of The Building Coder
 
@@ -155,7 +165,7 @@ Then, you can also participate in the feedback forum discussions.
 Familiarise yourself with the Revit feedback portal now.
 Then you will be ready to jump in and actively join the fray as soon as possible.
 
-####<a name="4"></a> Bye-Bye Document Macro
+####<a name="4"></a> Bye-Bye Document Macro?
 
 In the course of revamping the Revit API, the development team also took a look at the macro environment.
 Support for .NET Core will obviously affect that as well.
@@ -241,13 +251,14 @@ Let me briefly point out two AI-related news items that I found interesting:
 
 - [AI recreates clip of Pink Floyd song from recordings of brain activity](https://www.newscientist.com/article/2387343-ai-recreates-clip-of-pink-floyd-song-from-recordings-of-brain-activity/)
 
-####<a name="7"></a> Create ML Model with one Sentence
+####<a name="7"></a> Create ML Model with one Sentence?
 
 For a lengthier discussion on how ML can be used or misused, check out the several hundred comments
 on [Allie K. Miller's post on LinkedIn: You can now write one sentence to train an entire ML model](https://www.linkedin.com/posts/alliekmiller_you-can-now-write-one-sentence-to-train-an-activity-7097974848001331200-DtJE):
 
 > How does it work?
-You just describe the ML model you want ... a chain of AI systems will take that ...
+You just describe the ML model you want...
+a chain of AI systems will take that...
 
 ####<a name="8"></a> Compress Greenhouse Gas Emissions
 
