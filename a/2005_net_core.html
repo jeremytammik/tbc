@@ -119,7 +119,7 @@ and observations on geometry, AI and emissions:</p>
 </center></p>
 <p>It has soon passed its puberty now and is almost a full grown-up blog now, preparing to stand on its own legs.
 And, in case you didn't know, this is blog post number 2005.
-We silently crossed into the third millenium in July.</p>
+We silently crossed into the third millennium in July.</p>
 <h4><a name="3"></a> Revit API with .NET Core</h4>
 <p>A number of questions were raised in
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> on
@@ -142,7 +142,7 @@ Microsoft may release <a href="https://devblogs.microsoft.com/dotnet/announcing-
 <p>So, as you can imagine, we will probably be facing a similar transition in the Revit API as well.
 The situation for Revit is complicated by dependencies, addons, and other components and relationships to consider.
 The development team is still working out the details.</p>
-<p>So, basically, all we can say about this at the moment is that we are working on it and it remains a moving target.</p>
+<p>So, basically, all we can say about this at the moment is that we are working on it, and it remains a moving target.</p>
 <p>Please keep your eyes peeled for the Revit preview releases.
 There is no guarantee yet by when the internal dependencies will have settled enough to include a version of the Revit API supporting .NET Core in a Revit preview release.
 It may take until the end of the year.</p>
@@ -188,7 +188,7 @@ For this, you would probably have to take the worst case (inner area) and projec
 <p>Another method I used in the past for 2D is to tesselate the perimeter and fill the opening with a grid of points, then
 use <a href="https://en.wikipedia.org/wiki/Delaunay_triangulation">Delaunay triangulation</a> etc., adding up the sum area of resulting triangles.
 The area is always slightly underestimated for concave edges and slightly overestimated for convex edges.
-Smaller triangles obviously improves that, but increases processing time.</p>
+Using smaller triangles obviously improves that but also increases processing time.</p>
 <p>Another option is to create a single faced solid over the opening with one of the shape builders.
 Some surface types are not supported by all shape builders, however.</p>
 <p><center>
@@ -200,7 +200,7 @@ Some surface types are not supported by all shape builders, however.</p>
 </center></p>
 <p>I think walls are quite simple compared to floors.
 In shaped floors, especially, you don't always get inner loops.
-For example in the below there are no inner loops.
+For example, in the below there are no inner loops.
 The thing you do know however is that the actual outline edges always have vertical faces adjacent.
 Therefore, fold edges always contain two horizontal or quasi-horizontal faces.
 So, by elimination of those that way, you are left with the outline edge curves and it is then just a case of ordering them into loops and determining if they are outer or inner.
@@ -209,7 +209,7 @@ You can't rely on direction of curve for that because in reality they are all ou
 <img src="img/area_of_wall_opening_3.png" alt="Area of wall opening" title="Area of wall opening" width="600"/> <!-- Pixel Height: 566 Pixel Width: 1,065 -->
 </center></p>
 <p>So, there isn't a universal solution to these things.</p>
-<p>Many thanks to Richard for sharing hos thoughts and extensive experience on this!</p>
+<p>Many thanks to Richard for sharing his thoughts and extensive experience on this!</p>
 <h4><a name="6"></a> AI Recreates Pink Floyd from Brain Activity</h4>
 <p>Let me briefly point out two AI-related news items that I found interesting:</p>
 <ul>

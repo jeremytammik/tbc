@@ -124,7 +124,7 @@ We celebrated The Building Coder's 15th birthday yesterday, August 22.
 
 It has soon passed its puberty now and is almost a full grown-up blog now, preparing to stand on its own legs.
 And, in case you didn't know, this is blog post number 2005.
-We silently crossed into the third millenium in July.
+We silently crossed into the third millennium in July.
 
 ####<a name="3"></a> Revit API with .NET Core
 
@@ -152,7 +152,7 @@ So, as you can imagine, we will probably be facing a similar transition in the R
 The situation for Revit is complicated by dependencies, addons, and other components and relationships to consider.
 The development team is still working out the details.
 
-So, basically, all we can say about this at the moment is that we are working on it and it remains a moving target.
+So, basically, all we can say about this at the moment is that we are working on it, and it remains a moving target.
 
 Please keep your eyes peeled for the Revit preview releases.
 There is no guarantee yet by when the internal dependencies will have settled enough to include a version of the Revit API supporting .NET Core in a Revit preview release.
@@ -214,7 +214,7 @@ For this, you would probably have to take the worst case (inner area) and projec
 Another method I used in the past for 2D is to tesselate the perimeter and fill the opening with a grid of points, then
 use [Delaunay triangulation](https://en.wikipedia.org/wiki/Delaunay_triangulation) etc., adding up the sum area of resulting triangles.
 The area is always slightly underestimated for concave edges and slightly overestimated for convex edges.
-Smaller triangles obviously improves that, but increases processing time.
+Using smaller triangles obviously improves that but also increases processing time.
 
 Another option is to create a single faced solid over the opening with one of the shape builders.
 Some surface types are not supported by all shape builders, however.
@@ -231,7 +231,7 @@ You can then extract the surface area of those.
 
 I think walls are quite simple compared to floors.
 In shaped floors, especially, you don't always get inner loops.
-For example in the below there are no inner loops.
+For example, in the below there are no inner loops.
 The thing you do know however is that the actual outline edges always have vertical faces adjacent.
 Therefore, fold edges always contain two horizontal or quasi-horizontal faces.
 So, by elimination of those that way, you are left with the outline edge curves and it is then just a case of ordering them into loops and determining if they are outer or inner.
@@ -243,7 +243,7 @@ You can't rely on direction of curve for that because in reality they are all ou
 
 So, there isn't a universal solution to these things.
 
-Many thanks to Richard for sharing hos thoughts and extensive experience on this!
+Many thanks to Richard for sharing his thoughts and extensive experience on this!
 
 ####<a name="6"></a> AI Recreates Pink Floyd from Brain Activity
 
