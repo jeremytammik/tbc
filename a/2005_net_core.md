@@ -58,7 +58,7 @@
 
 twitter:
 
-The Building Coder 15-year birthday celebration, @AutodeskRevit #RevitAPI with .NET Core, macros, and polygon area algorithms to determine wall area without openings #BIM @DynamoBIM @AutodeskAPS
+The Building Coder 15-year birthday celebration, @AutodeskRevit #RevitAPI with .NET Core and macro prospects and polygon area algorithms to determine wall area without openings #BIM @DynamoBIM @AutodeskAPS https://autode.sk/dotnetcoreprospect
 
 A birthday celebration, a forward-looking statement or two and observations on geometry, AI and emissions
 &ndash; 15 years of The Building Coder
@@ -275,27 +275,19 @@ Or that going audio-only on Zoom calls reduces carbon emissions by up to 96%?
 <img src="img/greenhouse_emissions_by_sector.png" alt="Greenhouse gas emissions by sector" title="Greenhouse gas emissions by sector" width="600"/> <!-- Pixel Height: 1,233 Pixel Width: 1,302 -->
 </center>
 
-
-
 <!--
 
 img/internet_carbon_footprint.png
 
-
-
 carbon footprint of driving versus flying
 
-Your flight:
-
-From: Basel (CH), BSL to: Malaga (ES), AGP, Roundtrip, Economy Class, ca. 3,100 km, 2 travellers
-
+flight Basel-Malaga Roundtrip ca. 3,100 km, 2 travellers
 CO2 amount: 1.2 t
 
 https://co2.myclimate.org/en/portfolios?calculation_id=6115626
 
-from Lörrach
-to La Garnatilla, 18614, Granada, Spain
-1,935 km
+car Basel-Garnatilla
+1935 km
 CO2 amount: 0.476 t
 return trip 1 t
 
@@ -310,6 +302,5 @@ https://foundation.mozilla.org/en/blog/ai-internet-carbon-footprint/
 Powering the Internet: Your Virtual Carbon Footprint [Infographic]
 https://www.webfx.com/blog/marketing/carbon-footprint-internet/
 internet_carbon_footprint.png
-
 
 -->
