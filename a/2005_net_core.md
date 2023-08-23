@@ -109,7 +109,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 We celebrated The Building Coder's 15th birthday yesterday, August 22.
 
 <center>
-<img src="img/tbc_15_years.jpg" alt="The Building Coder's 15th birthday" title="The Building Coder's 15th birthday" width="1160"/> <!-- Pixel Height: 810 Pixel Width: 1,160 -->
+<img src="img/tbc_15_years.jpg" alt="The Building Coder's 15th birthday" title="The Building Coder's 15th birthday" width="600"/> <!-- Pixel Height: 810 Pixel Width: 1,160 -->
 </center>
 
 It has soon passed its puberty now and is almost a full grown-up blog now, preparing to stand on its own legs.
@@ -136,11 +136,11 @@ Madhukar Moogala and Kean Walmsley have already published some information about
 
 AutoCAD and Civil3D have published preview versions with .NET Core 6 support for developers to explore.
 However, it is by no means clear yet which version of .NET Core will be targeted by their next major releases.
-Microsoft will probably be releasing [.NET Core 8 in November](https://devblogs.microsoft.com/dotnet/announcing-dotnet-8-preview-7/).
+Microsoft may release [.NET Core 8 in November](https://devblogs.microsoft.com/dotnet/announcing-dotnet-8-preview-7/).
 
 So, as you can imagine, we will probably be facing a similar transition in the Revit API as well.
-The situation for Revit is a little bit more complicated than for AutoCAD, though, and the development team is still working out the details.
-Revit has many dependencies, addons, and other components to consider.
+The situation for Revit is complicated by dependencies, addons, and other components and relationships to consider.
+The development team is still working out the details.
 
 So, basically, all we can say about this at the moment is that we are working on it and it remains a moving target.
 
@@ -148,8 +148,10 @@ Please keep your eyes peeled for the Revit preview releases.
 There is no guarantee yet by when the internal dependencies will have settled enough to include a version of the Revit API supporting .NET Core in a Revit preview release.
 It may take until the end of the year.
 
-If you are interested in this topic, please ensure that you have joined the Revit feedback community and have access to the upcoming preview releases for evaluation.
+What can I do right now?
 
+Above all, if you are interested in this topic, please ensure that you have joined the Revit feedback community and have access to the upcoming preview releases for evaluation.
+Then, you can also participate in the feedback forum discussions.
 Familiarise yourself with the Revit feedback portal now.
 Then you will be ready to jump in and actively join the fray as soon as possible.
 
@@ -158,15 +160,15 @@ Then you will be ready to jump in and actively join the fray as soon as possible
 In the course of revamping the Revit API, the development team also took a look at the macro environment.
 Support for .NET Core will obviously affect that as well.
 Last year, they asked for feedback from the add-in developer community
-on [how you use Revit Macros](https://forums.autodesk.com/t5/revit-api-forum/research-how-do-you-use-revit-macros/m-p/11158305),
+on [how you use Revit macros](https://forums.autodesk.com/t5/revit-api-forum/research-how-do-you-use-revit-macros/m-p/11158305)
 and [shared back the results](https://thebuildingcoder.typepad.com/blog/2022/05/analysis-of-macros-journals-and-add-in-manager.html#2).
 
-As a result oif this and other usage analysis, the current plan is to drop support for document macros.
+As a result of this and other usage analysis, the current plan is to drop support for document macros.
 Converting a document macro to an application macro is easy, and I hope to share some simple instructions on that anon.
 
 ####<a name="5"></a> Polygon Area Algorithms
 
-Maving away from plans and speculations about what the future will bring,
+Moving on from plans and speculations about what the future might bring,
 Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas
 shared some valuable hints and examples of polygon area algorithms answering a question on how to obtain
 the [area of a wall opening](https://forums.autodesk.com/t5/revit-api-forum/area-of-a-wall-opening/m-p/12174104):
@@ -176,8 +178,8 @@ I cannot delete any object.
 
 **Answer:** You can delete an object temporarily inside a transaction that is never committed, so the changes are never stored in the database:
 
-- [Calculating Gross and Net Wall Areas](http://thebuildingcoder.typepad.com/blog/2015/03/calculating-gross-and-net-wall-areas.html)
-- [Gross and Net Wall Area Calculation Enhancement](https://thebuildingcoder.typepad.com/blog/2015/04/gross-and-net-wall-area-calculation-enhancement-and-events.html)
+- [Calculating gross and net wall areas](http://thebuildingcoder.typepad.com/blog/2015/03/calculating-gross-and-net-wall-areas.html)
+- [Gross and net wall area calculation enhancement](https://thebuildingcoder.typepad.com/blog/2015/04/gross-and-net-wall-area-calculation-enhancement-and-events.html)
 
 **Response:** I cannot delete elements, even transitory.
 
@@ -208,13 +210,13 @@ Another option is to create a single faced solid over the opening with one of th
 Some surface types are not supported by all shape builders, however.
 
 <center>
-<img src="img/area_of_wall_opening_1.png" alt="Area of wall opening" title="Area of wall opening" width="600"/> <!-- Pixel Height: 450 Pixel Width: 1,087 -->
+<img src="img/area_of_wall_opening_1.png" alt="Area of wall opening" title="Area of wall opening" width="800"/> <!-- Pixel Height: 450 Pixel Width: 1,087 -->
 </center>
 
 You can then extract the surface area of those.
 
 <center>
-<img src="img/area_of_wall_opening_2.png" alt="Area of wall opening" title="Area of wall opening" width="600"/> <!-- Pixel Height: 439 Pixel Width: 1,082 -->
+<img src="img/area_of_wall_opening_2.png" alt="Area of wall opening" title="Area of wall opening" width="800"/> <!-- Pixel Height: 439 Pixel Width: 1,082 -->
 </center>
 
 I think walls are quite simple compared to floors.
@@ -231,32 +233,33 @@ You can't rely on direction of curve for that because in reality they are all ou
 
 So, there isn't a universal solution to these things.
 
+Many thanks to Richard for sharing hos thoughts and extensive experience on this!
+
 ####<a name="6"></a> AI Recreates Pink Floyd from Brain Activity
 
-Let me briefly point to two AI-related news items that I found interesting:
+Let me briefly point out two AI-related news items that I found interesting:
 
 - [AI recreates clip of Pink Floyd song from recordings of brain activity](https://www.newscientist.com/article/2387343-ai-recreates-clip-of-pink-floyd-song-from-recordings-of-brain-activity/)
 
 ####<a name="7"></a> Create ML Model with one Sentence
 
-For a lengthier discussion on how ML can be used or misused, check out, the several hundreds of comments
+For a lengthier discussion on how ML can be used or misused, check out the several hundred comments
 on [Allie K. Miller's post on LinkedIn: You can now write one sentence to train an entire ML model](https://www.linkedin.com/posts/alliekmiller_you-can-now-write-one-sentence-to-train-an-activity-7097974848001331200-DtJE):
 
-> You can now write one sentence to train an entire ML model.
-How does it work?
+> How does it work?
 You just describe the ML model you want ... a chain of AI systems will take that ...
 
 ####<a name="8"></a> CO2 and Compression
 
 Please compress stuff!
 
-Some people are starting to pay attention to the carbon footprint of today's widespread and growing usage of the Internet and digital devices.
+It is worthwhile paying attention to the carbon footprint of today's widespread and growing usage of the Internet and digital devices.
 
 Some estimates deem it comparable with the pollution generated by airlines and flying.
 
 I just checked out the effect of reduction of resolution and compression (using [compressjpeg.com](https://compressjpeg.com/)) on an image that I emailed to some friends:
 
-- a.jpg &ndash; 3506 pixel height original &ndash; 1.759.026 bytes
+- a0.jpg &ndash; 3506 pixel height original &ndash; 1.759.026 bytes
 - a1.jpg &ndash; 3506 pixel height compressed &ndash; 850.770 bytes
 - a2.jpg &ndash; 900 pixel height  &ndash; 149.291 bytes
 - a3.jpg &ndash; 900 pixel height compressed &ndash; 97.220 bytes
