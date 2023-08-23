@@ -109,7 +109,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 We celebrated The Building Coder's 15th birthday yesterday, August 22.
 
 <center>
-<img src="img/" alt="tbc_15_years.jpg" title="tbc_15_years.jpg" width="1160"/> <!-- Pixel Height: 810 Pixel Width: 1,160 -->
+<img src="img/tbc_15_years.jpg" alt="The Building Coder's 15th birthday" title="The Building Coder's 15th birthday" width="1160"/> <!-- Pixel Height: 810 Pixel Width: 1,160 -->
 </center>
 
 It has soon passed its puberty now and is almost a full grown-up blog now, preparing to stand on its own legs.
@@ -155,14 +155,82 @@ Then you will be ready to jump in and actively join the fray as soon as possible
 
 ####<a name="4"></a> Bye-Bye Document Macro
 
-dropping macro support for document macros
-https://thebuildingcoder.typepad.com/blog/2022/05/analysis-of-macros-journals-and-add-in-manager.html#2
-how to convert form project to application macro
+In the course of revamping the Revit API, the development team also took a look at the macro environment.
+Support for .NET Core will obviously affect that as well.
+Last year, they asked for feedback from the add-in developer community
+on [how you use Revit Macros](https://forums.autodesk.com/t5/revit-api-forum/research-how-do-you-use-revit-macros/m-p/11158305),
+and [shared back the results](https://thebuildingcoder.typepad.com/blog/2022/05/analysis-of-macros-journals-and-add-in-manager.html#2).
+
+As a result oif this and other usage analysis, the current plan is to drop support for document macros.
+Converting a document macro to an application macro is easy, and I hope to share some simple instructions on that anon.
 
 ####<a name="5"></a> Polygon Area Algorithms
 
-- polygon area algorithms
-https://forums.autodesk.com/t5/revit-api-forum/area-of-a-wall-opening/m-p/12174104#M73476
+Maving away from plans and speculations about what the future will bring,
+Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas
+shared some valuable hints and examples of polygon area algorithms answering a question on how to obtain
+the [area of a wall opening](https://forums.autodesk.com/t5/revit-api-forum/area-of-a-wall-opening/m-p/12174104):
+
+**Question:** How can I calculate the area of a wall opening?
+I cannot delete any object.
+
+**Answer:** You can delete an object temporarily inside a transaction that is never committed, so the changes are never stored in the database:
+
+- [Calculating Gross and Net Wall Areas](http://thebuildingcoder.typepad.com/blog/2015/03/calculating-gross-and-net-wall-areas.html)
+- [Gross and Net Wall Area Calculation Enhancement](https://thebuildingcoder.typepad.com/blog/2015/04/gross-and-net-wall-area-calculation-enhancement-and-events.html)
+
+**Response:** I cannot delete elements, even transitory.
+
+**Answer:** Here is a possible solution, except for ruled faces (for ruled faces, there must be a mathematical approximation similar to below):
+
+Generally, for other types of faces you can find the inner loops of the face and use `Edge.GetCurveUV` to create a loop in the dimensions of the face parameters.
+Unfortunately, there is no tessellate for `CurveUV`, but you can evaluate points along the loop to get a set of ordered UVs.
+Each `U` and `V` can then be multiplied based on how the face is parameterised in that direction, i.e., for a planar face, it 1 in both directions, but for a cylindrical face the `U` is based on angles, so, instead you have to multiply it based on radius to get the segment length (`V` is still in length, so you can use 1 for that).
+Prior to the existence of `CurveUV`, you would likely have had to have used `Edge.EvaluateOnFace` to create the tessellated points.
+
+Once you've multiplied the UV's, you can create a polygon and use
+the [shoelace formula](https://en.wikipedia.org/wiki/Shoelace_formula) etc. to find the area of the polygon and so the surface area of the opening.
+
+It is hard for faces with normalised parametrisation (such as ruled faces), because the multiple used to convert normalised to raw in one direction changes along the other direction.
+For example, if you have a ruled surface between two lines of different length, one at the base (Vmin) and one at the top (Vmax), the length varies from base to top, so how you convert `U` to raw parameter isn't constant, but varies according to the height of `V` where `U` is being measured.
+
+How we measure openings in surfaces can also be a bit subjective to a degree.
+If you have a cylindrical wall, then the area for the same opening on the outer face will be larger than the inner, but neither, I suspect, will likely be the thing that is useful to an MEP engineer.
+I assume they would likely want the projected (flat opening area).
+For this, you would probably have to take the worst case (inner area) and project it onto a plane to establish what can fit into that 2D area (or how much ventilation you have).
+
+Another method I used in the past for 2D is to tesselate the perimeter and fill the opening with a grid of points, then
+use [Delaunay triangulation](https://en.wikipedia.org/wiki/Delaunay_triangulation) etc., adding up the sum area of resulting triangles.
+The area is always slightly underestimated for concave edges and slightly overestimated for convex edges.
+Smaller triangles obviously improves that, but increases processing time.
+
+Another option is to create a single faced solid over the opening with one of the shape builders.
+Some surface types are not supported by all shape builders, however.
+
+<center>
+<img src="img/area_of_wall_opening_1.png" alt="Area of wall opening" title="Area of wall opening" width="600"/> <!-- Pixel Height: 450 Pixel Width: 1,087 -->
+</center>
+
+You can then extract the surface area of those.
+
+<center>
+<img src="img/area_of_wall_opening_2.png" alt="Area of wall opening" title="Area of wall opening" width="600"/> <!-- Pixel Height: 439 Pixel Width: 1,082 -->
+</center>
+
+I think walls are quite simple compared to floors.
+In shaped floors, especially, you don't always get inner loops.
+For example in the below there are no inner loops.
+The thing you do know however is that the actual outline edges always have vertical faces adjacent.
+Therefore, fold edges always contain two horizontal or quasi-horizontal faces.
+So, by elimination of those that way, you are left with the outline edge curves and it is then just a case of ordering them into loops and determining if they are outer or inner.
+You can't rely on direction of curve for that because in reality they are all outer edges to their face.
+
+<center>
+<img src="img/area_of_wall_opening_3.png" alt="Area of wall opening" title="Area of wall opening" width="600"/> <!-- Pixel Height: 566 Pixel Width: 1,065 -->
+</center>
+
+So, there isn't a universal solution to these things.
+
 
 ####<a name="6"></a> AI Recreates Pink Floyd from Brain Activity
 
