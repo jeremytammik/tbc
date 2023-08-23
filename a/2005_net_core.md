@@ -273,9 +273,8 @@ Some supporting articles that I checked out:
 > Did you know that writing an email can send 17 grams or more of carbon dioxide into the atmosphere?
 Or that going audio-only on Zoom calls reduces carbon emissions by up to 96%?
 
-
 <center>
-<img src="img/greenhouse_emissions_by_sector.png" alt="Greenhouse emissions by sector" title="Greenhouse emissions by sector" width="600"/> <!-- Pixel Height: 566 Pixel Width: 1,065 -->
+<img src="img/greenhouse_emissions_by_sector.png" alt="Greenhouse emissions by sector" title="Greenhouse emissions by sector" width="600"/> <!-- Pixel Height: 1,233 Pixel Width: 1,302 -->
 </center>
 
 
