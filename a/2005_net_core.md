@@ -116,7 +116,21 @@ It has soon passed its puberty now and is almost a full grown-up blog now, prepa
 And, in case you didn't know, this is blog post number 2005.
 We silently crossed into the third millenium in July.
 
-####<a name="3"></a>
+####<a name="3"></a> Revit API with .NET Core
+
+A number of questions were raised in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) on
+Revit API support for .NET Core, e.g.:
+
+- [Does Revit target .NET standard](https://forums.autodesk.com/t5/revit-api-forum/does-revit-target-net-standard/m-p/9792894?search-action-id=812462935117&search-result-uid=9792894)
+- [Revit API should support .NET 5+](https://forums.autodesk.com/t5/revit-api-forum/revitapi-should-support-net-5/m-p/10533160?search-action-id=812462935117&search-result-uid=10533160)
+- [TypeLoadException on addin startup after changing project to .NET 5](https://forums.autodesk.com/t5/revit-api-forum/typeloadexception-on-addin-startup-after-changing-project-to-net/m-p/10341283?search-action-id=812462935117&search-result-uid=10341283)
+- [Has anyone been successful in building a NetStandard-2.0 or Net-5.0 plug-in?](https://forums.autodesk.com/t5/revit-api-forum/has-anyone-been-successful-in-building-a-netstandard-2-0-or-net/m-p/10694884?search-action-id=812462935117&search-result-uid=10694884)
+
+Sol Amour has covered most of what can be said on this topic in his overview of [Dynamo upgrading to .NET 6](
+
+https://forum.dynamobim.com/t/dynamo-upgrading-to-net-6/90638/21?page=2
+
 
 
 - .net core migration coming
@@ -149,20 +163,6 @@ revit november is not guaranteed
 point to autocad one
 dynamo also annouced that they are working on it
 
-Dynamo upgrading to .NET 6
-https://forum.dynamobim.com/t/dynamo-upgrading-to-net-6/90638/21?page=2
-
-Does revit target .net standard
-https://forums.autodesk.com/t5/revit-api-forum/does-revit-target-net-standard/m-p/9792894?search-action-id=812462935117&search-result-uid=9792894
-
-RevitAPI should support .NET 5+
-https://forums.autodesk.com/t5/revit-api-forum/revitapi-should-support-net-5/m-p/10533160?search-action-id=812462935117&search-result-uid=10533160
-
-TypeLoadException on Addin startup after changing project to .NET 5
-https://forums.autodesk.com/t5/revit-api-forum/typeloadexception-on-addin-startup-after-changing-project-to-net/m-p/10341283?search-action-id=812462935117&search-result-uid=10341283
-
-Has anyone been successful in building a NetStandard-2.0 or Net-5.0 plug-in?
-https://forums.autodesk.com/t5/revit-api-forum/has-anyone-been-successful-in-building-a-netstandard-2-0-or-net/m-p/10694884?search-action-id=812462935117&search-result-uid=10694884
 
 familiarise yourself with the Revit feedback portal now.
 then you will be ready to check out the new Revit API as soon as it becomes available
