@@ -58,10 +58,16 @@
 
 twitter:
 
- @AutodeskRevit
-  the #RevitAPI  #BIM @DynamoBIM @AutodeskAPS
+The Building Coder 15-year birthday celebration, @AutodeskRevit #RevitAPI with .NET Core, macros, and polygon area algorithms to determine wall area without openings #BIM @DynamoBIM @AutodeskAPS
 
-&ndash; ...
+A birthday celebration, a forward-looking statement or two and observations on geometry, AI and emissions
+&ndash; 15 years of The Building Coder
+&ndash; Revit API with .NET Core
+&ndash; Bye-bye document macro?
+&ndash; Polygon area algorithms
+&ndash; AI recreates Pink Floyd from brain activity
+&ndash; Create ML model with one sentence?
+&ndash; Compress greenhouse gas emissions...
 
 linkedin:
 
@@ -266,7 +272,7 @@ Some supporting articles that I checked out:
 Or that going audio-only on Zoom calls reduces carbon emissions by up to 96%?
 
 <center>
-<img src="img/greenhouse_emissions_by_sector.png" alt="Greenhouse emissions by sector" title="Greenhouse emissions by sector" width="600"/> <!-- Pixel Height: 1,233 Pixel Width: 1,302 -->
+<img src="img/greenhouse_emissions_by_sector.png" alt="Greenhouse gas emissions by sector" title="Greenhouse gas emissions by sector" width="600"/> <!-- Pixel Height: 1,233 Pixel Width: 1,302 -->
 </center>
 
 
