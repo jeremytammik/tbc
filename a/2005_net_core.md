@@ -249,7 +249,7 @@ on [Allie K. Miller's post on LinkedIn: You can now write one sentence to train 
 > How does it work?
 You just describe the ML model you want ... a chain of AI systems will take that ...
 
-####<a name="8"></a> CO2 and Compression
+####<a name="8"></a> Compress Greenhouse Gas Emissions
 
 Please compress stuff!
 
@@ -270,6 +270,7 @@ The combination of lower pixel count and compression reduced the size from over 
 
 Some supporting articles that I checked out:
 
+- Wikipedia entry on [Greenhouse gas](https://en.wikipedia.org/wiki/Greenhouse_gas)
 - [Greenhouse emissions by sector](https://ourworldindata.org/emissions-by-sector)
 - [Powering the Internet: your virtual carbon footprint infographic](https://www.webfx.com/blog/marketing/carbon-footprint-internet/)
 - [The Internet’s invisible carbon footprint](https://foundation.mozilla.org/en/blog/ai-internet-carbon-footprint/)
