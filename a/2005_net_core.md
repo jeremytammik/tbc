@@ -58,7 +58,7 @@
 
 twitter:
 
-The Building Coder 15-year birthday celebration, @AutodeskRevit #RevitAPI with .NET Core and macro prospects and polygon area algorithms to determine wall area without openings #BIM @DynamoBIM @AutodeskAPS https://autode.sk/dotnetcoreprospect
+The Building Coder 15-year birthday celebration, @AutodeskRevit #RevitAPI with .NET Core and macro prospects, and polygon area algorithms to determine wall area without openings #BIM @DynamoBIM @AutodeskAPS https://autode.sk/dotnetcoreprospect
 
 A birthday celebration, a forward-looking statement or two and observations on geometry, AI and emissions
 &ndash; 15 years of The Building Coder
@@ -71,6 +71,17 @@ A birthday celebration, a forward-looking statement or two and observations on g
 
 linkedin:
 
+The Building Coder 15-year birthday celebration, #RevitAPI with .NET Core and macro prospects, and polygon area algorithms to determine wall area without openings
+
+https://autode.sk/dotnetcoreprospect
+
+- 15 years of The Building Coder
+- Revit API with .NET Core
+- Bye-bye document macro?
+- Polygon area algorithms
+- AI recreates Pink Floyd from brain activity
+- Create ML model with one sentence?
+- Compress greenhouse gas emissions...
 
 #BIM #DynamoBIM #AutodeskAPS #Revit #API #IFC #SDK #Autodesk #AEC #adsk
 
