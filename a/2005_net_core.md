@@ -71,6 +71,14 @@ A birthday celebration, a forward-looking statement or two and observations on g
 
 linkedin:
 
+jeremytammik
+
+https://www.linkedin.com/posts/jeremytammik_15-years-polygon-areas-and-net-core-activity-7100129768016093185-SO6O
+
+BIM Experts
+
+https://www.linkedin.com/feed/update/urn:li:activity:7100129808394641409
+
 The Building Coder 15-year birthday celebration, #RevitAPI with .NET Core and macro prospects, and polygon area algorithms to determine wall area without openings
 
 https://autode.sk/dotnetcoreprospect
