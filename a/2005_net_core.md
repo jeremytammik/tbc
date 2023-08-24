@@ -128,6 +128,34 @@ It has soon passed its puberty now and is almost a full grown-up blog now, prepa
 And, in case you didn't know, this is blog post number 2005.
 We silently crossed into the third millennium in July.
 
+####<a name="2.1"></a> Congratulations
+
+On [LinkedIn](https://www.linkedin.com/posts/jeremytammik_15-years-polygon-areas-and-net-core-activity-7100129768016093185-SO6O):
+and [BIM Experts](https://www.linkedin.com/feed/update/urn:li:activity:7100129808394641409):
+
+- Alex Vila Ortega, WSP, Sydney:
+  Congrats!!!
+- Diego Mendoza Acosta, Ingeniero Civil:
+  Congratulations !!!
+- Stephen Preston, Developer Relations and Platform Ecosystems leader:
+  Congratulations Jeremy. This is a great achievement. Its heartwarming to think of the many people you've helped in their careers, businesses and hobbies by sharing your knowledge.
+- Emile Kfouri, Senior Technology Product Leader:
+  Amazing! I remember your first blog post and thinking what an amazing thing it was going to be for Revit. Thank you for helping all of us be better developers and solve problems we could not solve on our own.
+- João Teixeira, Software Solutions for AEC and Manufacturing:
+  Congrats for all the contributions to the community over the last 15 years! Keep up the excellent work!
+- Wouter Hilhorst, Projectleider bij OPL architecten / re-designers:
+  Congratulations! The next 15 years From API to AI?
+- Lester Molina Espinosa, Sr. Principal CAD/BIM Designer:
+  Happy 15th birthday!!! Well done Jeremy. Keep up the good work!
+- Boy d'Hont, Senior Architect / BIM Programmer at WGA Architects:
+  Thank you for all your input for the API. You brought the polish that made that rusty old Revit shine.
+- Luís Filipe Santos, Architect at OSLO WORKS:
+  Congrats for the great blog and all the help building plugins for Revit!
+- Jakob Hirn, BIM, digital twins, building data platforms, Revit training, CAD-CAM automation:
+  Happy Birthday and thanks a lot for all the work you’ve done for the Revit community in these years. 🙏
+
+Thank you all and the entire Revit add-in developer community for your appreciation and support!
+
 ####<a name="3"></a> Revit API with .NET Core
 
 A number of questions were raised in
