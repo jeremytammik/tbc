@@ -142,6 +142,8 @@ and [BIM Experts](https://www.linkedin.com/feed/update/urn:li:activity:710012980
   Congratulations Jeremy. This is a great achievement. Its heartwarming to think of the many people you've helped in their careers, businesses and hobbies by sharing your knowledge.
 - Emile Kfouri, Senior Technology Product Leader:
   Amazing! I remember your first blog post and thinking what an amazing thing it was going to be for Revit. Thank you for helping all of us be better developers and solve problems we could not solve on our own.
+- Chris Theobald, Technology Officer at SCS:
+  Happy 15th!
 - João Teixeira, Software Solutions for AEC and Manufacturing:
   Congrats for all the contributions to the community over the last 15 years! Keep up the excellent work!
 - Wouter Hilhorst, Projectleider bij OPL architecten / re-designers:
