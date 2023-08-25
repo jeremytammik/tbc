@@ -138,6 +138,8 @@ and [BIM Experts](https://www.linkedin.com/feed/update/urn:li:activity:710012980
   Congrats!!!
 - Diego Mendoza Acosta, Ingeniero Civil:
   Congratulations !!!
+- Simon Jones, Freelance BIM Consultant & Developer, AEC BIM Tools:
+  Congratulations Jeremy &ndash; glad to see it still going!
 - Stephen Preston, Developer Relations and Platform Ecosystems leader:
   Congratulations Jeremy. This is a great achievement. Its heartwarming to think of the many people you've helped in their careers, businesses and hobbies by sharing your knowledge.
 - Emile Kfouri, Senior Technology Product Leader:
@@ -169,6 +171,26 @@ Revit API support for .NET Core, e.g.:
 - [Revit API should support .NET 5+](https://forums.autodesk.com/t5/revit-api-forum/revitapi-should-support-net-5/m-p/10533160?search-action-id=812462935117&search-result-uid=10533160)
 - [TypeLoadException on addin startup after changing project to .NET 5](https://forums.autodesk.com/t5/revit-api-forum/typeloadexception-on-addin-startup-after-changing-project-to-net/m-p/10341283?search-action-id=812462935117&search-result-uid=10341283)
 - [Has anyone been successful in building a NetStandard-2.0 or Net-5.0 plug-in?](https://forums.autodesk.com/t5/revit-api-forum/has-anyone-been-successful-in-building-a-netstandard-2-0-or-net/m-p/10694884?search-action-id=812462935117&search-result-uid=10694884)
+
+More significantly, we have a Revit Idea Station wishlist item
+for [.NET version 6](https://forums.autodesk.com/t5/revit-ideas/net-version/idc-p/12196972) that
+has now been accepted:
+
+- **Request:** Could you use .NET 6 for the Revit API?
+That would greatly improve the quality of the tools I develop.
+The use of .NET 6 would also improve Revit's performance as it is faster and more efficient than the .NET framework.
+Also, with a .NET version greater than .NET 5 comes C# 9, which offers newer and more functionality for developing with the Revit API.
+Furthermore, with the latest version of .NET comes the latest version of WPF, which offers better looks and overall improvements.
+- **Response:** Status changed to: Accepted. Congrats!
+We think this is a great idea, so we've decided to add it to our roadmap.
+Thanks for the suggestion!
+To follow the progress of features in development, please see
+the [Revit Public Roadmap](https://blogs.autodesk.com/revit/roadmap/) and join
+the [Revit Preview Release](https://feedback.autodesk.com/key/LHMJFVHGJK085G2M) to
+participate in feature testing.
+(Note that Accepted Ideas may not be immediately available.)
+<p class="author">The Factory</p>
+
 
 Sol Amour has covered most of what can be said on this topic in his overview of [Dynamo upgrading to .NET 6](https://forum.dynamobim.com/t/dynamo-upgrading-to-net-6).
 
