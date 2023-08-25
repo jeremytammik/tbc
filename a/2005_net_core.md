@@ -172,8 +172,9 @@ Revit API support for .NET Core, e.g.:
 - [TypeLoadException on addin startup after changing project to .NET 5](https://forums.autodesk.com/t5/revit-api-forum/typeloadexception-on-addin-startup-after-changing-project-to-net/m-p/10341283?search-action-id=812462935117&search-result-uid=10341283)
 - [Has anyone been successful in building a NetStandard-2.0 or Net-5.0 plug-in?](https://forums.autodesk.com/t5/revit-api-forum/has-anyone-been-successful-in-building-a-netstandard-2-0-or-net/m-p/10694884?search-action-id=812462935117&search-result-uid=10694884)
 
-More significantly, we have a Revit Idea Station wishlist item
-for [.NET version 6](https://forums.autodesk.com/t5/revit-ideas/net-version/idc-p/12196972) that
+More significantly, we have
+a [Revit Idea Station](https://forums.autodesk.com/t5/revit-ideas/idb-p/302)
+[wishlist item for .NET version 6](https://forums.autodesk.com/t5/revit-ideas/net-version/idc-p/12196972) that
 has now been accepted:
 
 - **Request:** Could you use .NET 6 for the Revit API?
@@ -190,7 +191,6 @@ the [Revit Preview Release](https://feedback.autodesk.com/key/LHMJFVHGJK085G2M) 
 participate in feature testing.
 (Note that Accepted Ideas may not be immediately available.)
 <p class="author">The Factory</p>
-
 
 Sol Amour has covered most of what can be said on this topic in his overview of [Dynamo upgrading to .NET 6](https://forum.dynamobim.com/t/dynamo-upgrading-to-net-6).
 
