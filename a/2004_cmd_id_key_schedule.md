@@ -33,7 +33,7 @@ A nice, varied bouquet of topics
 &ndash; Revit command id list
 &ndash; AI generates 3D model from 2D drawings
 &ndash; Careful with infant screen use
-&ndash; Renaissance typography in the digital world...
+&ndash; Baroque typography in the digital world...
 
 linkedin:
 
@@ -48,7 +48,7 @@ A nice, varied bouquet of topics
 - Revit command id list
 - AI generates 3D model from 2D drawings
 - Careful with infant screen use
-- Renaissance typography in the digital world...
+- Baroque typography in the digital world...
 
 #BIM #DynamoBIM #AutodeskAPS #Revit #API #IFC #SDK #Autodesk #AEC #adsk
 
@@ -70,7 +70,7 @@ Today we present a nice, varied bouquet of interesting topics:
 - [Revit command id list](#4)
 - [AI generates 3D model from 2D drawings](#5)
 - [Careful with infant screen use](#6)
-- [Renaissance typography in the digital world](#7)
+- [Baroque typography in the digital world](#7)
 
 ####<a name="2"></a> GasTools
 
@@ -206,7 +206,7 @@ Vital and life-changing effects are seen to correlate with infant interaction wi
 according to a study by the National University of Singapore and several other research labs,
 [infant screen use leads to reduced cognitive skills at age 9](https://www.uxtigers.com/post/infant-screen-use).
 
-####<a name="7"></a> Renaissance Typography in the Digital World
+####<a name="7"></a> Baroque Typography in the Digital World
 
 To close on a pleasant note, I very much enjoyed the explanation (and good taste) by Lin Yangchen in his article on
 using [a 17th-century font in a 21st-century thesis](https://www.linyangchen.com/Typography-Fell-Types-font).
