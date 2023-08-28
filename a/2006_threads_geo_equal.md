@@ -38,6 +38,10 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ####<a name="2"></a> Add-In Threads
 
+Some clarification on the single-threaded Revit API versus multi-threaded Revit.exe and add-ins was gained in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+asking [Is my plugin restricted by the computing resources of Revit?](https://forums.autodesk.com/t5/revit-api-forum/is-my-plugin-restricted-by-the-computing-resources-of-revit/m-p/12155865):
+
 
 <center>
 <img src="img/" alt="" title="" width="100"/> <!-- Pixel Height: 810 Pixel Width: 1,160 -->
@@ -45,7 +49,10 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 
 
-####<a name="3"></a> FeometryObject Comparison Methods
+####<a name="3"></a> GeometryObject Comparison Methods
+
+- Equality methods of GeometryObject
+https://forums.autodesk.com/t5/revit-api-forum/equality-methods-of-geometryobject/m-p/12155610
 
 
 
