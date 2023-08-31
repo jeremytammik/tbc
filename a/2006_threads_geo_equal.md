@@ -247,14 +247,23 @@ The pain of this kind of approach is that you have to create a new list of items
 
 Many thanks to Richard for raising this important question and sharing his viable and well-considered solution.
 
+####<a name="4"></a> Accessing Access
 
-####<a name="4"></a>
+A repeating question
+on [connecting with a MS Access database](https://forums.autodesk.com/t5/revit-api-forum/connecting-to-ms-access/m-p/12208698) came
+up once again, and the answer is known, so worthwhile to point out here as well.
 
-####<a name="5"></a>
+Oleg 'OR_AND_NO' Rodygin of [RZD Project](https://en.wikipedia.org/wiki/Russian_Railways) very kindly pointed out that the answer is provided in a previous post:
+[Can't make connection to Access database](https://forums.autodesk.com/t5/revit-api-forum/cant-make-connection-to-acces-database/m-p/10879626):
 
-**Question:**
+> You need to install the [Microsoft Access 2013 Runtime](https://www.microsoft.com/en-us/download/details.aspx?id=39358)
 
-**Answer:**
+Thank you, Oleg.
 
-**Response:**
+####<a name="5"></a> The INTERCAL programming Language
+
+For some slightly less useful information,
+in case you are interested in weird programming languages,
+[INTERCAL](https://en.wikipedia.org/wiki/INTERCAL) may rank pretty high.
+Reading the Wikipedia entry made me laugh out loud.
 
