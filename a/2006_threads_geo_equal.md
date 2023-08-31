@@ -42,6 +42,81 @@ Some clarification on the single-threaded Revit API versus multi-threaded Revit.
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 asking [Is my plugin restricted by the computing resources of Revit?](https://forums.autodesk.com/t5/revit-api-forum/is-my-plugin-restricted-by-the-computing-resources-of-revit/m-p/12155865):
 
+ grubdex  172 Views, 4 Replies
+‎2023-08-03 04:42 AM
+Is my plugin restricted by the computing resources of Revit?
+Hi,
+Revit is a single-threaded (therefore single-core) process. I was wondering if a Revit plugin would then have to live with the same restriction or whether a plugin could theoretically run multi-threaded/multi-processed? And what about GPU access? I know that some commercial plugin providers have developed standalone software with bidirectional connections to and from Revit, and I was wondering whether the hardware restrictions of Revit were the reason behind that.
+Tags (0)
+Add tags
+Report
+Labels (2)
+"Revit"  Revit Plugin
+4 REPLIES
+Sort:
+MESSAGE 2 OF 5
+jeremy.tammik
+  Autodesk jeremy.tammik  in reply to: grubdex
+‎2023-08-03 05:18 AM
+Your add-in is not restricted in any way. The only restriction imposed by Revit is the single-threaded implementation of the Revit API and access to Revit functionality. All other operations performed by your add-in are not restricted., limited or influenced by Revit in any way whatsoever. The next limiting factor might be the .NET environment in which your add-in lives, and the AppDomain that Revit provides for it. However, you also can always implement whatever functionality you like outside of your Revit add-in and communicate between that and the add-in in a number of ways.
+
+Jeremy Tammik,  Developer Advocacy and Support, The Building Coder, Autodesk Developer Network, ADN Open
+Tags (0)
+Add tags
+Report
+MESSAGE 3 OF 5
+grubdex
+  Contributor grubdex  in reply to: jeremy.tammik
+‎2023-08-03 05:30 AM
+Hi Jeremy, thanks for the quick reply. Could you elabore a bit more on the following aspect of your answer?
+
+The next limiting factor might be the .NET environment in which your add-in lives, and the AppDomain that Revit provides for it.
+What does that mean in practice?
+
+Getting data out of Revit and back in of course also means more overhead in terms of what needs to be built. Is there some kind of advice / best practices you can give here on when it's feasible to go that route?
+
+Thanks in advance,
+grubdex
+
+Tags (0)
+Add tags
+Report
+MESSAGE 4 OF 5
+jeremy.tammik
+  Autodesk jeremy.tammik  in reply to: grubdex
+‎2023-08-03 05:46 AM
+My pleasure, Thank you for your appreciation.
+
+> What does that mean in practice?
+
+No idea. I prefer theory. Sorry, studied math. You could examine the official .NET documentation and check what they say.
+
+> Getting data out of Revit and back in of course also means more overhead in terms of what needs to be built. Is there some kind of advice / best practices you can give here on when it's feasible to go that route?
+
+I don't understand your question. Please clarify what you want to achieve.
+
+Jeremy Tammik,  Developer Advocacy and Support, The Building Coder, Autodesk Developer Network, ADN Open
+Tags (0)
+Add tags
+Report
+MESSAGE 5 OF 5
+Kennan.Chen
+  Advocate Kennan.Chen  in reply to: grubdex
+‎2023-08-07 09:33 PM
+According to my personal understanding, the limitation of running tasks on a single thread is not due to hardware restrictions but rather a deliberate design choice aimed at ensuring data consistency.
+
+To clarify, the term "single-threaded" does not necessarily mean it all operates on a single core; it depends on the nature of the data your application handles during different phases.
+
+When we refer to "single-threaded," we are likely talking about the "event loop" utilized by Revit to manage model modifications. The event loop is a common design pattern used in UI applications. However, internally, Revit can utilize multi-core or GPU cores to parallelize rendering processes and generate model data into images.
+
+In the majority of cases, achieving parallel execution of tasks requires a careful design to split jobs into multiple individual sub-jobs. This can be quite challenging for most real-world scenarios.
+
+For many UI applications, opting for a single-threaded approach offers greater stability and simplicity in maintaining data consistency. This holds particularly true for Revit, which is a software equipped with a third-party plugin system. In Revit, all operations related to reading and updating the model are queued and executed sequentially on the main thread, a decision rooted in Revit's specific business domain.
+
+While it is possible to design Revit to support multi-threading, similar to a database software, doing so would entail sacrificing simplicity and introduce complexities related to handling thread-safety during modifications.
+
+Moreover, it's important to note that even for writing data in parallel, a database relies on locking mechanisms to ensure data consistency, effectively making it single-threaded at its core. This approach is based on the widely accepted understanding that modifying related data must be regulated to guarantee data consistency.
+
 
 
 
