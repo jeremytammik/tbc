@@ -34,7 +34,12 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Add-In Threads and Geometry Comparison
 
+Here are a couple of rather deep Revit API questions that can use some clarification, plus a simple database installation issue:
 
+- [Add-in threads](#2)
+- [`GeometryObject` comparison Methods](#3)
+- [Accessing Access](#4)
+- [The INTERCAL programming language](#5)
 
 ####<a name="2"></a> Add-In Threads
 
@@ -260,7 +265,7 @@ Oleg 'OR_AND_NO' Rodygin of [RZD Project](https://en.wikipedia.org/wiki/Russian_
 
 Thank you, Oleg.
 
-####<a name="5"></a> The INTERCAL programming Language
+####<a name="5"></a> The INTERCAL Programming Language
 
 For some slightly less useful information,
 in case you are interested in weird programming languages,
