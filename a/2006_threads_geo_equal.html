@@ -1,0 +1,235 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css"></p>
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+<p></head></p>
+<!---
+
+- Equality methods of GeometryObject
+  https://forums.autodesk.com/t5/revit-api-forum/equality-methods-of-geometryobject/m-p/12155610
+
+- on single threaded API versus multi-threaded Revit
+  Is my plugin restricted by the computing resources of Revit?
+  https://forums.autodesk.com/t5/revit-api-forum/is-my-plugin-restricted-by-the-computing-resources-of-revit/m-p/12155865#M73273
+
+twitter:
+
+ @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS
+
+&ndash; ...
+
+linkedin:
+
+#BIM #DynamoBIM #AutodeskAPS #Revit #API #IFC #SDK #Autodesk #AEC #adsk
+
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+
+<center>
+<img src="img/" alt="" title="" width="600"/>
+<p style="font-size: 80%; font-style:italic"></p>
+</center>
+
+-->
+
+<h3>Add-In Threads and Geometry Comparison</h3>
+<p>A couple of rather deep Revit API questions can use some clarification, plus a simple database connection issue is reolved:</p>
+<ul>
+<li><a href="#2">Add-in threads</a></li>
+<li><a href="#3"><code>GeometryObject</code> comparison Methods</a></li>
+<li><a href="#4">Accessing Access</a></li>
+<li><a href="#5">The INTERCAL programming language</a></li>
+</ul>
+<h4><a name="2"></a> Add-In Threads</h4>
+<p>Some aspects of the single-threaded Revit API versus multi-threaded Revit.exe and add-ins were highlighted in
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
+asking <a href="https://forums.autodesk.com/t5/revit-api-forum/is-my-plugin-restricted-by-the-computing-resources-of-revit/m-p/12155865">Is my plugin restricted by the computing resources of Revit?</a>:</p>
+<p><strong>Question:</strong> The Revit API is a single-threaded (therefore single-core) process.
+I was wondering if a Revit plugin would then have to live with the same restriction or whether a plugin could theoretically run multi-threaded/multi-processed?
+And what about GPU access?
+I know that some commercial plugin providers have developed standalone software with bidirectional connections to and from Revit, and I was wondering whether the hardware restrictions of Revit were the reason behind that.</p>
+<p><strong>Answer:</strong> The limitation of running tasks on a single thread in the Revit API is not due to hardware restrictions but rather a deliberate design choice aimed at ensuring data consistency.</p>
+<p>To clarify, the term "single-threaded" does not necessarily mean it all operates on a single core; it depends on the nature of the data your application handles during different phases.</p>
+<p>When we refer to "single-threaded," we are likely talking about the "event loop" utilized by Revit to manage model modifications. The event loop is a common design pattern used in UI applications. However, internally, Revit can utilize multi-core or GPU cores to parallelize rendering processes and generate model data into images.</p>
+<p>In the majority of cases, achieving parallel execution of tasks requires a careful design to split jobs into multiple individual sub-jobs. This can be quite challenging for most real-world scenarios.</p>
+<p>For many UI applications, opting for a single-threaded approach offers greater stability and simplicity in maintaining data consistency. This holds particularly true for Revit, which is a software equipped with a third-party plugin system. In Revit, all operations related to reading and updating the model are queued and executed sequentially on the main thread, a decision rooted in Revit's specific business domain.</p>
+<p>While it is possible to design Revit to support multi-threading, similar to a database software, doing so would entail sacrificing simplicity and introduce complexities related to handling thread-safety during modifications.</p>
+<p>Moreover, it's important to note that even for writing data in parallel, a database relies on locking mechanisms to ensure data consistency, effectively making it single-threaded at its core. This approach is based on the widely accepted understanding that modifying related data must be regulated to guarantee data consistency.</p>
+<p>Your add-in is not restricted in any way.
+The only restriction imposed by Revit is the single-threaded implementation of the Revit API and access to Revit functionality.
+All other operations performed by your add-in are not restricted, limited or influenced by Revit in any way whatsoever.
+The next limiting factor might be the .NET environment in which your add-in lives, and the <code>AppDomain</code> that Revit provides for it.
+Please examine the official .NET documentation for that.</p>
+<p>However, you also can always implement whatever functionality you like outside of your Revit add-in and communicate between that and the add-in in a number of ways.</p>
+<h4><a name="3"></a> GeometryObject Comparison Methods</h4>
+<p>A pertinent question from
+Richard <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859">RPThomas108</a> Thomas
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/equality-methods-of-geometryobject/td-p/12149045">equality methods of <code>GeometryObject</code></a>:
+was clarified by the development team:</p>
+<p><strong>Question:</strong> Can someone confirm what the equality methods of <code>GeometryObject</code> are based upon, i.e.:</p>
+<ul>
+<li>Memory reference</li>
+<li>Geometric configuration and/or properties of the class</li>
+<li>Id assigned to the class alone (GeometryObject.Id)</li>
+<li>Something else?</li>
+</ul>
+<p>I'm specifically interested in the equality/inequality operators and the overridden <code>Object.Equals</code>:</p>
+<p><center>
+<img src="img/geo_obj_comparison.png" alt="Object.Equals et al" title="Object.Equals et al" width="800"/> <!-- Pixel Height: 353 Pixel Width: 974 -->
+</center></p>
+<p>I guess the simple yes / no answer (if it exists) would be: are the equality methods noted above based on memory reference alone?
+However, isn't <code>Object.Equals</code> based on memory reference to begin with?
+If it is overridden, then how is it overridden?
+I tend to create a lot of class objects whose purpose is to wrap an API object and attach an id due to uncertainty about the equality of the API objects.
+Some clarification here or in the documentation would probably be quite helpful in reducing this aspect.
+I see the following in the RevitAPI.chm under GeometryObject.Equals in the Remarks section:</p>
+<blockquote>
+<p>This compares the internal identifiers of the geometry, and doesn't compare them geometrically</p>
+</blockquote>
+<p>Now that we've ruled out the geometric configuration, we just need to know what the 'internal identifiers' are exactly.
+Is it the <code>GeometryObject.Id</code> or something else?
+What kind of operations affect these identifiers?
+Do they exist for every API object created or just the items coming directly from element geometry?</p>
+<p>I've now also reviewed the below from RevitAPI.chm on <code>GeometryObject.Id</code>:</p>
+<blockquote>
+<p>This id can be stored and used for future referencing.
+The reference should be stable between minor geometric changes and modifications, but may not remain valid if there are major changes to the element or its surroundings.
+Note that the id may be negative (and thus invalid for referencing) if obtained from view-specific geometry, or if obtained from most GeometryObjects created in memory by the API.
+Negative ids cannot be used for referencing.
+These integer ids should not be used for comparison purposes (other than to check if they are equivalent or not).
+Nothing should be assumed about rules about how an element populates the sequence of different numeric values as this may change based on the element's definition.</p>
+</blockquote>
+<p>I've noticed previously that geometry from two different elements could have the same id (the id values are low so that is reasonable).
+That being the case, I'm also looking to confirm that the equality methods noted above are not equating two geometry objects with the same id from two different elements as being the same (internal identifier &lt;&gt; GeometryObject.Id).</p>
+<p>I think knowing more about this could be quite helpful either way.
+We could test and find answers, but it would then remain an unknown aspect to new people encountering the API.</p>
+<p>Personally, I always look at the equals functions in the documentation to see if it has been overridden for a class or not.
+That then informs me if I can use Linq extensions such as <code>distinct</code> and <code>union</code> with it (so we need to know how it is overridden also).</p>
+<p>For classes such as <code>ElementId</code>, it is inherently obvious, but some objects are less so and need more description.
+If it is just using GeometryObject.Id, then I can live with the limitations of that; I just need to know that is what it is doing.</p>
+<p><strong>Answer:</strong> Good question, amight be something worth documenting:</p>
+<ul>
+<li>GeometryObject.Equals &ndash; This compares the memory references of the compared objects.</li>
+<li>GeometryObject.operator == &ndash; This compares the pointers of the Revit-internal geometry objects.</li>
+<li>GeometryObject.GetHashCode &ndash; This is a hash of the pointer to the Revit-internal geometry object.</li>
+</ul>
+<p>In principle, there could be two different Revit.DB.GeometryObject objects that are both handles to the same Revit-internal geometry object; for example, if you retrieve the GeometryObject from the same <code>Reference</code> twice in succession, you would end up with two different GeometryObjects that both are handles to the same Revit-internal object.
+In this case, GeometryObject.Equals would return false, but GeometryObject.operator == would return true.
+Both GeometryObjects would have the same hash code.</p>
+<p>If either comparison method returns true, then that guarantees that they both have the same GeometryObject.Id, which is an attribute of the underlying Revit object.
+However, two totally unrelated GeometryObjects may have the same Id, since this is not intended to be a globally unique identifier.</p>
+<p>For completeness, the inequality operator is simply the negation of the equality operator.
+Two GeometryObjects that internally hold null pointers to Revit-internal objects are considered equal when compared with operator ==.</p>
+<p>I think this behavior could be considered reasonable, if we update the documentation to reflect the actual behavior.</p>
+<p>Also, as noted, it may not make sense to override Object.Equals at all.</p>
+<p><strong>Response:</strong> I think I'm largely happy with the status quo; as stated, it is probably more important that how it works is better described in the documentation; we then can make the right allowances based on that.</p>
+<p>Seems like there is no real logic in two managed objects that point to the same unmanaged object not returning true for Equals.
+I can't think of a reason off of the top of my head as to why the Equals function doesn't work exactly the same way as the == operator.
+However the Linq extensions will only be using 'Equals' not ==, so it might be useful therefore to make Equals the same as ==.
+Secondly, <code>GetHashCode</code> will be called by Linq extensions prior to <code>Equals</code>, so therefore it should be overridden to return 0 to force the comparison by <code>Equals</code>, or be overridden to perhaps provide a better hashing function related to the unmanaged memory reference (not the managed counterpart.</p>
+<p>I have a feeling that the default algorithm that Object.GetHashCode uses in .NET is fast rather than perfect in terms of comparing two objects as being the same.
+Since the hash code is based on the reference (64 bit on 64 bit system) but the hash code itself is only 32 bit.
+So, in theory there can be clashes that then need further resolution via <code>Equals</code>.
+In contrast, if you are comparing the value of 64 bit memory pointers directly on the unmanaged side, then there can be no doubt it is the same object.</p>
+<p>All I'm aiming for in the end is that when I extract objects from Revit I can then pass those objects through my functions which could perhaps sort them or group them, but in the end I can compare what comes out against the original set.
+I also need to remove items from a List (List&lt;T&gt;.Remove) which is sometimes hard if <code>Equals</code> and <code>GetHashCode</code> have not been overridden, since that method will use the default equality comparer.</p>
+<p>To deal with these kinds of things I recently wrote the following generic classes where comparisons are conducted during the context of the external command.
+I think a lot of it comes down to trust in <code>GetHashCode</code>.
+Obviously, the below is for all kinds of things, not just geometry objects.
+The pain of this kind of approach is that you have to create a new list of items of the below classes from the existing list of API objects rather than just knowing you can use the API objects directly.</p>
+<pre class="prettyprint">
+  Public Class RT_GeometryObjWithId(Of T As GeometryObject)
+    Inherits RT_ApiObjectWithId(Of T)
+
+    Public ReadOnly Property GeometryId As Integer
+    Public Sub New(Obj As T)
+      MyBase.New(Obj)
+      GeometryId = Obj.Id
+    End Sub
+  End Class
+
+  Public Class RT_ApiObjectWithId(Of T As APIObject)
+    Implements IDisposable
+
+    Public ReadOnly Property UID As Guid = Guid.NewGuid
+    Private disposedValue As Boolean
+    Private IntAPIObj As T
+    Public Property APIObject As T
+      Get
+        Return IntAPIObj
+      End Get
+      Set(value As T)
+        IntAPIObj = value
+      End Set
+    End Property
+    Public Sub New(Obj As T)
+      IntAPIObj = Obj
+    End Sub
+
+    Public Overrides Function GetHashCode() As Integer
+      'Force consideration of Equals
+      'Likely I could leave this alone and rely on the default implementation
+      'However I have more trust in comparing two guids than GetHashCode
+      Return 0
+    End Function
+    Public Overrides Function Equals(obj As Object) As Boolean
+      Dim Other As RT_ApiObjectWithId(Of T) = _
+        TryCast(obj, RT_ApiObjectWithId(Of T))
+      If Other Is Nothing Then Return False else
+      Return Me.UID = Other.UID
+    End Function
+
+    Public Shared Operator =(A As RT_ApiObjectWithId(Of T), _
+      B As RT_ApiObjectWithId(Of T)) As Boolean
+      Return A.Equals(B)
+    End Operator
+    Public Shared Operator &lt;&gt;(A As RT_ApiObjectWithId(Of T), _
+      B As RT_ApiObjectWithId(Of T)) As Boolean
+      Return Not A.Equals(B)
+    End Operator
+
+    Protected Overridable Sub Dispose(disposing As Boolean)
+      If Not disposedValue Then
+        If disposing Then
+          ' TODO: dispose managed state (managed objects)
+          If APIObject IsNot Nothing Then
+            APIObject.Dispose()
+          End If
+        End If
+
+        ' TODO: free unmanaged resources (unmanaged objects) and override finalizer
+        ' TODO: set large fields to null
+        disposedValue = True
+      End If
+    End Sub
+
+    ' ' TODO: override finalizer only if 'Dispose(disposing As Boolean)' has code to free unmanaged resources
+    ' Protected Overrides Sub Finalize()
+    '   ' Do not change this code. Put cleanup code in 'Dispose(disposing As Boolean)' method
+    '   Dispose(disposing:=False)
+    '   MyBase.Finalize()
+    ' End Sub
+
+    Public Sub Dispose() Implements IDisposable.Dispose
+      ' Do not change this code. Put cleanup code in 'Dispose(disposing As Boolean)' method
+      Dispose(disposing:=True)
+      GC.SuppressFinalize(Me)
+    End Sub
+  End Class
+</pre>
+
+<p>Many thanks to Richard for raising this important question and sharing his viable and well-considered solution.</p>
+<h4><a name="4"></a> Accessing Access</h4>
+<p>A repeating question
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/connecting-to-ms-access/m-p/12208698">connecting with a MS Access database</a> came
+up once again, and the answer is known, so worthwhile to point out here as well.</p>
+<p>Oleg 'OR_AND_NO' Rodygin of <a href="https://en.wikipedia.org/wiki/Russian_Railways">RZD Project</a> very kindly pointed out that the answer is provided in a previous post:
+<a href="https://forums.autodesk.com/t5/revit-api-forum/cant-make-connection-to-acces-database/m-p/10879626">Can't make connection to Access database</a>:</p>
+<blockquote>
+<p>You need to install the <a href="https://www.microsoft.com/en-us/download/details.aspx?id=39358">Microsoft Access 2013 Runtime</a></p>
+</blockquote>
+<p>Thank you, Oleg.</p>
+<h4><a name="5"></a> The INTERCAL Programming Language</h4>
+<p>For some slightly less useful information,
+in case you are interested in weird programming languages,
+<a href="https://en.wikipedia.org/wiki/INTERCAL">INTERCAL</a> may rank pretty high.
+Reading the Wikipedia entry made me laugh out loud.</p>

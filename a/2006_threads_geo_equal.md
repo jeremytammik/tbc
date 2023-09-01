@@ -34,7 +34,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Add-In Threads and Geometry Comparison
 
-Here are a couple of rather deep Revit API questions that can use some clarification, plus a simple database installation issue:
+A couple of rather deep Revit API questions can use some clarification, plus a simple database connection issue is reolved:
 
 - [Add-in threads](#2)
 - [`GeometryObject` comparison Methods](#3)
