@@ -134,24 +134,46 @@ We silently crossed into the third millennium in July.
 On [LinkedIn](https://www.linkedin.com/posts/jeremytammik_15-years-polygon-areas-and-net-core-activity-7100129768016093185-SO6O):
 and [BIM Experts](https://www.linkedin.com/feed/update/urn:li:activity:7100129808394641409):
 
+- Tim Hoffeller:
+  Thank you Jeremy, for all the inspiration through all those years! The BIM world would be a less creative one without you 😊
+- Prasad Sumanasekara, MagiCAD Group AB:
+  Congratulations ...!!!
 - Alex Vila Ortega, WSP, Sydney:
   Congrats!!!
 - Diego Mendoza Acosta, Ingeniero Civil:
   Congratulations !!!
 - Simon Jones, Freelance BIM Consultant & Developer, AEC BIM Tools:
   Congratulations Jeremy &ndash; glad to see it still going!
+- José Ignacio Montes Herraiz, North London Heat Power Project:
+  Congratulations Jeremy!
 - Stephen Preston, Developer Relations and Platform Ecosystems leader:
   Congratulations Jeremy. This is a great achievement. Its heartwarming to think of the many people you've helped in their careers, businesses and hobbies by sharing your knowledge.
+- Matt Taylor, WSP Aotearoa:
+  Happy birthday TBC/Jeremy! Thanks for all you do.
 - Emile Kfouri, Senior Technology Product Leader:
   Amazing! I remember your first blog post and thinking what an amazing thing it was going to be for Revit. Thank you for helping all of us be better developers and solve problems we could not solve on our own.
+- Madhukar Moogala, Principal Developer Advocate at Autodesk:
+  Congrats Jeremy an epic milestone ! 😀
 - Chris Theobald, Technology Officer at SCS:
   Happy 15th!
+- Ali Najmi, BIMLOGiQ:
+  Congrats Jeremy, Thanks for all that hard work over the past 15 years
 - João Teixeira, Software Solutions for AEC and Manufacturing:
   Congrats for all the contributions to the community over the last 15 years! Keep up the excellent work!
+- Kean Walmsley, Software Architect & Senior Manager, Convergence Engineering, Autodesk Research:
+  Congratulations, Jeremy! It's been wonderful seeing TBC go from strength to strength with your continued focus and investment. A fantastic milestone and achievement!
+- Chuong Ho, Computational Design Researcher:
+  Thank you Jeremy, your blog is awesome.
+- Carlos Ernesto Suárez Guerra, EMPAI:
+  Congratulations!!!!!
+- Nastya Baranouskaya, Software engineer and BIM Manager:
+  Congratulations!!!
 - Wouter Hilhorst, Projectleider bij OPL architecten / re-designers:
   Congratulations! The next 15 years From API to AI?
 - Lester Molina Espinosa, Sr. Principal CAD/BIM Designer:
   Happy 15th birthday!!! Well done Jeremy. Keep up the good work!
+- Michelangelo Capraro, Autodesk:
+  I reference your pages constantly, what a great community resource, congrats!
 - Boy d'Hont, Senior Architect / BIM Programmer at WGA Architects:
   Thank you for all your input for the API. You brought the polish that made that rusty old Revit shine.
 - Luís Filipe Santos, Architect at OSLO WORKS:
