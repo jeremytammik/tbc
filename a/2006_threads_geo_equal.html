@@ -32,7 +32,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 -->
 
 <h3>Add-In Threads and Geometry Comparison</h3>
-<p>A couple of rather deep Revit API questions can use some clarification, plus a simple database connection issue is reolved:</p>
+<p>A couple of rather deep Revit API questions can use some clarification, plus a simple database connection issue is resolved:</p>
 <ul>
 <li><a href="#2">Add-in threads</a></li>
 <li><a href="#3"><code>GeometryObject</code> comparison Methods</a></li>
@@ -106,30 +106,30 @@ We could test and find answers, but it would then remain an unknown aspect to ne
 That then informs me if I can use Linq extensions such as <code>distinct</code> and <code>union</code> with it (so we need to know how it is overridden also).</p>
 <p>For classes such as <code>ElementId</code>, it is inherently obvious, but some objects are less so and need more description.
 If it is just using GeometryObject.Id, then I can live with the limitations of that; I just need to know that is what it is doing.</p>
-<p><strong>Answer:</strong> Good question, amight be something worth documenting:</p>
+<p><strong>Answer:</strong> Good question, might be something worth documenting:</p>
 <ul>
 <li>GeometryObject.Equals &ndash; This compares the memory references of the compared objects.</li>
 <li>GeometryObject.operator == &ndash; This compares the pointers of the Revit-internal geometry objects.</li>
 <li>GeometryObject.GetHashCode &ndash; This is a hash of the pointer to the Revit-internal geometry object.</li>
 </ul>
-<p>In principle, there could be two different Revit.DB.GeometryObject objects that are both handles to the same Revit-internal geometry object; for example, if you retrieve the GeometryObject from the same <code>Reference</code> twice in succession, you would end up with two different GeometryObjects that both are handles to the same Revit-internal object.
+<p>In principle, there could be two different Revit.DB.GeometryObject objects that are both handles to the same Revit-internal geometry object; for example, if you retrieve the GeometryObject from the same <code>Reference</code> twice in succession, you will end up with two different GeometryObjects that both are handles to the same Revit-internal object.
 In this case, GeometryObject.Equals would return false, but GeometryObject.operator == would return true.
 Both GeometryObjects would have the same hash code.</p>
 <p>If either comparison method returns true, then that guarantees that they both have the same GeometryObject.Id, which is an attribute of the underlying Revit object.
 However, two totally unrelated GeometryObjects may have the same Id, since this is not intended to be a globally unique identifier.</p>
 <p>For completeness, the inequality operator is simply the negation of the equality operator.
 Two GeometryObjects that internally hold null pointers to Revit-internal objects are considered equal when compared with operator ==.</p>
-<p>I think this behavior could be considered reasonable, if we update the documentation to reflect the actual behavior.</p>
+<p>I think this behaviour could be considered reasonable, if we update the documentation to reflect the actual behaviour.</p>
 <p>Also, as noted, it may not make sense to override Object.Equals at all.</p>
 <p><strong>Response:</strong> I think I'm largely happy with the status quo; as stated, it is probably more important that how it works is better described in the documentation; we then can make the right allowances based on that.</p>
 <p>Seems like there is no real logic in two managed objects that point to the same unmanaged object not returning true for Equals.
 I can't think of a reason off of the top of my head as to why the Equals function doesn't work exactly the same way as the == operator.
-However the Linq extensions will only be using 'Equals' not ==, so it might be useful therefore to make Equals the same as ==.
-Secondly, <code>GetHashCode</code> will be called by Linq extensions prior to <code>Equals</code>, so therefore it should be overridden to return 0 to force the comparison by <code>Equals</code>, or be overridden to perhaps provide a better hashing function related to the unmanaged memory reference (not the managed counterpart.</p>
+However, the Linq extensions will only be using 'Equals', not ==, so it might be useful therefore to make Equals the same as ==.
+Secondly, <code>GetHashCode</code> will be called by Linq extensions prior to <code>Equals</code>, so therefore it should be overridden to return 0 to force the comparison by <code>Equals</code> or be overridden to perhaps provide a better hashing function related to the unmanaged memory reference (not the managed counterpart.</p>
 <p>I have a feeling that the default algorithm that Object.GetHashCode uses in .NET is fast rather than perfect in terms of comparing two objects as being the same.
-Since the hash code is based on the reference (64 bit on 64 bit system) but the hash code itself is only 32 bit.
+Since the hash code is based on the reference (64 bit on 64-bit system) but the hash code itself is only 32 bits.
 So, in theory there can be clashes that then need further resolution via <code>Equals</code>.
-In contrast, if you are comparing the value of 64 bit memory pointers directly on the unmanaged side, then there can be no doubt it is the same object.</p>
+In contrast, if you are comparing the value of 64-bit memory pointers directly on the unmanaged side, then there can be no doubt it is the same object.</p>
 <p>All I'm aiming for in the end is that when I extract objects from Revit I can then pass those objects through my functions which could perhaps sort them or group them, but in the end I can compare what comes out against the original set.
 I also need to remove items from a List (List&lt;T&gt;.Remove) which is sometimes hard if <code>Equals</code> and <code>GetHashCode</code> have not been overridden, since that method will use the default equality comparer.</p>
 <p>To deal with these kinds of things I recently wrote the following generic classes where comparisons are conducted during the context of the external command.

@@ -34,7 +34,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Add-In Threads and Geometry Comparison
 
-A couple of rather deep Revit API questions can use some clarification, plus a simple database connection issue is reolved:
+A couple of rather deep Revit API questions can use some clarification, plus a simple database connection issue is resolved:
 
 - [Add-in threads](#2)
 - [`GeometryObject` comparison Methods](#3)
@@ -129,13 +129,13 @@ That then informs me if I can use Linq extensions such as `distinct` and `union`
 For classes such as `ElementId`, it is inherently obvious, but some objects are less so and need more description.
 If it is just using GeometryObject.Id, then I can live with the limitations of that; I just need to know that is what it is doing.
 
-**Answer:** Good question, amight be something worth documenting:
+**Answer:** Good question, might be something worth documenting:
 
 - GeometryObject.Equals &ndash; This compares the memory references of the compared objects.
 - GeometryObject.operator == &ndash; This compares the pointers of the Revit-internal geometry objects.
 - GeometryObject.GetHashCode &ndash; This is a hash of the pointer to the Revit-internal geometry object.
 
-In principle, there could be two different Revit.DB.GeometryObject objects that are both handles to the same Revit-internal geometry object; for example, if you retrieve the GeometryObject from the same `Reference` twice in succession, you would end up with two different GeometryObjects that both are handles to the same Revit-internal object.
+In principle, there could be two different Revit.DB.GeometryObject objects that are both handles to the same Revit-internal geometry object; for example, if you retrieve the GeometryObject from the same `Reference` twice in succession, you will end up with two different GeometryObjects that both are handles to the same Revit-internal object.
 In this case, GeometryObject.Equals would return false, but GeometryObject.operator == would return true.
 Both GeometryObjects would have the same hash code.
 
@@ -145,7 +145,7 @@ However, two totally unrelated GeometryObjects may have the same Id, since this 
 For completeness, the inequality operator is simply the negation of the equality operator.
 Two GeometryObjects that internally hold null pointers to Revit-internal objects are considered equal when compared with operator ==.
 
-I think this behavior could be considered reasonable, if we update the documentation to reflect the actual behavior.
+I think this behaviour could be considered reasonable, if we update the documentation to reflect the actual behaviour.
 
 Also, as noted, it may not make sense to override Object.Equals at all.
 
@@ -153,13 +153,13 @@ Also, as noted, it may not make sense to override Object.Equals at all.
 
 Seems like there is no real logic in two managed objects that point to the same unmanaged object not returning true for Equals.
 I can't think of a reason off of the top of my head as to why the Equals function doesn't work exactly the same way as the == operator.
-However the Linq extensions will only be using 'Equals' not ==, so it might be useful therefore to make Equals the same as ==.
-Secondly, `GetHashCode` will be called by Linq extensions prior to `Equals`, so therefore it should be overridden to return 0 to force the comparison by `Equals`, or be overridden to perhaps provide a better hashing function related to the unmanaged memory reference (not the managed counterpart.
+However, the Linq extensions will only be using 'Equals', not ==, so it might be useful therefore to make Equals the same as ==.
+Secondly, `GetHashCode` will be called by Linq extensions prior to `Equals`, so therefore it should be overridden to return 0 to force the comparison by `Equals` or be overridden to perhaps provide a better hashing function related to the unmanaged memory reference (not the managed counterpart.
 
 I have a feeling that the default algorithm that Object.GetHashCode uses in .NET is fast rather than perfect in terms of comparing two objects as being the same.
-Since the hash code is based on the reference (64 bit on 64 bit system) but the hash code itself is only 32 bit.
+Since the hash code is based on the reference (64 bit on 64-bit system) but the hash code itself is only 32 bits.
 So, in theory there can be clashes that then need further resolution via `Equals`.
-In contrast, if you are comparing the value of 64 bit memory pointers directly on the unmanaged side, then there can be no doubt it is the same object.
+In contrast, if you are comparing the value of 64-bit memory pointers directly on the unmanaged side, then there can be no doubt it is the same object.
 
 All I'm aiming for in the end is that when I extract objects from Revit I can then pass those objects through my functions which could perhaps sort them or group them, but in the end I can compare what comes out against the original set.
 I also need to remove items from a List (List&lt;T&gt;.Remove) which is sometimes hard if `Equals` and `GetHashCode` have not been overridden, since that method will use the default equality comparer.
