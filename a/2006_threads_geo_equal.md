@@ -17,7 +17,11 @@ twitter:
 
  @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS
 
-&ndash; ...
+Deep Revit API questions requiring clarification and a simple database connection issue resolved:
+&ndash; Add-in threads
+&ndash; <code>GeometryObject</code> comparison methods
+&ndash; Accessing Access
+&ndash; The INTERCAL programming language...
 
 linkedin:
 
@@ -37,7 +41,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 A couple of rather deep Revit API questions can use some clarification, plus a simple database connection issue is resolved:
 
 - [Add-in threads](#2)
-- [`GeometryObject` comparison Methods](#3)
+- [`GeometryObject` comparison methods](#3)
 - [Accessing Access](#4)
 - [The INTERCAL programming language](#5)
 
@@ -73,6 +77,8 @@ The next limiting factor might be the .NET environment in which your add-in live
 Please examine the official .NET documentation for that.
 
 However, you also can always implement whatever functionality you like outside of your Revit add-in and communicate between that and the add-in in a number of ways.
+
+Many thanks to Kennan Chen for this clarification!
 
 ####<a name="3"></a> GeometryObject Comparison Methods
 
