@@ -356,6 +356,16 @@ The shrunk and compressed image was virtually indistinguishable from the origina
 
 The combination of lower pixel count and compression reduced the size from over 1.7 MB to less than 100 kB, by a factor of over 18.
 
+<!--
+
+2023-09-02 another bafudi email list image to send
+564769 original image, pixel width > 1800
+180374 reduced width = 900
+96328 [compressjpeg.com](https://compressjpeg.com)
+less radical savings, factor of 5.9
+
+-->
+
 Some supporting articles that I checked out:
 
 - Wikipedia entry on [Greenhouse gas](https://en.wikipedia.org/wiki/Greenhouse_gas)
