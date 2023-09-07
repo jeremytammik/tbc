@@ -25,6 +25,15 @@ Deep Revit API questions requiring clarification and a simple database connectio
 
 linkedin:
 
+Deep Revit API questions requiring clarification on add-in threads, GeometryObject comparison methods and accessing MS Access in the #RevitAPI
+
+https://autode.sk/objequals
+
+- Add-in threads
+- GeometryObject comparison methods
+- Accessing Access
+- The INTERCAL programming language...
+
 #BIM #DynamoBIM #AutodeskAPS #Revit #API #IFC #SDK #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
