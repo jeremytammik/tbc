@@ -151,17 +151,14 @@ def raamstaat_sections(window):
 **Answer:** Great! Congratulations!
 Thank you for the interesting point that ChatGPT was useful in translating the code.
 
-Many thanks to you for sharing the result.
+Many thanks to Pieter for raising this and sharing his nice solution and coding approach.
 
 
+
+
+####<a name="4"></a>
 
 <center>
 <img src="img/.png" alt="" title="" width="100"/> <!-- Pixel Height: 353 Pixel Width: 974 -->
 </center>
-
-
-Many thanks to  for raising this important question and sharing his viable and well-considered solution.
-
-####<a name="4"></a>
-
 
