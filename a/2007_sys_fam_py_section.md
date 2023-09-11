@@ -45,28 +45,22 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ####<a name="2"></a> System Family Predicate
 
-- determine is family system or not?
-https://autodesk.slack.com/archives/C0SR6NAP8/p1691697108465579
-[Q] Given a Family in the API what is the most straight forward approach to determining if the family is a system family or not in C#?
-[A] Jacob Small
-Would be curious to know others thoughts on this, as I haven't needed this myself, but I would try to use a combination of the IsEditable and IsInPlace properties.
-IsEditable will let you know if the family can be saved, which means it isn't a system family. It would however return a false positive for InPlace families.
-IsInPlace will cover the in place families.
-revitapidocs.comrevitapidocs.com
-IsEditable Property
-IsInPlace Property
-B: I've also heard:
-that built-in families (system families) are not stored as FamilyInstance objects. So you can do a FEC.WhereElementIsNotElementType().OfClass(typeof(FamilyInstance)) to get non-system family instances. The remainder of the objects which were not returned by the filter should then be system families.
-&&
-System families do not have MaterialQuantities:
-doc.Settings.Categories.Cast<Category>().Where(x => x.CategoryType == CategoryType.Model).Where(x => x.HasMaterialQuantities).OrderBy(x => x.Name);
-I can't personally decipher which is better (or accurate) as I'm new to both Revit + Revit API, so determining this has been a hurdle. . . curious to hear others thoughts on this
-[A] The best approach is the first, what Jacob mentioned. That is the correct one.
-Relying on FamilyInstance would only mean you are also assuming all families you are interested in have placed an instance. And is otherwise a hacky solution as well.
-regarding the second suggestion: as you realized, your question makes little sense. If you have a Family object, it is a Family and that is that. "System Families" are just a concept, but such objects or C++/C# classes do not exist.
-The only nuances, as pointed above, are is it in-place and is it "editable" (meaning not ancient and not some hacky internal concoction).
-The only meaningful related question that I can think of is: "Given an ElementType, is it of a 'system family' or of a real, user-made Family?"
-To answer that, you just try to cast it to a FamilySymbol. If it fails, then it is of "system family". If it succeeds, then you can get he Family property, which is a Family object that you can further interrogate for in-place, editability, etc.
+Jacob Small suggests how to identify system families:
+
+**Question:** Given a family, what is the most straight-forward approach to determine programmatically whether it is a system family or not in the C# Revit API?
+
+**Answer:** I would try to use a combination of the `IsEditable` and `IsInPlace` properties.
+`IsEditable` will let you know if the family can be saved, which means it isn't a system family.
+It would however return a false positive for in-place families.
+`IsInPlace` will cover the in-place families:
+
+- [IsEditable](https://www.revitapidocs.com/2024/d7d3ef05-d2bd-b770-47df-96b7fd280f9f.htm)
+- [IsInPlace](https://www.revitapidocs.com/2024/eb138fd5-6092-5257-e6e1-073013cb8582.htm
+
+A meaningful related question: Given an `ElementType`, does it specify a system family or a real, user-defined RFA-based family?
+To answer that, you can try to cast it to a `FamilySymbol`.
+If that fails, it refers to a system family.
+If it succeeds, you can read he `Family` property, which is a `Family` object that you can interrogate further for in-place, editability, etc.
 
 ####<a name="3"></a> Level-Based Family Requires Apprpriate Stuff
 
