@@ -19,7 +19,6 @@
   creates a section that looks at a window from the outside
   https://forums.autodesk.com/t5/revit-api-forum/create-section-with-revit-api-python/m-p/12211534
 
-
 twitter:
 
  @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS
