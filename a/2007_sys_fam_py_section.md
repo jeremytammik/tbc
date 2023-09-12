@@ -41,6 +41,11 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### System Family Predicate and Python Section Creation
 
+Today, we shed some light on family and section view creation:
+
+- [System family predicate](#2)
+- [Level-based family template](#3)
+- [Create section view in Python](#4)
 
 ####<a name="2"></a> System Family Predicate
 
@@ -54,7 +59,7 @@ It would however return a false positive for in-place families.
 `IsInPlace` will cover the in-place families:
 
 - [IsEditable](https://www.revitapidocs.com/2024/d7d3ef05-d2bd-b770-47df-96b7fd280f9f.htm)
-- [IsInPlace](https://www.revitapidocs.com/2024/eb138fd5-6092-5257-e6e1-073013cb8582.htm
+- [IsInPlace](https://www.revitapidocs.com/2024/eb138fd5-6092-5257-e6e1-073013cb8582.htm)
 
 **Question:**  A meaningful related question:
 Given an `ElementType`, does it specify a system family or a real, user-defined RFA-based family?
@@ -65,14 +70,15 @@ If it succeeds, you can read he `Family` property, which is a `Family` object th
 
 Thank you for that, Jacob and Ivan.
 
-####<a name="3"></a> Level-Based Family Requires Appropriate Stuff
+####<a name="3"></a> Level-Based Family Template
 
-Another family related discussion
-on [custom family type built-in parameters](https://forums.autodesk.com/t5/revit-api-forum/custom-family-type-builtin-parameters/m-p/12203945)
+In another family-related discussion
+on [custom family type built-in parameters](https://forums.autodesk.com/t5/revit-api-forum/custom-family-type-builtin-parameters/m-p/12203945),
+Richard [RPThomas108](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859) Thomas
 explains the need to use the appropriate family definition template in order to obtain the built-in properties required to attach to bottom and top levels, for instance.
-
-So, to create structural columns, you need to use the Metric Structural Column (or imperial equivalent).
-Similarly, to create a structural framing family, you should use the Metric Structural Framing - Beams and Braces (or imperial equivalent).
+To create structural columns, you need to use the *Metric Structural Column* (or its imperial equivalent).
+Similarly, to create a structural framing family, you should use the *Metric Structural Framing - Beams and Braces* (or imperial equivalent).
+In detail:
 
 **Question:** I am using Revit API 2023 to create a family.
 The family is getting created just fine.
@@ -95,7 +101,6 @@ I tend to use
 - FAMILY_TOP_LEVEL_PARAM
 
 They are not read-only:
-
 
 <center>
 <img src="img/column_family_level_4.png" alt="Column family properties" title="Column family properties" width="100"/>
@@ -136,16 +141,17 @@ One of the most confusing things when people first interact with the Revit famil
 In reality, the content of those templates is hard-coded to suit a certain purpose and you can't change it to match another template type.
 In that respect it is a bit different to other programs where they would perhaps use a different file extension to note different template types.
 
-**Answer:** Thanks for the advice.
+**Response:** Thanks for the advice.
 I have now integrated the structural column template and it is giving me non-null parameters for top and base levels.
 I am at least able to move it ahead.
-Thanks a lot for all your help.
 
-####<a name="4"></a>
+Many thanks to Richard for all his help.
+
+####<a name="4"></a> Create Section View in Python
 
 Pieter Lamoen raised and solved a question on how
 to [create section with Revit API and Python](https://forums.autodesk.com/t5/revit-api-forum/create-section-with-revit-api-python/m-p/12211534)
-that creates a section looking at a window from the outside:
+that creates and orients a section looking at a window from the outside:
 
 **Question:** I'm trying to create a section with Python.
 Creating the section is easy.
@@ -217,6 +223,3 @@ Thank you for the interesting point that ChatGPT was useful in translating the c
 
 Many thanks to Pieter for raising this and sharing his nice solution and coding approach.
 
-
-
-####<a name="4"></a>

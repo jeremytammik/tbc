@@ -1,0 +1,190 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css"></p>
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+<p></head></p>
+<!---
+
+- determine is family system or not?
+  https://autodesk.slack.com/archives/C0SR6NAP8/p1691697108465579
+  [Q] Given a Family in the API what is the most straight forward approach to determining if the family is a system family or not in C#?
+  [A] Jacob Small
+
+- you need a column family to define a column family
+  Custom Family Type - BuiltIn Parameters
+  https://forums.autodesk.com/t5/revit-api-forum/custom-family-type-builtin-parameters/m-p/12203945
+
+- Create section with Revit API, Python
+  creates a section that looks at a window from the outside
+  https://forums.autodesk.com/t5/revit-api-forum/create-section-with-revit-api-python/m-p/12211534
+
+twitter:
+
+ @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS
+
+
+&ndash; ...
+
+linkedin:
+
+#BIM #DynamoBIM #AutodeskAPS #Revit #API #IFC #SDK #Autodesk #AEC #adsk
+
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+
+<center>
+<img src="img/" alt="" title="" width="600"/>
+<p style="font-size: 80%; font-style:italic"></p>
+</center>
+
+-->
+
+<h3>System Family Predicate and Python Section Creation</h3>
+<p>Today, we shed some light on family and section view creation:</p>
+<ul>
+<li><a href="#2">System family predicate</a></li>
+<li><a href="#3">Level-based family template</a></li>
+<li><a href="#4">Create section view in Python</a></li>
+</ul>
+<h4><a name="2"></a> System Family Predicate</h4>
+<p>Jacob Small and Ivan Dobrianov suggest a efficient and simple solution to identify system families:</p>
+<p><strong>Question:</strong> Given a family, what is the most straight-forward approach to determine programmatically whether it is a system family or not in the C# Revit API?</p>
+<p><strong>Answer:</strong> I would try to use a combination of the <code>IsEditable</code> and <code>IsInPlace</code> properties.
+<code>IsEditable</code> will let you know if the family can be saved, which means it isn't a system family.
+It would however return a false positive for in-place families.
+<code>IsInPlace</code> will cover the in-place families:</p>
+<ul>
+<li><a href="https://www.revitapidocs.com/2024/d7d3ef05-d2bd-b770-47df-96b7fd280f9f.htm">IsEditable</a></li>
+<li><a href="https://www.revitapidocs.com/2024/eb138fd5-6092-5257-e6e1-073013cb8582.htm">IsInPlace</a></li>
+</ul>
+<p><strong>Question:</strong>  A meaningful related question:
+Given an <code>ElementType</code>, does it specify a system family or a real, user-defined RFA-based family?</p>
+<p><strong>Answer:</strong> To answer that, you can try to cast it to a <code>FamilySymbol</code>.
+If that fails, it refers to a system family.
+If it succeeds, you can read he <code>Family</code> property, which is a <code>Family</code> object that you can interrogate further for in-place, editability, etc.</p>
+<p>Thank you for that, Jacob and Ivan.</p>
+<h4><a name="3"></a> Level-Based Family Template</h4>
+<p>In another family-related discussion
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/custom-family-type-builtin-parameters/m-p/12203945">custom family type built-in parameters</a>,
+Richard <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859">RPThomas108</a> Thomas
+explains the need to use the appropriate family definition template in order to obtain the built-in properties required to attach to bottom and top levels, for instance.
+To create structural columns, you need to use the <em>Metric Structural Column</em> (or its imperial equivalent).
+Similarly, to create a structural framing family, you should use the <em>Metric Structural Framing - Beams and Braces</em> (or imperial equivalent).
+In detail:</p>
+<p><strong>Question:</strong> I am using Revit API 2023 to create a family.
+The family is getting created just fine.
+Then I load that family and create a <code>FamilyInstance</code> of type <code>StructuralColumn</code> and <code>StructuralFraming</code>.
+So far, so good.</p>
+<p>The problem I am facing is when I try to set the offset related parameters, e.g., <code>FAMILY_TOP_LEVEL_OFFSET_PARAM</code> and <code>FAMILY_BASE_LEVEL_OFFSET_PARAM</code>.
+These are null when I try to retrieve them via <code>get_Parameter</code>.</p>
+<p>These are not custom parameters, but built-in.
+I read that <a href="https://forums.autodesk.com/t5/revit-api-forum/add-built-in-parameter-to-family/td-p/10674669">I can't create a built-in parameter because it is built-in</a>.
+It talks about adding them to an existing family and the answer is NO, we can't.
+But I want to know if I can add them to a newly created family through API.</p>
+<p><strong>Answer:</strong> You can only change the values of a built-in parameter, not add it to a family; they either exist or they don't depending on the category.</p>
+<p>I tend to use</p>
+<ul>
+<li>FAMILY_BASE_LEVEL_PARAM</li>
+<li>FAMILY_TOP_LEVEL_PARAM</li>
+</ul>
+<p>They are not read-only:</p>
+<p><center>
+<img src="img/column_family_level_4.png" alt="Column family properties" title="Column family properties" width="100"/>
+<br/>
+<img src="img/column_family_level_5.png" alt="Column family properties" title="Column family properties" width="100"/>
+</center></p>
+<p>The associated schedule ones are also not read-only but I would not use those since they were added for schedules.
+It doesn't make sense to me to use the schedule ones when the intended family ones do exactly the same thing, have existing for longer and were obviously created for that purpose.</p>
+<p>Families placed on a level such as columns point upwards from that level this is unlike in the UI where the column ends up below the view level you place it on.
+So your <code>toplevel</code> notation indicates to me that you are setting the bottom of your column onto the top level and also setting the top of the column to that same level after placement.</p>
+<p>To be honest, that should trigger a warning, i.e., the top and bottom level can't be the same:</p>
+<p><center>
+<img src="img/column_family_level_6.png" alt="Column family properties" title="Column family properties" width="100"/>
+<br/>
+<img src="img/column_family_level_7.png" alt="Column family properties" title="Column family properties" width="100"/>
+</center></p>
+<p><strong>Response:</strong>  I tried to use the FAMILY_BASE_LEVEL_PARAM and FAMILY_TOP_LEVEL_PARAM in my case but they are coming as null.
+Then I tried to use the inbuilt families in Revit and for them these parameters are coming as not null.
+As a next step I tried to see the Revit SDK sample code from GenericModelCreation to create the custom family and used that family in my code but for that as well these parameters FAMILY_BASE_LEVEL_PARAM etc. are coming as null.
+I believe that something is missing from the family creation code which is controlling which built-in parameters should be present in the instance.</p>
+<p><strong>Answer:</strong> If you are using the generic model template to create your column family, then that isn't going to add those built-in parameters, even if you set the category.</p>
+<p>That is the same as the UI.</p>
+<p>To create structural columns you need to use the <em>Metric Structural Column</em> (or imperial equivalent).
+Similarly, to create a structural framing family you should use <em>Metric Structural Framing - Beams and Braces</em> (or imperial equivalent).
+You should have an imperial and metric version of all your templates/content in reality (likewise versions with localised parameter names if you are localising).</p>
+<p>So the problem is easier than you think, i.e., if you don't see the built-in parameters in your family (when placed in the project) then you are using the wrong family template to create the family.</p>
+<p>One of the most confusing things when people first interact with the Revit family environment is due to the incorrect assumption that any type of element functionality can come from the same RFT or RFA file.
+In reality, the content of those templates is hard-coded to suit a certain purpose and you can't change it to match another template type.
+In that respect it is a bit different to other programs where they would perhaps use a different file extension to note different template types.</p>
+<p><strong>Response:</strong> Thanks for the advice.
+I have now integrated the structural column template and it is giving me non-null parameters for top and base levels.
+I am at least able to move it ahead.</p>
+<p>Many thanks to Richard for all his help.</p>
+<h4><a name="4"></a> Create Section View in Python</h4>
+<p>Pieter Lamoen raised and solved a question on how
+to <a href="https://forums.autodesk.com/t5/revit-api-forum/create-section-with-revit-api-python/m-p/12211534">create section with Revit API and Python</a>
+that creates and orients a section looking at a window from the outside:</p>
+<p><strong>Question:</strong> I'm trying to create a section with Python.
+Creating the section is easy.
+Is there a simple way to change the oriëntation?
+By default, the section looks down; I would like it to look forward, like a normal section, e.g., <code>XYZ(0,1,0)</code>.
+How can I acieve this?
+I only know Python and no C#.</p>
+<p><strong>Answer:</strong> I love Python. C# is also very nice.
+Most of my Revit API samples are in C#.
+The Building Coder includes a whole topic group
+on <a href="https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.38">articles on how to set up section views</a>.</p>
+<p><strong>Response:</strong>  First of all thanks for all the sample code!
+I came up with the idea to use chatGPT to translate your code to Python and then changed it to fit my needs.
+My code now creates a section that looks at a window from the outside.
+This code gets the job done:</p>
+<pre class="prettyprint">
+def raamstaat_sections(window):
+  # find window dimensions, center and host(wall)
+  window_bb = window.get_BoundingBox(doc.ActiveView)
+  window_center = (window_bb.Min + window_bb.Max)/2
+  window_width = window.LookupParameter("Width").AsDouble()
+  window_height = window.LookupParameter("Height").AsDouble()
+  window_sill_height = window.LookupParameter("Sill Height").AsDouble()
+  host = window.Host
+
+  # vectors for view direction
+  wall_ext = host.Orientation
+  wall_direction = XYZ(wall_ext.Y, -wall_ext.X, wall_ext.Z)
+  up_direction = XYZ.BasisZ
+  wall_int = XYZ(-wall_ext.X, -wall_ext.Y, wall_ext.Z)
+
+  ### BOUNDING BOX FOR ELEVATION
+  # Calculate the bounding box
+  min_point_elev = XYZ((-window_width/2) - 500/304.8, (-window_height/2) - window_sill_height - 750/304.8, -1000/304.8)
+  max_point_elev = XYZ((window_width/2) + 500/304.8, (window_height/2) + 1000/304.8, 0)
+
+  # create 'rotated' bounding box
+  rotation_transform_elev = Transform.Identity
+  rotation_transform_elev.Origin = window_center
+  rotation_transform_elev.BasisX = wall_direction
+  rotation_transform_elev.BasisY = up_direction
+  rotation_transform_elev.BasisZ = wall_int
+
+  rotated_bounding_box_elev = BoundingBoxXYZ()
+  rotated_bounding_box_elev.Transform = rotation_transform_elev
+  rotated_bounding_box_elev.Min = min_point_elev
+  rotated_bounding_box_elev.Max = max_point_elev
+
+  ### CREATE SECTION
+  # create sections, change name, apply view template
+  t = Transaction(doc, "create section")
+  t.Start()
+
+  type = window.LookupParameter("S3A_Type").AsString()
+  #elevation
+  newViewElev = ViewSection.CreateSection(doc, SectionTypes[1].Id, rotated_bounding_box_elev)
+  newViewElev.Name = type + " - aanzicht TEST"
+  newViewElev.ViewTemplateId = templateS.Id
+
+  t.Commit()
+</pre>
+
+<p><strong>Answer:</strong> Great!
+Congratulations!
+Thank you for the interesting point that ChatGPT was useful in translating the code.</p>
+<p>Many thanks to Pieter for raising this and sharing his nice solution and coding approach.</p>
