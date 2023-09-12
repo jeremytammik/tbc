@@ -96,8 +96,12 @@ I tend to use
 
 They are not read-only:
 
-RPTHOMAS108_0-1692918336616.png
-RPTHOMAS108_1-1692918378264.png
+
+<center>
+<img src="img/column_family_level_4.png" alt="Column family properties" title="Column family properties" width="100"/>
+<br/>
+<img src="img/column_family_level_5.png" alt="Column family properties" title="Column family properties" width="100"/>
+</center>
 
 The associated schedule ones are also not read-only but I would not use those since they were added for schedules.
 It doesn't make sense to me to use the schedule ones when the intended family ones do exactly the same thing, have existing for longer and were obviously created for that purpose.
@@ -107,8 +111,11 @@ So your `toplevel` notation indicates to me that you are setting the bottom of y
 
 To be honest, that should trigger a warning, i.e., the top and bottom level can't be the same:
 
-RPTHOMAS108_2-1692918942890.png
-RPTHOMAS108_3-1692918959936.png
+<center>
+<img src="img/column_family_level_6.png" alt="Column family properties" title="Column family properties" width="100"/>
+<br/>
+<img src="img/column_family_level_7.png" alt="Column family properties" title="Column family properties" width="100"/>
+</center>
 
 **Response:**  I tried to use the FAMILY_BASE_LEVEL_PARAM and FAMILY_TOP_LEVEL_PARAM in my case but they are coming as null.
 Then I tried to use the inbuilt families in Revit and for them these parameters are coming as not null.
@@ -204,7 +211,8 @@ def raamstaat_sections(window):
   t.Commit()
 </pre>
 
-**Answer:** Great! Congratulations!
+**Answer:** Great!
+Congratulations!
 Thank you for the interesting point that ChatGPT was useful in translating the code.
 
 Many thanks to Pieter for raising this and sharing his nice solution and coding approach.
@@ -212,8 +220,3 @@ Many thanks to Pieter for raising this and sharing his nice solution and coding 
 
 
 ####<a name="4"></a>
-
-<center>
-<img src="img/.png" alt="" title="" width="100"/> <!-- Pixel Height: 353 Pixel Width: 974 -->
-</center>
-
