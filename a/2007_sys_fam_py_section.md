@@ -49,7 +49,7 @@ Today, we shed some light on family and section view creation:
 
 ####<a name="2"></a> System Family Predicate
 
-Jacob Small and Ivan Dobrianov suggest a efficient and simple solution to identify system families:
+Jacob Small and Ivan Dobrianov suggest an efficient and simple solution to identify system families:
 
 **Question:** Given a family, what is the most straight-forward approach to determine programmatically whether it is a system family or not in the C# Revit API?
 
@@ -66,7 +66,7 @@ Given an `ElementType`, does it specify a system family or a real, user-defined 
 
 **Answer:** To answer that, you can try to cast it to a `FamilySymbol`.
 If that fails, it refers to a system family.
-If it succeeds, you can read he `Family` property, which is a `Family` object that you can interrogate further for in-place, editability, etc.
+If it succeeds, you can read the `Family` property, which is a `Family` object that you can interrogate further for in-place, editability, etc.
 
 Thank you for that, Jacob and Ivan.
 
@@ -93,7 +93,7 @@ I read that [I can't create a built-in parameter because it is built-in](https:/
 It talks about adding them to an existing family and the answer is NO, we can't.
 But I want to know if I can add them to a newly created family through API.
 
-**Answer:** You can only change the values of a built-in parameter, not add it to a family; they either exist or they don't depending on the category.
+**Answer:** You can only change the values of a built-in parameter, not add it to a family; they either exist or they don't, depending on the category.
 
 I tend to use
 
@@ -103,23 +103,27 @@ I tend to use
 They are not read-only:
 
 <center>
-<img src="img/column_family_level_4.png" alt="Column family properties" title="Column family properties" width="100"/>
+<img src="img/column_family_level_4.png" alt="Column family properties" title="Column family properties" width="650"/>
+<p style="font-size: 80%; font-style:italic">FAMILY_TOP_LEVEL_PARAM</p>
 <br/>
-<img src="img/column_family_level_5.png" alt="Column family properties" title="Column family properties" width="100"/>
+<img src="img/column_family_level_5.png" alt="Column family properties" title="Column family properties" width="650"/>
+<p style="font-size: 80%; font-style:italic">FAMILY_BASE_LEVEL_PARAM</p>
 </center>
 
 The associated schedule ones are also not read-only but I would not use those since they were added for schedules.
 It doesn't make sense to me to use the schedule ones when the intended family ones do exactly the same thing, have existing for longer and were obviously created for that purpose.
 
 Families placed on a level such as columns point upwards from that level this is unlike in the UI where the column ends up below the view level you place it on.
-So your `toplevel` notation indicates to me that you are setting the bottom of your column onto the top level and also setting the top of the column to that same level after placement.
+So, your `toplevel` notation indicates to me that you are setting the bottom of your column onto the top level and also setting the top of the column to that same level after placement.
 
 To be honest, that should trigger a warning, i.e., the top and bottom level can't be the same:
 
 <center>
-<img src="img/column_family_level_6.png" alt="Column family properties" title="Column family properties" width="100"/>
+<img src="img/column_family_level_6.png" alt="Column family properties" title="Column family properties" width="650"/>
+<p style="font-size: 80%; font-style:italic">LevelId</p>
 <br/>
-<img src="img/column_family_level_7.png" alt="Column family properties" title="Column family properties" width="100"/>
+<img src="img/column_family_level_7.png" alt="Column family properties" title="Column family properties" width="450"/>
+<p style="font-size: 80%; font-style:italic">Level constraints</p>
 </center>
 
 **Response:**  I tried to use the FAMILY_BASE_LEVEL_PARAM and FAMILY_TOP_LEVEL_PARAM in my case but they are coming as null.
@@ -131,11 +135,11 @@ I believe that something is missing from the family creation code which is contr
 
 That is the same as the UI.
 
-To create structural columns you need to use the *Metric Structural Column* (or imperial equivalent).
+To create structural columns, you need to use the *Metric Structural Column* (or imperial equivalent).
 Similarly, to create a structural framing family you should use *Metric Structural Framing - Beams and Braces* (or imperial equivalent).
 You should have an imperial and metric version of all your templates/content in reality (likewise versions with localised parameter names if you are localising).
 
-So the problem is easier than you think, i.e., if you don't see the built-in parameters in your family (when placed in the project) then you are using the wrong family template to create the family.
+So, the problem is easier than you think, i.e., if you don't see the built-in parameters in your family (when placed in the project) then you are using the wrong family template to create the family.
 
 One of the most confusing things when people first interact with the Revit family environment is due to the incorrect assumption that any type of element functionality can come from the same RFT or RFA file.
 In reality, the content of those templates is hard-coded to suit a certain purpose and you can't change it to match another template type.
@@ -155,9 +159,9 @@ that creates and orients a section looking at a window from the outside:
 
 **Question:** I'm trying to create a section with Python.
 Creating the section is easy.
-Is there a simple way to change the oriëntation?
+Is there a simple way to change the orientation?
 By default, the section looks down; I would like it to look forward, like a normal section, e.g., `XYZ(0,1,0)`.
-How can I acieve this?
+How can I achieve this?
 I only know Python and no C#.
 
 **Answer:** I love Python. C# is also very nice.
@@ -165,8 +169,8 @@ Most of my Revit API samples are in C#.
 The Building Coder includes a whole topic group
 on [articles on how to set up section views](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.38).
 
-**Response:**  First of all thanks for all the sample code!
-I came up with the idea to use chatGPT to translate your code to Python and then changed it to fit my needs.
+**Response:**  First of all, thanks for all the sample code!
+I came up with the idea to use ChatGPT to translate your code to Python and then changed it to fit my needs.
 My code now creates a section that looks at a window from the outside.
 This code gets the job done:
 
