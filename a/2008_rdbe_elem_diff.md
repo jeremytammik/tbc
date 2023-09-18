@@ -73,6 +73,12 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Element Diff, Shapely and RDBE
 
+Exciting new and enhanced tools and libraries to check out:
+
+- [Revit element difference comparison](#2)
+- [The Revit database explorer RDBE](#3)
+- [The Shapely Python 2D geometry library](#4)
+- [Measuring developer productivity](#5)
 
 ####<a name="2"></a> Revit Element Difference Comparison
 
@@ -93,7 +99,7 @@ Stay tuned for more updates and get ready to experience a whole new level of eff
 <img src="img/ch_compare_element.png" alt="Compare Element" title="Compare Element" width="670"/> <!-- Pixel Height: 588 Pixel Width: 1,336 -->
 </center>
 
-####<a name="3"></a> The Revit database explorer RDBE
+####<a name="3"></a> The Revit Database Explorer RDBE
 
 We already [mentioned](https://thebuildingcoder.typepad.com/blog/2022/07/immutable-uniqueid-and-revit-database-explorer.html#3)
 the [Revit database explorer RDBE](https://github.com/NeVeSpl/RevitDBExplorer) last year:
