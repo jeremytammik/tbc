@@ -30,6 +30,14 @@ Today, we shed some light on family and section view creation
 
 linkedin:
 
+Shed some light on family and section view creation, a system family predicate, level-based family template and creating section view in Python with #RevitAPI
+
+https://autode.sk/pythonsection
+
+- System family predicate
+- Level-based family template
+- Create section view in Python...
+
 #BIM #DynamoBIM #AutodeskAPS #Revit #API #IFC #SDK #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
