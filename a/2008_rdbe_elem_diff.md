@@ -76,13 +76,18 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ####<a name="2"></a> Revit Element Difference Comparison
 
-- compare element
-Chuong Ho
-It's been a while since our last Revit Add-in manager update, but we've got some exciting news to share today!
-I thrilled to introduce a new tool that's now part of the Add-in manager. This tool is a game-changer for both developers and users as it allows you to easily compare differences between two elements. Not only that, but it also uses color to visually highlight all parameter variations, making it incredibly intuitive and user-friendly. Plus, you can view the similarity results of value comparisons between parameters from those two elements
-Stay tuned for more updates and get ready to experience a whole new level of efficiency with our latest addition to the Revit Add-in manager!"
-Open Source : https://github.com/chuongmep/RevitAddInManager
-Documentation : [How to use Compare Parameter Element](https://github.com/chuongmep/RevitAddInManager/wiki/How-to-use-Compare-Parameter-Element)
+Chuong Ho announces new functionality enabling highlighting and comparison of differences between Revit database elements in his alternative Revit Add-in Manager:
+
+> It's been a while since our last Revit Add-in manager update, but we've got some exciting news to share today!
+
+> I'm thrilled to introduce a new tool that's now part of the Add-in Mmanager.
+This tool is a game-changer for both developers and users as it allows you to easily compare differences between two elements.
+Not only that, but it also uses color to visually highlight all parameter variations, making it incredibly intuitive and user-friendly.
+Plus, you can view the similarity results of value comparisons between parameters from two elements.
+Stay tuned for more updates and get ready to experience a whole new level of efficiency with our latest addition to the Revit Add-in manager!
+
+- [Open source](https://github.com/chuongmep/RevitAddInManager)
+- Documentation on [how to use Compare Parameter Element](https://github.com/chuongmep/RevitAddInManager/wiki/How-to-use-Compare-Parameter-Element)
 
 <center>
 <img src="img/ch_compare_element.png" alt="Compare Element" title="Compare Element" width="670"/> <!-- Pixel Height: 588 Pixel Width: 1,336 -->
