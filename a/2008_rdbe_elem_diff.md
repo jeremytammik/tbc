@@ -86,9 +86,9 @@ Chuong Ho announces new functionality enabling highlighting and comparison of di
 
 > It's been a while since our last Revit Add-in manager update, but we've got some exciting news to share today!
 
-> I'm thrilled to introduce a new tool that's now part of the Add-in Mmanager.
+> I'm thrilled to introduce a new tool that's now part of the Add-in Manager.
 This tool is a game-changer for both developers and users as it allows you to easily compare differences between two elements.
-Not only that, but it also uses color to visually highlight all parameter variations, making it incredibly intuitive and user-friendly.
+Not only that, but it also uses colour to visually highlight all parameter variations, making it incredibly intuitive and user-friendly.
 Plus, you can view the similarity results of value comparisons between parameters from two elements.
 Stay tuned for more updates and get ready to experience a whole new level of efficiency with our latest addition to the Revit Add-in manager!
 
@@ -105,7 +105,7 @@ We already [mentioned](https://thebuildingcoder.typepad.com/blog/2022/07/immutab
 the [Revit database explorer RDBE](https://github.com/NeVeSpl/RevitDBExplorer) last year:
 
 > The fastest, most advanced, asynchronous Revit database exploration tool for Revit 2021+.
-Yet another [RevitLookup](https://github.com/jeremytammik/RevitLookup) like tool.
+Yet another [RevitLookup](https://github.com/jeremytammik/RevitLookup)-like tool.
 RevitLookup was indispensable to work with Revit API for many years.
 Now, there is a better tool for the job.
 Let me introduce RDBE and its capabilities.
