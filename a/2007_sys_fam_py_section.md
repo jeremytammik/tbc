@@ -21,10 +21,12 @@
 
 twitter:
 
- @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS
+Shed some light on family and section view creation, a system family predicate, level-based family template and creating section view in Python with @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS https://autode.sk/pythonsection
 
-
-&ndash; ...
+Today, we shed some light on family and section view creation
+&ndash; System family predicate
+&ndash; Level-based family template
+&ndash; Create section view in Python...
 
 linkedin:
 
