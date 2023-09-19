@@ -54,7 +54,7 @@
 
 twitter:
 
- @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS
+Exciting new and enhanced tools and libraries to check out: Revit element difference comparison, database explorer RDBE and the Shapely Python 2D geometry library in the @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS https://autode.sk/elementdiff
 
 Exciting new and enhanced tools and libraries to check out
 &ndash; Revit element difference comparison
