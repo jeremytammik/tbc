@@ -56,7 +56,11 @@ twitter:
 
  @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS
 
-&ndash; ...
+Exciting new and enhanced tools and libraries to check out
+&ndash; Revit element difference comparison
+&ndash; The Revit database explorer RDBE
+&ndash; The Shapely Python 2D geometry library
+&ndash; Measuring developer productivity...
 
 linkedin:
 
@@ -71,7 +75,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Element Diff, Shapely and RDBE
+### Element Diff Compare, Shapely and RDBE
 
 Exciting new and enhanced tools and libraries to check out:
 
@@ -113,7 +117,7 @@ RDBE not only allows us to explore database in a more efficient way thanks to qu
 
 It has undergone further enhancement since then.
 
-I was prompted to point it out again by the recommendation in a RevitLookup issue to use this alternative Revit database exploration tool that offers better access to Extensible Storage Schemata, cf. RDBE's extensive list of features:
+[NeVeS](https://github.com/NeVeSpl) points out that you can use this alternative Revit database exploration tool for better access to Extensible Storage Schemata, cf. RDBE's extensive list of features:
 
 - [Query Revit database](#query-revit-database-with-rdq-revit-database-querying)
 - [Script Revit database](#script-revit-database-with-rds-revit-database-scripting)
