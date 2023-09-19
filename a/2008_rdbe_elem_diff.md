@@ -132,20 +132,17 @@ I was prompted to point it out again by the recommendation in a RevitLookup issu
 
 ####<a name="4"></a> The Shapely Python 2D Geometry Library
 
+Jake of [Ripcord Engineering](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/3926242) recently
+shared a bunch of valuable [Python and gbXML tips](https://thebuildingcoder.typepad.com/blog/2023/07/export-gbxml-and-python-tips.html).
 Discussing a solution
-to [gbXML from adjacent conceptual mass missing small ???](https://forums.autodesk.com/t5/revit-api-forum/gbxml-from-adjacent-conceptual-mass-adjacent-space-missing-small/m-p/12238726),
-
-??? pointed out
-
-https://forums.autodesk.com/t5/revit-api-forum/gbxml-from-adjacent-conceptual-mass-adjacent-space-missing-small/m-p/12238726#M74138
-
-[Shapely](https://pypi.org/project/shapely/),
+to [gbXML from adjacent conceptual mass or space missing small surface](https://forums.autodesk.com/t5/revit-api-forum/gbxml-from-adjacent-conceptual-mass-adjacent-space-missing-small/m-p/12238726),
+he now added a pointer
+to [Shapely](https://pypi.org/project/shapely/),
 a powerful-looking Python 2D geometry library for manipulation and analysis of geometric objects in the Cartesian plane.
 For instance, it includes support for 2D Booleans
 and [set operations](https://shapely.readthedocs.io/en/stable/set_operations.html).
-
-In this context, the Python [xgbxml library](https://pypi.org/project/xgbxml/) will
-probably come in handy as well.
+In this context, the Python [xgbxml library](https://pypi.org/project/xgbxml/) looks
+like another very handy tool.
 
 ####<a name="5"></a> Measuring Developer Productivity
 
