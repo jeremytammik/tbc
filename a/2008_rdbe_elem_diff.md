@@ -180,6 +180,8 @@ Going in plan is to use polygons as defined by Space wall outlines as truth data
 Not sure how this will mesh with current Ripcord Engineering gbxml workflow.
 Time will tell.
 
+Many thanks to Jake for the great pointer and nice example.
+
 ####<a name="5"></a> Measuring Developer Productivity
 
 Dealing with programming teams in general, Dan North and Associates share some insights on how to measure developer productivity,
