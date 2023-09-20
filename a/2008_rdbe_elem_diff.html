@@ -149,6 +149,26 @@ For instance, it includes support for 2D Booleans
 and <a href="https://shapely.readthedocs.io/en/stable/set_operations.html">set operations</a>.
 In this context, the Python <a href="https://pypi.org/project/xgbxml/">xgbxml library</a> looks
 like another very handy tool.</p>
+<h4><a name="4.1"></a> Shapely Find and Fixes a Hole</h4>
+<p>Jake added: I'm happy to report <a href="https://shapely.readthedocs.io/en/stable/index.html">Shapely</a> was
+able to find a missing 'small' surface (hole) in the 'Mass' demo file attached
+to <a href="https://forums.autodesk.com/t5/revit-api-forum/gbxml-from-adjacent-conceptual-mass-adjacent-space-missing-small/m-p/12253611">this thread</a>. To find XY plane holes:</p>
+<ul>
+<li>Make Space surface polygons
+  with <a href="https://shapely.readthedocs.io/en/stable/reference/shapely.Polygon.html#shapely.Polygon">shapely.Polygon</a></li>
+<li>Make Space polygons from Space surface polygons
+  with <a href="https://shapely.readthedocs.io/en/stable/reference/shapely.union_all.html#shapely.union_all">shapely.union_all</a></li>
+<li>Make Level surface polygons from Space polygons
+  with <a href="https://shapely.readthedocs.io/en/stable/reference/shapely.union_all.html#shapely.union_all">shapely.union_all</a></li>
+<li>Ask shapely for
+  the <a href="https://shapely.readthedocs.io/en/stable/reference/shapely.Polygon.html#shapely.Polygon">'interiors' attribute</a> for
+  a sequence of rings which bound all existing holes in Level surface polygons.</li>
+</ul>
+<p>Next step is to correlate holes with Spaces.
+This is the trickier part in my opinion.
+Going in plan is to use polygons as defined by Space wall outlines as truth data.
+Not sure how this will mesh with current Ripcord Engineering gbxml workflow.
+Time will tell.</p>
 <h4><a name="5"></a> Measuring Developer Productivity</h4>
 <p>Dealing with programming teams in general, Dan North and Associates share some insights on how to measure developer productivity,
 describing <a href="https://dannorth.net/2023/09/02/the-worst-programmer/">the worst programmer I know</a>:</p>

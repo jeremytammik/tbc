@@ -157,6 +157,28 @@ and [set operations](https://shapely.readthedocs.io/en/stable/set_operations.htm
 In this context, the Python [xgbxml library](https://pypi.org/project/xgbxml/) looks
 like another very handy tool.
 
+####<a name="4.1"></a> Shapely Find and Fixes a Hole
+
+Jake added: I'm happy to report [Shapely](https://shapely.readthedocs.io/en/stable/index.html) was
+able to find a missing 'small' surface (hole) in the 'Mass' demo file attached
+to [this thread](https://forums.autodesk.com/t5/revit-api-forum/gbxml-from-adjacent-conceptual-mass-adjacent-space-missing-small/m-p/12253611). To find XY plane holes:
+
+- Make Space surface polygons
+  with [shapely.Polygon](https://shapely.readthedocs.io/en/stable/reference/shapely.Polygon.html#shapely.Polygon)
+- Make Space polygons from Space surface polygons
+  with [shapely.union_all](https://shapely.readthedocs.io/en/stable/reference/shapely.union_all.html#shapely.union_all)
+- Make Level surface polygons from Space polygons
+  with [shapely.union_all](https://shapely.readthedocs.io/en/stable/reference/shapely.union_all.html#shapely.union_all)
+- Ask shapely for
+  the ['interiors' attribute](https://shapely.readthedocs.io/en/stable/reference/shapely.Polygon.html#shapely.Polygon) for
+  a sequence of rings which bound all existing holes in Level surface polygons.
+
+Next step is to correlate holes with Spaces.
+This is the trickier part in my opinion.
+Going in plan is to use polygons as defined by Space wall outlines as truth data.
+Not sure how this will mesh with current Ripcord Engineering gbxml workflow.
+Time will tell.
+
 ####<a name="5"></a> Measuring Developer Productivity
 
 Dealing with programming teams in general, Dan North and Associates share some insights on how to measure developer productivity,
