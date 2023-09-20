@@ -91,6 +91,7 @@ Exciting new and enhanced tools and libraries to check out:
 - [Revit element difference comparison](#2)
 - [The Revit database explorer RDBE](#3)
 - [The Shapely Python 2D geometry library](#4)
+- [Shapely finds and fixes a hole](#4.1)
 - [Measuring developer productivity](#5)
 
 ####<a name="2"></a> Revit Element Difference Comparison
@@ -157,7 +158,7 @@ and [set operations](https://shapely.readthedocs.io/en/stable/set_operations.htm
 In this context, the Python [xgbxml library](https://pypi.org/project/xgbxml/) looks
 like another very handy tool.
 
-####<a name="4.1"></a> Shapely Find and Fixes a Hole
+####<a name="4.1"></a> Shapely Finds and Fixes a Hole
 
 Jake added: I'm happy to report [Shapely](https://shapely.readthedocs.io/en/stable/index.html) was
 able to find a missing 'small' surface (hole) in the 'Mass' demo file attached
