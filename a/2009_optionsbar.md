@@ -6,6 +6,17 @@
 
 <!---
 
+- OptionsBar
+  From: Роман
+  Hi Jeremy) I'm back from holiday, and I've written a new article. I think it can be published on the blog, many people will be interested in it.
+  Link to the post on LinkedIn: https://www.linkedin.com/feed/update/urn:li:activity:7109513543590289409
+  GitHub article: https://github.com/atomatiq/OptionsBar/blob/master/Readme.md
+  Raman Karpovich
+  Lead Developer
+  www.atomatiq.io
+  +48 517 989 812
+  ATOMATIQ SP ZOO. ul. Zygmunta Vogla, 28, lok. 02.63, 02-963 Warsaw, Poland. NIP: 9512571785
+
 - Lijuan Zhu: engines below will be REMOVED on 10/30/2023
   https://autodesk.slack.com/archives/C011QHANM8R/p1695262865665989
 
