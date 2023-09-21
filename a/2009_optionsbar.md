@@ -13,7 +13,7 @@
   GitHub article: https://github.com/atomatiq/OptionsBar/blob/master/Readme.md
   Raman Karpovich
   Lead Developer
-  www.atomatiq.io
+  http://www.atomatiq.io
   +48 517 989 812
   ATOMATIQ SP ZOO. ul. Zygmunta Vogla, 28, lok. 02.63, 02-963 Warsaw, Poland. NIP: 9512571785
 
@@ -44,6 +44,26 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 
 ####<a name="2"></a> Open Source OptionsBar
+
+
+  Hi Jeremy) I'm back from holiday, and I've written a new article. I think it can be published on the blog, many people will be interested in it.
+  Link to the post on LinkedIn: https://www.linkedin.com/feed/update/urn:li:activity:7109513543590289409
+  GitHub article: https://github.com/atomatiq/OptionsBar/blob/master/Readme.md
+
+
+
+🚀 Boosting Revit Efficiency with OptionsBar! 🏗️
+
+Did you know that Revit provides a powerful tool to enhance your workflow? Introducing OptionsBar - a convenient toolbar simplifying the addition of custom tools, options, and extra information.
+
+With OptionsBar, you can:
+
+✅ Add custom tools to the ribbon.
+✅ Fine-tune model element parameters in real-time.
+✅ Streamline the process of selecting elements in your model.
+✅ Create unique user interfaces for Revit.
+
+Want to learn more? Check out the in-depth article on OptionsBar and how to set it up on GitHub:
 
 
 
@@ -79,4 +99,18 @@ In general, the following rules apply:
 - All attempts to reference a removed engine version will fail.
 
 So, in the case of Revit, please take heed if you are still using the Revit 2018 engine in DA4R and update to a more recent version before the end of next month.
+
+####<a name="4"></a> Method Draw Online SVG Editor
+
+I keep looking for a handy online vector editor that enables precise measurement, e.g., for creating a simple 2D work sketch with exact millimetre dimensions for a carpentry project.
+
+I found a new likely candidate now, [Method Draw](https://editor.method.ac):
+
+> Method Draw is a simple <a href="https://github.com/methodofaction/Method-Draw">open source</a> vector drawing application. Method Draw was forked from <a href="https://github.com/SVG-Edit/svgedit">SVG-Edit</a> several years ago with the goal of improving and modernizing the interface.
+
+> At this time (2021), the author (<a href="http://method.ac/writing">Mark MacKay</a>) is working on improving stability and improving the codebase, which contains a lot of legacy practices. The goal is to create a vector editor suitable for simple graphic design tasks.
+
+I'll let you know how I get on with that.
+If you have a recommendation, please let me know.
+Thx!
 
