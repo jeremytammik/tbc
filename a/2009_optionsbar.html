@@ -40,7 +40,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 -->
 
 <h3>OptionsBar and Bye Bye to DA4R 2018</h3>
-<p>A great new open source productivity enhancement tool and a reminder on the deprecated DA4R Revit engine:</p>
+<p>A great new open source productivity enhancement tool and a reminder of the deprecated DA4R Revit engine:</p>
 <ul>
 <li><a href="#2">Open source OptionsBar</a><ul>
 <li><a href="#2.1">Introduction</a></li>
@@ -110,66 +110,66 @@ Instead, we simply hide it and display our custom panel when necessary.</p>
 <pre class="prettyprint lang-cs">
 public static class RibbonController
 {
-    private static readonly Grid RootGrid;
-    private static ContentPresenter _panelPresenter;
-    private static readonly FrameworkElement InternalToolPanel;
+  private static readonly Grid RootGrid;
+  private static ContentPresenter _panelPresenter;
+  private static readonly FrameworkElement InternalToolPanel;
 
-    static RibbonController()
+  static RibbonController()
+  {
+    RootGrid = VisualUtils.FindVisualParent&lt;Grid&gt;(ComponentManager.Ribbon, "rootGrid");
+    if (RootGrid is null) throw new InvalidOperationException("Cannot find root grid in Revit UI");
+
+    InternalToolPanel = VisualUtils.FindVisualChild&lt;DialogBarControl&gt;(RootGrid, string.Empty);
+    if (InternalToolPanel is null) throw new InvalidOperationException("Cannot find internal tool panel in Revit UI");
+  }
+
+  public static void ShowOptionsBar(FrameworkElement content)
+  {
+    if (_panelPresenter is not null)
     {
-        RootGrid = VisualUtils.FindVisualParent&lt;Grid&gt;(ComponentManager.Ribbon, "rootGrid");
-        if (RootGrid is null) throw new InvalidOperationException("Cannot find root grid in Revit UI");
-
-        InternalToolPanel = VisualUtils.FindVisualChild&lt;DialogBarControl&gt;(RootGrid, string.Empty);
-        if (InternalToolPanel is null) throw new InvalidOperationException("Cannot find internal tool panel in Revit UI");
+      _panelPresenter.Content = content;
+      _panelPresenter.Visibility = Visibility.Visible;
+      InternalToolPanel.Height = 0;
+      return;
     }
 
-    public static void ShowOptionsBar(FrameworkElement content)
+    _panelPresenter = CreateOptionsBar();
+    _panelPresenter.Content = content;
+
+    InternalToolPanel.Height = 0;
+  }
+
+  public static void HideOptionsBar()
+  {
+    if (_panelPresenter is null) return;
+
+    _panelPresenter.Content = null;
+    _panelPresenter.Visibility = Visibility.Collapsed;
+
+    InternalToolPanel.Height = 26;
+  }
+
+  private static ContentPresenter CreateOptionsBar()
+  {
+    const int panelRow = 2;
+
+    RootGrid.RowDefinitions.Insert(2, new RowDefinition
     {
-        if (_panelPresenter is not null)
-        {
-            _panelPresenter.Content = content;
-            _panelPresenter.Visibility = Visibility.Visible;
-            InternalToolPanel.Height = 0;
-            return;
-        }
+      Height = new GridLength(1, GridUnitType.Auto)
+    });
 
-        _panelPresenter = CreateOptionsBar();
-        _panelPresenter.Content = content;
-
-        InternalToolPanel.Height = 0;
+    foreach (UIElement child in RootGrid.Children)
+    {
+      var row = Grid.GetRow(child);
+      if (row &gt; 1) Grid.SetRow(child, row + 1);
     }
 
-    public static void HideOptionsBar()
-    {
-        if (_panelPresenter is null) return;
+    var panelPresenter = new ContentPresenter();
+    Grid.SetRow(panelPresenter, panelRow);
+    RootGrid.Children.Add(panelPresenter);
 
-        _panelPresenter.Content = null;
-        _panelPresenter.Visibility = Visibility.Collapsed;
-
-        InternalToolPanel.Height = 26;
-    }
-
-    private static ContentPresenter CreateOptionsBar()
-    {
-        const int panelRow = 2;
-
-        RootGrid.RowDefinitions.Insert(2, new RowDefinition
-        {
-            Height = new GridLength(1, GridUnitType.Auto)
-        });
-
-        foreach (UIElement child in RootGrid.Children)
-        {
-            var row = Grid.GetRow(child);
-            if (row &gt; 1) Grid.SetRow(child, row + 1);
-        }
-
-        var panelPresenter = new ContentPresenter();
-        Grid.SetRow(panelPresenter, panelRow);
-        RootGrid.Children.Add(panelPresenter);
-
-        return panelPresenter;
-    }
+    return panelPresenter;
+  }
 }
 </pre>
 
@@ -182,46 +182,46 @@ The <code>ShowOptionsBar()</code> method takes any FrameworkElement, which will 
 <p><img alt="" src="https://github.com/Nice3point/OptionsBar/assets/20504884/3932ef5f-82e0-4b59-bc61-b95aef6199c8" /></p>
 <pre class="prettyprint lang-xml">
 <StackPanel
-        x:Class="OptionsBar.Views.OptionsView"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:viewModels="clr-namespace:OptionsBar.ViewModels"
-        d:DataContext="{d:DesignInstance Type=viewModels:OptionsViewModel}"
-        mc:Ignorable="d"
-        Background="#FFE5F0D7"
-        Orientation="Horizontal"
-        Height="26"
-        d:DesignWidth="430">
-    <TextBlock
-            Margin="10 0 0 0"
-            Text="Wall options"
-            VerticalAlignment="Center" />
-    <Border
-            Width="3"
-            BorderThickness="1 0"
-            BorderBrush="Azure"
-            Background="Gray"
-            Margin="10 0" />
-    <TextBlock
-            Text="Offset: "
-            VerticalAlignment="Center" />
-    <TextBox
-            Width="100"
-            Margin="10 1 0 1"
-            VerticalContentAlignment="Center"
-            Text="{Binding Offset, UpdateSourceTrigger=PropertyChanged}" />
-    <TextBlock
-            Text="Constraint: "
-            Margin="10 0 0 0"
-            VerticalAlignment="Center" />
-    <ComboBox
-            Width="100"
-            Margin="10 1 0 1"
-            VerticalContentAlignment="Center"
-            SelectedIndex="0"
-            ItemsSource="{Binding Constraints}" />
+    x:Class="OptionsBar.Views.OptionsView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:viewModels="clr-namespace:OptionsBar.ViewModels"
+    d:DataContext="{d:DesignInstance Type=viewModels:OptionsViewModel}"
+    mc:Ignorable="d"
+    Background="#FFE5F0D7"
+    Orientation="Horizontal"
+    Height="26"
+    d:DesignWidth="430">
+  <TextBlock
+    Margin="10 0 0 0"
+    Text="Wall options"
+    VerticalAlignment="Center" />
+  <Border
+    Width="3"
+    BorderThickness="1 0"
+    BorderBrush="Azure"
+    Background="Gray"
+    Margin="10 0" />
+  <TextBlock
+    Text="Offset: "
+    VerticalAlignment="Center" />
+  <TextBox
+    Width="100"
+    Margin="10 1 0 1"
+    VerticalContentAlignment="Center"
+    Text="{Binding Offset, UpdateSourceTrigger=PropertyChanged}" />
+  <TextBlock
+    Text="Constraint: "
+    Margin="10 0 0 0"
+    VerticalAlignment="Center" />
+  <ComboBox
+    Width="100"
+    Margin="10 1 0 1"
+    VerticalContentAlignment="Center"
+    SelectedIndex="0"
+    ItemsSource="{Binding Constraints}" />
 </StackPanel>
 </pre>
 
@@ -229,8 +229,8 @@ The <code>ShowOptionsBar()</code> method takes any FrameworkElement, which will 
 <pre class="prettyprint lang-cs">
 public partial class OptionsViewModel : ObservableObject
 {
-    [ObservableProperty] private double _offset;
-    [ObservableProperty] private string[] _constraints;
+  [ObservableProperty] private double _offset;
+  [ObservableProperty] private string[] _constraints;
 }
 </pre>
 
@@ -253,71 +253,77 @@ For more convenient and intuitive parameter customization, you can use OptionsBa
 <p>The first step in this scenario is to set up OptionsBar for display on the Revit ribbon.
   You can create your own view for OptionsBar with parameters that the user can customize.</p>
 <p>Example code using the MVVM pattern:</p>
-<pre><code>```C#
-private OptionsViewModel SetupOptionsBar()
-{
+<pre class="prettyprint lang-cs">
+  private OptionsViewModel SetupOptionsBar()
+  {
     var options = new OptionsViewModel
     {
-        Offset = 0,
-        Constraints = Document.EnumerateInstances&lt;Level&gt;(BuiltInCategory.OST_Levels).Select(level =&gt; level.Name).ToArray()
+      Offset = 0,
+      Constraints = Document.EnumerateInstances&lt;Level&gt;(BuiltInCategory.OST_Levels).Select(level => level.Name).ToArray()
     };
 
     var view = new OptionsView(options);
     RibbonController.ShowOptionsBar(view);
     return options;
-}
-```
-</code></pre>
+  }
+</pre>
+
 <ul>
 <li>Step 2: Selecting an Element</li>
 </ul>
 <p>After configuring OptionsBar, the user selects an element in the model with which they want to work.
   This could be, for example, selecting a wall to adjust the offset.</p>
 <p>Example code for element selection:</p>
-<p><code>C#
+<pre class="prettyprint lang-cs">
   private Wall PickWall()
   {
-      var selectionConfiguration = new SelectionConfiguration().Allow.Element(selection =&gt; selection is Wall);
-      var reference = UiDocument.Selection.PickObject(ObjectType.Element, selectionConfiguration.Filter, "Select wall");
-      return reference.ElementId.ToElement&lt;Wall&gt;(Document);
-  }</code></p>
+    var selectionConfiguration = new SelectionConfiguration().Allow.Element(selection => selection is Wall);
+    var reference = UiDocument.Selection.PickObject(ObjectType.Element, selectionConfiguration.Filter, "Select wall");
+    return reference.ElementId.ToElement&lt;Wall&gt;(Document);
+  }
+</pre>
+
 <ul>
 <li>Step 3: Adjusting Element Parameters</li>
 </ul>
 <p>Now that the user has selected an element and OptionsBar is configured, you can start adjusting the element's parameters.
   We'll take the offset value from the ViewModel entered by the user and set it to the wall parameter.</p>
 <p>Example code for adjusting element parameters:</p>
-<p><code>C#
+<pre class="prettyprint lang-cs">
   private void ModifyWall(Wall wall, OptionsViewModel options)
   {
-      using var transaction = new Transaction(Document);
-      transaction.Start("Set offset");
-      wall.GetParameter(BuiltInParameter.WALL_TOP_OFFSET)!.Set(options.Offset);
-      transaction.Commit();
-  }</code></p>
+    using var transaction = new Transaction(Document);
+    transaction.Start("Set offset");
+    wall.GetParameter(BuiltInParameter.WALL_TOP_OFFSET)!.Set(options.Offset);
+    transaction.Commit();
+  }
+</pre>
+
 <ul>
 <li>Step 4: Restoring the Revit Ribbon</li>
 </ul>
 <p>After completing the element parameter configuration, it's important to hide OptionsBar and restore the normal state of the Revit ribbon.
   To do this, add a <code>finally</code> block after calling all the methods.</p>
-<p><code>C#
+<pre class="prettyprint lang-cs">
   public override void Execute()
   {
-      try
-      {
-          var options = SetupOptionsBar();
-          var wall = PickWall();
-          ModifyWall(wall, options);
-      }
-      catch (OperationCanceledException)
-      {
-          // ignored
-      }
-      finally
-      {
-          RibbonController.HideOptionsBar();
-      }
-  }</code></p>
+    try
+    {
+      var options = SetupOptionsBar();
+      var wall = PickWall();
+      ModifyWall(wall, options);
+    }
+    catch (OperationCanceledException)
+    {
+      // ignored
+    }
+    finally
+    {
+      RibbonController.HideOptionsBar();
+    }
+  }
+</pre>
+
 <p>This scenario allows users to quickly and conveniently customize the parameters of model elements without the need to open additional windows or perform extra actions.
   OptionsBar makes the process of editing elements more intuitive and efficient.</p>
 <h4><a name="2.3.3"></a> Use Case 3: Marquee</h4>
