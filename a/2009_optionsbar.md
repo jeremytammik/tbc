@@ -42,6 +42,17 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### OptionsBar and Bye Bye to DA4R 2018
 
+A great new open source productivity enhancement tool and a reminder of the deprecated DA4R Revit engine:
+
+- [Open source OptionsBar](#2)
+    - [Introduction](#2.1)
+    - [Configuring OptionsBar step by step](#2.2.0)
+    - [Use case 1: utilities](#2.3.1)
+    - [Use case 2: element selection options](#2.3.2)
+    - [Use case 3: marquee](#2.3.3)
+    - [Conclusion](#2.4)
+- [Bye bye DA4R 2018](#3)
+- [Method Draw online SVG editor](#4)
 
 ####<a name="2"></a> Open Source OptionsBar
 
@@ -113,66 +124,66 @@ Let's take a look at a code example that allows displaying and hiding the custom
 <pre class="prettyprint lang-cs">
 public static class RibbonController
 {
-    private static readonly Grid RootGrid;
-    private static ContentPresenter _panelPresenter;
-    private static readonly FrameworkElement InternalToolPanel;
+  private static readonly Grid RootGrid;
+  private static ContentPresenter _panelPresenter;
+  private static readonly FrameworkElement InternalToolPanel;
 
-    static RibbonController()
+  static RibbonController()
+  {
+    RootGrid = VisualUtils.FindVisualParent&lt;Grid&gt;(ComponentManager.Ribbon, "rootGrid");
+    if (RootGrid is null) throw new InvalidOperationException("Cannot find root grid in Revit UI");
+
+    InternalToolPanel = VisualUtils.FindVisualChild&lt;DialogBarControl&gt;(RootGrid, string.Empty);
+    if (InternalToolPanel is null) throw new InvalidOperationException("Cannot find internal tool panel in Revit UI");
+  }
+
+  public static void ShowOptionsBar(FrameworkElement content)
+  {
+    if (_panelPresenter is not null)
     {
-        RootGrid = VisualUtils.FindVisualParent&lt;Grid&gt;(ComponentManager.Ribbon, "rootGrid");
-        if (RootGrid is null) throw new InvalidOperationException("Cannot find root grid in Revit UI");
-
-        InternalToolPanel = VisualUtils.FindVisualChild&lt;DialogBarControl&gt;(RootGrid, string.Empty);
-        if (InternalToolPanel is null) throw new InvalidOperationException("Cannot find internal tool panel in Revit UI");
+      _panelPresenter.Content = content;
+      _panelPresenter.Visibility = Visibility.Visible;
+      InternalToolPanel.Height = 0;
+      return;
     }
 
-    public static void ShowOptionsBar(FrameworkElement content)
+    _panelPresenter = CreateOptionsBar();
+    _panelPresenter.Content = content;
+
+    InternalToolPanel.Height = 0;
+  }
+
+  public static void HideOptionsBar()
+  {
+    if (_panelPresenter is null) return;
+
+    _panelPresenter.Content = null;
+    _panelPresenter.Visibility = Visibility.Collapsed;
+
+    InternalToolPanel.Height = 26;
+  }
+
+  private static ContentPresenter CreateOptionsBar()
+  {
+    const int panelRow = 2;
+
+    RootGrid.RowDefinitions.Insert(2, new RowDefinition
     {
-        if (_panelPresenter is not null)
-        {
-            _panelPresenter.Content = content;
-            _panelPresenter.Visibility = Visibility.Visible;
-            InternalToolPanel.Height = 0;
-            return;
-        }
+      Height = new GridLength(1, GridUnitType.Auto)
+    });
 
-        _panelPresenter = CreateOptionsBar();
-        _panelPresenter.Content = content;
-
-        InternalToolPanel.Height = 0;
+    foreach (UIElement child in RootGrid.Children)
+    {
+      var row = Grid.GetRow(child);
+      if (row &gt; 1) Grid.SetRow(child, row + 1);
     }
 
-    public static void HideOptionsBar()
-    {
-        if (_panelPresenter is null) return;
+    var panelPresenter = new ContentPresenter();
+    Grid.SetRow(panelPresenter, panelRow);
+    RootGrid.Children.Add(panelPresenter);
 
-        _panelPresenter.Content = null;
-        _panelPresenter.Visibility = Visibility.Collapsed;
-
-        InternalToolPanel.Height = 26;
-    }
-
-    private static ContentPresenter CreateOptionsBar()
-    {
-        const int panelRow = 2;
-
-        RootGrid.RowDefinitions.Insert(2, new RowDefinition
-        {
-            Height = new GridLength(1, GridUnitType.Auto)
-        });
-
-        foreach (UIElement child in RootGrid.Children)
-        {
-            var row = Grid.GetRow(child);
-            if (row &gt; 1) Grid.SetRow(child, row + 1);
-        }
-
-        var panelPresenter = new ContentPresenter();
-        Grid.SetRow(panelPresenter, panelRow);
-        RootGrid.Children.Add(panelPresenter);
-
-        return panelPresenter;
-    }
+    return panelPresenter;
+  }
 }
 </pre>
 
@@ -190,46 +201,46 @@ For example, let's consider a simple panel layout with a text field and a dropdo
 
 <pre class="prettyprint lang-xml">
 <StackPanel
-        x:Class="OptionsBar.Views.OptionsView"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:viewModels="clr-namespace:OptionsBar.ViewModels"
-        d:DataContext="{d:DesignInstance Type=viewModels:OptionsViewModel}"
-        mc:Ignorable="d"
-        Background="#FFE5F0D7"
-        Orientation="Horizontal"
-        Height="26"
-        d:DesignWidth="430">
-    <TextBlock
-            Margin="10 0 0 0"
-            Text="Wall options"
-            VerticalAlignment="Center" />
-    <Border
-            Width="3"
-            BorderThickness="1 0"
-            BorderBrush="Azure"
-            Background="Gray"
-            Margin="10 0" />
-    <TextBlock
-            Text="Offset: "
-            VerticalAlignment="Center" />
-    <TextBox
-            Width="100"
-            Margin="10 1 0 1"
-            VerticalContentAlignment="Center"
-            Text="{Binding Offset, UpdateSourceTrigger=PropertyChanged}" />
-    <TextBlock
-            Text="Constraint: "
-            Margin="10 0 0 0"
-            VerticalAlignment="Center" />
-    <ComboBox
-            Width="100"
-            Margin="10 1 0 1"
-            VerticalContentAlignment="Center"
-            SelectedIndex="0"
-            ItemsSource="{Binding Constraints}" />
+    x:Class="OptionsBar.Views.OptionsView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:viewModels="clr-namespace:OptionsBar.ViewModels"
+    d:DataContext="{d:DesignInstance Type=viewModels:OptionsViewModel}"
+    mc:Ignorable="d"
+    Background="#FFE5F0D7"
+    Orientation="Horizontal"
+    Height="26"
+    d:DesignWidth="430">
+  <TextBlock
+    Margin="10 0 0 0"
+    Text="Wall options"
+    VerticalAlignment="Center" />
+  <Border
+    Width="3"
+    BorderThickness="1 0"
+    BorderBrush="Azure"
+    Background="Gray"
+    Margin="10 0" />
+  <TextBlock
+    Text="Offset: "
+    VerticalAlignment="Center" />
+  <TextBox
+    Width="100"
+    Margin="10 1 0 1"
+    VerticalContentAlignment="Center"
+    Text="{Binding Offset, UpdateSourceTrigger=PropertyChanged}" />
+  <TextBlock
+    Text="Constraint: "
+    Margin="10 0 0 0"
+    VerticalAlignment="Center" />
+  <ComboBox
+    Width="100"
+    Margin="10 1 0 1"
+    VerticalContentAlignment="Center"
+    SelectedIndex="0"
+    ItemsSource="{Binding Constraints}" />
 </StackPanel>
 </pre>
 
@@ -238,8 +249,8 @@ Sample code for the ViewModel:
 <pre class="prettyprint lang-cs">
 public partial class OptionsViewModel : ObservableObject
 {
-    [ObservableProperty] private double _offset;
-    [ObservableProperty] private string[] _constraints;
+  [ObservableProperty] private double _offset;
+  [ObservableProperty] private string[] _constraints;
 }
 </pre>
 
@@ -273,20 +284,20 @@ Example: Suppose you have a plugin that allows users to adjust the top offset of
 
   Example code using the MVVM pattern:
 
-    ```C#
-    private OptionsViewModel SetupOptionsBar()
+<pre class="prettyprint lang-cs">
+  private OptionsViewModel SetupOptionsBar()
+  {
+    var options = new OptionsViewModel
     {
-        var options = new OptionsViewModel
-        {
-            Offset = 0,
-            Constraints = Document.EnumerateInstances<Level>(BuiltInCategory.OST_Levels).Select(level => level.Name).ToArray()
-        };
+      Offset = 0,
+      Constraints = Document.EnumerateInstances&lt;Level&gt;(BuiltInCategory.OST_Levels).Select(level => level.Name).ToArray()
+    };
 
-        var view = new OptionsView(options);
-        RibbonController.ShowOptionsBar(view);
-        return options;
-    }
-    ```
+    var view = new OptionsView(options);
+    RibbonController.ShowOptionsBar(view);
+    return options;
+  }
+</pre>
 
 - Step 2: Selecting an Element
 
@@ -295,14 +306,14 @@ Example: Suppose you have a plugin that allows users to adjust the top offset of
 
   Example code for element selection:
 
-  ```C#
+<pre class="prettyprint lang-cs">
   private Wall PickWall()
   {
-      var selectionConfiguration = new SelectionConfiguration().Allow.Element(selection => selection is Wall);
-      var reference = UiDocument.Selection.PickObject(ObjectType.Element, selectionConfiguration.Filter, "Select wall");
-      return reference.ElementId.ToElement<Wall>(Document);
+    var selectionConfiguration = new SelectionConfiguration().Allow.Element(selection => selection is Wall);
+    var reference = UiDocument.Selection.PickObject(ObjectType.Element, selectionConfiguration.Filter, "Select wall");
+    return reference.ElementId.ToElement&lt;Wall&gt;(Document);
   }
-  ```
+</pre>
 
 - Step 3: Adjusting Element Parameters
 
@@ -311,40 +322,40 @@ Example: Suppose you have a plugin that allows users to adjust the top offset of
 
   Example code for adjusting element parameters:
 
-  ```C#
+<pre class="prettyprint lang-cs">
   private void ModifyWall(Wall wall, OptionsViewModel options)
   {
-      using var transaction = new Transaction(Document);
-      transaction.Start("Set offset");
-      wall.GetParameter(BuiltInParameter.WALL_TOP_OFFSET)!.Set(options.Offset);
-      transaction.Commit();
+    using var transaction = new Transaction(Document);
+    transaction.Start("Set offset");
+    wall.GetParameter(BuiltInParameter.WALL_TOP_OFFSET)!.Set(options.Offset);
+    transaction.Commit();
   }
-  ```
+</pre>
 
 - Step 4: Restoring the Revit Ribbon
 
   After completing the element parameter configuration, it's important to hide OptionsBar and restore the normal state of the Revit ribbon.
   To do this, add a `finally` block after calling all the methods.
 
-  ```C#
+<pre class="prettyprint lang-cs">
   public override void Execute()
   {
-      try
-      {
-          var options = SetupOptionsBar();
-          var wall = PickWall();
-          ModifyWall(wall, options);
-      }
-      catch (OperationCanceledException)
-      {
-          // ignored
-      }
-      finally
-      {
-          RibbonController.HideOptionsBar();
-      }
+    try
+    {
+      var options = SetupOptionsBar();
+      var wall = PickWall();
+      ModifyWall(wall, options);
+    }
+    catch (OperationCanceledException)
+    {
+      // ignored
+    }
+    finally
+    {
+      RibbonController.HideOptionsBar();
+    }
   }
-  ```
+</pre>
 
   This scenario allows users to quickly and conveniently customize the parameters of model elements without the need to open additional windows or perform extra actions.
   OptionsBar makes the process of editing elements more intuitive and efficient.
@@ -402,10 +413,4 @@ I found a new likely candidate now, [Method Draw](https://editor.method.ac):
 I'll let you know how I get on with that.
 If you have a recommendation, please let me know.
 Thx!
-
-
-
-<center>
-<img src="img/.png" alt="" title="" width="100"/> <!-- Pixel Height: 588 Pixel Width: 1,336 -->
-</center>
 
