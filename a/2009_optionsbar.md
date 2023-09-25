@@ -197,7 +197,10 @@ To create a user interface for OptionsBar, we'll use the MVVM (Model-View-ViewMo
 
 For example, let's consider a simple panel layout with a text field and a dropdown list:
 
-![](https://github.com/Nice3point/OptionsBar/assets/20504884/3932ef5f-82e0-4b59-bc61-b95aef6199c8)
+<center>
+<!-- https://github.com/Nice3point/OptionsBar/assets/20504884/3932ef5f-82e0-4b59-bc61-b95aef6199c8 -->
+<img src="img/rk_optionsbar_2.jpg" alt="OptionsBar" title="OptionsBar" width="600"/>
+</center>
 
 <pre class="prettyprint lang-xml">
 &lt;StackPanel
@@ -266,7 +269,10 @@ Let's explore some of the most popular use cases:
 OptionsBar can be used to add custom tools that can be conveniently placed on the toolbar.
 This is especially useful when creating a separate window is unnecessary.
 
-![изображение](https://github.com/Nice3point/OptionsBar/assets/20504884/10cafa43-8255-49ba-b764-7c5c0be2340a)
+<center>
+<!-- https://github.com/Nice3point/OptionsBar/assets/20504884/3932ef5f-82e0-4b59-bc61-b95aef6199c8 -->
+<img src="img/rk_optionsbar_3.jpg" alt="OptionsBar" title="OptionsBar" width="600"/>
+</center>
 
 ####<a name="2.3.2"></a> Use Case 2: Element Selection Options
 
@@ -275,7 +281,10 @@ For more convenient and intuitive parameter customization, you can use OptionsBa
 
 Example: Suppose you have a plugin that allows users to adjust the top offset of a wall. Let's see how to arrange all the tools on the OptionsBar panel.
 
-![изображение](https://github.com/Nice3point/OptionsBar/assets/20504884/65a508ce-2f9c-414d-80b3-f996b5e679d6)
+<center>
+<!-- https://github.com/Nice3point/OptionsBar/assets/20504884/65a508ce-2f9c-414d-80b3-f996b5e679d6 -->
+<img src="img/rk_optionsbar_4.jpg" alt="OptionsBar" title="OptionsBar" width="600"/>
+</center>
 
 - Step 1: Adding OptionsBar to the Revit Ribbon
 
@@ -364,7 +373,10 @@ Example: Suppose you have a plugin that allows users to adjust the top offset of
 
 Want something unusual? A marquee can add excitement to your mundane modeling routine.
 
-![](https://github.com/Nice3point/OptionsBar/assets/20504884/9427569b-1cce-41c8-a1f5-e88bea4c8683)
+<center>
+<!-- https://github.com/Nice3point/OptionsBar/assets/20504884/9427569b-1cce-41c8-a1f5-e88bea4c8683 -->
+<img src="img/rk_optionsbar_5.gif" alt="OptionsBar" title="OptionsBar" width="600"/>
+</center>
 
 ####<a name="2.4"></a> Conclusion
 
