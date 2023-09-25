@@ -24,6 +24,15 @@ twitter:
 
  the @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS
 
+A great new open-source productivity enhancement tool making use of the built-in OptionsBar provides handy access to frequently used , and a reminder of the deprecated DA4R Revit engine
+
+    - [Use case 1: utilities](#2.3.1)
+    - [Use case 2: element selection options](#2.3.2)
+    - [Use case 3: marquee](#2.3.3)
+    - [Conclusion](#2.4)
+- [Bye bye DA4R 2018](#3)
+- [Method Draw online SVG editor](#4)
+
 &ndash; ...
 
 linkedin:
@@ -44,7 +53,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 A great new open-source productivity enhancement tool and a reminder of the deprecated DA4R Revit engine:
 
-- [Open source OptionsBar](#2)
+- [Open-source OptionsBar](#2)
     - [Introduction](#2.1)
     - [Configuring OptionsBar step by step](#2.2.0)
     - [Use case 1: utilities](#2.3.1)
@@ -54,7 +63,7 @@ A great new open-source productivity enhancement tool and a reminder of the depr
 - [Bye bye DA4R 2018](#3)
 - [Method Draw online SVG editor](#4)
 
-####<a name="2"></a> Open Source OptionsBar
+####<a name="2"></a> Open-Source OptionsBar
 
 Raman Karpovich, aka Роман Карпович, is sharing a great new open-source Revit user interface enhancement enabling programmatic use of the options bar:
 
@@ -418,7 +427,7 @@ I keep looking for a handy online vector editor that enables precise measurement
 
 I found a new likely candidate now, [Method Draw](https://editor.method.ac):
 
-> Method Draw is a simple <a href="https://github.com/methodofaction/Method-Draw">open source</a> vector drawing application. Method Draw was forked from <a href="https://github.com/SVG-Edit/svgedit">SVG-Edit</a> several years ago with the goal of improving and modernizing the interface.
+> [Method Draw](https://editor.method.ac) is a simple <a href="https://github.com/methodofaction/Method-Draw">open source</a> vector drawing application. Method Draw was forked from <a href="https://github.com/SVG-Edit/svgedit">SVG-Edit</a> several years ago with the goal of improving and modernizing the interface.
 
 > At this time (2021), the author (<a href="http://method.ac/writing">Mark MacKay</a>) is working on improving stability and improving the codebase, which contains a lot of legacy practices. The goal is to create a vector editor suitable for simple graphic design tasks.
 
