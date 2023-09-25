@@ -90,9 +90,9 @@ However, the Revit API documentation doesn't offer sufficient information on ful
 For this, we'll need the <code>AdWindows.dll</code> library, which comes with Revit.</p>
 <p>To compile the project on any device, let's add a NuGet package to the <code>.csproj</code> project file as follows:</p>
 <pre class="prettyprint lang-xml">
-<ItemGroup>
-    <PackageReference Include="Nice3point.Revit.Api.AdWindows" Version="$(RevitVersion).*"/>
-</ItemGroup>
+&lt;ItemGroup&gt;
+    &lt;PackageReference Include="Nice3point.Revit.Api.AdWindows" Version="$(RevitVersion).*"/&gt;
+&lt;/ItemGroup&gt;
 </pre>
 
 <h4><a name="2.2.2"></a> Step 2: Creating a Controller</h4>
@@ -181,7 +181,7 @@ The <code>ShowOptionsBar()</code> method takes any FrameworkElement, which will 
 <p>For example, let's consider a simple panel layout with a text field and a dropdown list:</p>
 <p><img alt="" src="https://github.com/Nice3point/OptionsBar/assets/20504884/3932ef5f-82e0-4b59-bc61-b95aef6199c8" /></p>
 <pre class="prettyprint lang-xml">
-<StackPanel
+&lt;StackPanel
     x:Class="OptionsBar.Views.OptionsView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -193,36 +193,36 @@ The <code>ShowOptionsBar()</code> method takes any FrameworkElement, which will 
     Background="#FFE5F0D7"
     Orientation="Horizontal"
     Height="26"
-    d:DesignWidth="430">
-  <TextBlock
+    d:DesignWidth="430"&gt;
+  &lt;TextBlock
     Margin="10 0 0 0"
     Text="Wall options"
-    VerticalAlignment="Center" />
-  <Border
+    VerticalAlignment="Center" /&gt;
+  &lt;Border
     Width="3"
     BorderThickness="1 0"
     BorderBrush="Azure"
     Background="Gray"
-    Margin="10 0" />
-  <TextBlock
+    Margin="10 0" /&gt;
+  &lt;TextBlock
     Text="Offset: "
-    VerticalAlignment="Center" />
-  <TextBox
+    VerticalAlignment="Center" /&gt;
+  &lt;TextBox
     Width="100"
     Margin="10 1 0 1"
     VerticalContentAlignment="Center"
-    Text="{Binding Offset, UpdateSourceTrigger=PropertyChanged}" />
-  <TextBlock
+    Text="{Binding Offset, UpdateSourceTrigger=PropertyChanged}" /&gt;
+  &lt;TextBlock
     Text="Constraint: "
     Margin="10 0 0 0"
-    VerticalAlignment="Center" />
-  <ComboBox
+    VerticalAlignment="Center" /&gt;
+  &lt;ComboBox
     Width="100"
     Margin="10 1 0 1"
     VerticalContentAlignment="Center"
     SelectedIndex="0"
-    ItemsSource="{Binding Constraints}" />
-</StackPanel>
+    ItemsSource="{Binding Constraints}" /&gt;
+&lt;/StackPanel&gt;
 </pre>
 
 <p>Sample code for the ViewModel:</p>
