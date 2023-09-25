@@ -42,7 +42,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### OptionsBar and Bye Bye to DA4R 2018
 
-A great new open source productivity enhancement tool and a reminder of the deprecated DA4R Revit engine:
+A great new open-source productivity enhancement tool and a reminder of the deprecated DA4R Revit engine:
 
 - [Open source OptionsBar](#2)
     - [Introduction](#2.1)
@@ -56,7 +56,7 @@ A great new open source productivity enhancement tool and a reminder of the depr
 
 ####<a name="2"></a> Open Source OptionsBar
 
-Raman Karpovich, aka Роман Карпович, is sharing a great new open source Revit user interface enhancement enabling programmatic use of the options bar:
+Raman Karpovich, aka Роман Карпович, is sharing a great new open-source Revit user interface enhancement enabling programmatic use of the options bar:
 
 - [Post on LinkedIn](https://www.linkedin.com/feed/update/urn:li:activity:7109513543590289409)
 - [GitHub article](https://github.com/atomatiq/OptionsBar/blob/master/Readme.md)
@@ -73,7 +73,7 @@ Enhance the user experience and boost Revit efficiency with `OptionsBar`, a powe
 
 ####<a name="2.1"></a> Introduction to OptionsBar
 
-[Revit](https://www.autodesk.com/products/revit/overview) is a powerful tool for building design and modeling, and undoubtedly, high efficiency in working with this software is a key aspect for successful projects.
+[Revit](https://www.autodesk.com/products/revit/overview) is a powerful tool for building design and modelling, and undoubtedly, high efficiency in working with this software is a key aspect for successful projects.
 One of the tools that contributes to this efficiency is
 the [OptionsBar](https://help.autodesk.com/view/RVT/2024/ENU/?guid=GUID-28BDE98C-E8A9-4C74-8ABC-9DABD13163D9).
 This convenient toolbar within Revit has tremendous potential, but not many people are aware of its capabilities and how to configure it.
