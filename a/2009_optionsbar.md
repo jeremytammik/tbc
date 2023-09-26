@@ -101,7 +101,7 @@ To compile the project on any device, let's add a NuGet package to the `.csproj`
 
 <pre class="prettyprint lang-xml">
 &lt;ItemGroup&gt;
-    &lt;PackageReference Include="Nice3point.Revit.Api.AdWindows" Version="$(RevitVersion).*"/&gt;
+  &lt;PackageReference Include="Nice3point.Revit.Api.AdWindows" Version="$(RevitVersion).*"/&gt;
 &lt;/ItemGroup&gt;
 </pre>
 
