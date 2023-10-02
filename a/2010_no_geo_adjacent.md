@@ -63,15 +63,80 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 </pre>
 
 
-<center>
-<img src="img/" alt="" title="" width="100"/>
-</center>
+####<a name="2"></a> pyRevit Discourse
+
+I just discovered the recommendation to direct all pyRevit questions to
+the dedicated [pyRevit discussion forums](https://discourse.pyrevitlabs.io/):
+
+> ... questions related to pyRevit should be routed
+to [discourse.pyrevitlabs.io](https://discourse.pyrevitlabs.io/).
+This type of question has been formulated or answered in many different ways there;
+[search for subprocess](https://discourse.pyrevitlabs.io/search?q=subprocess)...
+
+Thanks to Jean-Marc Couffin of [BIM One Inc](https://bimone.com) for pointing this out in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on [CPython and PyRevit](https://forums.autodesk.com/t5/revit-api-forum/cpython-and-pyrevit/m-p/12278795#M74411).
 
 
-####<a name="2"></a> Get touching elements
+####<a name="3"></a> Get touching elements
 
 Get touching elements
 https://forums.autodesk.com/t5/revit-api-forum/get-touching-elements/m-p/12223781
+
+
+####<a name="3"></a> CUT_EDGE Reference Voodoo
+
+Joseph Tenenbaum shares a new application of stable reference magic voodoo in his solution
+to [retrieve `CUT_EDGE` references from walls](https://forums.autodesk.com/t5/revit-api-forum/retrieve-cut-edge-references-from-walls/m-p/12278698):
+
+**Question:** I am trying to get the CUT_EDGE references of a given wall using the API. At the moment I can get part of the references based on the Wall geometry. I first go to the Solids and for each edge of the solid I check if the Reference is of type CUT_EDGE. This works but does not get all the options (I see more when generating a dimension line manually in the UI of Revit).
+
+For example, I have the wall seen in this image:
+
+<center>
+<img src="img/cut_edge_voodoo_2.png" alt="CUT_EDGE reference stable representation" title="CUT_EDGE reference stable representation" width="100"/> <!-- Pixel Height: 253
+Pixel Width: 514 -->
+</center>
+
+The dimension is attached to the following `CUT_EDGE` references:
+
+- 3aecdde0-f1aa-42b2-a208-f740e7a17720-003f7f7f:8:CUT_EDGE/0/1
+- 3aecdde0-f1aa-42b2-a208-f740e7a17720-003f7f7f:8:CUT_EDGE/1/1
+
+But when I run over all the edges of the wall, I only get the following options:
+
+<center>
+<img src="img/cut_edge_voodoo_1.png" alt="CUT_EDGE reference stable representation" title="CUT_EDGE reference stable representation" width="100"/> <!-- Pixel Height: 253
+Pixel Width: 514 -->
+</center>
+
+I played already with the visibility and detail options, and `IncludeNonVisibleObjects`, and nothing helps.
+
+I think knowing better what the structure of the stable representations mean could help a lot.
+
+**Answer:** Here is my finding that actually worked, for example using the Stable Representation 3aecdde0-f1aa-42b2-a208-f740e7a17720-003f7f7f:8:CUT_EDGE/0/1.
+
+- 3aecdde0-f1aa-42b2-a208-f740e7a17720-003f7f7f: Refers to the element itself
+- 8: Is the ID of the face of the Revit `Element`
+- CUT_EDGE/0/1: This is the type and location of the Reference. It is CUT_EDGE type,  the `1` means which edge of the face, and the `0` is its end-point index.
+
+My original findings were correct; I was just missing the index of the end-point of the edge I found. All this is possible to find via the Edges of the Solids that are part of the geometry of an Element.
+
+Many thanks to Joseph for his research and clear explanation!
+
+A welcome addition to The Building Coder collection of stable representation magic voodoo information:
+
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2016/04/stable-reference-string-magic-voodoo.html" target="_blank" rel="noopener">Reference Stable Representation Magic Voodoo</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2016/08/voodoo-magic-retrieves-global-instance-edges.html" target="_blank" rel="noopener">Voodoo Magic Retrieves Global Instance Edges</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2017/06/hatch-line-dimensioning-voodoo.html" target="_blank" rel="noopener">Hatch Line Dimensioning Voodoo</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2017/06/picked-family-instance-face-geometry-in-lcs-versus-wcs.html" target="_blank" rel="noopener">Picked Instance Face Geometry in LCS Versus WCS</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2018/09/reference-intersector-and-deleting-reference-planes.html" target="_blank" rel="noopener">Reference Intersector and Deleting Reference Planes</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2018/12/fire-rating-zone-intersection.html" target="_blank" rel="noopener">Fire Rating Zone Intersection</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2019/02/stable-reference-relationships.html" target="_blank" rel="noopener">Stable Reference Relationships</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2022/10/element-level-and-ifc-properties-.html" target="_blank" rel="noopener">Element Level and IFC Properties</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2023/03/ifc-dimension-and-reference-intersector-with-links.html" target="_blank" rel="noopener">IFC, Dimension and Reference Intersector with Links</a></li>
+</ul>
 
 ####<a name="3"></a> The BIM has No Geometry
 
