@@ -6,7 +6,6 @@
 
 <!---
 
-
 - Get touching elements
   https://forums.autodesk.com/t5/revit-api-forum/get-touching-elements/m-p/12223781
 
@@ -39,17 +38,11 @@
 
 twitter:
 
-A reminder of the deprecated @AutodeskAPS DA4R 2018 engine and a great new open-source #RevitAPI productivity enhancement tool using the @AutodeskRevit OptionsBar for frequently used info, utilities, element selection options etc. #BIM @DynamoBIM https://autode.sk/optionsbar
-
-A great new open-source productivity enhancement tool making use of the built-in @AutodeskRevit OptionsBar provides handy access to frequently used information, utilities, element selection options and more, and a reminder of the deprecated @AutodeskAPS DA4R Revit 2018 engine with the #RevitAPI #BIM @DynamoBIM https://autode.sk/optionsbar
-
-A great new open-source productivity enhancement tool making use of the built-in OptionsBar provides handy access to frequently used information, utilities, element selection options and more, and a reminder of the deprecated DA4R Revit 2018 engine...
+@AutodeskAPS  #RevitAPI  @AutodeskRevit  #BIM @DynamoBIM
 
 linkedin:
 
-A reminder of the deprecated #AutodeskAPS DA4R 2018 engine and a great new open-source #Revit #API productivity enhancement tool using the #Autodesk OptionsBar for frequently used info, utilities, element selection options etc.
-
-https://autode.sk/optionsbar
+ #AutodeskAPS  #Revit #API  #Autodesk
 
 #BIM #DynamoBIM #AutodeskAPS #Revit #API #IFC #SDK #Autodesk #AEC #adsk
 
@@ -65,9 +58,6 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 ### Touching Geometry and No Geometry
 
 
-
-####<a name="2"></a>
-
 <pre class="prettyprint lang-cs">
 
 </pre>
@@ -78,10 +68,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 </center>
 
 
-####<a name="3"></a>
-
-
-####<a name="3"></a> Get touching elements
+####<a name="2"></a> Get touching elements
 
 Get touching elements
 https://forums.autodesk.com/t5/revit-api-forum/get-touching-elements/m-p/12223781
@@ -99,20 +86,20 @@ However, it does not work. I have seen messages on the forum stating that workin
 There is no geometry in the BIM!
 The model as you see it (and its geometry) is just a view of the elements, their relationships, parameters and constraints.
 
-####<a name="3"></a> Revit and IFC coordinate systems
+####<a name="4"></a> Revit and IFC coordinate systems
 
 Revit and IFC coordinate systems
 [Revit, IFC and coordinate systems](https://bim-me-up.com/en/revit-ifc-und-koordinatensysteme/)
 Lejla Secerbegovic
 Digital Technology Enthusiast | BIM & Sustainability
 
-####<a name="3"></a> Deepfakes of Chinese influencers are livestreaming 24/7
+####<a name="5"></a> Deepfakes of Chinese influencers are livestreaming 24/7
 
 Deepfakes of Chinese influencers are livestreaming 24/7
 https://www.technologyreview.com/2023/09/19/1079832/chinese-ecommerce-deepfakes-livestream-influencers-ai/
 > With just a few minutes of sample video and $1,000 in costs, brands can clone a human streamer to work 24/7.
 
-####<a name="3"></a> generative ai use and misuse
+####<a name="6"></a> generative ai use and misuse
 
 generative ai use and misuse
 [How people can create &ndash; and destroy &ndash; value with generative AI](https://www.bcg.com/publications/2023/how-people-create-and-destroy-value-with-gen-ai)
