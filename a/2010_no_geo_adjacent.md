@@ -40,6 +40,16 @@ twitter:
 
 @AutodeskAPS  #RevitAPI  @AutodeskRevit  #BIM @DynamoBIM
 
+Discussions of BIM, geometry, pyRevit and AI news
+&ndash; pyRevit discourse
+&ndash; The BIM has no geometry
+&ndash; Get touching elements
+&ndash; What is a stable representation of a reference?
+&ndash; CUT_EDGE reference voodoo
+&ndash; Revit and IFC coordinate systems
+&ndash; Chinese influencer deepfakes livestreaming 24/7
+&ndash; Generative AI use and misuse...
+
 linkedin:
 
  #AutodeskAPS  #Revit #API  #Autodesk
