@@ -55,7 +55,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Touching Geometry and No Geometry
+### No Geometry, Touching Geometry and Cut Geometry
 
 Discussions of BIM, geometry, pyRevit and AI news:
 
@@ -176,7 +176,7 @@ I tested setting visibility options, detail options, and `IncludeNonVisibleObjec
 
 I think knowing better what the structure of the stable representations mean could help a lot.
 
-**Answer:** Here is my finding that actually worked, for example using the Stable Representation 3aecdde0-f1aa-42b2-a208-f740e7a17720-003f7f7f:8:CUT_EDGE/0/1.
+**Answer:** Here is my finding that actually worked, for example using the Stable Representation *3aecdde0-f1aa-42b2-a208-f740e7a17720-003f7f7f:8:CUT_EDGE/0/1*.
 
 - 3aecdde0-f1aa-42b2-a208-f740e7a17720-003f7f7f: Refers to the element itself
 - 8: Is the ID of the face of the Revit `Element`
@@ -205,14 +205,14 @@ on [Revit, IFC and coordinate systems](https://bim-me-up.com/en/revit-ifc-und-ko
 
 ####<a name="8"></a> Chinese Influencer Deepfakes Livestreaming 24/7
 
-Moving from the Revit API to my other favourite topic, AI et al,
-[Deepfakes of Chinese influencers are livestreaming 24/7](https://www.technologyreview.com/2023/09/19/1079832/chinese-ecommerce-deepfakes-livestream-influencers-ai/):
+Moving from the Revit API to my other favourite topic, AI et al:
+[deepfakes of Chinese influencers are livestreaming 24/7](https://www.technologyreview.com/2023/09/19/1079832/chinese-ecommerce-deepfakes-livestream-influencers-ai/):
 
 > With just a few minutes of sample video and $1,000 in costs, brands can clone a human streamer to work 24/7.
 
 ####<a name="9"></a> Generative AI Use and Misuse
 
-Calosing with another AI-related topic, an experiment reveals how people can make use of generative AI, but also misuse it, and
+Closing with another AI-related topic, an experiment reveals how people can make use of generative AI, but also misuse it, and
 thus [how people can create &ndash; and destroy &ndash; value with generative AI](https://www.bcg.com/publications/2023/how-people-create-and-destroy-value-with-gen-ai):
 
 > Key Takeaways &ndash; A first-of-its-kind scientific experiment finds that people mistrust generative AI in areas where it can contribute tremendous value and trust it too much where the technology isn’t competent:
