@@ -57,11 +57,16 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Touching Geometry and No Geometry
 
+Discussions of BIM, geometry, pyRevit and AI news:
 
-<pre class="prettyprint lang-cs">
-
-</pre>
-
+- [pyRevit discourse](#2)
+- [The BIM has no geometry](#3)
+- [Get touching elements](#4)
+- [What is a stable representation of a reference?](#5)
+- [CUT_EDGE reference voodoo](#6)
+- [Revit and IFC coordinate systems](#7)
+- [Chinese influencer deepfakes livestreaming 24/7](#8)
+- [Generative AI use and misuse](#9)
 
 ####<a name="2"></a> pyRevit Discourse
 
