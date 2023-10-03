@@ -110,13 +110,13 @@ The model as you see it (and its geometry) is just a view of the elements, their
 ####<a name="4"></a> Get Touching Elements
 
 In spite of that, we keep running into tasks that are intimately involved with the BIM element geometry, such as
-the [retrieval of cut edges between intersecting elements discussed below](#6) and the task
+the [retrieval of cut edges between intersecting elements discussed below](#6) and the following task
 to [get touching elements](https://forums.autodesk.com/t5/revit-api-forum/get-touching-elements/m-p/12223781):
 
 **Question:** I want to get the slabs that are on the edge of a beam as shown in this figure:
 
 <center>
-<img src="img/touching_elements.png" alt="Touching elements" title="Touching elements" width="600"/>
+<img src="img/touching_elements.png" alt="Touching elements" title="Touching elements" width="500"/>
 </center>
 
 How can I get these slabs?
@@ -157,8 +157,7 @@ to [retrieve `CUT_EDGE` references from walls](https://forums.autodesk.com/t5/re
 For example, I have the wall seen in this image:
 
 <center>
-<img src="img/cut_edge_voodoo_2.png" alt="CUT_EDGE reference stable representation" title="CUT_EDGE reference stable representation" width="100"/> <!-- Pixel Height: 253
-Pixel Width: 514 -->
+<img src="img/cut_edge_voodoo_2.png" alt="CUT_EDGE reference stable representation" title="CUT_EDGE reference stable representation" width="500"/> <!-- Pixel Height: 786 Pixel Width: 1,120 -->
 </center>
 
 The dimension is attached to the following `CUT_EDGE` references:
@@ -169,7 +168,7 @@ The dimension is attached to the following `CUT_EDGE` references:
 But when I run over all the edges of the wall, I only get the following options:
 
 <center>
-<img src="img/cut_edge_voodoo_1.png" alt="CUT_EDGE reference stable representation" title="CUT_EDGE reference stable representation" width="100"/> <!-- Pixel Height: 253
+<img src="img/cut_edge_voodoo_1.png" alt="CUT_EDGE reference stable representation" title="CUT_EDGE reference stable representation" width="500"/> <!-- Pixel Height: 253
 Pixel Width: 514 -->
 </center>
 

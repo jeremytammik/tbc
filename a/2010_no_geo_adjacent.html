@@ -99,11 +99,11 @@ The BIM is completely driven by parameters and constraints.</p>
 <p>The model as you see it (and its geometry) is just a view of the elements, their relationships, parameters and constraints.</p>
 <h4><a name="4"></a> Get Touching Elements</h4>
 <p>In spite of that, we keep running into tasks that are intimately involved with the BIM element geometry, such as
-the <a href="#6">retrieval of cut edges between intersecting elements discussed below</a> and the task
+the <a href="#6">retrieval of cut edges between intersecting elements discussed below</a> and the following task
 to <a href="https://forums.autodesk.com/t5/revit-api-forum/get-touching-elements/m-p/12223781">get touching elements</a>:</p>
 <p><strong>Question:</strong> I want to get the slabs that are on the edge of a beam as shown in this figure:</p>
 <p><center>
-<img src="img/touching_elements.png" alt="Touching elements" title="Touching elements" width="600"/>
+<img src="img/touching_elements.png" alt="Touching elements" title="Touching elements" width="500"/>
 </center></p>
 <p>How can I get these slabs?
 <code>ElementIntersectsElement</code> and <code>ElementIntersectsSolid</code> don't work in this case.</p>
@@ -129,8 +129,7 @@ to <a href="https://forums.autodesk.com/t5/revit-api-forum/retrieve-cut-edge-ref
 <p><strong>Question:</strong> I am trying to get the CUT_EDGE references of a given wall using the API. At the moment I can get part of the references based on the Wall geometry. I first go to the Solids and for each edge of the solid I check if the Reference is of type CUT_EDGE. This works but does not get all the options (I see more when generating a dimension line manually in the UI of Revit).</p>
 <p>For example, I have the wall seen in this image:</p>
 <p><center>
-<img src="img/cut_edge_voodoo_2.png" alt="CUT_EDGE reference stable representation" title="CUT_EDGE reference stable representation" width="100"/> <!-- Pixel Height: 253
-Pixel Width: 514 -->
+<img src="img/cut_edge_voodoo_2.png" alt="CUT_EDGE reference stable representation" title="CUT_EDGE reference stable representation" width="500"/> <!-- Pixel Height: 786 Pixel Width: 1,120 -->
 </center></p>
 <p>The dimension is attached to the following <code>CUT_EDGE</code> references:</p>
 <ul>
@@ -139,7 +138,7 @@ Pixel Width: 514 -->
 </ul>
 <p>But when I run over all the edges of the wall, I only get the following options:</p>
 <p><center>
-<img src="img/cut_edge_voodoo_1.png" alt="CUT_EDGE reference stable representation" title="CUT_EDGE reference stable representation" width="100"/> <!-- Pixel Height: 253
+<img src="img/cut_edge_voodoo_1.png" alt="CUT_EDGE reference stable representation" title="CUT_EDGE reference stable representation" width="500"/> <!-- Pixel Height: 253
 Pixel Width: 514 -->
 </center></p>
 <p>I played already with the visibility and detail options, and <code>IncludeNonVisibleObjects</code>, and nothing helps.</p>
