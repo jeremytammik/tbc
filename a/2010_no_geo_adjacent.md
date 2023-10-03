@@ -194,26 +194,26 @@ It provides a welcome addition to The Building Coder collection of stable repres
 <li><a href="https://thebuildingcoder.typepad.com/blog/2023/03/ifc-dimension-and-reference-intersector-with-links.html#4">Stable Representation Voodoo for Reference Intersector with Links</a></li>
 </ul>
 
-####<a name="4"></a> Revit and IFC coordinate systems
+####<a name="7"></a> Revit and IFC coordinate systems
 
-Revit and IFC coordinate systems
-[Revit, IFC and coordinate systems](https://bim-me-up.com/en/revit-ifc-und-koordinatensysteme/)
-Lejla Secerbegovic
-Digital Technology Enthusiast | BIM & Sustainability
+Let's round off the Revit-related topics with a short note to point out Lejla Secerbegovic' article
+on [Revit, IFC and coordinate systems](https://bim-me-up.com/en/revit-ifc-und-koordinatensysteme/).
 
-####<a name="5"></a> Deepfakes of Chinese influencers are livestreaming 24/7
+####<a name="8"></a> Chinese Influencer Deepfakes Livestreaming 24/7
 
-Deepfakes of Chinese influencers are livestreaming 24/7
-https://www.technologyreview.com/2023/09/19/1079832/chinese-ecommerce-deepfakes-livestream-influencers-ai/
+Moving from the Revit API to my other favourite topic, AI et al,
+[Deepfakes of Chinese influencers are livestreaming 24/7](https://www.technologyreview.com/2023/09/19/1079832/chinese-ecommerce-deepfakes-livestream-influencers-ai/):
+
 > With just a few minutes of sample video and $1,000 in costs, brands can clone a human streamer to work 24/7.
 
-####<a name="6"></a> generative ai use and misuse
+####<a name="9"></a> Generative AI Use and Misuse
 
-generative ai use and misuse
-[How people can create &ndash; and destroy &ndash; value with generative AI](https://www.bcg.com/publications/2023/how-people-create-and-destroy-value-with-gen-ai)
-Key Takeaways &ndash; A first-of-its-kind scientific experiment finds that people mistrust generative AI in areas where it can contribute tremendous value and trust it too much where the technology isn’t competent:
-Around 90% of participants improved their performance when using GenAI for creative ideation. People did best when they did not attempt to edit GPT-4’s output.
-When working on business problem solving, a task outside the tool’s current competence, many participants took GPT-4's misleading output at face value. Their performance was 23% worse than those who didn’t use the tool at all.
-Adopting generative AI is a massive change management effort. The job of the leader is to help people use the new technology in the right way, for the right tasks and to continually adjust and adapt in the face of GenAI’s ever-expanding frontier.
+Calosing with another AI-related topic, an experiment reveals how people can make use of generative AI, but also misuse it, and
+thus [how people can create &ndash; and destroy &ndash; value with generative AI](https://www.bcg.com/publications/2023/how-people-create-and-destroy-value-with-gen-ai):
 
+> Key Takeaways &ndash; A first-of-its-kind scientific experiment finds that people mistrust generative AI in areas where it can contribute tremendous value and trust it too much where the technology isn’t competent:
+
+> - Around 90% of participants improved their performance when using GenAI for creative ideation. People did best when they did not attempt to edit GPT-4’s output.
+- When working on business problem solving, a task outside the tool’s current competence, many participants took GPT-4's misleading output at face value. Their performance was 23% worse than those who didn’t use the tool at all.
+- Adopting generative AI is a massive change management effort. The job of the leader is to help people use the new technology in the right way, for the right tasks and to continually adjust and adapt in the face of GenAI’s ever-expanding frontier.
 
