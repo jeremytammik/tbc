@@ -168,11 +168,11 @@ The dimension is attached to the following `CUT_EDGE` references:
 But when I run over all the edges of the wall, I only get the following options:
 
 <center>
-<img src="img/cut_edge_voodoo_1.png" alt="CUT_EDGE reference stable representation" title="CUT_EDGE reference stable representation" width="500"/> <!-- Pixel Height: 253
+<img src="img/cut_edge_voodoo_1.png" alt="CUT_EDGE reference stable representation" title="CUT_EDGE reference stable representation" width="400"/> <!-- Pixel Height: 253
 Pixel Width: 514 -->
 </center>
 
-I played already with the visibility and detail options, and `IncludeNonVisibleObjects`, and nothing helps.
+I tested setting visibility options, detail options, and `IncludeNonVisibleObjects`, but nothing helps.
 
 I think knowing better what the structure of the stable representations mean could help a lot.
 
