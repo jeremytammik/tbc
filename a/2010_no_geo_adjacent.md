@@ -77,12 +77,59 @@ Thanks to Jean-Marc Couffin of [BIM One Inc](https://bimone.com) for pointing th
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [CPython and PyRevit](https://forums.autodesk.com/t5/revit-api-forum/cpython-and-pyrevit/m-p/12278795#M74411).
 
+####<a name="3"></a> The BIM has No Geometry
 
-####<a name="3"></a> Get touching elements
+One fundamental and possibly surprising aspect of the BIM: it has no geometry.
+This came up in the thread on how
+to [simplify elements geometry](https://forums.autodesk.com/t5/revit-api-forum/simplify-elements-geometry/m-p/12266629):
 
-Get touching elements
-https://forums.autodesk.com/t5/revit-api-forum/get-touching-elements/m-p/12223781
+**Question:** I am trying to simplify the geometry of elements such as cylinders, spheres, etc. through the API.
+My first idea was simple:
 
+- Retrieve a mesh from all faces with low quality using `face.Triangulate(0)`
+- Apply the new mesh to the element geometry
+
+However, it does not work.
+I have seen messages on the forum stating that working with geometry through the API is not allowed.
+Anyway, I believe that there it should be another approach to tackle this issue.
+
+**Answer:** No.
+There is no way that you can specify Revit element geometry.
+Please bear in mind that Revit is a BIM authoring tool.
+The BIM is completely driven by parameters and constraints.
+
+There is no geometry in the BIM!
+
+The model as you see it (and its geometry) is just a view of the elements, their relationships, parameters and constraints.
+
+####<a name="4"></a> Get Touching Elements
+
+In spite of that, we keep running into task that are inimately related to the BIM element geometry, such as
+the [retrieval of cut edges between intersecting elements discussed below](#5) and the task
+to [get touching elements](https://forums.autodesk.com/t5/revit-api-forum/get-touching-elements/m-p/12223781):
+
+**Question:** I want to get the slabs that are on the edge of a beam as shown in this figure:
+
+<center>
+<img src="img/touching_elements.png" alt="Touching elements" title="Touching elements" width="600"/>
+</center>
+
+How can I get these slabs?
+`ElementIntersectsElement` and `ElementIntersectsSolid` don't work in this case.
+
+**Answer:** You should be able to use `ElementIntersectsSolid` with a slightly enlarged solid.
+
+If your beam is aligned with one of the cardinal axes, you could even use a `BoundingBoxIntersectsFilter` instead, which is a quick filter.
+Just make the bounding box a bit bigger than the beam.
+
+If worst comes to worst, you can also use the `ReferenceIntersector` to shoot rays from the beam to detect the neighbouring slab.
+
+Finally, though, and best of all, 11 years ago, The Building Coder presented a solution
+to [filter for touching beams using solid intersection](https://thebuildingcoder.typepad.com/blog/2012/09/filter-for-touching-beams-using-solid-intersection.html)
+
+**Response:** Thank you, that solution helped a lot.
+I made a solution where I used the location line and some transform functions.
+Then, the `solid.IntersectsWithCurve` method enabled me to retrieve the slabs.
 
 ####<a name="3"></a> CUT_EDGE Reference Voodoo
 
@@ -137,19 +184,6 @@ A welcome addition to The Building Coder collection of stable representation mag
 <li><a href="https://thebuildingcoder.typepad.com/blog/2022/10/element-level-and-ifc-properties-.html" target="_blank" rel="noopener">Element Level and IFC Properties</a></li>
 <li><a href="https://thebuildingcoder.typepad.com/blog/2023/03/ifc-dimension-and-reference-intersector-with-links.html" target="_blank" rel="noopener">IFC, Dimension and Reference Intersector with Links</a></li>
 </ul>
-
-####<a name="3"></a> The BIM has No Geometry
-
-The BIM has No Geometry
-[Simplify elements geometry](https://forums.autodesk.com/t5/revit-api-forum/simplify-elements-geometry/m-p/12266629)
-**Question:** I am trying to simfplify the geometry of elements (such as cylinders, shperes, etc.) throgh the API.
-My first idea was simple:
-1. Retrieve a mesh from all faces with low quality using face.Triangulate(0);
-2. Apply the new mesh for element's geometry.
-However, it does not work. I have seen messages on the forum stating that working with geometry through the API is not allowed. Anyway, I believe that there it should be another approach to tackle this issue. I would appreciate any help.
-**Answer:** No. There is no way that you can specify Revit element geometry. Please bear in mind that Revit is a BIM authoring tool. The BIM is completely driven by parameters and constraints.
-There is no geometry in the BIM!
-The model as you see it (and its geometry) is just a view of the elements, their relationships, parameters and constraints.
 
 ####<a name="4"></a> Revit and IFC coordinate systems
 
