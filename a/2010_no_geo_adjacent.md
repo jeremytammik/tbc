@@ -109,8 +109,8 @@ The model as you see it (and its geometry) is just a view of the elements, their
 
 ####<a name="4"></a> Get Touching Elements
 
-In spite of that, we keep running into task that are inimately related to the BIM element geometry, such as
-the [retrieval of cut edges between intersecting elements discussed below](#5) and the task
+In spite of that, we keep running into tasks that are intimately involved with the BIM element geometry, such as
+the [retrieval of cut edges between intersecting elements discussed below](#6) and the task
 to [get touching elements](https://forums.autodesk.com/t5/revit-api-forum/get-touching-elements/m-p/12223781):
 
 **Question:** I want to get the slabs that are on the edge of a beam as shown in this figure:
