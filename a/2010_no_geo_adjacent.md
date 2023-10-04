@@ -38,7 +38,7 @@
 
 twitter:
 
-@AutodeskAPS  #RevitAPI  @AutodeskRevit  #BIM @DynamoBIM
+Aspects of BIM geometry: no database geometry stored, retrieving touching elements, cut edges and stable representation of geometry references in the #RevitAPI @AutodeskRevit #BIM @DynamoBIM @AutodeskAPS https://autode.sk/bimgeo
 
 Discussions of BIM, geometry, pyRevit and AI news
 &ndash; pyRevit discourse
