@@ -52,10 +52,10 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 Jake of [Ripcord Engineering](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/3926242) recently
 shared a bunch of valuable [Python and gbXML tips](https://thebuildingcoder.typepad.com/blog/2023/07/export-gbxml-and-python-tips.html) and followed up with a pointer
 to [Shapely](https://pypi.org/project/shapely/)
-to [Find and Fix a gap in the building geometry](https://thebuildingcoder.typepad.com/blog/2023/09/element-diff-compare-shapely-and-rdbe.html#4).
+to [find and fix a gap in the building geometry](https://thebuildingcoder.typepad.com/blog/2023/09/element-diff-compare-shapely-and-rdbe.html#4).
 
 He followed up with this impressive and beautiful documentation of
-an entire gbXML [small surface solution addressing the whole building](doc/gbxml_small_surface_solution_whole_building.pdf) that I think warrantds an entire blog post of its own, so here goes:
+an entire gbXML [small surface solution addressing the whole building](doc/gbxml_small_surface_solution_whole_building.pdf) that I think warrants an entire blog post of its own, so here goes:
 
 ####<a name="2"></a> Small Surface Solution &ndash; Whole Building
 
@@ -78,18 +78,23 @@ from uuid import uuid4
 
 Generate parser:
 
+<pre class="prettyprint">
 # uses xgbxml to generate a lxml parser to read gbXML version 0.37
 parser=get_parser(version='0.37')
+</pre>
 
 ####<a name="3"></a> Open gbXML BIM Model
 
 Open file *23-013 WH Swan Hill_Mass_23-08-30.xml*:
 
+<pre class="prettyprint">
 # opens the file using the custom lxml parser
 fp='23-013 WH Swan Hill_Mass_23-08-30.xml' tree=etree.parse(fp,parser) gbxml=tree.getroot()
 # renders the Campus element
 ax=gbxml.Campus.render() ax.figure.set_size_inches(8, 8) ax.set_title(fp)
 plt.show()
+</pre>
+
 1 of 6 10/4/2023, 19:59
 small_surface_solution - whole_building file:///C:/Users/admin/AppData/Local/Temp/pid-10720/small_surface_s...
 
@@ -97,7 +102,10 @@ small_surface_solution - whole_building file:///C:/Users/admin/AppData/Local/Tem
 
 Identify all gaps in the surfaces of the building This uses a new method of the Building element -> get_gaps_in_surfaces .
 In [5]:
-Out[5]: [{'space_ids': ['aim2197'],
+Out[5]:
+
+<pre class="prettyprint">
+[{'space_ids': ['aim2197'],
 'shell': [(72.2287629, -0.3141381, 0.0),
            (72.2287629, -0.4999998, 0.0),
            (72.0986211, -0.4999998, 0.0),
@@ -113,6 +121,7 @@ Out[5]: [{'space_ids': ['aim2197'],
            (72.2287629, -0.3141381, 10.0),
            (72.0986211, -0.4999998, 10.0),
            (72.2287629, -0.4999998, 10.0)]}]
+
    # identify gaps in surfaces of building
 gaps=gbxml.Campus.Building.get_gaps_in_surfaces() gaps
  The result is a list of dictionaries. Each dictionary contains two items:
