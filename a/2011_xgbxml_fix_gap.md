@@ -6,6 +6,26 @@
 
 <!---
 
+- /Users/jta/a/doc/revit/tbc/git/a/doc/gbxml_small_surface_solution_whole_building.pdf
+
+- LLaVA: Large Language and Vision Assistant
+  https://llava.hliu.cc/
+  Checkout opensource vision assistant >>
+  Best part is it is open source and can be run locally with descent enough hardware. Needs linux and an rtx.
+  But non-Commercial
+  Google Glass but more helpful perhaps :deploy-parrot:
+  Identify plants, tools in a workspace, even run basic support (I know some in my family who could use some help being told where to click on the computer screen sometimes)
+  I'm sure someone will train a commercial-allowed equivalent
+
+- Text to video ($36M in funding so far, and they call themselves ‘lean’): https://moonvalley.ai
+  moonvalley.aimoonvalley.ai
+  > Animate your ideas... a machine learning model that can create visually stunning, high definition videos & animation from simple text prompts. (1 MB)
+
+- Detect objects in images
+  Did you know that you could run neural networks entirely in the browser without contacting a server? This fun demo shows you how.
+  DETR (End-to-End Object Detection) model with ResNet-50 backbone
+  I provided it with a picture of me eating churros ([^](/Users/jta/Pictures/2023/2023-10-10_garnatilla/16.jpg)), it it rapidly identified the following objects:
+  jeremy_eating_churros.png
 
 twitter:
 
