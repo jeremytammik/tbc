@@ -95,71 +95,95 @@ ax=gbxml.Campus.render() ax.figure.set_size_inches(8, 8) ax.set_title(fp)
 plt.show()
 </pre>
 
-1 of 6 10/4/2023, 19:59
-small_surface_solution - whole_building file:///C:/Users/admin/AppData/Local/Temp/pid-10720/small_surface_s...
+<center>
+<img src="img/xgbxml_fix_gap.png" alt="Campus rendering" title="Campus rendering" width="600"/>
+<p style="font-size: 80%; font-style:italic">Campus rendering</p>
+</center>
 
 ####<a name="2.3"></a> Identify Gaps in Geometry
 
-Identify all gaps in the surfaces of the building This uses a new method of the Building element -> get_gaps_in_surfaces .
-In [5]:
-Out[5]:
+Identify all gaps in the surfaces of the building;
+this uses a new method of the `Building` element, `get_gaps_in_surfaces`:
+
+<pre class="prettyprint">
+# identify gaps in surfaces of building
+gaps=gbxml.Campus.Building.get_gaps_in_surfaces() gaps
+</pre>
+
+The result is a list of dictionaries. Each dictionary contains two items:
+
+- `space_ids`: a list of the ids of the adjacent Spaces
+- `shell`: a list of the coordinates of the exterior polygon of the gaps
+
+Here, the first and third items appear to be triangle gaps with only one adjacent space &ndash; so these are exterior gaps also adjacent to the outside.
 
 <pre class="prettyprint">
 [{'space_ids': ['aim2197'],
-'shell': [(72.2287629, -0.3141381, 0.0),
-           (72.2287629, -0.4999998, 0.0),
-           (72.0986211, -0.4999998, 0.0),
-           (72.2287629, -0.3141381, 0.0)]},
-         {'space_ids': ['aim2553', 'aim7413'],
-          'shell': [(80.2291667, 14.5625, 10.0),
-           (80.0208333, 14.5625, 10.0),
-           (80.0208333, 16.020833, 10.0),
-           (80.2291667, 16.020833, 10.0),
-           (80.2291667, 14.5625, 10.0)]},
-         {'space_ids': ['aim6674'],
-          'shell': [(72.2287629, -0.4999998, 10.0),
-           (72.2287629, -0.3141381, 10.0),
-           (72.0986211, -0.4999998, 10.0),
-           (72.2287629, -0.4999998, 10.0)]}]
-
-   # identify gaps in surfaces of building
-gaps=gbxml.Campus.Building.get_gaps_in_surfaces() gaps
- The result is a list of dictionaries. Each dictionary contains two items:
-2 of 6 10/4/2023, 19:59
-
-small_surface_solution - whole_building file:///C:/Users/admin/AppData/Local/Temp/pid-10720/small_surface_s...
- • 'space_ids': a list of the ids of the adjacent Spaces.
-• 'shell': a list of the coordinates of the exterior polygon of the gaps.
-Here the first and third items appear to be triangle gaps with only one adjacent space - so these are exterior gaps also adjacent to the outside.
-
+    'shell': [
+      (72.2287629, -0.3141381, 0.0),
+      (72.2287629, -0.4999998, 0.0),
+      (72.0986211, -0.4999998, 0.0),
+      (72.2287629, -0.3141381, 0.0)]},
+      {'space_ids': ['aim2553', 'aim7413'],
+    'shell': [(80.2291667, 14.5625, 10.0),
+      (80.0208333, 14.5625, 10.0),
+      (80.0208333, 16.020833, 10.0),
+      (80.2291667, 16.020833, 10.0),
+      (80.2291667, 14.5625, 10.0)]},
+  {'space_ids': ['aim6674'],
+    'shell': [(72.2287629, -0.4999998, 10.0),
+      (72.2287629, -0.3141381, 10.0),
+      (72.0986211, -0.4999998, 10.0),
+      (72.2287629, -0.4999998, 10.0)]}]
+</pre>
 
 ####<a name="2.4"></a> Add Missing Sufaces
 
-
 Adding the missing surfaces to the building; first gap:
 
-In [6]:
-Out[6]: {'space_ids': ['aim2197'],
+<pre class="prettyprint">
+# print gap
+gap=gaps[0]
+gap
+</pre>
+
+Result:
+
+<pre class="prettyprint">
+{'space_ids': ['aim2197'],
 'shell': [(72.2287629, -0.3141381, 0.0),
-   # print gap
-gap=gaps[0] gap
  In [7]:
 (72.2287629, -0.4999998, 0.0),
 (72.0986211, -0.4999998, 0.0),
 (72.2287629, -0.3141381, 0.0)]}
-   # add Surface
-# surface element surface=gbxml.Campus.add_Surface(
-id=str(uuid4()), surfaceType=None, # to do constructionIdRef=None, # to do exposedToSun=None # to do
+</pre>
+
+Fix:
+
+<pre class="prettyprint">
+# add Surface
+# surface element
+surface=gbxml.Campus.add_Surface(
+  id=str(uuid4()),
+  surfaceType=None, # to do
+  constructionIdRef=None, # to do
+  exposedToSun=None # to do
 )
 # adjacent space id child element
-for space_id in gap['space_ids']: surface.add_AdjacentSpaceId(
-spaceIdRef=space_id
-)
+for space_id in gap['space_ids']:
+  surface.add_AdjacentSpaceId(
+    spaceIdRef=space_id )
 # planar geometry child element
-planar_geometry = surface.add_PlanarGeometry() planar_geometry.set_shell(gap['shell'])
+planar_geometry = surface.add_PlanarGeometry()
+planar_geometry.set_shell(gap['shell'])
 # check
 print(surface.tostring())
- <Surface xmlns="http://www.gbxml.org/schema" id="f20a7dbc-94d5-43ee-bf64-748c3e61658
+</pre>
+
+Result:
+
+<pre class="prettyprint">
+<Surface xmlns="http://www.gbxml.org/schema" id="f20a7dbc-94d5-43ee-bf64-748c3e61658
 b">
   <AdjacentSpaceId spaceIdRef="aim2197"/>
   <PlanarGeometry>
@@ -172,9 +196,6 @@ b">
       <CartesianPoint>
         <Coordinate>72.2287629</Coordinate>
         <Coordinate>-0.4999998</Coordinate>
-3 of 6 10/4/2023, 19:59
-
-small_surface_solution - whole_building file:///C:/Users/admin/AppData/Local/Temp/pid-10720/small_surface_s...
                  <Coordinate>0.0</Coordinate>
               </CartesianPoint>
               <CartesianPoint>
@@ -185,34 +206,57 @@ small_surface_solution - whole_building file:///C:/Users/admin/AppData/Local/Tem
             </PolyLoop>
           </PlanarGeometry>
         </Surface>
-
+</pre>
 
 ####<a name="2.5"></a> Second Gap
 
+Second gap:
 
-Second gap
-In [8]:
-Out[8]: {'space_ids': ['aim2553', 'aim7413'], 'shell': [(80.2291667, 14.5625, 10.0),
-   # print gap
-gap=gaps[1] gap
- In [9]:
-(80.0208333, 14.5625, 10.0),
-(80.0208333, 16.020833, 10.0),
-(80.2291667, 16.020833, 10.0),
-(80.2291667, 14.5625, 10.0)]}
-   # add Surface
-# surface element surface=gbxml.Campus.add_Surface(
-id=str(uuid4()), surfaceType=None, # to do constructionIdRef=None, # to do exposedToSun=None # to do
+<pre class="prettyprint">
+# print gap
+gap=gaps[1]
+gap
+</pre>
+
+Result:
+
+<pre class="prettyprint">
+{'space_ids': ['aim2553', 'aim7413'],
+  'shell':
+    [(80.2291667, 14.5625, 10.0),
+    (80.0208333, 14.5625, 10.0),
+    (80.0208333, 16.020833, 10.0),
+    (80.2291667, 16.020833, 10.0),
+    (80.2291667, 14.5625, 10.0)]}
+</pre>
+
+Fix:
+
+<pre class="prettyprint">
+# add Surface
+# surface element
+surface=gbxml.Campus.add_Surface(
+  id=str(uuid4()),
+  surfaceType=None, # to do
+  constructionIdRef=None, # to do
+  exposedToSun=None # to do
 )
 # adjacent space id child element
-for space_id in gap['space_ids']: surface.add_AdjacentSpaceId(
-spaceIdRef=space_id
-)
+for space_id in gap['space_ids']:
+  surface.add_AdjacentSpaceId(
+    spaceIdRef=space_id
+  )
 # planar geometry child element
-planar_geometry = surface.add_PlanarGeometry() planar_geometry.set_shell(gap['shell'])
+planar_geometry = surface.add_PlanarGeometry()
+planar_geometry.set_shell(gap['shell'])
 # check
 print(surface.tostring())
- <Surface xmlns="http://www.gbxml.org/schema" id="407a76aa-3287-4b5e-ac62-0440fb629f7
+</pre>
+
+Result:
+
+<pre class="prettyprint">
+<Surface xmlns="http://www.gbxml.org/schema" id="407a76aa-3287-4b5e-ac62-0440fb629f7
 2">
   <AdjacentSpaceId spaceIdRef="aim2553"/>
   <AdjacentSpaceId spaceIdRef="aim7413"/>
@@ -224,9 +268,6 @@ print(surface.tostring())
         <Coordinate>10.0</Coordinate>
       </CartesianPoint>
       <CartesianPoint>
-4 of 6 10/4/2023, 19:59
-
-small_surface_solution - whole_building file:///C:/Users/admin/AppData/Local/Temp/pid-10720/small_surface_s...
                   <Coordinate>80.0208333</Coordinate>
                  <Coordinate>14.5625</Coordinate>
                  <Coordinate>10.0</Coordinate>
@@ -244,18 +285,30 @@ small_surface_solution - whole_building file:///C:/Users/admin/AppData/Local/Tem
              </PolyLoop>
            </PlanarGeometry>
          </Surface>
+</pre>
 
-####<a name="2.6"></a> Second Gap
+####<a name="2.6"></a> Third Gap
 
-In [10]:
-Out[10]: {'space_ids': ['aim6674'],
-'shell': [(72.2287629, -0.4999998, 10.0),
-   # print gap
-gap=gaps[2] gap
- (72.2287629, -0.3141381, 10.0),
-(72.0986211, -0.4999998, 10.0),
-(72.2287629, -0.4999998, 10.0)]}
-   # add Surface
+<pre class="prettyprint">
+# print gap
+gap=gaps[2]
+gap
+</pre>
+
+Result:
+
+<pre class="prettyprint">
+{'space_ids': ['aim6674'],
+  'shell':
+    [(72.2287629, -0.4999998, 10.0),
+    (72.2287629, -0.3141381, 10.0),
+    (72.0986211, -0.4999998, 10.0),
+    (72.2287629, -0.4999998, 10.0)]}
+</pre>
+
+Fix:
+
+# add Surface
 # surface element surface=gbxml.Campus.add_Surface(
 id=str(uuid4()), surfaceType=None, # to do constructionIdRef=None, # to do exposedToSun=None # to do
 )
@@ -267,7 +320,9 @@ spaceIdRef=space_id
 planar_geometry = surface.add_PlanarGeometry() planar_geometry.set_shell(gap['shell'])
 # check
 print(surface.tostring())
- In [11]:
+
+Result:
+
 <Surface xmlns="http://www.gbxml.org/schema" id="96ad28f6-56fb-42b8-94d0-93c73d39886
 6">
   <AdjacentSpaceId spaceIdRef="aim6674"/>
@@ -275,9 +330,6 @@ print(surface.tostring())
     <PolyLoop>
       <CartesianPoint>
 <Coordinate>72.2287629</Coordinate>
-5 of 6 10/4/2023, 19:59
-
-small_surface_solution - whole_building file:///C:/Users/admin/AppData/Local/Temp/pid-10720/small_surface_s...
 <Coordinate>-0.4999998</Coordinate>
                  <Coordinate>10.0</Coordinate>
                </CartesianPoint>
