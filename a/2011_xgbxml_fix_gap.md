@@ -62,7 +62,7 @@ an entire gbXML [small surface solution addressing the whole building](doc/gbxml
 Addressing the issue
 on [gbXML from adjacent conceptual mass/adjacent space missing small surface](https://forums.autodesk.com/t5/revit-api-forum/gbxml-from-adjacent-conceptual-mass-adjacent-space-missing-small/m-p/12232100).
 
-####<a name="3"></a> Setup
+####<a name="2.1"></a> Setup
 
 Import packages:
 
@@ -83,7 +83,7 @@ Generate parser:
 parser=get_parser(version='0.37')
 </pre>
 
-####<a name="3"></a> Open gbXML BIM Model
+####<a name="2.2"></a> Open gbXML BIM Model
 
 Open file *23-013 WH Swan Hill_Mass_23-08-30.xml*:
 
@@ -98,7 +98,7 @@ plt.show()
 1 of 6 10/4/2023, 19:59
 small_surface_solution - whole_building file:///C:/Users/admin/AppData/Local/Temp/pid-10720/small_surface_s...
 
-####<a name="3"></a> Identify Gaps in Geometry
+####<a name="2.3"></a> Identify Gaps in Geometry
 
 Identify all gaps in the surfaces of the building This uses a new method of the Building element -> get_gaps_in_surfaces .
 In [5]:
@@ -133,7 +133,7 @@ small_surface_solution - whole_building file:///C:/Users/admin/AppData/Local/Tem
 Here the first and third items appear to be triangle gaps with only one adjacent space - so these are exterior gaps also adjacent to the outside.
 
 
-####<a name="3"></a> Add Missing Sufaces
+####<a name="2.4"></a> Add Missing Sufaces
 
 
 Adding the missing surfaces to the building; first gap:
@@ -187,7 +187,7 @@ small_surface_solution - whole_building file:///C:/Users/admin/AppData/Local/Tem
         </Surface>
 
 
-####<a name="3"></a> Second Gap
+####<a name="2.5"></a> Second Gap
 
 
 Second gap
@@ -245,7 +245,7 @@ small_surface_solution - whole_building file:///C:/Users/admin/AppData/Local/Tem
            </PlanarGeometry>
          </Surface>
 
-####<a name="3"></a> Second Gap
+####<a name="2.6"></a> Second Gap
 
 In [10]:
 Out[10]: {'space_ids': ['aim6674'],
@@ -295,7 +295,7 @@ small_surface_solution - whole_building file:///C:/Users/admin/AppData/Local/Tem
            </PlanarGeometry>
          </Surface>
 
-####<a name="3"></a> Verify Waterproof
+####<a name="2.7"></a> Verify Waterproof
 
 Recheck gaps in surfaces of building; there should now be no gaps.
 
@@ -306,7 +306,7 @@ Out[12]:
 
 []
 
-####<a name="3"></a> Save Model
+####<a name="2.8"></a> Save Model
 
 Save the updated gbxml file.
 
@@ -314,3 +314,37 @@ In [13]:
 
 # writes the gbXML etree to a local file
 tree.write('23-013 WH Swan Hill_Mass_23-08-30-UPDATED.xml', pretty_print=True)
+
+####<a name="3"></a> LLaVA Large Language and Vision Assistant
+
+The [LLaVA Large Language and Vision Assistant](https://llava.hliu.cc/) is
+open source with a non-commercial license and can be run locally with decent enough hardware.
+Needs linux and an rtx.
+Like Google Glass but more helpful perhaps.
+Identify plants, tools in a workspace, even run basic support, e.g., provide help on where to click on the computer screen etc.
+Presumably someone will soon train a commercial-allowed equivalent.
+
+####<a name="4"></a> Moonvalley Text to Video
+
+[Moonvalley](https://moonvalley.ai) is a text-to-video startup
+($36M in funding so far, and they call themselves ‘lean’):
+
+> Animate your ideas... a machine learning model that can create visually stunning, high definition videos and animation from simple text prompts.
+
+####<a name="5"></a> DETR Model Detects Objects in Images
+
+Did you know that you could run neural networks entirely in the browser without contacting a server?
+
+The StackOverflow newsletter pointed me to a fun demo that shows you how.
+Unfortunately, I lost the link and cannot find it anymore.
+All I have is the note I made of the underlying tool, and the result of running it on a photo I had at hand:
+
+- DETR (End-to-End Object Detection) model with ResNet-50 backbone
+
+I provided it with a picture of me eating churros ([^](/Users/jta/Pictures/2023/2023-10-10_garnatilla/16.jpg)), it it rapidly (a handful of seconds) identified the following objects:
+
+<center>
+<img src="img/jeremy_eating_churros.png" alt="Jeremy eating churros" title="Jeremy eating churros" width="600"/>
+</center>
+
+
