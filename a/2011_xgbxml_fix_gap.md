@@ -49,6 +49,21 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Xgbxml Fixes Building Geometry Gaps
 
+As we approach the weekend, I finally get around to sharing a mighty beautiful Python solution for fixing gaps in the building geometry, followed buy a bunch of little AI-related tidbits:
+
+- [Fixing building geometry gaps](#2)
+    - [Setup](#2.1)
+    - [Open gbXML BIM model](#2.2)
+    - [Identify gaps in geometry](#2.3)
+    - [Add missing surfaces](#2.4)
+    - [Second gap](#2.5)
+    - [Third gap](#2.6)
+    - [Verify waterproof](#2.7)
+    - [Save model](#2.8)
+- [LLaVA large language and vision assistant](#3)
+- [Moonvalley text to video](#4)
+- [DETR model detects objects in images](#5)
+
 Jake of [Ripcord Engineering](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/3926242) recently
 shared a bunch of valuable [Python and gbXML tips](https://thebuildingcoder.typepad.com/blog/2023/07/export-gbxml-and-python-tips.html) and followed up with a pointer
 to [Shapely](https://pypi.org/project/shapely/)
@@ -57,7 +72,7 @@ to [find and fix a gap in the building geometry](https://thebuildingcoder.typepa
 He followed up with this impressive and beautiful documentation of
 an entire gbXML [small surface solution addressing the whole building](doc/gbxml_small_surface_solution_whole_building.pdf) that I think warrants an entire blog post of its own, so here goes:
 
-####<a name="2"></a> Small Surface Solution &ndash; Whole Building
+####<a name="2"></a> Fixing Building Geometry Gaps
 
 Addressing the issue
 on [gbXML from adjacent conceptual mass/adjacent space missing small surface](https://forums.autodesk.com/t5/revit-api-forum/gbxml-from-adjacent-conceptual-mass-adjacent-space-missing-small/m-p/12232100).
@@ -137,7 +152,7 @@ Here, the first and third items appear to be triangle gaps with only one adjacen
       (72.2287629, -0.4999998, 10.0)]}]
 </pre>
 
-####<a name="2.4"></a> Add Missing Sufaces
+####<a name="2.4"></a> Add Missing Surfaces
 
 Adding the missing surfaces to the building; first gap:
 
