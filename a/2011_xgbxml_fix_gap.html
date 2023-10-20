@@ -72,6 +72,9 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 <li><a href="#5">DETR model detects objects in images</a></li>
 </ul>
 <h4><a name="2"></a> Fixing Building Geometry Gaps</h4>
+<p>Many developers have encountered issues with gaps in the building geometry caused by the relatively low precision used by Revit when tessellating surfaces.
+Some of them can be addressed by adding appropriate fuzz and adjusting neighbouring vertices to better match and line up.
+However, sometimes a gap remains.</p>
 <p>Jake of <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/3926242">Ripcord Engineering</a> recently
 shared a bunch of valuable <a href="https://thebuildingcoder.typepad.com/blog/2023/07/export-gbxml-and-python-tips.html">Python and gbXML tips</a> and followed up with a pointer
 to <a href="https://pypi.org/project/shapely/">Shapely</a>

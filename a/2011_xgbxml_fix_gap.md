@@ -73,6 +73,10 @@ As we approach the weekend, I finally get around to sharing a mighty beautiful P
 
 ####<a name="2"></a> Fixing Building Geometry Gaps
 
+Many developers have encountered issues with gaps in the building geometry caused by the relatively low precision used by Revit when tessellating surfaces.
+Some of them can be addressed by adding appropriate fuzz and adjusting neighbouring vertices to better match and line up.
+However, sometimes a gap remains.
+
 Jake of [Ripcord Engineering](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/3926242) recently
 shared a bunch of valuable [Python and gbXML tips](https://thebuildingcoder.typepad.com/blog/2023/07/export-gbxml-and-python-tips.html) and followed up with a pointer
 to [Shapely](https://pypi.org/project/shapely/)
