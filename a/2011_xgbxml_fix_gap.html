@@ -30,8 +30,15 @@ twitter:
 
  the #RevitAPI @AutodeskRevit #BIM @DynamoBIM @AutodeskAPS
 
-
-&ndash; ...
+A mighty beautiful Python solution for fixing gaps in the building geometry and new AI-related titbits
+&ndash; Fixing building geometry gaps
+&ndash; Open and render gbXML BIM model
+&ndash; Identify gaps in geometry
+&ndash; Add missing surfaces
+&ndash; Verify waterproof
+&ndash; LLaVA large language and vision assistant
+&ndash; Moonvalley text to video
+&ndash; DETR model detects objects in images...
 
 linkedin:
 
@@ -64,14 +71,13 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 <li><a href="#4">Moonvalley text to video</a></li>
 <li><a href="#5">DETR model detects objects in images</a></li>
 </ul>
+<h4><a name="2"></a> Fixing Building Geometry Gaps</h4>
 <p>Jake of <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/3926242">Ripcord Engineering</a> recently
 shared a bunch of valuable <a href="https://thebuildingcoder.typepad.com/blog/2023/07/export-gbxml-and-python-tips.html">Python and gbXML tips</a> and followed up with a pointer
 to <a href="https://pypi.org/project/shapely/">Shapely</a>
 to <a href="https://thebuildingcoder.typepad.com/blog/2023/09/element-diff-compare-shapely-and-rdbe.html#4">find and fix a gap in the building geometry</a>.</p>
 <p>He followed up with this impressive and beautiful documentation of
-an entire gbXML <a href="doc/gbxml_small_surface_solution_whole_building.pdf">small surface solution addressing the whole building</a> that I think warrants an entire blog post of its own, so here goes:</p>
-<h4><a name="2"></a> Fixing Building Geometry Gaps</h4>
-<p>Addressing the issue
+an entire gbXML <a href="doc/gbxml_small_surface_solution_whole_building.pdf">small surface solution addressing the whole building</a> that I think warrants an entire blog post of its own, so here goes, addressing the issue
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/gbxml-from-adjacent-conceptual-mass-adjacent-space-missing-small/m-p/12232100">gbXML from adjacent conceptual mass/adjacent space missing small surface</a>.</p>
 <h4><a name="2.1"></a> Setup</h4>
 <p>Import packages:</p>

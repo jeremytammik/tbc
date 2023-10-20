@@ -31,8 +31,15 @@ twitter:
 
  the #RevitAPI @AutodeskRevit #BIM @DynamoBIM @AutodeskAPS
 
-
-&ndash; ...
+A mighty beautiful Python solution for fixing gaps in the building geometry and new AI-related titbits
+&ndash; Fixing building geometry gaps
+&ndash; Open and render gbXML BIM model
+&ndash; Identify gaps in geometry
+&ndash; Add missing surfaces
+&ndash; Verify waterproof
+&ndash; LLaVA large language and vision assistant
+&ndash; Moonvalley text to video
+&ndash; DETR model detects objects in images...
 
 linkedin:
 
@@ -64,17 +71,15 @@ As we approach the weekend, I finally get around to sharing a mighty beautiful P
 - [Moonvalley text to video](#4)
 - [DETR model detects objects in images](#5)
 
+####<a name="2"></a> Fixing Building Geometry Gaps
+
 Jake of [Ripcord Engineering](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/3926242) recently
 shared a bunch of valuable [Python and gbXML tips](https://thebuildingcoder.typepad.com/blog/2023/07/export-gbxml-and-python-tips.html) and followed up with a pointer
 to [Shapely](https://pypi.org/project/shapely/)
 to [find and fix a gap in the building geometry](https://thebuildingcoder.typepad.com/blog/2023/09/element-diff-compare-shapely-and-rdbe.html#4).
 
 He followed up with this impressive and beautiful documentation of
-an entire gbXML [small surface solution addressing the whole building](doc/gbxml_small_surface_solution_whole_building.pdf) that I think warrants an entire blog post of its own, so here goes:
-
-####<a name="2"></a> Fixing Building Geometry Gaps
-
-Addressing the issue
+an entire gbXML [small surface solution addressing the whole building](doc/gbxml_small_surface_solution_whole_building.pdf) that I think warrants an entire blog post of its own, so here goes, addressing the issue
 on [gbXML from adjacent conceptual mass/adjacent space missing small surface](https://forums.autodesk.com/t5/revit-api-forum/gbxml-from-adjacent-conceptual-mass-adjacent-space-missing-small/m-p/12232100).
 
 ####<a name="2.1"></a> Setup
