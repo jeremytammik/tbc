@@ -47,7 +47,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Xgbxml Fixes Gaps in Building Geometry
+### Xgbxml Fixes Building Geometry Gaps
 
 Jake of [Ripcord Engineering](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/3926242) recently
 shared a bunch of valuable [Python and gbXML tips](https://thebuildingcoder.typepad.com/blog/2023/07/export-gbxml-and-python-tips.html) and followed up with a pointer
@@ -183,29 +183,28 @@ print(surface.tostring())
 Result:
 
 <pre class="prettyprint">
-<Surface xmlns="http://www.gbxml.org/schema" id="f20a7dbc-94d5-43ee-bf64-748c3e61658
-b">
-  <AdjacentSpaceId spaceIdRef="aim2197"/>
-  <PlanarGeometry>
-    <PolyLoop>
-      <CartesianPoint>
-        <Coordinate>72.2287629</Coordinate>
-        <Coordinate>-0.3141381</Coordinate>
-        <Coordinate>0.0</Coordinate>
-      </CartesianPoint>
-      <CartesianPoint>
-        <Coordinate>72.2287629</Coordinate>
-        <Coordinate>-0.4999998</Coordinate>
-                 <Coordinate>0.0</Coordinate>
-              </CartesianPoint>
-              <CartesianPoint>
-                <Coordinate>72.0986211</Coordinate>
-                <Coordinate>-0.4999998</Coordinate>
-                <Coordinate>0.0</Coordinate>
-              </CartesianPoint>
-            </PolyLoop>
-          </PlanarGeometry>
-        </Surface>
+&lt;Surface xmlns="http://www.gbxml.org/schema" id="f20a7dbc-94d5-43ee-bf64-748c3e61658b"&gt;
+  &lt;AdjacentSpaceId spaceIdRef="aim2197"/&gt;
+  &lt;PlanarGeometry&gt;
+    &lt;PolyLoop&gt;
+      &lt;CartesianPoint&gt;
+        &lt;Coordinate&gt;72.2287629&lt;/Coordinate&gt;
+        &lt;Coordinate&gt;-0.3141381&lt;/Coordinate&gt;
+        &lt;Coordinate&gt;0.0&lt;/Coordinate&gt;
+      &lt;/CartesianPoint&gt;
+      &lt;CartesianPoint&gt;
+        &lt;Coordinate&gt;72.2287629&lt;/Coordinate&gt;
+        &lt;Coordinate&gt;-0.4999998&lt;/Coordinate&gt;
+        &lt;Coordinate&gt;0.0&lt;/Coordinate&gt;
+      &lt;/CartesianPoint&gt;
+      &lt;CartesianPoint&gt;
+        &lt;Coordinate&gt;72.0986211&lt;/Coordinate&gt;
+        &lt;Coordinate&gt;-0.4999998&lt;/Coordinate&gt;
+        &lt;Coordinate&gt;0.0&lt;/Coordinate&gt;
+      &lt;/CartesianPoint&gt;
+    &lt;/PolyLoop&gt;
+  &lt;/PlanarGeometry&gt;
+&lt;/Surface&gt;
 </pre>
 
 ####<a name="2.5"></a> Second Gap
@@ -256,35 +255,34 @@ print(surface.tostring())
 Result:
 
 <pre class="prettyprint">
-<Surface xmlns="http://www.gbxml.org/schema" id="407a76aa-3287-4b5e-ac62-0440fb629f7
-2">
-  <AdjacentSpaceId spaceIdRef="aim2553"/>
-  <AdjacentSpaceId spaceIdRef="aim7413"/>
-  <PlanarGeometry>
-    <PolyLoop>
-      <CartesianPoint>
-        <Coordinate>80.2291667</Coordinate>
-        <Coordinate>14.5625</Coordinate>
-        <Coordinate>10.0</Coordinate>
-      </CartesianPoint>
-      <CartesianPoint>
-                  <Coordinate>80.0208333</Coordinate>
-                 <Coordinate>14.5625</Coordinate>
-                 <Coordinate>10.0</Coordinate>
-               </CartesianPoint>
-               <CartesianPoint>
-                 <Coordinate>80.0208333</Coordinate>
-                 <Coordinate>16.020833</Coordinate>
-                 <Coordinate>10.0</Coordinate>
-               </CartesianPoint>
-               <CartesianPoint>
-                 <Coordinate>80.2291667</Coordinate>
-                 <Coordinate>16.020833</Coordinate>
-                 <Coordinate>10.0</Coordinate>
-               </CartesianPoint>
-             </PolyLoop>
-           </PlanarGeometry>
-         </Surface>
+&lt;Surface xmlns="http://www.gbxml.org/schema" id="407a76aa-3287-4b5e-ac62-0440fb629f72"&gt;
+  &lt;AdjacentSpaceId spaceIdRef="aim2553"/&gt;
+  &lt;AdjacentSpaceId spaceIdRef="aim7413"/&gt;
+  &lt;PlanarGeometry&gt;
+    &lt;PolyLoop&gt;
+      &lt;CartesianPoint&gt;
+        &lt;Coordinate&gt;80.2291667&lt;/Coordinate&gt;
+        &lt;Coordinate&gt;14.5625&lt;/Coordinate&gt;
+        &lt;Coordinate&gt;10.0&lt;/Coordinate&gt;
+      &lt;/CartesianPoint&gt;
+      &lt;CartesianPoint&gt;
+        &lt;Coordinate&gt;80.0208333&lt;/Coordinate&gt;
+        &lt;Coordinate&gt;14.5625&lt;/Coordinate&gt;
+        &lt;Coordinate&gt;10.0&lt;/Coordinate&gt;
+      &lt;/CartesianPoint&gt;
+      &lt;CartesianPoint&gt;
+        &lt;Coordinate&gt;80.0208333&lt;/Coordinate&gt;
+        &lt;Coordinate&gt;16.020833&lt;/Coordinate&gt;
+        &lt;Coordinate&gt;10.0&lt;/Coordinate&gt;
+      &lt;/CartesianPoint&gt;
+      &lt;CartesianPoint&gt;
+        &lt;Coordinate&gt;80.2291667&lt;/Coordinate&gt;
+        &lt;Coordinate&gt;16.020833&lt;/Coordinate&gt;
+        &lt;Coordinate&gt;10.0&lt;/Coordinate&gt;
+      &lt;/CartesianPoint&gt;
+    &lt;/PolyLoop&gt;
+  &lt;/PlanarGeometry&gt;
+&lt;/Surface&gt;
 </pre>
 
 ####<a name="2.6"></a> Third Gap
@@ -308,6 +306,7 @@ Result:
 
 Fix:
 
+<pre class="prettyprint">
 # add Surface
 # surface element surface=gbxml.Campus.add_Surface(
 id=str(uuid4()), surfaceType=None, # to do constructionIdRef=None, # to do exposedToSun=None # to do
@@ -320,52 +319,61 @@ spaceIdRef=space_id
 planar_geometry = surface.add_PlanarGeometry() planar_geometry.set_shell(gap['shell'])
 # check
 print(surface.tostring())
+</pre>
 
 Result:
 
-<Surface xmlns="http://www.gbxml.org/schema" id="96ad28f6-56fb-42b8-94d0-93c73d39886
-6">
-  <AdjacentSpaceId spaceIdRef="aim6674"/>
-  <PlanarGeometry>
-    <PolyLoop>
-      <CartesianPoint>
-<Coordinate>72.2287629</Coordinate>
-<Coordinate>-0.4999998</Coordinate>
-                 <Coordinate>10.0</Coordinate>
-               </CartesianPoint>
-               <CartesianPoint>
-                 <Coordinate>72.2287629</Coordinate>
-                 <Coordinate>-0.3141381</Coordinate>
-                 <Coordinate>10.0</Coordinate>
-               </CartesianPoint>
-               <CartesianPoint>
-                 <Coordinate>72.0986211</Coordinate>
-                 <Coordinate>-0.4999998</Coordinate>
-                 <Coordinate>10.0</Coordinate>
-               </CartesianPoint>
-             </PolyLoop>
-           </PlanarGeometry>
-         </Surface>
+<pre class="prettyprint">
+&lt;Surface xmlns="http://www.gbxml.org/schema" id="96ad28f6-56fb-42b8-94d0-93c73d398866"&gt;
+  &lt;AdjacentSpaceId spaceIdRef="aim6674"/&gt;
+  &lt;PlanarGeometry&gt;
+    &lt;PolyLoop&gt;
+      &lt;CartesianPoint&gt;
+        &lt;Coordinate&gt;72.2287629&lt;/Coordinate&gt;
+        &lt;Coordinate&gt;-0.4999998&lt;/Coordinate&gt;
+        &lt;Coordinate&gt;10.0&lt;/Coordinate&gt;
+      &lt;/CartesianPoint&gt;
+      &lt;CartesianPoint&gt;
+        &lt;Coordinate&gt;72.2287629&lt;/Coordinate&gt;
+        &lt;Coordinate&gt;-0.3141381&lt;/Coordinate&gt;
+        &lt;Coordinate&gt;10.0&lt;/Coordinate&gt;
+      &lt;/CartesianPoint&gt;
+      &lt;CartesianPoint&gt;
+        &lt;Coordinate&gt;72.0986211&lt;/Coordinate&gt;
+        &lt;Coordinate&gt;-0.4999998&lt;/Coordinate&gt;
+        &lt;Coordinate&gt;10.0&lt;/Coordinate&gt;
+      &lt;/CartesianPoint&gt;
+    &lt;/PolyLoop&gt;
+  &lt;/PlanarGeometry&gt;
+&lt;/Surface&gt;
+</pre>
 
 ####<a name="2.7"></a> Verify Waterproof
 
 Recheck gaps in surfaces of building; there should now be no gaps.
 
+<pre class="prettyprint">
 # identify gaps in surfaces of building
 gaps=gbxml.Campus.Building.get_gaps_in_surfaces() gaps
+</pre>
 
-Out[12]:
+Result:
 
+<pre class="prettyprint">
 []
+</pre>
 
 ####<a name="2.8"></a> Save Model
 
 Save the updated gbxml file.
 
-In [13]:
-
+<pre class="prettyprint">
 # writes the gbXML etree to a local file
 tree.write('23-013 WH Swan Hill_Mass_23-08-30-UPDATED.xml', pretty_print=True)
+</pre>
+
+Many thanks again to Jake for this extremely powerful solution and
+his [beautiful documentation](doc/gbxml_small_surface_solution_whole_building.pdf).
 
 ####<a name="3"></a> LLaVA Large Language and Vision Assistant
 
