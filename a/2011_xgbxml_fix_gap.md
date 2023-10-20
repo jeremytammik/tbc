@@ -49,7 +49,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Xgbxml Fixes Building Geometry Gaps
 
-As we approach the weekend, I finally get around to sharing a mighty beautiful Python solution for fixing gaps in the building geometry, followed by a bunch of little AI-related tidbits:
+As we approach the weekend, I finally get around to sharing a mighty beautiful Python solution for fixing gaps in the building geometry, followed by a bunch of little AI-related titbits:
 
 - [Fixing building geometry gaps](#2)
     - [Setup](#2.1)
@@ -419,16 +419,21 @@ Presumably someone will soon train a commercial-allowed equivalent.
 
 Did you know that you could run neural networks entirely in the browser without contacting a server?
 
-The StackOverflow newsletter pointed me to a fun demo that shows you how.
+The latest StackOverflow newsletter pointed me to a fun demo that shows you how.
+I uploaded a picture and tested it.
 Unfortunately, I lost the link and cannot find it anymore.
-All I have is the note I made of the underlying tool, and the result of running it on a photo I had at hand:
+All I have now is the note I made of the underlying tool, and the result of running it on a photo I had at hand:
 
 - DETR (End-to-End Object Detection) model with ResNet-50 backbone
 
-I provided it with a picture of me eating churros ([^](/Users/jta/Pictures/2023/2023-10-10_garnatilla/16.jpg)), it it rapidly (a handful of seconds) identified the following objects:
+I provided it with a picture of me eating churros ([^](/Users/jta/Pictures/2023/2023-10-10_garnatilla/16.jpg)) and
+it rapidly (in a handful of seconds) identified the following objects:
 
 <center>
 <img src="img/jeremy_eating_churros.png" alt="Jeremy eating churros" title="Jeremy eating churros" width="600"/>
 </center>
 
+I find that pretty impressive.
+
+Exciting times... oh, dear, and deeply troubling, too... thinking of all the conflicts currently blooming...
 
