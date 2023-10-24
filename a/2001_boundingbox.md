@@ -108,7 +108,7 @@ Today we look at some aspects axis-aligned bounding boxes, bounding box transfor
 <!--
 ####<a name="2"></a> All Categories and Parameters
 
-Roman [Nice3point](https://github.com/Nice3point), principle maintained of RevitLookup, presents a new discovery; in his own words:
+Roman [Nice3point](https://github.com/Nice3point), principle maintainer of RevitLookup, presents a new discovery; in his own words:
 
 I made a new discovery for me.
 As far as I know, it is impossible to get a list of all built-in parameters using the public Revit API.

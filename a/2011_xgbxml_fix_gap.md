@@ -29,7 +29,7 @@
 
 twitter:
 
- the #RevitAPI @AutodeskRevit #BIM @DynamoBIM @AutodeskAPS
+A mighty beautiful #Python solution to fix gaps in building geometry, render @gbXML BIM model, add missing surfaces and verify waterproof with the #RevitAPI @AutodeskRevit #BIM @DynamoBIM @AutodeskAPS https://autode.sk/fixgaps
 
 A mighty beautiful Python solution for fixing gaps in the building geometry and new AI-related titbits
 &ndash; Fixing building geometry gaps
@@ -42,6 +42,19 @@ A mighty beautiful Python solution for fixing gaps in the building geometry and 
 &ndash; DETR model detects objects in images...
 
 linkedin:
+
+A mighty beautiful #Python solution to fix gaps in building geometry, render @gbXML BIM model, add missing surfaces and verify waterproof with the #RevitAPI @AutodeskRevit #BIM @DynamoBIM @AutodeskAPS
+
+https://autode.sk/fixgaps
+
+- Fixing building geometry gaps
+- Open and render gbXML BIM model
+- Identify gaps in geometry
+- Add missing surfaces
+- Verify waterproof
+- LLaVA large language and vision assistant
+- Moonvalley text to video
+- DETR model detects objects in images...
 
 #BIM #DynamoBIM #AutodeskAPS #Revit #API #IFC #SDK #Autodesk #AEC #adsk
 
