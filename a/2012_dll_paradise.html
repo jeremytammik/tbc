@@ -87,7 +87,7 @@ on <a href="https://github.com/atomatiq/InterprocessCommunication">Interprocess 
 <p>Please be aware that the Revit development team is looking at
 possible <a href="https://thebuildingcoder.typepad.com/blog/2023/08/15-years-polygon-areas-and-net-core.html#3">options for moving the Revit API forward from .NET 4.8</a> as
 we speak.
-As usual, Roman is one step ahead.</p>
+With the approach described here, you can move ahead today and solve other DLL cnflict issues as well.</p>
 <h4><a name="3"></a> Interprocess Communication: Strategies and Best Practices</h4>
 <p>We all know how challenging it is to maintain large programs and keep up with progress.
 Developers of plugins for Revit understand this better than anyone else.
@@ -122,7 +122,7 @@ What is simpler, calling a function directly, or exchanging messages? Obviously,
 <li>Resolving Dependency Conflicts</li>
 </ul>
 <p>With each passing year, the size of Revit plugins is growing exponentially, and dependencies are also increasing at a geometric rate.
-  Plugins might use incompatible versions of a single library, leading to program crashes. Process isolation solves this problem.</p>
+Plugins might use incompatible versions of a single library, leading to program crashes. Process isolation solves this problem.</p>
 <ul>
 <li>Performance</li>
 </ul>
@@ -149,13 +149,13 @@ What is simpler, calling a function directly, or exchanging messages? Obviously,
 <p>The 68-fold difference in speed when finding the minimum value, and the complete absence of memory allocation, is impressive.</p>
 <p>How then to write a program in the latest .NET version that will interact with an incompatible .NET framework?
 Create two applications, Server and Client, without adding dependencies between each other and configure the interaction between them using a configured protocol.</p>
-<p>Below are some of the possible ways of interaction between two applications:</p>
-<ol>
+<p>Here are some possible ways of interaction between two applications:</p>
+<ul>
 <li>Using WCF (Windows Communication Foundation)</li>
 <li>Using sockets (TCP or UDP)</li>
 <li>Using Named Pipes</li>
 <li>Using operating system signals (e.g., Windows signals):</li>
-</ol>
+</ul>
 <p>An example of the latter from Autodesk's code, the interaction of the Project Browser plugin with the Revit backend via messages.</p>
 <pre class="prettyprint">
 public class DataTransmitter : IEventObserver
@@ -211,7 +211,7 @@ Apart from high performance, Named Pipes also offer various security levels, mak
 <p>Let's consider two applications, one containing the business logic (server), and the other one for the user interface (client).
 NamedPipe is used to facilitate communication between these two processes.</p>
 <p>The operation principle of NamedPipe involves the following steps:</p>
-<ol>
+<ul>
 <li><strong>Creation and configuration of NamedPipe</strong>: The server creates and configures the NamedPipe with a specific name that will be accessible to the client.
    The client needs to know this name to connect to the pipe.</li>
 <li><strong>Waiting for connection</strong>: The server starts to wait for the client to connect to the pipe.
@@ -220,7 +220,7 @@ NamedPipe is used to facilitate communication between these two processes.</p>
 <li><strong>Data exchange</strong>: After a successful connection, the client and server can exchange data in the form of byte streams.
    The client sends requests for executing the business logic, and the server processes these requests and sends back the results.</li>
 <li><strong>Session termination</strong>: After the data exchange is complete, the client and server can close the connection with NamedPipe.</li>
-</ol>
+</ul>
 <h5><a name="3.5"></a> Server Creation</h5>
 <p>On the .NET platform, the server side is represented by the <code>NamedPipeServerStream</code> class.
 The class implementation provides both asynchronous and synchronous methods for working with NamedPipe.
@@ -597,14 +597,14 @@ public class ClientDispatcher
 </pre>
 
 <p>Working principle:</p>
-<ol>
+<ul>
 <li><strong>Initialization:</strong> the <code>NamedPipeClientStream</code> is initialized in the class constructor, used to create a client stream with a named pipe.</li>
 <li><strong>Establishing Connection:</strong> the <code>ConnectToServer</code> method initiates an asynchronous connection to the server.
    The operation's result is stored in a <code>Task</code>.
    <code>TimeOutNewProcess</code> is used to disconnect the client in case of unexpected exceptions.</li>
 <li><strong>Sending Requests:</strong> the <code>WriteRequestAsync</code> method is designed for asynchronously sending a Request object through the established connection.
    The request will be sent only after the connection is established.</li>
-</ol>
+</ul>
 <p>To receive messages by the server, we will create a <code>ServerDispatcher</code> class to manage the connection and read requests.</p>
 <pre class="prettyprint">
 /// &lt;summary&gt;
@@ -658,13 +658,13 @@ public class ServerDispatcher
 </pre>
 
 <p>Working principle:</p>
-<ol>
+<ul>
 <li><strong>Initialization:</strong> the <code>NamedPipeServerStream</code> is initialized in the class constructor, used to create a server stream with a named pipe.</li>
 <li><strong>Listening for Connections:</strong> The <code>ListenAndDispatchConnections()</code> method asynchronously waits for a client connection.
    After processing the requests, it closes the named pipe and releases resources.</li>
 <li><strong>Handling Requests:</strong> The <code>ListenAndDispatchConnectionsCoreAsync()</code> method handles requests until the client is disconnected.
    Depending on the type of request, corresponding data processing occurs, such as displaying the message content in the console or updating the model.</li>
-</ol>
+</ul>
 <p>An example of sending a request from the UI to the server:</p>
 <pre class="prettyprint">
 /// &lt;summary&gt;

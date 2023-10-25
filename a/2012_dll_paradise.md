@@ -91,7 +91,7 @@ on [Interprocess Communication: Strategies and Best Practices](https://github.co
 Please be aware that the Revit development team is looking at
 possible [options for moving the Revit API forward from .NET 4.8](https://thebuildingcoder.typepad.com/blog/2023/08/15-years-polygon-areas-and-net-core.html#3) as
 we speak.
-As usual, Roman is one step ahead.
+With the approach described here, you can move ahead today and solve other DLL cnflict issues as well.
 
 ####<a name="3"></a> Interprocess Communication: Strategies and Best Practices
 
@@ -131,17 +131,17 @@ So what are the benefits of doing this?
 
 - Resolving Dependency Conflicts
 
-  With each passing year, the size of Revit plugins is growing exponentially, and dependencies are also increasing at a geometric rate.
-  Plugins might use incompatible versions of a single library, leading to program crashes. Process isolation solves this problem.
+With each passing year, the size of Revit plugins is growing exponentially, and dependencies are also increasing at a geometric rate.
+Plugins might use incompatible versions of a single library, leading to program crashes. Process isolation solves this problem.
 
 - Performance
 
-  The performance measurements for sorting and mathematical calculations on different .NET versions are provided below.
+The performance measurements for sorting and mathematical calculations on different .NET versions are provided below.
 
-  - BenchmarkDotNet v0.13.9, Windows 11 (10.0.22621.1702/22H2/2022Update/SunValley2)
-  - AMD Ryzen 5 2600X, 1 CPU, 12 logical and 6 physical cores
-  - .NET 7.0.9 (7.0.923.32018), X64 RyuJIT AVX2
-  - .NET Framework 4.8.1 (4.8.9139.0), X64 RyuJIT VectorSize=256
+- BenchmarkDotNet v0.13.9, Windows 11 (10.0.22621.1702/22H2/2022Update/SunValley2)
+- AMD Ryzen 5 2600X, 1 CPU, 12 logical and 6 physical cores
+- .NET 7.0.9 (7.0.923.32018), X64 RyuJIT AVX2
+- .NET Framework 4.8.1 (4.8.9139.0), X64 RyuJIT VectorSize=256
 
 <center>
 <table>
@@ -157,18 +157,17 @@ So what are the benefits of doing this?
 </table>
 </center>
 
-
-  The 68-fold difference in speed when finding the minimum value, and the complete absence of memory allocation, is impressive.
+The 68-fold difference in speed when finding the minimum value, and the complete absence of memory allocation, is impressive.
 
 How then to write a program in the latest .NET version that will interact with an incompatible .NET framework?
 Create two applications, Server and Client, without adding dependencies between each other and configure the interaction between them using a configured protocol.
 
-Below are some of the possible ways of interaction between two applications:
+Here are some possible ways of interaction between two applications:
 
-1. Using WCF (Windows Communication Foundation)
-2. Using sockets (TCP or UDP)
-3. Using Named Pipes
-4. Using operating system signals (e.g., Windows signals):
+-  Using WCF (Windows Communication Foundation)
+-  Using sockets (TCP or UDP)
+-  Using Named Pipes
+-  Using operating system signals (e.g., Windows signals):
 
 An example of the latter from Autodesk's code, the interaction of the Project Browser plugin with the Revit backend via messages.
 
@@ -232,14 +231,14 @@ NamedPipe is used to facilitate communication between these two processes.
 
 The operation principle of NamedPipe involves the following steps:
 
-1. **Creation and configuration of NamedPipe**: The server creates and configures the NamedPipe with a specific name that will be accessible to the client.
+-  **Creation and configuration of NamedPipe**: The server creates and configures the NamedPipe with a specific name that will be accessible to the client.
    The client needs to know this name to connect to the pipe.
-2. **Waiting for connection**: The server starts to wait for the client to connect to the pipe.
+-  **Waiting for connection**: The server starts to wait for the client to connect to the pipe.
    This is a blocking operation, and the server remains in a pending state until the client connects.
-3. **Connecting to NamedPipe**: The client initiates a connection to the NamedPipe, specifying the name of the pipe to which it wants to connect.
-4. **Data exchange**: After a successful connection, the client and server can exchange data in the form of byte streams.
+-  **Connecting to NamedPipe**: The client initiates a connection to the NamedPipe, specifying the name of the pipe to which it wants to connect.
+-  **Data exchange**: After a successful connection, the client and server can exchange data in the form of byte streams.
    The client sends requests for executing the business logic, and the server processes these requests and sends back the results.
-5. **Session termination**: After the data exchange is complete, the client and server can close the connection with NamedPipe.
+-  **Session termination**: After the data exchange is complete, the client and server can close the connection with NamedPipe.
 
 #####<a name="3.5"></a> Server Creation
 
@@ -640,11 +639,11 @@ public class ClientDispatcher
 
 Working principle:
 
-1. **Initialization:** the `NamedPipeClientStream` is initialized in the class constructor, used to create a client stream with a named pipe.
-2. **Establishing Connection:** the `ConnectToServer` method initiates an asynchronous connection to the server.
+-  **Initialization:** the `NamedPipeClientStream` is initialized in the class constructor, used to create a client stream with a named pipe.
+-  **Establishing Connection:** the `ConnectToServer` method initiates an asynchronous connection to the server.
    The operation's result is stored in a `Task`.
    `TimeOutNewProcess` is used to disconnect the client in case of unexpected exceptions.
-3. **Sending Requests:** the `WriteRequestAsync` method is designed for asynchronously sending a Request object through the established connection.
+-  **Sending Requests:** the `WriteRequestAsync` method is designed for asynchronously sending a Request object through the established connection.
    The request will be sent only after the connection is established.
 
 To receive messages by the server, we will create a `ServerDispatcher` class to manage the connection and read requests.
@@ -702,10 +701,10 @@ public class ServerDispatcher
 
 Working principle:
 
-1. **Initialization:** the `NamedPipeServerStream` is initialized in the class constructor, used to create a server stream with a named pipe.
-2. **Listening for Connections:** The `ListenAndDispatchConnections()` method asynchronously waits for a client connection.
+-  **Initialization:** the `NamedPipeServerStream` is initialized in the class constructor, used to create a server stream with a named pipe.
+-  **Listening for Connections:** The `ListenAndDispatchConnections()` method asynchronously waits for a client connection.
    After processing the requests, it closes the named pipe and releases resources.
-3. **Handling Requests:** The `ListenAndDispatchConnectionsCoreAsync()` method handles requests until the client is disconnected.
+-  **Handling Requests:** The `ListenAndDispatchConnectionsCoreAsync()` method handles requests until the client is disconnected.
    Depending on the type of request, corresponding data processing occurs, such as displaying the message content in the console or updating the model.
 
 An example of sending a request from the UI to the server:
