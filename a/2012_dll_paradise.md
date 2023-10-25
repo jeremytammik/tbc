@@ -34,7 +34,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 - [DLL paradise for Revit add-ins via named pipe IPC](#2)
 - [Interprocess communication: strategies and best practices](#3)
     - [Table of contents](#3.1)
-    - [Introduction to using named pipes for communication between applications on different .NET versions](#3.2)
+    - [Using named pipes to communicate between different .NET versions](#3.2)
     - [What are named pipes?](#3.3)
     - [Interactions between applications in .NET 4.8 and .NET 7](#3.4)
     - [Server creation](#3.5)
@@ -94,6 +94,8 @@ Ultimately, this affects users who are forced to use outdated software.
 In such scenarios, splitting the application into multiple processes using Named Pipes appears to be an excellent solution due to its performance and reliability.
 In this article, we discuss how to create and use Named Pipes to communicate between the Revit application running on .NET 4.8 and its plugin running on .NET 7.
 
+<!--
+
 ####<a name="3.1"></a> Table of Contents
 
 * [Introduction to Using Named Pipes for Communication Between Applications on Different .NET Versions](#introduction-to-using-named-pipes-for-communication-between-applications-on-different-net-versions)
@@ -108,7 +110,9 @@ In this article, we discuss how to create and use Named Pipes to communicate bet
 * [Installing .NET Runtime during plugin installation](#installing-net-runtime-during-plugin-installation)
 * [Conclusion](#conclusion)
 
-####<a name="3.2"></a> Introduction to Using Named Pipes for Communication Between Applications on Different .NET Versions
+-->
+
+####<a name="3.2"></a> Using Named Pipes to Communicate Between Different .NET Versions
 
 In the world of application development, there is often a need to ensure data exchange between different applications, especially in cases where they operate on different versions of .NET or different languages.
 Splitting a single application into multiple processes must be justified.
