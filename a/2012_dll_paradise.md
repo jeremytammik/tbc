@@ -72,6 +72,13 @@ One huge article explaining how you can address DLL hell today, and a bunch of l
 - [How open source wins](#6)
 - [HTTP/3](#5)
 
+By the way, I am writing this from my hospital bed.
+I had a 6-metre fall from a ladder onto earth last weekend and broke my rip hipbone, both front and back.
+Now I am waiting for an operastion to get it screwed back together again and hope that will provide a stable basis for a speedy recovery.
+
+<center>
+<img src="img/2023-10-21_jeremy_in_hospital.jpg" alt="Jeremy in hospital" title="Jeremy in hospital" width="600"/>
+</center>
 
 ####<a name="1"></a> What are the Autodesk Platform Services?
 
