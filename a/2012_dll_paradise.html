@@ -18,6 +18,14 @@ th, td {
 <p></head></p>
 <!---
 
+- aps intro:
+  We have a new overview video answering the question “What is Autodesk Platform Services?” This gives a quick explanation of what APS is, how it fits into the Autodesk Platform, and shows some of the most popular applications of APS in use with our customers and partners. You can find the video on YouTube here: https://youtu.be/RrAel5Mx7-0?si=lk3C2qLjUHX8PALi
+
+- another open source multimodal model
+  Fuyu-8B: A Multimodal Architecture for AI Agents
+  https://www.adept.ai/blog/fuyu-8b
+  Can be run offline on a laptop CPU
+
 
 twitter:
 
@@ -41,7 +49,9 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 -->
 
 <h3>DLL Paradise</h3>
+<p>One huge article explaining how you can address DLL hell today, and a bunch of little notes to decorate it:</p>
 <ul>
+<li><a href="#1">What are the Autodesk Platform Services?</a></li>
 <li><a href="#2">DLL paradise for Revit add-ins via named pipe IPC</a></li>
 <li><a href="#3">Interprocess communication: strategies and best practices</a><ul>
 <li><a href="#3.1">Table of contents</a></li>
@@ -58,7 +68,14 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 <li><a href="#3.12">Conclusion</a></li>
 </ul>
 </li>
+<li><a href="#4">Fuyu-8B multimodal architecture for AI agents</a></li>
+<li><a href="#6">How open source wins</a></li>
+<li><a href="#5">HTTP/3</a></li>
 </ul>
+<h4><a name="1"></a> What are the Autodesk Platform Services?</h4>
+<p>We have a new two-and-a-half-minute overview YouTube video answering
+the question <a href="https://youtu.be/RrAel5Mx7-0?feature=shared">What is Autodesk Platform Services?</a> to
+give a quick explanation of what APS is, how it fits into the Autodesk Platform, and shows some of the most popular applications of APS in use with our customers and partners.</p>
 <h4><a name="2"></a> DLL Paradise for Revit Add-ins via Named Pipe IPC</h4>
 <p>Windows applications integrating external components occasionally
 encounter <a href="https://duckduckgo.com/?q=dll+hell">DLL hell</a> due to conflicting dependencies.
@@ -126,7 +143,7 @@ Plugins might use incompatible versions of a single library, leading to program 
 <ul>
 <li>Performance</li>
 </ul>
-<p>The performance measurements for sorting and mathematical calculations on different .NET versions are provided below.</p>
+<p>Here are a few performance measurements for sorting and mathematical calculations on different .NET versions:</p>
 <ul>
 <li>BenchmarkDotNet v0.13.9, Windows 11 (10.0.22621.1702/22H2/2022Update/SunValley2)</li>
 <li>AMD Ryzen 5 2600X, 1 CPU, 12 logical and 6 physical cores</li>
@@ -1175,5 +1192,15 @@ Dealing with code that needs to be maintained across multiple versions, a well-c
 However, let us not forget that the choice of approach requires analysis and should be based on the actual requirements and constraints of your project.</p>
 <p>Do you need to split each plugin into multiple processes? Definitely not.</p>
 <p>We hope that this article will help you find the best solution for your interprocess communication scenarios and give you an understanding of how to apply IPC approaches in practice.</p>
-<h4><a name="4"></a></h4>
-<h4><a name="5"></a></h4>
+<p>Many thanks to Roman for his deep research and careful documentation of this important topic, in addition to all his maintenance work on RevitLookup.</p>
+<h4><a name="4"></a> Fuyu-8B Multimodal Architecture for AI Agents</h4>
+<p>Another open source multimodal model hit the scene,
+<a href="https://www.adept.ai/blog/fuyu-8b">Fuyu-8B: A Multimodal Architecture for AI Agents</a>.</p>
+<p>It can be run offline on a laptop CPU.</p>
+<h4><a name="6"></a> How Open Source Wins</h4>
+<p>(Open Source does not win by being cheaper)[https://github.com/getlago/lago/wiki/Open-Source-does-not-win-by-being-cheaper#how-open-source-winsby-solving-an-extensibility-problem],
+but by offering tranparency, extensibility and quality.</p>
+<h4><a name="5"></a> HTTP/3</h4>
+<p>Did you notice that you have started using HTTP/3?
+I hadn't.
+Learn <a href="https://blog.apnic.net/2023/09/25/why-http-3-is-eating-the-world/">why HTTP/3 is eating the world</a>.</p>

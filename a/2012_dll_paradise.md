@@ -19,6 +19,14 @@ th, td {
 
 <!---
 
+- aps intro:
+  We have a new overview video answering the question “What is Autodesk Platform Services?” This gives a quick explanation of what APS is, how it fits into the Autodesk Platform, and shows some of the most popular applications of APS in use with our customers and partners. You can find the video on YouTube here: https://youtu.be/RrAel5Mx7-0?si=lk3C2qLjUHX8PALi
+
+- another open source multimodal model
+  Fuyu-8B: A Multimodal Architecture for AI Agents
+  https://www.adept.ai/blog/fuyu-8b
+  Can be run offline on a laptop CPU
+
 
 twitter:
 
@@ -43,7 +51,9 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### DLL Paradise
 
+One huge article explaining how you can address DLL hell today, and a bunch of little notes to decorate it:
 
+- [What are the Autodesk Platform Services?](#1)
 - [DLL paradise for Revit add-ins via named pipe IPC](#2)
 - [Interprocess communication: strategies and best practices](#3)
     - [Table of contents](#3.1)
@@ -58,6 +68,16 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
     - [Implementation for Revit plug-in](#3.10)
     - [Installing .NET runtime during plugin installation](#3.11)
     - [Conclusion](#3.12)
+- [Fuyu-8B multimodal architecture for AI agents](#4)
+- [How open source wins](#6)
+- [HTTP/3](#5)
+
+
+####<a name="1"></a> What are the Autodesk Platform Services?
+
+We have a new two-and-a-half-minute overview YouTube video answering
+the question [What is Autodesk Platform Services?](https://youtu.be/RrAel5Mx7-0?feature=shared) to
+give a quick explanation of what APS is, how it fits into the Autodesk Platform, and shows some of the most popular applications of APS in use with our customers and partners.
 
 
 ####<a name="2"></a> DLL Paradise for Revit Add-ins via Named Pipe IPC
@@ -136,7 +156,7 @@ Plugins might use incompatible versions of a single library, leading to program 
 
 - Performance
 
-The performance measurements for sorting and mathematical calculations on different .NET versions are provided below.
+Here are a few performance measurements for sorting and mathematical calculations on different .NET versions:
 
 - BenchmarkDotNet v0.13.9, Windows 11 (10.0.22621.1702/22H2/2022Update/SunValley2)
 - AMD Ryzen 5 2600X, 1 CPU, 12 logical and 6 physical cores
@@ -1255,10 +1275,23 @@ Do you need to split each plugin into multiple processes? Definitely not.
 
 We hope that this article will help you find the best solution for your interprocess communication scenarios and give you an understanding of how to apply IPC approaches in practice.
 
+Many thanks to Roman for his deep research and careful documentation of this important topic, in addition to all his maintenance work on RevitLookup.
 
-####<a name="4"></a>
+####<a name="4"></a> Fuyu-8B Multimodal Architecture for AI Agents
 
-####<a name="5"></a>
+Another open source multimodal model hit the scene,
+[Fuyu-8B: A Multimodal Architecture for AI Agents](https://www.adept.ai/blog/fuyu-8b).
 
+It can be run offline on a laptop CPU.
 
+####<a name="6"></a> How Open Source Wins
+
+(Open Source does not win by being cheaper)[https://github.com/getlago/lago/wiki/Open-Source-does-not-win-by-being-cheaper#how-open-source-winsby-solving-an-extensibility-problem],
+but by offering tranparency, extensibility and quality.
+
+####<a name="5"></a> HTTP/3
+
+Did you notice that you have started using HTTP/3?
+I hadn't.
+Learn [why HTTP/3 is eating the world](https://blog.apnic.net/2023/09/25/why-http-3-is-eating-the-world/).
 
