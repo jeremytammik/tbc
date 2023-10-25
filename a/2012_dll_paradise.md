@@ -32,7 +32,14 @@ twitter:
 
  with the #RevitAPI @AutodeskRevit #BIM @DynamoBIM @AutodeskAPS
 
-&ndash; ...
+APS overview
+&ndash; DLL paradise for Revit add-ins via named pipe IPC
+&ndash; Interprocess communication strategies and best practices
+&ndash; Using named pipes to communicate between different .NET versions
+&ndash; Interactions between .NET 4.8 and .NET 7
+&ndash; Server / client transmission protocol
+&ndash; Connection management
+&ndash; Two-way communication...
 
 linkedin:
 
@@ -49,7 +56,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### DLL Paradise
+### DLL Paradise and a Fall
 
 One huge article explaining how you can address DLL hell today, and a bunch of little notes to decorate it:
 
@@ -73,8 +80,8 @@ One huge article explaining how you can address DLL hell today, and a bunch of l
 - [HTTP/3](#5)
 
 By the way, I am writing this from my hospital bed.
-I had a 6-metre fall from a ladder onto earth last weekend and broke my rip hipbone, both front and back.
-Now I am waiting for an operastion to get it screwed back together again and hope that will provide a stable basis for a speedy recovery.
+I had a 6-metre fall from a ladder onto earth last weekend and broke my right hipbone, both front and back, plus some other less important bits and pieces.
+Now I am waiting for an operastion to get it all screwed back together again and hope that will provide a stable basis for a speedy recovery.
 
 <center>
 <img src="img/2023-10-21_jeremy_in_hospital.jpg" alt="Jeremy in hospital" title="Jeremy in hospital" width="600"/>
@@ -1288,12 +1295,11 @@ Many thanks to Roman for his deep research and careful documentation of this imp
 
 Another open source multimodal model hit the scene,
 [Fuyu-8B: A Multimodal Architecture for AI Agents](https://www.adept.ai/blog/fuyu-8b).
-
 It can be run offline on a laptop CPU.
 
 ####<a name="6"></a> How Open Source Wins
 
-(Open Source does not win by being cheaper)[https://github.com/getlago/lago/wiki/Open-Source-does-not-win-by-being-cheaper#how-open-source-winsby-solving-an-extensibility-problem],
+[Open Source does not win by being cheaper](https://github.com/getlago/lago/wiki/Open-Source-does-not-win-by-being-cheaper#how-open-source-winsby-solving-an-extensibility-problem),
 but by offering tranparency, extensibility and quality.
 
 ####<a name="5"></a> HTTP/3
