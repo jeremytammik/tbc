@@ -33,9 +33,9 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ####<a name="2"></a> DLL Paradise for Revit Add-ins via Named Pipe IPC
 
-Windows applications with dependencies on external components occasionally
-encounter [DLL hell\(https://duckduckgo.com/?q=dll+hell) due to conflicting dependencies.
-The Building Coder occasionally discussed
+Windows applications with integrating external components occasionally
+encounter [DLL hell](https://duckduckgo.com/?q=dll+hell) due to conflicting dependencies.
+The Building Coder discussed
 some [specific and even some pretty generic solutions](https://www.google.com/search?q=dll+hell&as_sitesearch=thebuildingcoder.typepad.com).
 Once again, Roman [Nice3point](https://github.com/Nice3point) Karpovich
 of [atomatiq](https://www.linkedin.com/company/atomatiq/), aka Роман Карпович,
@@ -118,12 +118,12 @@ So what are the benefits of doing this?
 
   The performance measurements for sorting and mathematical calculations on different .NET versions are provided below.
 
-    ```
+    <pre class="prettyprint">
     BenchmarkDotNet v0.13.9, Windows 11 (10.0.22621.1702/22H2/2022Update/SunValley2)
     AMD Ryzen 5 2600X, 1 CPU, 12 logical and 6 physical cores
     .NET 7.0           : .NET 7.0.9 (7.0.923.32018), X64 RyuJIT AVX2
     .NET Framework 4.8 : .NET Framework 4.8.1 (4.8.9139.0), X64 RyuJIT VectorSize=256
-    ```
+    </pre>
   | Method      | Runtime            | Mean           | Error        | StdDev       | Allocated |
     |------------ |------------------- |---------------:|-------------:|-------------:|----------:|
   | ListSort    | .NET 7.0           | 1,113,161.8 ns | 20,385.15 ns | 21,811.88 ns |  804753 B |
@@ -149,7 +149,7 @@ Below are some of the possible ways of interaction between two applications:
 
    An example from Autodesk's code, the interaction of the Project Browser plugin with the Revit backend via messages.
 
-    ```c#
+    <pre class="prettyprint">
     public class DataTransmitter : IEventObserver
     {
         private void PostMessageToMainWindow(int iCmd) =>
@@ -192,7 +192,7 @@ Below are some of the possible ways of interaction between two applications:
             }
         }
     }
-    ```
+    </pre>
 
 Each option has its own pros and cons. In my opinion, the most convenient for local machine interaction is Named Pipes. Let's delve into it.
 
@@ -226,7 +226,7 @@ To avoid blocking the main thread, we will utilize asynchronous methods.
 
 Here's an example code snippet for creating a NamedPipeServer:
 
-```C#
+<pre class="prettyprint">
 public static class NamedPipeUtil
 {
     /// <summary>
@@ -254,7 +254,7 @@ public static class NamedPipeUtil
             .Replace("=", string.Empty);
     }
 }
-```
+</pre>
 
 The server name should not contain special characters to avoid exceptions.
 To generate the pipe name, we will use a hash created from the username and the current folder, which is unique enough for the client to use this server upon connection.
@@ -271,7 +271,7 @@ To create the client, we will use the `NamedPipeClientStream` class.
 The code is almost similar to the server and may vary slightly depending on the .NET versions.
 For instance, in .NET framework 4.8, the `PipeOptions.CurrentUserOnly` value does not exist, but it appears in .NET 7.
 
-```C#
+<pre class="prettyprint">
 /// <summary>
 /// Create a client for the current user only
 /// </summary>
@@ -294,7 +294,7 @@ private static string GetPipeName()
         .Replace("/", "_")
         .Replace("=", string.Empty);
 }
-```
+</pre>
 
 #####<a name="2"></a> Transmission Protocol
 
@@ -308,17 +308,17 @@ They ensure the structuring of information to facilitate understanding and prope
 In cases where we need to send a "Request to execute a specific command on the server" or a "Request to update application settings," the server must understand how to process it from the client.
 Therefore, to facilitate request handling and data exchange management, we will create an `RequestType` Enum.
 
-```C#
+<pre class="prettyprint">
 public enum RequestType
 {
     PrintMessage,
     UpdateModel
 }
-```
+</pre>
 
 The request itself will be represented by a class that will contain all the information about the transmitted data.
 
-```c#
+<pre class="prettyprint">
 public abstract class Request
 {
     public abstract RequestType Type { get; }
@@ -358,13 +358,13 @@ public abstract class Request
         writer.Write(value.ToCharArray());
     }
 }
-```
+</pre>
 
 The class contains the basic code for writing data to the stream. `AddRequestBody()` is used by derived classes to write their own structured data.
 
 Examples of derived classes:
 
-```C#
+<pre class="prettyprint">
 /// <summary>
 /// Represents a Request from the client. A Request is as follows.
 ///
@@ -430,7 +430,7 @@ public class UpdateModelRequest : Request
         WriteLengthPrefixedString(writer, ModelName);
     }
 }
-```
+</pre>
 
 By using this structure, clients can create requests of various types, each of which defines its own logic for handling data and parameters.
 The `PrintMessageRequest` and `UpdateModelRequest` classes provide examples of requests that can be sent to the server to perform specific tasks.
@@ -440,7 +440,7 @@ To do this, the server must read data from the stream and use the received param
 
 Example of a received request on the server side:
 
-```c#
+<pre class="prettyprint">
 /// <summary>
 /// Represents a request from the client. A request is as follows.
 ///
@@ -574,7 +574,7 @@ public class UpdateModelRequest : Request
         WriteLengthPrefixedString(writer, ModelName);
     }
 }
-```
+</pre>
 
 The `ReadAsync()` method reads the request type from the stream and then, depending on the type, reads the corresponding data and creates an object of the corresponding request.
 
@@ -585,7 +585,7 @@ However, when designing such protocols, it is essential to consider potential se
 
 To send messages from the UI client to the server, let's create a `ClientDispatcher` class that will handle connections, timeouts, and scheduling requests, providing an interface for client-server interaction via named pipes.
 
-```C#
+<pre class="prettyprint">
 /// <summary>
 ///     This class manages the connections, timeout and general scheduling of requests to the server.
 /// </summary>
@@ -613,7 +613,7 @@ public class ClientDispatcher
         await request.WriteAsync(_client);
     }
 }
-```
+</pre>
 
 Working principle:
 
@@ -626,7 +626,7 @@ Working principle:
 
 To receive messages by the server, we will create a `ServerDispatcher` class to manage the connection and read requests.
 
-```C#
+<pre class="prettyprint">
 /// <summary>
 ///     This class manages the connections, timeout and general scheduling of the client requests.
 /// </summary>
@@ -675,7 +675,7 @@ public class ServerDispatcher
         }
     }
 }
-```
+</pre>
 
 Working principle:
 
@@ -687,7 +687,7 @@ Working principle:
 
 An example of sending a request from the UI to the server:
 
-```C#
+<pre class="prettyprint">
 
 /// <summary>
 ///     Programme entry point
@@ -724,7 +724,7 @@ public partial class MainViewModel : ObservableObject
         await App.ClientDispatcher.WriteRequestAsync(request);
     }
 }
-```
+</pre>
 
 The complete code example is available in the repository, and you can run it on your machine by following a few steps:
 
@@ -742,7 +742,7 @@ To enable more complex interaction between the client and the server, developers
 Similar to requests, to efficiently handle responses, it is also necessary to define an enumeration for response types.
 This will enable the client to interpret the received data correctly.
 
-```C#
+<pre class="prettyprint">
 public enum ResponseType
 {
     // The update request completed on the server and the results are contained in the message.
@@ -751,13 +751,13 @@ public enum ResponseType
     // The request was rejected by the server.
     Rejected
 }
-```
+</pre>
 
 Efficient handling of responses will require creating a new class named `Response`.
 Functionally, it does not differ from the Request class.
 However, unlike Request, which can be read on the server, Response will be written to the stream.
 
-```C#
+<pre class="prettyprint">
 /// <summary>
 /// Base class for all possible responses to a request.
 /// The ResponseType enum should list all possible response types
@@ -803,7 +803,7 @@ public abstract class Response
         // Same as request class from client
     }
 }
-```
+</pre>
 
 You can find derivative classes in the project repository: [PipeProtocol](https://github.com/atomatiq/InterprocessCommunication/blob/main/TwoWay/Backend/Server/PipeProtocol.cs)
 
@@ -812,18 +812,18 @@ This will allow writing responses to the stream after executing a task.
 
 Additionally, let's change the pipe direction to bidirectional:
 
-```C#
+<pre class="prettyprint">
 _server = NamedPipeUtil.CreateServer(PipeDirection.InOut);
 
 /// <summary>
 ///     Write a Response to the client.
 /// </summary>
 public async Task WriteResponseAsync(Response response) => await response.WriteAsync(_server);
-```
+</pre>
 
 To demonstrate the operation, let's add a 2-second delay, emulating a heavy task, in the `ListenAndDispatchConnectionsCoreAsync()` method.
 
-```C#
+<pre class="prettyprint">
 private async Task ListenAndDispatchConnectionsCoreAsync()
 {
     while (_server.IsConnected)
@@ -847,12 +847,12 @@ private async Task ListenAndDispatchConnectionsCoreAsync()
         }
     }
 }
-```
+</pre>
 
 Currently, the client does not handle responses from the server.
 Let's address this. Let's create a `Response` class in the client that will handle the received responses.
 
-```C#
+<pre class="prettyprint">
 /// <summary>
 /// Base class for all possible responses to a request.
 /// The ResponseType enum should list all possible response types
@@ -905,23 +905,23 @@ public abstract class Response
         // Same as request class from server
     }
 }
-```
+</pre>
 
 Furthermore, we'll update the `ClientDispatcher` class to handle responses from the server.
 To do this, we'll add a new method and change the direction to bidirectional.
 
-```C#
+<pre class="prettyprint">
 _client = NamedPipeUtil.CreateClient(PipeDirection.InOut);
 
 /// <summary>
 ///     Read a Response from the server.
 /// </summary>
 public async Task<Response> ReadResponseAsync() => await Response.ReadAsync(_client);
-```
+</pre>
 
 We'll also add response handling to the ViewModel, where we'll simply display it as a message.
 
-```C#
+<pre class="prettyprint">
 [RelayCommand]
 private async Task UpdateModelAsync()
 {
@@ -940,7 +940,7 @@ private async Task UpdateModelAsync()
         MessageBox.Show("Update failed");
     }
 }
-```
+</pre>
 
 These changes will allow for more efficient organization of the interaction between the client and the server, ensuring a more complete and reliable handling of requests and responses.
 
@@ -965,7 +965,7 @@ This will help the client to automatically close its process upon the closure of
 
 Here is the code for sending the ID of the current process to the client:
 
-```C#
+<pre class="prettyprint">
 private static void RunClient(string clientName)
 {
     var startInfo = new ProcessStartInfo
@@ -976,11 +976,11 @@ private static void RunClient(string clientName)
 
     Process.Start(startInfo);
 }
-```
+</pre>
 
 And here is the code for the client, which facilitates the closure of its process upon the closure of the parent Revit process:
 
-```C#
+<pre class="prettyprint">
 protected override void OnStartup(StartupEventArgs args)
 {
     ParseCommandArguments(args.Args);
@@ -993,11 +993,11 @@ private void ParseCommandArguments(string[] args)
     ownerProcess.EnableRaisingEvents = true;
     ownerProcess.Exited += (_, _) => Shutdown();
 }
-```
+</pre>
 
 Additionally, we require a method that will handle the deletion of selected model elements:
 
-```C#
+<pre class="prettyprint">
 public static ICollection<ElementId> DeleteSelectedElements()
 {
     var transaction = new Transaction(Document);
@@ -1009,11 +1009,11 @@ public static ICollection<ElementId> DeleteSelectedElements()
     transaction.Commit();
     return deletedIds;
 }
-```
+</pre>
 
 Let's also update the method `ListenAndDispatchConnectionsCoreAsync()` to handle incoming connections:
 
-```C#
+<pre class="prettyprint">
 private async Task ListenAndDispatchConnectionsCoreAsync()
 {
     while (_server.IsConnected)
@@ -1045,11 +1045,11 @@ private async Task ProcessDeleteElementsAsync()
         await WriteResponseAsync(new RejectedResponse(exception.Message));
     }
 }
-```
+</pre>
 
 And finally, the updated ViewModel code:
 
-```C#
+<pre class="prettyprint">
 [RelayCommand]
 private async Task DeleteElementsAsync()
 {
@@ -1068,7 +1068,7 @@ private async Task DeleteElementsAsync()
         MessageBox.Show($"Deletion failed\n{rejectedResponse.Reason}");
     }
 }
-```
+</pre>
 
 ####<a name="2"></a> Installing .NET Runtime during plugin installation
 
@@ -1079,7 +1079,7 @@ The templates use the WixSharp library, which enables the creation of `.msi` fil
 
 To add custom actions and install .NET Runtime, we will create a `CustomAction`:
 
-```C#
+<pre class="prettyprint">
 public static class RuntimeActions
 {
     /// <summary>
@@ -1187,14 +1187,14 @@ public static class RuntimeActions
         session.Message(InstallMessage.ActionStart, record);
     }
 }
-```
+</pre>
 
 This code checks whether the required version of .NET is installed on the local machine, and if not, it downloads and installs it.
 The installation process updates the `Status` of the current progress of downloading and unpacking the Runtime.
 
 Finally, we need to connect the `CustomAction` to the WixSharp project. To do this, we initialize the `Actions` property:
 
-```C#
+<pre class="prettyprint">
 var project = new Project
 {
     Name = "Wix Installer",
@@ -1209,7 +1209,7 @@ var project = new Project
             Condition.NOT_Installed)
     }
 };
-```
+</pre>
 
 ####<a name="2"></a> Conclusion
 
