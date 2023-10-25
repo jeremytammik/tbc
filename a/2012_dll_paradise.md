@@ -55,25 +55,16 @@ Learn about the essence of Named Pipes:
 Want to know how it works? Check out the full GitHub article
 on [Interprocess Communication: Strategies and Best Practices](https://github.com/atomatiq/InterprocessCommunication):
 
- a new solution for
+- [LinkedIn post](https://www.linkedin.com/feed/update/urn:li:activity:7120385512464388096/)
+- [ENU version](https://github.com/atomatiq/InterprocessCommunication)
+- [CIS version](https://github.com/Nice3point/InterprocessCommunication)
 
+Please be aware that the Revit development team is looking at
+possible [options for moving the Revit API forward from .NET 4.8](https://thebuildingcoder.typepad.com/blog/2023/08/15-years-polygon-areas-and-net-core.html#3) as
+we speak.
+As usual, Roman is one step ahead.
 
-- roman blog post -- ipc for revit add-ins
-DLL Hell -- past discussions
-DLL Paradise -- roman
-Just wrote a new article about Revit and plugins inter-processor communication
-Post: https://www.linkedin.com/feed/update/urn:li:activity:7120385512464388096/
-ENU version: https://github.com/atomatiq/InterprocessCommunication
-CIS version: https://github.com/Nice3point/InterprocessCommunication
-Please be aware that Revit API is working at moving away from .NET 4.8 as we speak:
-https://thebuildingcoder.typepad.com/blog/2023/08/15-years-polygon-areas-and-net-core.html#3
-As usual, you are one step ahead and mention .NET 7…
-
-
-
-
-
-####<a name="2"></a> Interprocess Communication: Strategies and Best Practices
+####<a name="3"></a> Interprocess Communication: Strategies and Best Practices
 
 <p align="center">
   <img src="https://github.com/Nice3point/InterprocessCommunication/assets/20504884/21d38cc0-9dfe-46af-959d-8deffaf91b3c" />
@@ -87,7 +78,7 @@ Ultimately, this affects users who are forced to use outdated software.
 In such scenarios, splitting the application into multiple processes using Named Pipes appears to be an excellent solution due to its performance and reliability.
 In this article, we discuss how to create and use Named Pipes to communicate between the Revit application running on .NET 4.8 and its plugin running on .NET 7.
 
-####<a name="2"></a> Table of Contents
+####<a name="3.1"></a> Table of Contents
 
 * [Introduction to Using Named Pipes for Communication Between Applications on Different .NET Versions](#introduction-to-using-named-pipes-for-communication-between-applications-on-different-net-versions)
 * [What are Named Pipes?](#what-are-named-pipes)
@@ -101,7 +92,7 @@ In this article, we discuss how to create and use Named Pipes to communicate bet
 * [Installing .NET Runtime during plugin installation](#installing-net-runtime-during-plugin-installation)
 * [Conclusion](#conclusion)
 
-####<a name="2"></a> Introduction to Using Named Pipes for Communication Between Applications on Different .NET Versions
+####<a name="3.2"></a> Introduction to Using Named Pipes for Communication Between Applications on Different .NET Versions
 
 In the world of application development, there is often a need to ensure data exchange between different applications, especially in cases where they operate on different versions of .NET or different languages.
 Splitting a single application into multiple processes must be justified.
@@ -147,62 +138,62 @@ Below are some of the possible ways of interaction between two applications:
 3. Using Named Pipes
 4. Using operating system signals (e.g., Windows signals):
 
-   An example from Autodesk's code, the interaction of the Project Browser plugin with the Revit backend via messages.
+An example of the latter from Autodesk's code, the interaction of the Project Browser plugin with the Revit backend via messages.
 
-    <pre class="prettyprint">
-    public class DataTransmitter : IEventObserver
+<pre class="prettyprint">
+public class DataTransmitter : IEventObserver
+{
+  private void PostMessageToMainWindow(int iCmd) =&gt;
+    this.HandleOnMainThread((Action) (() =&gt;
+      Win32Api.PostMessage(Application.UIApp.getUIApplication().MainWindowHandle, 273U, new IntPtr(iCmd), IntPtr.Zero)));
+
+  public void HandleShortCut(string key, bool ctrlPressed)
+  {
+    string lower = key.ToLower();
+    switch (PrivateImplementationDetails.ComputeStringHash(lower))
     {
-        private void PostMessageToMainWindow(int iCmd) =>
-            this.HandleOnMainThread((Action) (() =>
-                Win32Api.PostMessage(Application.UIApp.getUIApplication().MainWindowHandle, 273U, new IntPtr(iCmd), IntPtr.Zero)));
-
-        public void HandleShortCut(string key, bool ctrlPressed)
-        {
-            string lower = key.ToLower();
-            switch (PrivateImplementationDetails.ComputeStringHash(lower))
-            {
-            case 388133425:
-              if (!(lower == "f2")) break;
-              this.PostMessageToMainWindow(DataTransmitter.ID_RENAME);
-              break;
-            case 1740784714:
-              if (!(lower == "delete")) break;
-              this.PostMessageToMainWindow(DataTransmitter.ID_DELETE);
-              break;
-            case 3447633555:
-              if (!(lower == "contextmenu")) break;
-              this.PostMessageToMainWindow(DataTransmitter.ID_PROJECTBROWSER_CONTEXT_MENU_POP);
-              break;
-            case 3859557458:
-              if (!(lower == "c") || !ctrlPressed) break;
-              this.PostMessageToMainWindow(DataTransmitter.ID_COPY);
-              break;
-            case 4077666505:
-              if (!(lower == "v") || !ctrlPressed) break;
-              this.PostMessageToMainWindow(DataTransmitter.ID_PASTE);
-              break;
-            case 4228665076:
-              if (!(lower == "y") || !ctrlPressed) break;
-              this.PostMessageToMainWindow(DataTransmitter.ID_REDO);
-              break;
-            case 4278997933:
-              if (!(lower == "z") || !ctrlPressed) break;
-              this.PostMessageToMainWindow(DataTransmitter.ID_UNDO);
-              break;
-            }
-        }
+    case 388133425:
+      if (!(lower == "f2")) break;
+      this.PostMessageToMainWindow(DataTransmitter.ID_RENAME);
+      break;
+    case 1740784714:
+      if (!(lower == "delete")) break;
+      this.PostMessageToMainWindow(DataTransmitter.ID_DELETE);
+      break;
+    case 3447633555:
+      if (!(lower == "contextmenu")) break;
+      this.PostMessageToMainWindow(DataTransmitter.ID_PROJECTBROWSER_CONTEXT_MENU_POP);
+      break;
+    case 3859557458:
+      if (!(lower == "c") || !ctrlPressed) break;
+      this.PostMessageToMainWindow(DataTransmitter.ID_COPY);
+      break;
+    case 4077666505:
+      if (!(lower == "v") || !ctrlPressed) break;
+      this.PostMessageToMainWindow(DataTransmitter.ID_PASTE);
+      break;
+    case 4228665076:
+      if (!(lower == "y") || !ctrlPressed) break;
+      this.PostMessageToMainWindow(DataTransmitter.ID_REDO);
+      break;
+    case 4278997933:
+      if (!(lower == "z") || !ctrlPressed) break;
+      this.PostMessageToMainWindow(DataTransmitter.ID_UNDO);
+      break;
     }
-    </pre>
+  }
+}
+</pre>
 
 Each option has its own pros and cons. In my opinion, the most convenient for local machine interaction is Named Pipes. Let's delve into it.
 
-####<a name="2"></a> What are Named Pipes?
+####<a name="3.3"></a> What are Named Pipes?
 
 Named Pipes are a mechanism for Inter-Process Communication (IPC) that enables processes to exchange data through named channels.
 They provide a one-way or duplex connection between processes.
 Apart from high performance, Named Pipes also offer various security levels, making them an attractive solution for many inter-process communication scenarios.
 
-####<a name="2"></a> Interactions between applications in .NET 4.8 and .NET 7
+####<a name="3.4"></a> Interactions between applications in .NET 4.8 and .NET 7
 
 Let's consider two applications, one containing the business logic (server), and the other one for the user interface (client).
 NamedPipe is used to facilitate communication between these two processes.
@@ -218,7 +209,7 @@ The operation principle of NamedPipe involves the following steps:
    The client sends requests for executing the business logic, and the server processes these requests and sends back the results.
 5. **Session termination**: After the data exchange is complete, the client and server can close the connection with NamedPipe.
 
-#####<a name="2"></a> Server Creation
+#####<a name="3.5"></a> Server Creation
 
 On the .NET platform, the server side is represented by the `NamedPipeServerStream` class.
 The class implementation provides both asynchronous and synchronous methods for working with NamedPipe.
@@ -229,30 +220,30 @@ Here's an example code snippet for creating a NamedPipeServer:
 <pre class="prettyprint">
 public static class NamedPipeUtil
 {
-    /// <summary>
-    /// Create a server for the current user only
-    /// </summary>
-    public static NamedPipeServerStream CreateServer(PipeDirection? pipeDirection = null)
-    {
-        const PipeOptions pipeOptions = PipeOptions.Asynchronous | PipeOptions.WriteThrough;
-        return new NamedPipeServerStream(
-            GetPipeName(),
-            pipeDirection ?? PipeDirection.InOut,
-            NamedPipeServerStream.MaxAllowedServerInstances,
-            PipeTransmissionMode.Byte,
-            pipeOptions);
-    }
+  /// &lt;summary&gt;
+  /// Create a server for the current user only
+  /// &lt;/summary&gt;
+  public static NamedPipeServerStream CreateServer(PipeDirection? pipeDirection = null)
+  {
+    const PipeOptions pipeOptions = PipeOptions.Asynchronous | PipeOptions.WriteThrough;
+    return new NamedPipeServerStream(
+      GetPipeName(),
+      pipeDirection ?? PipeDirection.InOut,
+      NamedPipeServerStream.MaxAllowedServerInstances,
+      PipeTransmissionMode.Byte,
+      pipeOptions);
+  }
 
-    private static string GetPipeName()
-    {
-        var serverDirectory = AppDomain.CurrentDomain.BaseDirectory.TrimEnd(Path.DirectorySeparatorChar);
-        var pipeNameInput = $"{Environment.UserName}.{serverDirectory}";
-        var hash = new SHA256Managed().ComputeHash(Encoding.UTF8.GetBytes(pipeNameInput));
+  private static string GetPipeName()
+  {
+    var serverDirectory = AppDomain.CurrentDomain.BaseDirectory.TrimEnd(Path.DirectorySeparatorChar);
+    var pipeNameInput = $"{Environment.UserName}.{serverDirectory}";
+    var hash = new SHA256Managed().ComputeHash(Encoding.UTF8.GetBytes(pipeNameInput));
 
-        return Convert.ToBase64String(hash)
-            .Replace("/", "_")
-            .Replace("=", string.Empty);
-    }
+    return Convert.ToBase64String(hash)
+      .Replace("/", "_")
+      .Replace("=", string.Empty);
+  }
 }
 </pre>
 
@@ -265,38 +256,38 @@ This approach is used in the [Roslyn .NET compiler](https://github.com/dotnet/ro
 The `PipeDirection` indicates the direction of the channel.
 `PipeDirection.In` implies that the server will only receive messages, while `PipeDirection.InOut` can both receive and send messages.
 
-#####<a name="2"></a> Client Creation
+#####<a name="3.6"></a> Client Creation
 
 To create the client, we will use the `NamedPipeClientStream` class.
 The code is almost similar to the server and may vary slightly depending on the .NET versions.
 For instance, in .NET framework 4.8, the `PipeOptions.CurrentUserOnly` value does not exist, but it appears in .NET 7.
 
 <pre class="prettyprint">
-/// <summary>
+/// &lt;summary&gt;
 /// Create a client for the current user only
-/// </summary>
+/// &lt;/summary&gt;
 public static NamedPipeClientStream CreateClient(PipeDirection? pipeDirection = null)
 {
-    const PipeOptions pipeOptions = PipeOptions.Asynchronous | PipeOptions.WriteThrough | PipeOptions.CurrentUserOnly;
-    return new NamedPipeClientStream(".",
-        GetPipeName(),
-        pipeDirection ?? PipeDirection.Out,
-        pipeOptions);
+  const PipeOptions pipeOptions = PipeOptions.Asynchronous | PipeOptions.WriteThrough | PipeOptions.CurrentUserOnly;
+  return new NamedPipeClientStream(".",
+    GetPipeName(),
+    pipeDirection ?? PipeDirection.Out,
+    pipeOptions);
 }
 
 private static string GetPipeName()
 {
-    var clientDirectory = AppDomain.CurrentDomain.BaseDirectory.TrimEnd(Path.DirectorySeparatorChar);
-    var pipeNameInput = $"{System.Environment.UserName}.{clientDirectory}";
-    var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(pipeNameInput));
+  var clientDirectory = AppDomain.CurrentDomain.BaseDirectory.TrimEnd(Path.DirectorySeparatorChar);
+  var pipeNameInput = $"{System.Environment.UserName}.{clientDirectory}";
+  var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(pipeNameInput));
 
-    return Convert.ToBase64String(bytes)
-        .Replace("/", "_")
-        .Replace("=", string.Empty);
+  return Convert.ToBase64String(bytes)
+    .Replace("/", "_")
+    .Replace("=", string.Empty);
 }
 </pre>
 
-#####<a name="2"></a> Transmission Protocol
+#####<a name="3.7"></a> Transmission Protocol
 
 NamedPipe represents a stream, which allows us to write any sequence of bytes to the stream.
 However, working with bytes directly might not be very convenient, especially when dealing with complex data or structures.
@@ -321,42 +312,42 @@ The request itself will be represented by a class that will contain all the info
 <pre class="prettyprint">
 public abstract class Request
 {
-    public abstract RequestType Type { get; }
+  public abstract RequestType Type { get; }
 
-    protected abstract void AddRequestBody(BinaryWriter writer);
+  protected abstract void AddRequestBody(BinaryWriter writer);
 
-    /// <summary>
-    ///     Write a Request to the given stream.
-    /// </summary>
-    public async Task WriteAsync(Stream outStream)
-    {
-        using var memoryStream = new MemoryStream();
-        using var writer = new BinaryWriter(memoryStream, Encoding.Unicode);
+  /// &lt;summary&gt;
+  ///   Write a Request to the given stream.
+  /// &lt;/summary&gt;
+  public async Task WriteAsync(Stream outStream)
+  {
+    using var memoryStream = new MemoryStream();
+    using var writer = new BinaryWriter(memoryStream, Encoding.Unicode);
 
-        writer.Write((int) Type);
-        AddRequestBody(writer);
-        writer.Flush();
+    writer.Write((int) Type);
+    AddRequestBody(writer);
+    writer.Flush();
 
-        // Write the length of the request
-        var length = checked((int) memoryStream.Length);
+    // Write the length of the request
+    var length = checked((int) memoryStream.Length);
 
-        // There is no way to know the number of bytes written to
-        // the pipe stream. We just have to assume all of them are written
-        await outStream.WriteAsync(BitConverter.GetBytes(length), 0, 4);
-        memoryStream.Position = 0;
-        await memoryStream.CopyToAsync(outStream, length);
-    }
+    // There is no way to know the number of bytes written to
+    // the pipe stream. We just have to assume all of them are written
+    await outStream.WriteAsync(BitConverter.GetBytes(length), 0, 4);
+    memoryStream.Position = 0;
+    await memoryStream.CopyToAsync(outStream, length);
+  }
 
-    /// <summary>
-    /// Write a string to the Writer where the string is encoded
-    /// as a length prefix (signed 32-bit integer) follows by
-    /// a sequence of characters.
-    /// </summary>
-    protected static void WriteLengthPrefixedString(BinaryWriter writer, string value)
-    {
-        writer.Write(value.Length);
-        writer.Write(value.ToCharArray());
-    }
+  /// &lt;summary&gt;
+  /// Write a string to the Writer where the string is encoded
+  /// as a length prefix (signed 32-bit integer) follows by
+  /// a sequence of characters.
+  /// &lt;/summary&gt;
+  protected static void WriteLengthPrefixedString(BinaryWriter writer, string value)
+  {
+    writer.Write(value.Length);
+    writer.Write(value.ToCharArray());
+  }
 }
 </pre>
 
@@ -365,7 +356,7 @@ The class contains the basic code for writing data to the stream. `AddRequestBod
 Examples of derived classes:
 
 <pre class="prettyprint">
-/// <summary>
+/// &lt;summary&gt;
 /// Represents a Request from the client. A Request is as follows.
 ///
 ///  Field Name         Type            Size (bytes)
@@ -376,25 +367,25 @@ Examples of derived classes:
 /// Strings are encoded via a character count prefix as a
 /// 32-bit integer, followed by an array of characters.
 ///
-/// </summary>
+/// &lt;/summary&gt;
 public class PrintMessageRequest : Request
 {
-    public string Message { get; }
+  public string Message { get; }
 
-    public override RequestType Type => RequestType.PrintMessage;
+  public override RequestType Type =&gt; RequestType.PrintMessage;
 
-    public PrintMessageRequest(string message)
-    {
-        Message = message;
-    }
+  public PrintMessageRequest(string message)
+  {
+    Message = message;
+  }
 
-    protected override void AddRequestBody(BinaryWriter writer)
-    {
-        WriteLengthPrefixedString(writer, Message);
-    }
+  protected override void AddRequestBody(BinaryWriter writer)
+  {
+    WriteLengthPrefixedString(writer, Message);
+  }
 }
 
-/// <summary>
+/// &lt;summary&gt;
 /// Represents a Request from the client. A Request is as follows.
 ///
 ///  Field Name         Type            Size (bytes)
@@ -407,28 +398,28 @@ public class PrintMessageRequest : Request
 /// Strings are encoded via a character count prefix as a
 /// 32-bit integer, followed by an array of characters.
 ///
-/// </summary>
+/// &lt;/summary&gt;
 public class UpdateModelRequest : Request
 {
-    public int Iterations { get; }
-    public bool ForceUpdate { get; }
-    public string ModelName { get; }
+  public int Iterations { get; }
+  public bool ForceUpdate { get; }
+  public string ModelName { get; }
 
-    public override RequestType Type => RequestType.UpdateModel;
+  public override RequestType Type =&gt; RequestType.UpdateModel;
 
-    public UpdateModelRequest(string modelName, int iterations, bool forceUpdate)
-    {
-        Iterations = iterations;
-        ForceUpdate = forceUpdate;
-        ModelName = modelName;
-    }
+  public UpdateModelRequest(string modelName, int iterations, bool forceUpdate)
+  {
+    Iterations = iterations;
+    ForceUpdate = forceUpdate;
+    ModelName = modelName;
+  }
 
-    protected override void AddRequestBody(BinaryWriter writer)
-    {
-        writer.Write(Iterations);
-        writer.Write(ForceUpdate);
-        WriteLengthPrefixedString(writer, ModelName);
-    }
+  protected override void AddRequestBody(BinaryWriter writer)
+  {
+    writer.Write(Iterations);
+    writer.Write(ForceUpdate);
+    WriteLengthPrefixedString(writer, ModelName);
+  }
 }
 </pre>
 
@@ -441,7 +432,7 @@ To do this, the server must read data from the stream and use the received param
 Example of a received request on the server side:
 
 <pre class="prettyprint">
-/// <summary>
+/// &lt;summary&gt;
 /// Represents a request from the client. A request is as follows.
 ///
 ///  Field Name         Type                Size (bytes)
@@ -449,67 +440,67 @@ Example of a received request on the server side:
 ///  RequestType       enum RequestType   4
 ///  RequestBody       Request subclass   variable
 ///
-/// </summary>
+/// &lt;/summary&gt;
 public abstract class Request
 {
-    public enum RequestType
+  public enum RequestType
+  {
+    PrintMessage,
+    UpdateModel
+  }
+
+  public abstract RequestType Type { get; }
+
+  /// &lt;summary&gt;
+  ///   Read a Request from the given stream.
+  /// &lt;/summary&gt;
+  public static async Task&lt;Request&gt; ReadAsync(Stream stream)
+  {
+    var lengthBuffer = new byte[4];
+    await ReadAllAsync(stream, lengthBuffer, 4).ConfigureAwait(false);
+    var length = BitConverter.ToUInt32(lengthBuffer, 0);
+
+    var requestBuffer = new byte[length];
+    await ReadAllAsync(stream, requestBuffer, requestBuffer.Length);
+
+    using var reader = new BinaryReader(new MemoryStream(requestBuffer), Encoding.Unicode);
+
+    var requestType = (RequestType) reader.ReadInt32();
+    return requestType switch
     {
-        PrintMessage,
-        UpdateModel
-    }
+      RequestType.PrintMessage =&gt; PrintMessageRequest.Create(reader),
+      RequestType.UpdateModel =&gt; UpdateModelRequest.Create(reader),
+      _ =&gt; throw new ArgumentOutOfRangeException()
+    };
+  }
 
-    public abstract RequestType Type { get; }
-
-    /// <summary>
-    ///     Read a Request from the given stream.
-    /// </summary>
-    public static async Task<Request> ReadAsync(Stream stream)
+  /// &lt;summary&gt;
+  /// This task does not complete until we are completely done reading.
+  /// &lt;/summary&gt;
+  private static async Task ReadAllAsync(Stream stream, byte[] buffer, int count)
+  {
+    var totalBytesRead = 0;
+    do
     {
-        var lengthBuffer = new byte[4];
-        await ReadAllAsync(stream, lengthBuffer, 4).ConfigureAwait(false);
-        var length = BitConverter.ToUInt32(lengthBuffer, 0);
+      var bytesRead = await stream.ReadAsync(buffer, totalBytesRead, count - totalBytesRead);
+      if (bytesRead == 0) throw new EndOfStreamException("Reached end of stream before end of read.");
+      totalBytesRead += bytesRead;
+    } while (totalBytesRead &lt; count);
+  }
 
-        var requestBuffer = new byte[length];
-        await ReadAllAsync(stream, requestBuffer, requestBuffer.Length);
-
-        using var reader = new BinaryReader(new MemoryStream(requestBuffer), Encoding.Unicode);
-
-        var requestType = (RequestType) reader.ReadInt32();
-        return requestType switch
-        {
-            RequestType.PrintMessage => PrintMessageRequest.Create(reader),
-            RequestType.UpdateModel => UpdateModelRequest.Create(reader),
-            _ => throw new ArgumentOutOfRangeException()
-        };
-    }
-
-    /// <summary>
-    /// This task does not complete until we are completely done reading.
-    /// </summary>
-    private static async Task ReadAllAsync(Stream stream, byte[] buffer, int count)
-    {
-        var totalBytesRead = 0;
-        do
-        {
-            var bytesRead = await stream.ReadAsync(buffer, totalBytesRead, count - totalBytesRead);
-            if (bytesRead == 0) throw new EndOfStreamException("Reached end of stream before end of read.");
-            totalBytesRead += bytesRead;
-        } while (totalBytesRead < count);
-    }
-
-    /// <summary>
-    /// Read a string from the Reader where the string is encoded
-    /// as a length prefix (signed 32-bit integer) followed by
-    /// a sequence of characters.
-    /// </summary>
-    protected static string ReadLengthPrefixedString(BinaryReader reader)
-    {
-        var length = reader.ReadInt32();
-        return length < 0 ? null : new string(reader.ReadChars(length));
-    }
+  /// &lt;summary&gt;
+  /// Read a string from the Reader where the string is encoded
+  /// as a length prefix (signed 32-bit integer) followed by
+  /// a sequence of characters.
+  /// &lt;/summary&gt;
+  protected static string ReadLengthPrefixedString(BinaryReader reader)
+  {
+    var length = reader.ReadInt32();
+    return length &lt; 0 ? null : new string(reader.ReadChars(length));
+  }
 }
 
-/// <summary>
+/// &lt;summary&gt;
 /// Represents a Request from the client. A Request is as follows.
 ///
 ///  Field Name         Type            Size (bytes)
@@ -520,25 +511,25 @@ public abstract class Request
 /// Strings are encoded via a character count prefix as a
 /// 32-bit integer, followed by an array of characters.
 ///
-/// </summary>
+/// &lt;/summary&gt;
 public class PrintMessageRequest : Request
 {
-    public string Message { get; }
+  public string Message { get; }
 
-    public override RequestType Type => RequestType.PrintMessage;
+  public override RequestType Type =&gt; RequestType.PrintMessage;
 
-    public PrintMessageRequest(string message)
-    {
-        Message = message;
-    }
+  public PrintMessageRequest(string message)
+  {
+    Message = message;
+  }
 
-    protected override void AddRequestBody(BinaryWriter writer)
-    {
-        WriteLengthPrefixedString(writer, Message);
-    }
+  protected override void AddRequestBody(BinaryWriter writer)
+  {
+    WriteLengthPrefixedString(writer, Message);
+  }
 }
 
-/// <summary>
+/// &lt;summary&gt;
 /// Represents a Request from the client. A Request is as follows.
 ///
 ///  Field Name         Type            Size (bytes)
@@ -551,28 +542,28 @@ public class PrintMessageRequest : Request
 /// Strings are encoded via a character count prefix as a
 /// 32-bit integer, followed by an array of characters.
 ///
-/// </summary>
+/// &lt;/summary&gt;
 public class UpdateModelRequest : Request
 {
-    public int Iterations { get; }
-    public bool ForceUpdate { get; }
-    public string ModelName { get; }
+  public int Iterations { get; }
+  public bool ForceUpdate { get; }
+  public string ModelName { get; }
 
-    public override RequestType Type => RequestType.UpdateModel;
+  public override RequestType Type =&gt; RequestType.UpdateModel;
 
-    public UpdateModelRequest(string modelName, int iterations, bool forceUpdate)
-    {
-        Iterations = iterations;
-        ForceUpdate = forceUpdate;
-        ModelName = modelName;
-    }
+  public UpdateModelRequest(string modelName, int iterations, bool forceUpdate)
+  {
+    Iterations = iterations;
+    ForceUpdate = forceUpdate;
+    ModelName = modelName;
+  }
 
-    protected override void AddRequestBody(BinaryWriter writer)
-    {
-        writer.Write(Iterations);
-        writer.Write(ForceUpdate);
-        WriteLengthPrefixedString(writer, ModelName);
-    }
+  protected override void AddRequestBody(BinaryWriter writer)
+  {
+    writer.Write(Iterations);
+    writer.Write(ForceUpdate);
+    WriteLengthPrefixedString(writer, ModelName);
+  }
 }
 </pre>
 
@@ -581,37 +572,37 @@ The `ReadAsync()` method reads the request type from the stream and then, depend
 Implementing a data transmission protocol and structuring requests as classes enable efficient management of information exchange between the client and the server, ensuring structured and comprehensible interaction between the two parties.
 However, when designing such protocols, it is essential to consider potential security risks and ensure that both ends of the interaction handle all possible scenarios correctly.
 
-#####<a name="2"></a> Connection Management
+#####<a name="3.8"></a> Connection Management
 
 To send messages from the UI client to the server, let's create a `ClientDispatcher` class that will handle connections, timeouts, and scheduling requests, providing an interface for client-server interaction via named pipes.
 
 <pre class="prettyprint">
-/// <summary>
+/// &lt;summary&gt;
 ///     This class manages the connections, timeout and general scheduling of requests to the server.
-/// </summary>
+/// &lt;/summary&gt;
 public class ClientDispatcher
 {
-    private const int TimeOutNewProcess = 10000;
+  private const int TimeOutNewProcess = 10000;
 
-    private Task _connectionTask;
-    private readonly NamedPipeClientStream _client = NamedPipeUtil.CreateClient(PipeDirection.Out);
+  private Task _connectionTask;
+  private readonly NamedPipeClientStream _client = NamedPipeUtil.CreateClient(PipeDirection.Out);
 
-    /// <summary>
-    ///     Connects to server without awaiting
-    /// </summary>
-    public void ConnectToServer()
-    {
-        _connectionTask = _client.ConnectAsync(TimeOutNewProcess);
-    }
+  /// &lt;summary&gt;
+  ///   Connects to server without awaiting
+  /// &lt;/summary&gt;
+  public void ConnectToServer()
+  {
+    _connectionTask = _client.ConnectAsync(TimeOutNewProcess);
+  }
 
-    /// <summary>
-    ///     Write a Request to the server.
-    /// </summary>
-    public async Task WriteRequestAsync(Request request)
-    {
-        await _connectionTask;
-        await request.WriteAsync(_client);
-    }
+  /// &lt;summary&gt;
+  ///   Write a Request to the server.
+  /// &lt;/summary&gt;
+  public async Task WriteRequestAsync(Request request)
+  {
+    await _connectionTask;
+    await request.WriteAsync(_client);
+  }
 }
 </pre>
 
@@ -627,53 +618,53 @@ Working principle:
 To receive messages by the server, we will create a `ServerDispatcher` class to manage the connection and read requests.
 
 <pre class="prettyprint">
-/// <summary>
+/// &lt;summary&gt;
 ///     This class manages the connections, timeout and general scheduling of the client requests.
-/// </summary>
+/// &lt;/summary&gt;
 public class ServerDispatcher
 {
-    private readonly NamedPipeServerStream _server = NamedPipeUtil.CreateServer(PipeDirection.In);
+  private readonly NamedPipeServerStream _server = NamedPipeUtil.CreateServer(PipeDirection.In);
 
-    /// <summary>
-    ///     This function will accept and process new requests until the client disconnects from the server
-    /// </summary>
-    public async Task ListenAndDispatchConnections()
+  /// &lt;summary&gt;
+  ///   This function will accept and process new requests until the client disconnects from the server
+  /// &lt;/summary&gt;
+  public async Task ListenAndDispatchConnections()
+  {
+    try
     {
-        try
-        {
-            await _server.WaitForConnectionAsync();
-            await ListenAndDispatchConnectionsCoreAsync();
-        }
-        finally
-        {
-            _server.Close();
-        }
+      await _server.WaitForConnectionAsync();
+      await ListenAndDispatchConnectionsCoreAsync();
     }
+    finally
+    {
+      _server.Close();
+    }
+  }
 
-    private async Task ListenAndDispatchConnectionsCoreAsync()
+  private async Task ListenAndDispatchConnectionsCoreAsync()
+  {
+    while (_server.IsConnected)
     {
-        while (_server.IsConnected)
+      try
+      {
+        var request = await Request.ReadAsync(_server);
+        if (request.Type == Request.RequestType.PrintMessage)
         {
-            try
-            {
-                var request = await Request.ReadAsync(_server);
-                if (request.Type == Request.RequestType.PrintMessage)
-                {
-                    var printRequest = (PrintMessageRequest) request;
-                    Console.WriteLine($"Message from client: {printRequest.Message}");
-                }
-                else if (request.Type == Request.RequestType.UpdateModel)
-                {
-                    var printRequest = (UpdateModelRequest) request;
-                    Console.WriteLine($"The {printRequest.ModelName} model has been {(printRequest.ForceUpdate ? "forcibly" : string.Empty)} updated {printRequest.Iterations} times");
-                }
-            }
-            catch (EndOfStreamException)
-            {
-                return; //Pipe disconnected
-            }
+          var printRequest = (PrintMessageRequest) request;
+          Console.WriteLine($"Message from client: {printRequest.Message}");
         }
+        else if (request.Type == Request.RequestType.UpdateModel)
+        {
+          var printRequest = (UpdateModelRequest) request;
+          Console.WriteLine($"The {printRequest.ModelName} model has been {(printRequest.ForceUpdate ? "forcibly" : string.Empty)} updated {printRequest.Iterations} times");
+        }
+      }
+      catch (EndOfStreamException)
+      {
+        return; //Pipe disconnected
+      }
     }
+  }
 }
 </pre>
 
@@ -688,41 +679,40 @@ Working principle:
 An example of sending a request from the UI to the server:
 
 <pre class="prettyprint">
-
-/// <summary>
-///     Programme entry point
-/// </summary>
+/// &lt;summary&gt;
+///   Programme entry point
+/// &lt;/summary&gt;
 public sealed partial class App
 {
-    public static ClientDispatcher ClientDispatcher { get; }
+  public static ClientDispatcher ClientDispatcher { get; }
 
-    static App()
-    {
-        ClientDispatcher = new ClientDispatcher();
-        ClientDispatcher.ConnectToServer();
-    }
+  static App()
+  {
+    ClientDispatcher = new ClientDispatcher();
+    ClientDispatcher.ConnectToServer();
+  }
 }
 
-/// <summary>
-///     WPF view business logic
-/// </summary>
+/// &lt;summary&gt;
+///   WPF view business logic
+/// &lt;/summary&gt;
 public partial class MainViewModel : ObservableObject
 {
-    [ObservableProperty] private string _message = string.Empty;
+  [ObservableProperty] private string _message = string.Empty;
 
-    [RelayCommand]
-    private async Task SendMessageAsync()
-    {
-        var request = new PrintMessageRequest(Message);
-        await App.ClientDispatcher.WriteRequestAsync(request);
-    }
+  [RelayCommand]
+  private async Task SendMessageAsync()
+  {
+    var request = new PrintMessageRequest(Message);
+    await App.ClientDispatcher.WriteRequestAsync(request);
+  }
 
-    [RelayCommand]
-    private async Task UpdateModelAsync()
-    {
-        var request = new UpdateModelRequest(AppDomain.CurrentDomain.FriendlyName, 666, true);
-        await App.ClientDispatcher.WriteRequestAsync(request);
-    }
+  [RelayCommand]
+  private async Task UpdateModelAsync()
+  {
+    var request = new UpdateModelRequest(AppDomain.CurrentDomain.FriendlyName, 666, true);
+    await App.ClientDispatcher.WriteRequestAsync(request);
+  }
 }
 </pre>
 
@@ -733,7 +723,7 @@ The complete code example is available in the repository, and you can run it on 
 
 The application will automatically launch the Server and Client, and you will see the full output of the messages transmitted via the NamedPipe in the IDE console.
 
-#####<a name="2"></a> Two-Way Communication
+#####<a name="3.9"></a> Two-Way Communication
 
 There are often situations where the usual one-way data transmission from the client to the server is not sufficient.
 In such cases, it is necessary to handle errors or send results in response.
@@ -745,11 +735,11 @@ This will enable the client to interpret the received data correctly.
 <pre class="prettyprint">
 public enum ResponseType
 {
-    // The update request completed on the server and the results are contained in the message.
-    UpdateCompleted,
+  // The update request completed on the server and the results are contained in the message.
+  UpdateCompleted,
 
-    // The request was rejected by the server.
-    Rejected
+  // The request was rejected by the server.
+  Rejected
 }
 </pre>
 
@@ -758,7 +748,7 @@ Functionally, it does not differ from the Request class.
 However, unlike Request, which can be read on the server, Response will be written to the stream.
 
 <pre class="prettyprint">
-/// <summary>
+/// &lt;summary&gt;
 /// Base class for all possible responses to a request.
 /// The ResponseType enum should list all possible response types
 /// and ReadResponse creates the appropriate response subclass based
@@ -769,39 +759,39 @@ However, unlike Request, which can be read on the server, Response will be writt
 /// -------------------------------------------------
 /// ResponseType     enum ResponseType   4
 /// ResponseBody     Response subclass   variable
-/// </summary>
+/// &lt;/summary&gt;
 public abstract class Response
 {
-    public enum ResponseType
-    {
-        // The update request completed on the server and the results are contained in the message.
-        UpdateCompleted,
+  public enum ResponseType
+  {
+    // The update request completed on the server and the results are contained in the message.
+    UpdateCompleted,
 
-        // The request was rejected by the server.
-        Rejected
-    }
+    // The request was rejected by the server.
+    Rejected
+  }
 
-    public abstract ResponseType Type { get; }
+  public abstract ResponseType Type { get; }
 
-    protected abstract void AddResponseBody(BinaryWriter writer);
+  protected abstract void AddResponseBody(BinaryWriter writer);
 
-    /// <summary>
-    ///     Write a Response to the stream.
-    /// </summary>
-    public async Task WriteAsync(Stream outStream)
-    {
-        // Same as request class from client
-    }
+  /// &lt;summary&gt;
+  ///   Write a Response to the stream.
+  /// &lt;/summary&gt;
+  public async Task WriteAsync(Stream outStream)
+  {
+    // Same as request class from client
+  }
 
-    /// <summary>
-    /// Write a string to the Writer where the string is encoded
-    /// as a length prefix (signed 32-bit integer) follows by
-    /// a sequence of characters.
-    /// </summary>
-    protected static void WriteLengthPrefixedString(BinaryWriter writer, string value)
-    {
-        // Same as request class from client
-    }
+  /// &lt;summary&gt;
+  /// Write a string to the Writer where the string is encoded
+  /// as a length prefix (signed 32-bit integer) follows by
+  /// a sequence of characters.
+  /// &lt;/summary&gt;
+  protected static void WriteLengthPrefixedString(BinaryWriter writer, string value)
+  {
+    // Same as request class from client
+  }
 }
 </pre>
 
@@ -815,10 +805,10 @@ Additionally, let's change the pipe direction to bidirectional:
 <pre class="prettyprint">
 _server = NamedPipeUtil.CreateServer(PipeDirection.InOut);
 
-/// <summary>
+/// &lt;summary&gt;
 ///     Write a Response to the client.
-/// </summary>
-public async Task WriteResponseAsync(Response response) => await response.WriteAsync(_server);
+/// &lt;/summary&gt;
+public async Task WriteResponseAsync(Response response) =&gt; await response.WriteAsync(_server);
 </pre>
 
 To demonstrate the operation, let's add a 2-second delay, emulating a heavy task, in the `ListenAndDispatchConnectionsCoreAsync()` method.
@@ -826,26 +816,26 @@ To demonstrate the operation, let's add a 2-second delay, emulating a heavy task
 <pre class="prettyprint">
 private async Task ListenAndDispatchConnectionsCoreAsync()
 {
-    while (_server.IsConnected)
+  while (_server.IsConnected)
+  {
+    try
     {
-        try
-        {
-            var request = await Request.ReadAsync(_server);
+      var request = await Request.ReadAsync(_server);
 
-            // ...
-            if (request.Type == Request.RequestType.UpdateModel)
-            {
-                var printRequest = (UpdateModelRequest) request;
+      // ...
+      if (request.Type == Request.RequestType.UpdateModel)
+      {
+        var printRequest = (UpdateModelRequest) request;
 
-                await Task.Delay(TimeSpan.FromSeconds(2));
-                await WriteResponseAsync(new UpdateCompletedResponse(changes: 69, version: "2.1.7"));
-            }
-        }
-        catch (EndOfStreamException)
-        {
-            return; //Pipe disconnected
-        }
+        await Task.Delay(TimeSpan.FromSeconds(2));
+        await WriteResponseAsync(new UpdateCompletedResponse(changes: 69, version: "2.1.7"));
+      }
     }
+    catch (EndOfStreamException)
+    {
+      return; //Pipe disconnected
+    }
+  }
 }
 </pre>
 
@@ -853,7 +843,7 @@ Currently, the client does not handle responses from the server.
 Let's address this. Let's create a `Response` class in the client that will handle the received responses.
 
 <pre class="prettyprint">
-/// <summary>
+/// &lt;summary&gt;
 /// Base class for all possible responses to a request.
 /// The ResponseType enum should list all possible response types
 /// and ReadResponse creates the appropriate response subclass based
@@ -865,45 +855,45 @@ Let's address this. Let's create a `Response` class in the client that will hand
 /// ResponseType     enum ResponseType   4
 /// ResponseBody     Response subclass   variable
 ///
-/// </summary>
+/// &lt;/summary&gt;
 public abstract class Response
 {
-    public enum ResponseType
-    {
-        // The update request completed on the server and the results are contained in the message.
-        UpdateCompleted,
+  public enum ResponseType
+  {
+    // The update request completed on the server and the results are contained in the message.
+    UpdateCompleted,
 
-        // The request was rejected by the server.
-        Rejected
-    }
+    // The request was rejected by the server.
+    Rejected
+  }
 
-    public abstract ResponseType Type { get; }
+  public abstract ResponseType Type { get; }
 
-    /// <summary>
-    ///     Read a Request from the given stream.
-    /// </summary>
-    public static async Task<Response> ReadAsync(Stream stream)
-    {
-        // Same as request class from server
-    }
+  /// &lt;summary&gt;
+  ///   Read a Request from the given stream.
+  /// &lt;/summary&gt;
+  public static async Task&lt;Response&gt; ReadAsync(Stream stream)
+  {
+    // Same as request class from server
+  }
 
-    /// <summary>
-    /// This task does not complete until we are completely done reading.
-    /// </summary>
-    private static async Task ReadAllAsync(Stream stream, byte[] buffer, int count)
-    {
-        // Same as request class from server
-    }
+  /// &lt;summary&gt;
+  /// This task does not complete until we are completely done reading.
+  /// &lt;/summary&gt;
+  private static async Task ReadAllAsync(Stream stream, byte[] buffer, int count)
+  {
+    // Same as request class from server
+  }
 
-    /// <summary>
-    /// Read a string from the Reader where the string is encoded
-    /// as a length prefix (signed 32-bit integer) followed by
-    /// a sequence of characters.
-    /// </summary>
-    protected static string ReadLengthPrefixedString(BinaryReader reader)
-    {
-        // Same as request class from server
-    }
+  /// &lt;summary&gt;
+  /// Read a string from the Reader where the string is encoded
+  /// as a length prefix (signed 32-bit integer) followed by
+  /// a sequence of characters.
+  /// &lt;/summary&gt;
+  protected static string ReadLengthPrefixedString(BinaryReader reader)
+  {
+    // Same as request class from server
+  }
 }
 </pre>
 
@@ -913,10 +903,10 @@ To do this, we'll add a new method and change the direction to bidirectional.
 <pre class="prettyprint">
 _client = NamedPipeUtil.CreateClient(PipeDirection.InOut);
 
-/// <summary>
+/// &lt;summary&gt;
 ///     Read a Response from the server.
-/// </summary>
-public async Task<Response> ReadResponseAsync() => await Response.ReadAsync(_client);
+/// &lt;/summary&gt;
+public async Task&lt;Response&gt; ReadResponseAsync() =&gt; await Response.ReadAsync(_client);
 </pre>
 
 We'll also add response handling to the ViewModel, where we'll simply display it as a message.
@@ -925,26 +915,26 @@ We'll also add response handling to the ViewModel, where we'll simply display it
 [RelayCommand]
 private async Task UpdateModelAsync()
 {
-    var request = new UpdateModelRequest(AppDomain.CurrentDomain.FriendlyName, 666, true);
-    await App.ClientDispatcher.WriteRequestAsync(request);
+  var request = new UpdateModelRequest(AppDomain.CurrentDomain.FriendlyName, 666, true);
+  await App.ClientDispatcher.WriteRequestAsync(request);
 
-    var response = await App.ClientDispatcher.ReadResponseAsync();
-    if (response.Type == Response.ResponseType.UpdateCompleted)
-    {
-        var completedResponse = (UpdateCompletedResponse) response;
+  var response = await App.ClientDispatcher.ReadResponseAsync();
+  if (response.Type == Response.ResponseType.UpdateCompleted)
+  {
+    var completedResponse = (UpdateCompletedResponse) response;
 
-        MessageBox.Show($"{completedResponse.Changes} elements successfully updated to version {completedResponse.Version}");
-    }
-    else if (response.Type == Response.ResponseType.Rejected)
-    {
-        MessageBox.Show("Update failed");
-    }
+    MessageBox.Show($"{completedResponse.Changes} elements successfully updated to version {completedResponse.Version}");
+  }
+  else if (response.Type == Response.ResponseType.Rejected)
+  {
+    MessageBox.Show("Update failed");
+  }
 }
 </pre>
 
 These changes will allow for more efficient organization of the interaction between the client and the server, ensuring a more complete and reliable handling of requests and responses.
 
-#####<a name="2"></a> Implementation for Revit plug-in
+#####<a name="3.10"></a> Implementation for Revit plug-in
 
 <p align="center">
   <img src="https://github.com/Nice3point/InterprocessCommunication/assets/20504884/09e0dee3-d4bd-4858-87eb-6bf6766b8dde" />
@@ -968,13 +958,13 @@ Here is the code for sending the ID of the current process to the client:
 <pre class="prettyprint">
 private static void RunClient(string clientName)
 {
-    var startInfo = new ProcessStartInfo
-    {
-        FileName = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!.AppendPath(clientName),
-        Arguments = Process.GetCurrentProcess().Id.ToString()
-    };
+  var startInfo = new ProcessStartInfo
+  {
+    FileName = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!.AppendPath(clientName),
+    Arguments = Process.GetCurrentProcess().Id.ToString()
+  };
 
-    Process.Start(startInfo);
+  Process.Start(startInfo);
 }
 </pre>
 
@@ -983,31 +973,31 @@ And here is the code for the client, which facilitates the closure of its proces
 <pre class="prettyprint">
 protected override void OnStartup(StartupEventArgs args)
 {
-    ParseCommandArguments(args.Args);
+  ParseCommandArguments(args.Args);
 }
 
 private void ParseCommandArguments(string[] args)
 {
-    var ownerPid = args[0];
-    var ownerProcess = Process.GetProcessById(int.Parse(ownerPid));
-    ownerProcess.EnableRaisingEvents = true;
-    ownerProcess.Exited += (_, _) => Shutdown();
+  var ownerPid = args[0];
+  var ownerProcess = Process.GetProcessById(int.Parse(ownerPid));
+  ownerProcess.EnableRaisingEvents = true;
+  ownerProcess.Exited += (_, _) =&gt; Shutdown();
 }
 </pre>
 
 Additionally, we require a method that will handle the deletion of selected model elements:
 
 <pre class="prettyprint">
-public static ICollection<ElementId> DeleteSelectedElements()
+public static ICollection&lt;ElementId&gt; DeleteSelectedElements()
 {
-    var transaction = new Transaction(Document);
-    transaction.Start("Delete elements");
+  var transaction = new Transaction(Document);
+  transaction.Start("Delete elements");
 
-    var selectedIds = UiDocument.Selection.GetElementIds();
-    var deletedIds = Document.Delete(selectedIds);
+  var selectedIds = UiDocument.Selection.GetElementIds();
+  var deletedIds = Document.Delete(selectedIds);
 
-    transaction.Commit();
-    return deletedIds;
+  transaction.Commit();
+  return deletedIds;
 }
 </pre>
 
@@ -1016,34 +1006,34 @@ Let's also update the method `ListenAndDispatchConnectionsCoreAsync()` to handle
 <pre class="prettyprint">
 private async Task ListenAndDispatchConnectionsCoreAsync()
 {
-    while (_server.IsConnected)
+  while (_server.IsConnected)
+  {
+    try
     {
-        try
-        {
-            var request = await Request.ReadAsync(_server);
-            if (request.Type == Request.RequestType.DeleteElements)
-            {
-                await ProcessDeleteElementsAsync();
-            }
-        }
-        catch (EndOfStreamException)
-        {
-            return; //Pipe disconnected
-        }
+      var request = await Request.ReadAsync(_server);
+      if (request.Type == Request.RequestType.DeleteElements)
+      {
+        await ProcessDeleteElementsAsync();
+      }
     }
+    catch (EndOfStreamException)
+    {
+      return; //Pipe disconnected
+    }
+  }
 }
 
 private async Task ProcessDeleteElementsAsync()
 {
-    try
-    {
-        var deletedIds = await Application.AsyncEventHandler.RaiseAsync(_ => RevitApi.DeleteSelectedElements());
-        await WriteResponseAsync(new DeletionCompletedResponse(deletedIds.Count));
-    }
-    catch (Exception exception)
-    {
-        await WriteResponseAsync(new RejectedResponse(exception.Message));
-    }
+  try
+  {
+    var deletedIds = await Application.AsyncEventHandler.RaiseAsync(_ =&gt; RevitApi.DeleteSelectedElements());
+    await WriteResponseAsync(new DeletionCompletedResponse(deletedIds.Count));
+  }
+  catch (Exception exception)
+  {
+    await WriteResponseAsync(new RejectedResponse(exception.Message));
+  }
 }
 </pre>
 
@@ -1053,24 +1043,24 @@ And finally, the updated ViewModel code:
 [RelayCommand]
 private async Task DeleteElementsAsync()
 {
-    var request = new DeleteElementsRequest();
-    await App.ClientDispatcher.WriteRequestAsync(request);
+  var request = new DeleteElementsRequest();
+  await App.ClientDispatcher.WriteRequestAsync(request);
 
-    var response = await App.ClientDispatcher.ReadResponseAsync();
-    if (response.Type == Response.ResponseType.Success)
-    {
-        var completedResponse = (DeletionCompletedResponse) response;
-        MessageBox.Show($"{completedResponse.Changes} elements successfully deleted");
-    }
-    else if (response.Type == Response.ResponseType.Rejected)
-    {
-        var rejectedResponse = (RejectedResponse) response;
-        MessageBox.Show($"Deletion failed\n{rejectedResponse.Reason}");
-    }
+  var response = await App.ClientDispatcher.ReadResponseAsync();
+  if (response.Type == Response.ResponseType.Success)
+  {
+    var completedResponse = (DeletionCompletedResponse) response;
+    MessageBox.Show($"{completedResponse.Changes} elements successfully deleted");
+  }
+  else if (response.Type == Response.ResponseType.Rejected)
+  {
+    var rejectedResponse = (RejectedResponse) response;
+    MessageBox.Show($"Deletion failed\n{rejectedResponse.Reason}");
+  }
 }
 </pre>
 
-####<a name="2"></a> Installing .NET Runtime during plugin installation
+####<a name="3.11"></a> Installing .NET Runtime during plugin installation
 
 Not every user may have the latest version of .NET Runtime installed on their local machine, so we need to make some changes to the plugin installer.
 
@@ -1082,110 +1072,110 @@ To add custom actions and install .NET Runtime, we will create a `CustomAction`:
 <pre class="prettyprint">
 public static class RuntimeActions
 {
-    /// <summary>
-    ///     Add-in client .NET version
-    /// </summary>
-    private const string DotnetRuntimeVersion = "7";
+  /// &lt;summary&gt;
+  ///   Add-in client .NET version
+  /// &lt;/summary&gt;
+  private const string DotnetRuntimeVersion = "7";
 
-    /// <summary>
-    ///     Direct download link
-    /// </summary>
-    private const string DotnetRuntimeUrl = $"https://aka.ms/dotnet/{DotnetRuntimeVersion}.0/windowsdesktop-runtime-win-x64.exe";
+  /// &lt;summary&gt;
+  ///   Direct download link
+  /// &lt;/summary&gt;
+  private const string DotnetRuntimeUrl = $"https://aka.ms/dotnet/{DotnetRuntimeVersion}.0/windowsdesktop-runtime-win-x64.exe";
 
-    /// <summary>
-    ///     Installing the .NET runtime after installing software
-    /// </summary>
-    [CustomAction]
-    public static ActionResult InstallDotnet(Session session)
+  /// &lt;summary&gt;
+  ///   Installing the .NET runtime after installing software
+  /// &lt;/summary&gt;
+  [CustomAction]
+  public static ActionResult InstallDotnet(Session session)
+  {
+    try
     {
-        try
-        {
-            var isRuntimeInstalled = CheckDotnetInstallation();
-            if (isRuntimeInstalled) return ActionResult.Success;
+      var isRuntimeInstalled = CheckDotnetInstallation();
+      if (isRuntimeInstalled) return ActionResult.Success;
 
-            var destinationPath = Path.Combine(Path.GetTempPath(), "windowsdesktop-runtime-win-x64.exe");
+      var destinationPath = Path.Combine(Path.GetTempPath(), "windowsdesktop-runtime-win-x64.exe");
 
-            UpdateStatus(session, "Downloading .NET runtime");
-            DownloadRuntime(destinationPath);
+      UpdateStatus(session, "Downloading .NET runtime");
+      DownloadRuntime(destinationPath);
 
-            UpdateStatus(session, "Installing .NET runtime");
-            var status = InstallRuntime(destinationPath);
+      UpdateStatus(session, "Installing .NET runtime");
+      var status = InstallRuntime(destinationPath);
 
-            var result = status switch
-            {
-                0 => ActionResult.Success,
-                1602 => ActionResult.UserExit,
-                1618 => ActionResult.Success,
-                _ => ActionResult.Failure
-            };
+      var result = status switch
+      {
+        0 =&gt; ActionResult.Success,
+        1602 =&gt; ActionResult.UserExit,
+        1618 =&gt; ActionResult.Success,
+        _ =&gt; ActionResult.Failure
+      };
 
-            File.Delete(destinationPath);
-            return result;
-        }
-        catch (Exception exception)
-        {
-            session.Log("Error downloading and installing DotNet: " + exception.Message);
-            return ActionResult.Failure;
-        }
+      File.Delete(destinationPath);
+      return result;
     }
-
-    private static int InstallRuntime(string destinationPath)
+    catch (Exception exception)
     {
-        var startInfo = new ProcessStartInfo(destinationPath)
-        {
-            Arguments = "/q",
-            UseShellExecute = false
-        };
-
-        var installProcess = Process.Start(startInfo)!;
-        installProcess.WaitForExit();
-        return installProcess.ExitCode;
+      session.Log("Error downloading and installing DotNet: " + exception.Message);
+      return ActionResult.Failure;
     }
+  }
 
-    private static void DownloadRuntime(string destinationPath)
+  private static int InstallRuntime(string destinationPath)
+  {
+    var startInfo = new ProcessStartInfo(destinationPath)
     {
-        ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
+      Arguments = "/q",
+      UseShellExecute = false
+    };
 
-        using var httpClient = new HttpClient();
-        var responseBytes = httpClient.GetByteArrayAsync(DotnetRuntimeUrl).Result;
+    var installProcess = Process.Start(startInfo)!;
+    installProcess.WaitForExit();
+    return installProcess.ExitCode;
+  }
 
-        File.WriteAllBytes(destinationPath, responseBytes);
-    }
+  private static void DownloadRuntime(string destinationPath)
+  {
+    ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
 
-    private static bool CheckDotnetInstallation()
+    using var httpClient = new HttpClient();
+    var responseBytes = httpClient.GetByteArrayAsync(DotnetRuntimeUrl).Result;
+
+    File.WriteAllBytes(destinationPath, responseBytes);
+  }
+
+  private static bool CheckDotnetInstallation()
+  {
+    var startInfo = new ProcessStartInfo
     {
-        var startInfo = new ProcessStartInfo
-        {
-            FileName = "dotnet",
-            Arguments = "--list-runtimes",
-            RedirectStandardOutput = true,
-            UseShellExecute = false,
-            CreateNoWindow = true
-        };
+      FileName = "dotnet",
+      Arguments = "--list-runtimes",
+      RedirectStandardOutput = true,
+      UseShellExecute = false,
+      CreateNoWindow = true
+    };
 
-        try
-        {
-            var process = Process.Start(startInfo)!;
-            var output = process.StandardOutput.ReadToEnd();
-            process.WaitForExit();
-
-            return output.Split('\n')
-                .Where(line => line.Contains("Microsoft.WindowsDesktop.App"))
-                .Any(line => line.Contains($"{DotnetRuntimeVersion}."));
-        }
-        catch
-        {
-            return false;
-        }
-    }
-
-    private static void UpdateStatus(Session session, string message)
+    try
     {
-        var record = new Record(3);
-        record[2] = message;
+      var process = Process.Start(startInfo)!;
+      var output = process.StandardOutput.ReadToEnd();
+      process.WaitForExit();
 
-        session.Message(InstallMessage.ActionStart, record);
+      return output.Split('\n')
+        .Where(line =&gt; line.Contains("Microsoft.WindowsDesktop.App"))
+        .Any(line =&gt; line.Contains($"{DotnetRuntimeVersion}."));
     }
+    catch
+    {
+      return false;
+    }
+  }
+
+  private static void UpdateStatus(Session session, string message)
+  {
+    var record = new Record(3);
+    record[2] = message;
+
+    session.Message(InstallMessage.ActionStart, record);
+  }
 }
 </pre>
 
@@ -1197,21 +1187,21 @@ Finally, we need to connect the `CustomAction` to the WixSharp project. To do th
 <pre class="prettyprint">
 var project = new Project
 {
-    Name = "Wix Installer",
-    UI = WUI.WixUI_FeatureTree,
-    GUID = new Guid("8F2926C8-3C6C-4D12-9E3C-7DF611CD6DDF"),
-    Actions = new Action[]
-    {
-        new ManagedAction(RuntimeActions.InstallDotnet,
-            Return.check,
-            When.Before,
-            Step.InstallFinalize,
-            Condition.NOT_Installed)
-    }
+  Name = "Wix Installer",
+  UI = WUI.WixUI_FeatureTree,
+  GUID = new Guid("8F2926C8-3C6C-4D12-9E3C-7DF611CD6DDF"),
+  Actions = new Action[]
+  {
+    new ManagedAction(RuntimeActions.InstallDotnet,
+      Return.check,
+      When.Before,
+      Step.InstallFinalize,
+      Condition.NOT_Installed)
+  }
 };
 </pre>
 
-####<a name="2"></a> Conclusion
+####<a name="3.12"></a> Conclusion
 
 In this article, we explored how Named Pipes, primarily used for Inter-Process Communication (IPC), can be used in scenarios requiring data exchange between applications running on different .NET versions.
 Dealing with code that needs to be maintained across multiple versions, a well-considered IPC strategy can be valuable, providing key benefits such as:
@@ -1234,9 +1224,6 @@ However, let us not forget that the choice of approach requires analysis and sho
 Do you need to split each plugin into multiple processes? Definitely not.
 
 We hope that this article will help you find the best solution for your interprocess communication scenarios and give you an understanding of how to apply IPC approaches in practice.
-
-
-
 
 
 <pre class="prettyprint">
