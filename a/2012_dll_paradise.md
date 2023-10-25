@@ -969,7 +969,7 @@ These changes will allow for more efficient organization of the interaction betw
 #####<a name="3.10"></a> Implementation for Revit plug-in
 
 <center>
-<img src="img/2023_revit_technology.jpg" alt="Revit technology 2023" title="Revit technology 2023" width="600"/>
+<img src="img/2023_revit_technology.jpg" alt="Revit technology 2023" title="Revit technology 2023" width="500"/>
 <p style="font-size: 80%; font-style:italic">Technology evolves, Revit never changes © Confucius</p>
 </center>
 
