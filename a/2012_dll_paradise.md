@@ -31,6 +31,22 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 ### DLL Paradise
 
 
+- [DLL paradise for Revit add-ins via named pipe IPC](#2)
+- [Interprocess communication: strategies and best practices](#3)
+    - [Table of contents](#3.1)
+    - [Introduction to using named pipes for communication between applications on different .NET versions](#3.2)
+    - [What are named pipes?](#3.3)
+    - [Interactions between applications in .NET 4.8 and .NET 7](#3.4)
+    - [Server creation](#3.5)
+    - [Client creation](#3.6)
+    - [Transmission protocol](#3.7)
+    - [Connection management](#3.8)
+    - [Two-way communication](#3.9)
+    - [Implementation for Revit plug-in](#3.10)
+    - [Installing .NET runtime during plugin installation](#3.11)
+    - [Conclusion](#3.12)
+
+
 ####<a name="2"></a> DLL Paradise for Revit Add-ins via Named Pipe IPC
 
 Windows applications with integrating external components occasionally
@@ -1226,20 +1242,9 @@ Do you need to split each plugin into multiple processes? Definitely not.
 We hope that this article will help you find the best solution for your interprocess communication scenarios and give you an understanding of how to apply IPC approaches in practice.
 
 
-<pre class="prettyprint">
-</pre>
-
-
-
-<center>
-<img src="img/.png" alt="" title="" width="100"/>
-<p style="font-size: 80%; font-style:italic">Campus rendering</p>
-</center>
-
-
-####<a name="3"></a>
-
 ####<a name="4"></a>
+
+####<a name="5"></a>
 
 
 
