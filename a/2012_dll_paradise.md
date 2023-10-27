@@ -43,7 +43,17 @@ APS overview
 
 linkedin:
 
+Autodesk Platform Services APS overview, and DLL paradise for #Revit #API add-ins via named pipe IPC, interprocess communication strategies and best practices communicating between .NET 4.8 and .NET 7
 
+https://autode.sk/dllparadise
+
+- DLL paradise for Revit add-ins via named pipe IPC
+- Interprocess communication strategies and best practices
+- Using named pipes to communicate between different .NET versions
+- Interactions between .NET 4.8 and .NET 7
+- Server / client transmission protocol
+- Connection management
+- Two-way communication...
 
 #BIM #DynamoBIM #AutodeskAPS #Revit #API #IFC #SDK #Autodesk #AEC #adsk
 

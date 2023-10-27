@@ -1,21 +1,9 @@
-<p><head>
+<head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<link rel="stylesheet" type="text/css" href="bc.css"></p>
+<link rel="stylesheet" type="text/css" href="bc.css">
 <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+</head>
 
-<style>
-table, th, td {
-  border: 1px solid black;
-  border-collapse: collapse;
-}
-th, td {
-  padding-left: 1em;
-  padding-right: 1em;
-  text-align:right;
-}
-</style>
-
-<p></head></p>
 <!---
 
 - aps intro:
@@ -25,7 +13,6 @@ th, td {
   Fuyu-8B: A Multimodal Architecture for AI Agents
   https://www.adept.ai/blog/fuyu-8b
   Can be run offline on a laptop CPU
-
 
 twitter:
 
@@ -65,76 +52,87 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-<h3>DLL Paradise and a Fall</h3>
-<p>One huge article explaining how you can address DLL hell today, and a bunch of little notes to decorate it:</p>
-<ul>
-<li><a href="#1">What are the Autodesk Platform Services?</a></li>
-<li><a href="#2">DLL paradise for Revit add-ins via named pipe IPC</a></li>
-<li><a href="#3">Interprocess communication: strategies and best practices</a><ul>
-<li><a href="#3.1">Table of contents</a></li>
-<li><a href="#3.2">Using named pipes to communicate between different .NET versions</a></li>
-<li><a href="#3.3">What are named pipes?</a></li>
-<li><a href="#3.4">Interactions between applications in .NET 4.8 and .NET 7</a></li>
-<li><a href="#3.5">Server creation</a></li>
-<li><a href="#3.6">Client creation</a></li>
-<li><a href="#3.7">Transmission protocol</a></li>
-<li><a href="#3.8">Connection management</a></li>
-<li><a href="#3.9">Two-way communication</a></li>
-<li><a href="#3.10">Implementation for Revit plug-in</a></li>
-<li><a href="#3.11">Installing .NET runtime during plugin installation</a></li>
-<li><a href="#3.12">Conclusion</a></li>
-</ul>
-</li>
-<li><a href="#4">Fuyu-8B multimodal architecture for AI agents</a></li>
-<li><a href="#6">How open source wins</a></li>
-<li><a href="#5">HTTP/3</a></li>
-</ul>
-<p>By the way, I am writing this from my hospital bed.
+### DLL Paradise and a Fall
+
+One huge article explaining how you can address DLL hell today, and a bunch of little notes to decorate it:
+
+- [What are the Autodesk Platform Services?](#1)
+- [DLL paradise for Revit add-ins via named pipe IPC](#2)
+- [Interprocess communication: strategies and best practices](#3)
+    - [Table of contents](#3.1)
+    - [Using named pipes to communicate between different .NET versions](#3.2)
+    - [What are named pipes?](#3.3)
+    - [Interactions between applications in .NET 4.8 and .NET 7](#3.4)
+    - [Server creation](#3.5)
+    - [Client creation](#3.6)
+    - [Transmission protocol](#3.7)
+    - [Connection management](#3.8)
+    - [Two-way communication](#3.9)
+    - [Implementation for Revit plug-in](#3.10)
+    - [Installing .NET runtime during plugin installation](#3.11)
+    - [Conclusion](#3.12)
+- [Fuyu-8B multimodal architecture for AI agents](#4)
+- [How open source wins](#6)
+- [HTTP/3](#5)
+
+By the way, I am writing this from my hospital bed.
 I had a 6-metre fall from a ladder onto earth last weekend and broke my right hipbone, both front and back, plus some other less important bits and pieces.
-Now I am waiting for an operastion to get it all screwed back together again and hope that will provide a stable basis for a speedy recovery.</p>
-<p><center>
+Now I am waiting for an operastion to get it all screwed back together again and hope that will provide a stable basis for a speedy recovery.
+
+<center>
 <img src="img/2023-10-21_jeremy_in_hospital.jpg" alt="Jeremy in hospital" title="Jeremy in hospital" width="600"/>
-</center></p>
-<h4><a name="1"></a> What are the Autodesk Platform Services?</h4>
-<p>We have a new two-and-a-half-minute overview YouTube video answering
-the question <a href="https://youtu.be/RrAel5Mx7-0?feature=shared">What is Autodesk Platform Services?</a> to
-give a quick explanation of what APS is, how it fits into the Autodesk Platform, and shows some of the most popular applications of APS in use with our customers and partners.</p>
-<h4><a name="2"></a> DLL Paradise for Revit Add-ins via Named Pipe IPC</h4>
-<p>Windows applications integrating external components occasionally
-encounter <a href="https://duckduckgo.com/?q=dll+hell">DLL hell</a> due to conflicting dependencies.
+</center>
+
+####<a name="1"></a> What are the Autodesk Platform Services?
+
+We have a new two-and-a-half-minute overview YouTube video answering
+the question [What is Autodesk Platform Services?](https://youtu.be/RrAel5Mx7-0?feature=shared) to
+give a quick explanation of what APS is, how it fits into the Autodesk Platform, and shows some of the most popular applications of APS in use with our customers and partners.
+
+
+####<a name="2"></a> DLL Paradise for Revit Add-ins via Named Pipe IPC
+
+Windows applications integrating external components occasionally
+encounter [DLL hell](https://duckduckgo.com/?q=dll+hell) due to conflicting dependencies.
 The Building Coder discussed
-some <a href="https://www.google.com/search?q=dll+hell&amp;as_sitesearch=thebuildingcoder.typepad.com">specific and even some pretty generic solutions</a>.
-Once again, Roman <a href="https://github.com/Nice3point">Nice3point</a> Karpovich
-of <a href="https://www.linkedin.com/company/atomatiq/">atomatiq</a>, aka Роман Карпович,
-principal maintainer of RevitLookup, comes to the rescue, sharing a new article about Revit and add-in inter-processor communication:</p>
-<p>Dive into the world of inter-process communication and discover how to establish seamless communication for running a Revit plugin on .NET 7.</p>
-<p>Learn about the essence of Named Pipes:</p>
-<ul>
-<li>Inter-process communication across .NET 4.8 and .NET 7</li>
-<li>Server setup and client creation</li>
-<li>Efficient data transmission protocols</li>
-<li>Connection management strategies</li>
-<li>Two-way data transfer capabilities</li>
-<li>Implementation of a Revit plugin</li>
-</ul>
-<p>Want to know how it works? Check out the full GitHub article
-on <a href="https://github.com/atomatiq/InterprocessCommunication">Interprocess Communication: Strategies and Best Practices</a>:</p>
-<ul>
-<li><a href="https://www.linkedin.com/feed/update/urn:li:activity:7120385512464388096/">LinkedIn post</a></li>
-<li><a href="https://github.com/atomatiq/InterprocessCommunication">ENU version</a></li>
-<li><a href="https://github.com/Nice3point/InterprocessCommunication">CIS version</a></li>
-</ul>
-<p>Please be aware that the Revit development team is looking at
-possible <a href="https://thebuildingcoder.typepad.com/blog/2023/08/15-years-polygon-areas-and-net-core.html#3">options for moving the Revit API forward from .NET 4.8</a> as
+some [specific and even some pretty generic solutions](https://www.google.com/search?q=dll+hell&as_sitesearch=thebuildingcoder.typepad.com).
+Once again, Roman [Nice3point](https://github.com/Nice3point) Karpovich
+of [atomatiq](https://www.linkedin.com/company/atomatiq/), aka Роман Карпович,
+principal maintainer of RevitLookup, comes to the rescue, sharing a new article about Revit and add-in inter-processor communication:
+
+Dive into the world of inter-process communication and discover how to establish seamless communication for running a Revit plugin on .NET 7.
+
+Learn about the essence of Named Pipes:
+
+- Inter-process communication across .NET 4.8 and .NET 7
+- Server setup and client creation
+- Efficient data transmission protocols
+- Connection management strategies
+- Two-way data transfer capabilities
+- Implementation of a Revit plugin
+
+Want to know how it works? Check out the full GitHub article
+on [Interprocess Communication: Strategies and Best Practices](https://github.com/atomatiq/InterprocessCommunication):
+
+- [LinkedIn post](https://www.linkedin.com/feed/update/urn:li:activity:7120385512464388096/)
+- [ENU version](https://github.com/atomatiq/InterprocessCommunication)
+- [CIS version](https://github.com/Nice3point/InterprocessCommunication)
+
+Please be aware that the Revit development team is looking at
+possible [options for moving the Revit API forward from .NET 4.8](https://thebuildingcoder.typepad.com/blog/2023/08/15-years-polygon-areas-and-net-core.html#3) as
 we speak.
-With the approach described here, you can move ahead today and address other DLL conflicts as well.</p>
-<h4><a name="3"></a> Interprocess Communication: Strategies and Best Practices</h4>
-<p>We all know how challenging it is to maintain large programs and keep up with progress.
+With the approach described here, you can move ahead today and address other DLL conflicts as well.
+
+####<a name="3"></a> Interprocess Communication: Strategies and Best Practices
+
+We all know how challenging it is to maintain large programs and keep up with progress.
 Developers of plugins for Revit understand this better than anyone else.
 We have to write our programs in .NET Framework 4.8 and forgo modern and fast libraries.
-Ultimately, this affects users who are forced to use outdated software.</p>
-<p>In such scenarios, splitting the application into multiple processes using Named Pipes appears to be an excellent solution due to its performance and reliability.
-In this article, we discuss how to create and use Named Pipes to communicate between the Revit application running on .NET 4.8 and its plugin running on .NET 7.</p>
+Ultimately, this affects users who are forced to use outdated software.
+
+In such scenarios, splitting the application into multiple processes using Named Pipes appears to be an excellent solution due to its performance and reliability.
+In this article, we discuss how to create and use Named Pipes to communicate between the Revit application running on .NET 4.8 and its plugin running on .NET 7.
+
 <!--
 
 ####<a name="3.1"></a> Table of Contents
@@ -153,27 +151,29 @@ In this article, we discuss how to create and use Named Pipes to communicate bet
 
 -->
 
-<h4><a name="3.2"></a> Using Named Pipes to Communicate Between Different .NET Versions</h4>
-<p>In the world of application development, there is often a need to ensure data exchange between different applications, especially in cases where they operate on different versions of .NET or different languages.
+####<a name="3.2"></a> Using Named Pipes to Communicate Between Different .NET Versions
+
+In the world of application development, there is often a need to ensure data exchange between different applications, especially in cases where they operate on different versions of .NET or different languages.
 Splitting a single application into multiple processes must be justified.
-What is simpler, calling a function directly, or exchanging messages? Obviously, the former.</p>
-<p>So what are the benefits of doing this?</p>
-<ul>
-<li>Resolving Dependency Conflicts</li>
-</ul>
-<p>With each passing year, the size of Revit plugins is growing exponentially, and dependencies are also increasing at a geometric rate.
-Plugins might use incompatible versions of a single library, leading to program crashes. Process isolation solves this problem.</p>
-<ul>
-<li>Performance</li>
-</ul>
-<p>Here are a few performance measurements for sorting and mathematical calculations on different .NET versions:</p>
-<ul>
-<li>BenchmarkDotNet v0.13.9, Windows 11 (10.0.22621.1702/22H2/2022Update/SunValley2)</li>
-<li>AMD Ryzen 5 2600X, 1 CPU, 12 logical and 6 physical cores</li>
-<li>.NET 7.0.9 (7.0.923.32018), X64 RyuJIT AVX2</li>
-<li>.NET Framework 4.8.1 (4.8.9139.0), X64 RyuJIT VectorSize=256</li>
-</ul>
-<p><center></p>
+What is simpler, calling a function directly, or exchanging messages? Obviously, the former.
+
+So what are the benefits of doing this?
+
+- Resolving Dependency Conflicts
+
+With each passing year, the size of Revit plugins is growing exponentially, and dependencies are also increasing at a geometric rate.
+Plugins might use incompatible versions of a single library, leading to program crashes. Process isolation solves this problem.
+
+- Performance
+
+Here are a few performance measurements for sorting and mathematical calculations on different .NET versions:
+
+- BenchmarkDotNet v0.13.9, Windows 11 (10.0.22621.1702/22H2/2022Update/SunValley2)
+- AMD Ryzen 5 2600X, 1 CPU, 12 logical and 6 physical cores
+- .NET 7.0.9 (7.0.923.32018), X64 RyuJIT AVX2
+- .NET Framework 4.8.1 (4.8.9139.0), X64 RyuJIT VectorSize=256
+
+<center>
 <table>
 <tr><th> Method</th><th>.NET</th><th>Mean ns</th><th>Error ns</th><th>SthDev ns</th><th>Bytes</th></tr>
 <tr><td> ListSort   </td><td>7.0</td><td>1,113,161</td><td>20,385</td><td>21,811</td><td> 804753</td></tr>
@@ -185,18 +185,22 @@ Plugins might use incompatible versions of a single library, leading to program 
 <tr><td> MinValue   </td><td>4.8</td><td>   58,019</td><td>   460</td><td>   430</td><td>     40</td></tr>
 <tr><td> MaxValue   </td><td>4.8</td><td>   66,053</td><td>   610</td><td>   541</td><td>     41</td></tr>
 </table>
-<p></center></p>
-<p>The 68-fold difference in speed when finding the minimum value, and the complete absence of memory allocation, is impressive.</p>
-<p>How then to write a program in the latest .NET version that will interact with an incompatible .NET framework?
-Create two applications, Server and Client, without adding dependencies between each other and configure the interaction between them using a configured protocol.</p>
-<p>Here are some possible ways of interaction between two applications:</p>
-<ul>
-<li>Using WCF (Windows Communication Foundation)</li>
-<li>Using sockets (TCP or UDP)</li>
-<li>Using Named Pipes</li>
-<li>Using operating system signals (e.g., Windows signals):</li>
-</ul>
-<p>An example of the latter from Autodesk's code, the interaction of the Project Browser plugin with the Revit backend via messages.</p>
+</center>
+
+The 68-fold difference in speed when finding the minimum value, and the complete absence of memory allocation, is impressive.
+
+How then to write a program in the latest .NET version that will interact with an incompatible .NET framework?
+Create two applications, Server and Client, without adding dependencies between each other and configure the interaction between them using a configured protocol.
+
+Here are some possible ways of interaction between two applications:
+
+-  Using WCF (Windows Communication Foundation)
+-  Using sockets (TCP or UDP)
+-  Using Named Pipes
+-  Using operating system signals (e.g., Windows signals):
+
+An example of the latter from Autodesk's code, the interaction of the Project Browser plugin with the Revit backend via messages.
+
 <pre class="prettyprint">
 public class DataTransmitter : IEventObserver
 {
@@ -242,30 +246,38 @@ public class DataTransmitter : IEventObserver
 }
 </pre>
 
-<p>Each option has its own pros and cons. In my opinion, the most convenient for local machine interaction is Named Pipes. Let's delve into it.</p>
-<h4><a name="3.3"></a> What are Named Pipes?</h4>
-<p>Named Pipes are a mechanism for Inter-Process Communication (IPC) that enables processes to exchange data through named channels.
+Each option has its own pros and cons. In my opinion, the most convenient for local machine interaction is Named Pipes. Let's delve into it.
+
+####<a name="3.3"></a> What are Named Pipes?
+
+Named Pipes are a mechanism for Inter-Process Communication (IPC) that enables processes to exchange data through named channels.
 They provide a one-way or duplex connection between processes.
-Apart from high performance, Named Pipes also offer various security levels, making them an attractive solution for many inter-process communication scenarios.</p>
-<h4><a name="3.4"></a> Interactions between applications in .NET 4.8 and .NET 7</h4>
-<p>Let's consider two applications, one containing the business logic (server), and the other one for the user interface (client).
-NamedPipe is used to facilitate communication between these two processes.</p>
-<p>The operation principle of NamedPipe involves the following steps:</p>
-<ul>
-<li><strong>Creation and configuration of NamedPipe</strong>: The server creates and configures the NamedPipe with a specific name that will be accessible to the client.
-   The client needs to know this name to connect to the pipe.</li>
-<li><strong>Waiting for connection</strong>: The server starts to wait for the client to connect to the pipe.
-   This is a blocking operation, and the server remains in a pending state until the client connects.</li>
-<li><strong>Connecting to NamedPipe</strong>: The client initiates a connection to the NamedPipe, specifying the name of the pipe to which it wants to connect.</li>
-<li><strong>Data exchange</strong>: After a successful connection, the client and server can exchange data in the form of byte streams.
-   The client sends requests for executing the business logic, and the server processes these requests and sends back the results.</li>
-<li><strong>Session termination</strong>: After the data exchange is complete, the client and server can close the connection with NamedPipe.</li>
-</ul>
-<h5><a name="3.5"></a> Server Creation</h5>
-<p>On the .NET platform, the server side is represented by the <code>NamedPipeServerStream</code> class.
+Apart from high performance, Named Pipes also offer various security levels, making them an attractive solution for many inter-process communication scenarios.
+
+####<a name="3.4"></a> Interactions between applications in .NET 4.8 and .NET 7
+
+Let's consider two applications, one containing the business logic (server), and the other one for the user interface (client).
+NamedPipe is used to facilitate communication between these two processes.
+
+The operation principle of NamedPipe involves the following steps:
+
+-  **Creation and configuration of NamedPipe**: The server creates and configures the NamedPipe with a specific name that will be accessible to the client.
+   The client needs to know this name to connect to the pipe.
+-  **Waiting for connection**: The server starts to wait for the client to connect to the pipe.
+   This is a blocking operation, and the server remains in a pending state until the client connects.
+-  **Connecting to NamedPipe**: The client initiates a connection to the NamedPipe, specifying the name of the pipe to which it wants to connect.
+-  **Data exchange**: After a successful connection, the client and server can exchange data in the form of byte streams.
+   The client sends requests for executing the business logic, and the server processes these requests and sends back the results.
+-  **Session termination**: After the data exchange is complete, the client and server can close the connection with NamedPipe.
+
+#####<a name="3.5"></a> Server Creation
+
+On the .NET platform, the server side is represented by the `NamedPipeServerStream` class.
 The class implementation provides both asynchronous and synchronous methods for working with NamedPipe.
-To avoid blocking the main thread, we will utilize asynchronous methods.</p>
-<p>Here's an example code snippet for creating a NamedPipeServer:</p>
+To avoid blocking the main thread, we will utilize asynchronous methods.
+
+Here's an example code snippet for creating a NamedPipeServer:
+
 <pre class="prettyprint">
 public static class NamedPipeUtil
 {
@@ -296,16 +308,21 @@ public static class NamedPipeUtil
 }
 </pre>
 
-<p>The server name should not contain special characters to avoid exceptions.
+The server name should not contain special characters to avoid exceptions.
 To generate the pipe name, we will use a hash created from the username and the current folder, which is unique enough for the client to use this server upon connection.
-You can modify this behavior or use any name within the scope of your project, especially if the client and server are in different directories.</p>
-<p>This approach is used in the <a href="https://github.com/dotnet/roslyn">Roslyn .NET compiler</a>. For those who want to delve deeper into this topic, I recommend studying the source code of the project</p>
-<p>The <code>PipeDirection</code> indicates the direction of the channel.
-<code>PipeDirection.In</code> implies that the server will only receive messages, while <code>PipeDirection.InOut</code> can both receive and send messages.</p>
-<h5><a name="3.6"></a> Client Creation</h5>
-<p>To create the client, we will use the <code>NamedPipeClientStream</code> class.
+You can modify this behavior or use any name within the scope of your project, especially if the client and server are in different directories.
+
+This approach is used in the [Roslyn .NET compiler](https://github.com/dotnet/roslyn). For those who want to delve deeper into this topic, I recommend studying the source code of the project
+
+The `PipeDirection` indicates the direction of the channel.
+`PipeDirection.In` implies that the server will only receive messages, while `PipeDirection.InOut` can both receive and send messages.
+
+#####<a name="3.6"></a> Client Creation
+
+To create the client, we will use the `NamedPipeClientStream` class.
 The code is almost similar to the server and may vary slightly depending on the .NET versions.
-For instance, in .NET framework 4.8, the <code>PipeOptions.CurrentUserOnly</code> value does not exist, but it appears in .NET 7.</p>
+For instance, in .NET framework 4.8, the `PipeOptions.CurrentUserOnly` value does not exist, but it appears in .NET 7.
+
 <pre class="prettyprint">
 /// &lt;summary&gt;
 /// Create a client for the current user only
@@ -331,14 +348,18 @@ private static string GetPipeName()
 }
 </pre>
 
-<h5><a name="3.7"></a> Transmission Protocol</h5>
-<p>NamedPipe represents a stream, which allows us to write any sequence of bytes to the stream.
+#####<a name="3.7"></a> Transmission Protocol
+
+NamedPipe represents a stream, which allows us to write any sequence of bytes to the stream.
 However, working with bytes directly might not be very convenient, especially when dealing with complex data or structures.
-To simplify the interaction with data streams and structure information in a convenient format, transmission protocols are used.</p>
-<p>Transmission protocols define the format and order of data transmission between applications.
-They ensure the structuring of information to facilitate understanding and proper interpretation of data between the sender and the receiver.</p>
-<p>In cases where we need to send a "Request to execute a specific command on the server" or a "Request to update application settings," the server must understand how to process it from the client.
-Therefore, to facilitate request handling and data exchange management, we will create an <code>RequestType</code> Enum.</p>
+To simplify the interaction with data streams and structure information in a convenient format, transmission protocols are used.
+
+Transmission protocols define the format and order of data transmission between applications.
+They ensure the structuring of information to facilitate understanding and proper interpretation of data between the sender and the receiver.
+
+In cases where we need to send a "Request to execute a specific command on the server" or a "Request to update application settings," the server must understand how to process it from the client.
+Therefore, to facilitate request handling and data exchange management, we will create an `RequestType` Enum.
+
 <pre class="prettyprint">
 public enum RequestType
 {
@@ -347,7 +368,8 @@ public enum RequestType
 }
 </pre>
 
-<p>The request itself will be represented by a class that will contain all the information about the transmitted data.</p>
+The request itself will be represented by a class that will contain all the information about the transmitted data.
+
 <pre class="prettyprint">
 public abstract class Request
 {
@@ -390,8 +412,10 @@ public abstract class Request
 }
 </pre>
 
-<p>The class contains the basic code for writing data to the stream. <code>AddRequestBody()</code> is used by derived classes to write their own structured data.</p>
-<p>Examples of derived classes:</p>
+The class contains the basic code for writing data to the stream. `AddRequestBody()` is used by derived classes to write their own structured data.
+
+Examples of derived classes:
+
 <pre class="prettyprint">
 /// &lt;summary&gt;
 /// Represents a Request from the client. A Request is as follows.
@@ -460,11 +484,14 @@ public class UpdateModelRequest : Request
 }
 </pre>
 
-<p>By using this structure, clients can create requests of various types, each of which defines its own logic for handling data and parameters.
-The <code>PrintMessageRequest</code> and <code>UpdateModelRequest</code> classes provide examples of requests that can be sent to the server to perform specific tasks.</p>
-<p>On the server side, it is necessary to develop the corresponding logic for processing incoming requests.
-To do this, the server must read data from the stream and use the received parameters to perform the necessary operations.</p>
-<p>Example of a received request on the server side:</p>
+By using this structure, clients can create requests of various types, each of which defines its own logic for handling data and parameters.
+The `PrintMessageRequest` and `UpdateModelRequest` classes provide examples of requests that can be sent to the server to perform specific tasks.
+
+On the server side, it is necessary to develop the corresponding logic for processing incoming requests.
+To do this, the server must read data from the stream and use the received parameters to perform the necessary operations.
+
+Example of a received request on the server side:
+
 <pre class="prettyprint">
 /// &lt;summary&gt;
 /// Represents a request from the client. A request is as follows.
@@ -601,11 +628,15 @@ public class UpdateModelRequest : Request
 }
 </pre>
 
-<p>The <code>ReadAsync()</code> method reads the request type from the stream and then, depending on the type, reads the corresponding data and creates an object of the corresponding request.</p>
-<p>Implementing a data transmission protocol and structuring requests as classes enable efficient management of information exchange between the client and the server, ensuring structured and comprehensible interaction between the two parties.
-However, when designing such protocols, it is essential to consider potential security risks and ensure that both ends of the interaction handle all possible scenarios correctly.</p>
-<h5><a name="3.8"></a> Connection Management</h5>
-<p>To send messages from the UI client to the server, let's create a <code>ClientDispatcher</code> class that will handle connections, timeouts, and scheduling requests, providing an interface for client-server interaction via named pipes.</p>
+The `ReadAsync()` method reads the request type from the stream and then, depending on the type, reads the corresponding data and creates an object of the corresponding request.
+
+Implementing a data transmission protocol and structuring requests as classes enable efficient management of information exchange between the client and the server, ensuring structured and comprehensible interaction between the two parties.
+However, when designing such protocols, it is essential to consider potential security risks and ensure that both ends of the interaction handle all possible scenarios correctly.
+
+#####<a name="3.8"></a> Connection Management
+
+To send messages from the UI client to the server, let's create a `ClientDispatcher` class that will handle connections, timeouts, and scheduling requests, providing an interface for client-server interaction via named pipes.
+
 <pre class="prettyprint">
 /// &lt;summary&gt;
 ///     This class manages the connections, timeout and general scheduling of requests to the server.
@@ -636,16 +667,17 @@ public class ClientDispatcher
 }
 </pre>
 
-<p>Working principle:</p>
-<ul>
-<li><strong>Initialization:</strong> the <code>NamedPipeClientStream</code> is initialized in the class constructor, used to create a client stream with a named pipe.</li>
-<li><strong>Establishing Connection:</strong> the <code>ConnectToServer</code> method initiates an asynchronous connection to the server.
-   The operation's result is stored in a <code>Task</code>.
-   <code>TimeOutNewProcess</code> is used to disconnect the client in case of unexpected exceptions.</li>
-<li><strong>Sending Requests:</strong> the <code>WriteRequestAsync</code> method is designed for asynchronously sending a Request object through the established connection.
-   The request will be sent only after the connection is established.</li>
-</ul>
-<p>To receive messages by the server, we will create a <code>ServerDispatcher</code> class to manage the connection and read requests.</p>
+Working principle:
+
+-  **Initialization:** the `NamedPipeClientStream` is initialized in the class constructor, used to create a client stream with a named pipe.
+-  **Establishing Connection:** the `ConnectToServer` method initiates an asynchronous connection to the server.
+   The operation's result is stored in a `Task`.
+   `TimeOutNewProcess` is used to disconnect the client in case of unexpected exceptions.
+-  **Sending Requests:** the `WriteRequestAsync` method is designed for asynchronously sending a Request object through the established connection.
+   The request will be sent only after the connection is established.
+
+To receive messages by the server, we will create a `ServerDispatcher` class to manage the connection and read requests.
+
 <pre class="prettyprint">
 /// &lt;summary&gt;
 ///     This class manages the connections, timeout and general scheduling of the client requests.
@@ -697,15 +729,16 @@ public class ServerDispatcher
 }
 </pre>
 
-<p>Working principle:</p>
-<ul>
-<li><strong>Initialization:</strong> the <code>NamedPipeServerStream</code> is initialized in the class constructor, used to create a server stream with a named pipe.</li>
-<li><strong>Listening for Connections:</strong> The <code>ListenAndDispatchConnections()</code> method asynchronously waits for a client connection.
-   After processing the requests, it closes the named pipe and releases resources.</li>
-<li><strong>Handling Requests:</strong> The <code>ListenAndDispatchConnectionsCoreAsync()</code> method handles requests until the client is disconnected.
-   Depending on the type of request, corresponding data processing occurs, such as displaying the message content in the console or updating the model.</li>
-</ul>
-<p>An example of sending a request from the UI to the server:</p>
+Working principle:
+
+-  **Initialization:** the `NamedPipeServerStream` is initialized in the class constructor, used to create a server stream with a named pipe.
+-  **Listening for Connections:** The `ListenAndDispatchConnections()` method asynchronously waits for a client connection.
+   After processing the requests, it closes the named pipe and releases resources.
+-  **Handling Requests:** The `ListenAndDispatchConnectionsCoreAsync()` method handles requests until the client is disconnected.
+   Depending on the type of request, corresponding data processing occurs, such as displaying the message content in the console or updating the model.
+
+An example of sending a request from the UI to the server:
+
 <pre class="prettyprint">
 /// &lt;summary&gt;
 ///   Programme entry point
@@ -744,18 +777,22 @@ public partial class MainViewModel : ObservableObject
 }
 </pre>
 
-<p>The complete code example is available in the repository, and you can run it on your machine by following a few steps:</p>
-<ul>
-<li>Run "Build Solution."</li>
-<li>Run "Run OneWay/Backend."</li>
-</ul>
-<p>The application will automatically launch the Server and Client, and you will see the full output of the messages transmitted via the NamedPipe in the IDE console.</p>
-<h5><a name="3.9"></a> Two-Way Communication</h5>
-<p>There are often situations where the usual one-way data transmission from the client to the server is not sufficient.
+The complete code example is available in the repository, and you can run it on your machine by following a few steps:
+
+- Run "Build Solution."
+- Run "Run OneWay/Backend."
+
+The application will automatically launch the Server and Client, and you will see the full output of the messages transmitted via the NamedPipe in the IDE console.
+
+#####<a name="3.9"></a> Two-Way Communication
+
+There are often situations where the usual one-way data transmission from the client to the server is not sufficient.
 In such cases, it is necessary to handle errors or send results in response.
-To enable more complex interaction between the client and the server, developers have to resort to the use of two-way data transmission, which allows for the exchange of information in both directions.</p>
-<p>Similar to requests, to efficiently handle responses, it is also necessary to define an enumeration for response types.
-This will enable the client to interpret the received data correctly.</p>
+To enable more complex interaction between the client and the server, developers have to resort to the use of two-way data transmission, which allows for the exchange of information in both directions.
+
+Similar to requests, to efficiently handle responses, it is also necessary to define an enumeration for response types.
+This will enable the client to interpret the received data correctly.
+
 <pre class="prettyprint">
 public enum ResponseType
 {
@@ -767,9 +804,10 @@ public enum ResponseType
 }
 </pre>
 
-<p>Efficient handling of responses will require creating a new class named <code>Response</code>.
+Efficient handling of responses will require creating a new class named `Response`.
 Functionally, it does not differ from the Request class.
-However, unlike Request, which can be read on the server, Response will be written to the stream.</p>
+However, unlike Request, which can be read on the server, Response will be written to the stream.
+
 <pre class="prettyprint">
 /// &lt;summary&gt;
 /// Base class for all possible responses to a request.
@@ -818,10 +856,13 @@ public abstract class Response
 }
 </pre>
 
-<p>You can find derivative classes in the project repository: <a href="https://github.com/atomatiq/InterprocessCommunication/blob/main/TwoWay/Backend/Server/PipeProtocol.cs">PipeProtocol</a></p>
-<p>To enable the server to send responses to the client, we need to modify the <code>ServerDispatcher</code> class.
-This will allow writing responses to the stream after executing a task.</p>
-<p>Additionally, let's change the pipe direction to bidirectional:</p>
+You can find derivative classes in the project repository: [PipeProtocol](https://github.com/atomatiq/InterprocessCommunication/blob/main/TwoWay/Backend/Server/PipeProtocol.cs)
+
+To enable the server to send responses to the client, we need to modify the `ServerDispatcher` class.
+This will allow writing responses to the stream after executing a task.
+
+Additionally, let's change the pipe direction to bidirectional:
+
 <pre class="prettyprint">
 _server = NamedPipeUtil.CreateServer(PipeDirection.InOut);
 
@@ -831,7 +872,8 @@ _server = NamedPipeUtil.CreateServer(PipeDirection.InOut);
 public async Task WriteResponseAsync(Response response) =&gt; await response.WriteAsync(_server);
 </pre>
 
-<p>To demonstrate the operation, let's add a 2-second delay, emulating a heavy task, in the <code>ListenAndDispatchConnectionsCoreAsync()</code> method.</p>
+To demonstrate the operation, let's add a 2-second delay, emulating a heavy task, in the `ListenAndDispatchConnectionsCoreAsync()` method.
+
 <pre class="prettyprint">
 private async Task ListenAndDispatchConnectionsCoreAsync()
 {
@@ -858,8 +900,9 @@ private async Task ListenAndDispatchConnectionsCoreAsync()
 }
 </pre>
 
-<p>Currently, the client does not handle responses from the server.
-Let's address this. Let's create a <code>Response</code> class in the client that will handle the received responses.</p>
+Currently, the client does not handle responses from the server.
+Let's address this. Let's create a `Response` class in the client that will handle the received responses.
+
 <pre class="prettyprint">
 /// &lt;summary&gt;
 /// Base class for all possible responses to a request.
@@ -915,8 +958,9 @@ public abstract class Response
 }
 </pre>
 
-<p>Furthermore, we'll update the <code>ClientDispatcher</code> class to handle responses from the server.
-To do this, we'll add a new method and change the direction to bidirectional.</p>
+Furthermore, we'll update the `ClientDispatcher` class to handle responses from the server.
+To do this, we'll add a new method and change the direction to bidirectional.
+
 <pre class="prettyprint">
 _client = NamedPipeUtil.CreateClient(PipeDirection.InOut);
 
@@ -926,7 +970,8 @@ _client = NamedPipeUtil.CreateClient(PipeDirection.InOut);
 public async Task&lt;Response&gt; ReadResponseAsync() =&gt; await Response.ReadAsync(_client);
 </pre>
 
-<p>We'll also add response handling to the ViewModel, where we'll simply display it as a message.</p>
+We'll also add response handling to the ViewModel, where we'll simply display it as a message.
+
 <pre class="prettyprint">
 [RelayCommand]
 private async Task UpdateModelAsync()
@@ -948,21 +993,28 @@ private async Task UpdateModelAsync()
 }
 </pre>
 
-<p>These changes will allow for more efficient organization of the interaction between the client and the server, ensuring a more complete and reliable handling of requests and responses.</p>
-<h5><a name="3.10"></a> Implementation for Revit plug-in</h5>
-<p><center>
-<img src="img/2023_revit_technology.jpg" alt="Revit technology 2023" title="Revit technology 2023" width="500"/></p>
+These changes will allow for more efficient organization of the interaction between the client and the server, ensuring a more complete and reliable handling of requests and responses.
+
+#####<a name="3.10"></a> Implementation for Revit plug-in
+
+<center>
+<img src="img/2023_revit_technology.jpg" alt="Revit technology 2023" title="Revit technology 2023" width="500"/>
 <p style="font-size: 80%; font-style:italic">Technology evolves, Revit never changes © Confucius</p>
-<p></center></p>
-<p>Currently, Revit is using .NET Framework 4.8.
+</center>
+
+Currently, Revit is using .NET Framework 4.8.
 However, to enhance the plugin user interface, let's consider upgrading to .NET 7.
-It is important to note that the backend of the plugin will interact only with the outdated framework of Revit and will act as a server.</p>
-<p>Let's create a mechanism of interaction that allows the client to send requests for the deletion of model elements and subsequently receive responses regarding the deletion results.
-To implement this functionality, we will use bidirectional data transfer between the server and the client.</p>
-<p>The first step in our development process will be to enable the plugin to automatically close upon Revit's closure.
+It is important to note that the backend of the plugin will interact only with the outdated framework of Revit and will act as a server.
+
+Let's create a mechanism of interaction that allows the client to send requests for the deletion of model elements and subsequently receive responses regarding the deletion results.
+To implement this functionality, we will use bidirectional data transfer between the server and the client.
+
+The first step in our development process will be to enable the plugin to automatically close upon Revit's closure.
 To accomplish this, we have written a method that sends the ID of the current process to the client.
-This will help the client to automatically close its process upon the closure of the parent Revit process.</p>
-<p>Here is the code for sending the ID of the current process to the client:</p>
+This will help the client to automatically close its process upon the closure of the parent Revit process.
+
+Here is the code for sending the ID of the current process to the client:
+
 <pre class="prettyprint">
 private static void RunClient(string clientName)
 {
@@ -976,7 +1028,8 @@ private static void RunClient(string clientName)
 }
 </pre>
 
-<p>And here is the code for the client, which facilitates the closure of its process upon the closure of the parent Revit process:</p>
+And here is the code for the client, which facilitates the closure of its process upon the closure of the parent Revit process:
+
 <pre class="prettyprint">
 protected override void OnStartup(StartupEventArgs args)
 {
@@ -992,7 +1045,8 @@ private void ParseCommandArguments(string[] args)
 }
 </pre>
 
-<p>Additionally, we require a method that will handle the deletion of selected model elements:</p>
+Additionally, we require a method that will handle the deletion of selected model elements:
+
 <pre class="prettyprint">
 public static ICollection&lt;ElementId&gt; DeleteSelectedElements()
 {
@@ -1007,7 +1061,8 @@ public static ICollection&lt;ElementId&gt; DeleteSelectedElements()
 }
 </pre>
 
-<p>Let's also update the method <code>ListenAndDispatchConnectionsCoreAsync()</code> to handle incoming connections:</p>
+Let's also update the method `ListenAndDispatchConnectionsCoreAsync()` to handle incoming connections:
+
 <pre class="prettyprint">
 private async Task ListenAndDispatchConnectionsCoreAsync()
 {
@@ -1042,7 +1097,8 @@ private async Task ProcessDeleteElementsAsync()
 }
 </pre>
 
-<p>And finally, the updated ViewModel code:</p>
+And finally, the updated ViewModel code:
+
 <pre class="prettyprint">
 [RelayCommand]
 private async Task DeleteElementsAsync()
@@ -1064,11 +1120,15 @@ private async Task DeleteElementsAsync()
 }
 </pre>
 
-<h4><a name="3.11"></a> Installing .NET Runtime during plugin installation</h4>
-<p>Not every user may have the latest version of .NET Runtime installed on their local machine, so we need to make some changes to the plugin installer.</p>
-<p>If you are using the <a href="https://github.com/Nice3point/RevitTemplates">Nice3point.RevitTemplates</a>, making these adjustments will be effortless.
-The templates use the WixSharp library, which enables the creation of <code>.msi</code> files directly in C#.</p>
-<p>To add custom actions and install .NET Runtime, we will create a <code>CustomAction</code>:</p>
+####<a name="3.11"></a> Installing .NET Runtime during plugin installation
+
+Not every user may have the latest version of .NET Runtime installed on their local machine, so we need to make some changes to the plugin installer.
+
+If you are using the [Nice3point.RevitTemplates](https://github.com/Nice3point/RevitTemplates), making these adjustments will be effortless.
+The templates use the WixSharp library, which enables the creation of `.msi` files directly in C#.
+
+To add custom actions and install .NET Runtime, we will create a `CustomAction`:
+
 <pre class="prettyprint">
 public static class RuntimeActions
 {
@@ -1179,9 +1239,11 @@ public static class RuntimeActions
 }
 </pre>
 
-<p>This code checks whether the required version of .NET is installed on the local machine, and if not, it downloads and installs it.
-The installation process updates the <code>Status</code> of the current progress of downloading and unpacking the Runtime.</p>
-<p>Finally, we need to connect the <code>CustomAction</code> to the WixSharp project. To do this, we initialize the <code>Actions</code> property:</p>
+This code checks whether the required version of .NET is installed on the local machine, and if not, it downloads and installs it.
+The installation process updates the `Status` of the current progress of downloading and unpacking the Runtime.
+
+Finally, we need to connect the `CustomAction` to the WixSharp project. To do this, we initialize the `Actions` property:
+
 <pre class="prettyprint">
 var project = new Project
 {
@@ -1199,31 +1261,46 @@ var project = new Project
 };
 </pre>
 
-<h4><a name="3.12"></a> Conclusion</h4>
-<p>In this article, we explored how Named Pipes, primarily used for Inter-Process Communication (IPC), can be used in scenarios requiring data exchange between applications running on different .NET versions.
-Dealing with code that needs to be maintained across multiple versions, a well-considered IPC strategy can be valuable, providing key benefits such as:</p>
-<ul>
-<li>Dependency conflict resolution</li>
-<li>Enhancing performance</li>
-<li>Functional flexibility</li>
-</ul>
-<p>We discussed the process of creating a server and client that interact with each other through a pre-defined protocol, as well as various ways of managing connections.</p>
-<p>We examined an example of server responses and demonstrated the operation of both sides of the interaction.</p>
-<p>Finally, we underscored how Named Pipes are used in the development of a plugin for Revit to provide communication between the backend operating on the legacy .NET 4.8 platform and the user interface running on the newer .NET 7 version.</p>
-<p>Demo code for each part of this article is available on GitHub.</p>
-<p>In certain cases, splitting applications into separate processes can not only reduce dependencies within the program but also improve the UI responsiveness.
-However, let us not forget that the choice of approach requires analysis and should be based on the actual requirements and constraints of your project.</p>
-<p>Do you need to split each plugin into multiple processes? Definitely not.</p>
-<p>We hope that this article will help you find the best solution for your interprocess communication scenarios and give you an understanding of how to apply IPC approaches in practice.</p>
-<p>Many thanks to Roman for his deep research and careful documentation of this important topic, in addition to all his maintenance work on RevitLookup.</p>
-<h4><a name="4"></a> Fuyu-8B Multimodal Architecture for AI Agents</h4>
-<p>Another open source multimodal model hit the scene,
-<a href="https://www.adept.ai/blog/fuyu-8b">Fuyu-8B: A Multimodal Architecture for AI Agents</a>.
-It can be run offline on a laptop CPU.</p>
-<h4><a name="6"></a> How Open Source Wins</h4>
-<p><a href="https://github.com/getlago/lago/wiki/Open-Source-does-not-win-by-being-cheaper#how-open-source-winsby-solving-an-extensibility-problem">Open Source does not win by being cheaper</a>,
-but by offering tranparency, extensibility and quality.</p>
-<h4><a name="5"></a> HTTP/3</h4>
-<p>Did you notice that you have started using HTTP/3?
+####<a name="3.12"></a> Conclusion
+
+In this article, we explored how Named Pipes, primarily used for Inter-Process Communication (IPC), can be used in scenarios requiring data exchange between applications running on different .NET versions.
+Dealing with code that needs to be maintained across multiple versions, a well-considered IPC strategy can be valuable, providing key benefits such as:
+
+- Dependency conflict resolution
+- Enhancing performance
+- Functional flexibility
+
+We discussed the process of creating a server and client that interact with each other through a pre-defined protocol, as well as various ways of managing connections.
+
+We examined an example of server responses and demonstrated the operation of both sides of the interaction.
+
+Finally, we underscored how Named Pipes are used in the development of a plugin for Revit to provide communication between the backend operating on the legacy .NET 4.8 platform and the user interface running on the newer .NET 7 version.
+
+Demo code for each part of this article is available on GitHub.
+
+In certain cases, splitting applications into separate processes can not only reduce dependencies within the program but also improve the UI responsiveness.
+However, let us not forget that the choice of approach requires analysis and should be based on the actual requirements and constraints of your project.
+
+Do you need to split each plugin into multiple processes? Definitely not.
+
+We hope that this article will help you find the best solution for your interprocess communication scenarios and give you an understanding of how to apply IPC approaches in practice.
+
+Many thanks to Roman for his deep research and careful documentation of this important topic, in addition to all his maintenance work on RevitLookup.
+
+####<a name="4"></a> Fuyu-8B Multimodal Architecture for AI Agents
+
+Another open source multimodal model hit the scene,
+[Fuyu-8B: A Multimodal Architecture for AI Agents](https://www.adept.ai/blog/fuyu-8b).
+It can be run offline on a laptop CPU.
+
+####<a name="6"></a> How Open Source Wins
+
+[Open Source does not win by being cheaper](https://github.com/getlago/lago/wiki/Open-Source-does-not-win-by-being-cheaper#how-open-source-winsby-solving-an-extensibility-problem),
+but by offering tranparency, extensibility and quality.
+
+####<a name="5"></a> HTTP/3
+
+Did you notice that you have started using HTTP/3?
 I hadn't.
-Learn <a href="https://blog.apnic.net/2023/09/25/why-http-3-is-eating-the-world/">why HTTP/3 is eating the world</a>.</p>
+Learn [why HTTP/3 is eating the world](https://blog.apnic.net/2023/09/25/why-http-3-is-eating-the-world/).
+
