@@ -80,6 +80,7 @@ As we approach the weekend, I finally get around to sharing a mighty beautiful P
     - [Third gap](#2.6)
     - [Verify waterproof](#2.7)
     - [Save model](#2.8)
+    - [Low precision and sliver area threshold](#2.9)
 - [LLaVA large language and vision assistant](#3)
 - [Moonvalley text to video](#4)
 - [DETR model detects objects in images](#5)
@@ -417,6 +418,19 @@ Save the updated gbxml file.
 # writes the gbXML etree to a local file
 tree.write('23-013 WH Swan Hill_Mass_23-08-30-UPDATED.xml', pretty_print=True)
 </pre>
+
+####<a name="2.9"></a> Low Precision and Sliver Area Threshold
+
+Regarding:
+
+> ... issues with gaps in the building geometry caused by the relatively low precision used by Revit when tessellating surfaces.
+
+Based on experience over time at Ripcord, 'low precision' appears directly related to an area threshold rather than a length threshold.
+What might be considered 'sliver' surfaces export OK.
+But once 'sliver' surfaces fall under the area threshold, whatever it is, the surface is not exported.
+
+It is likely that direct control of the area threshold would offer operators relief.
+Inability to control the area threshold creates a level of operator compensation that likely compels most to abandon value added analytical tasks.
 
 Many thanks again to Jake for this extremely powerful solution and
 his [beautiful documentation](doc/gbxml_small_surface_solution_whole_building.pdf).
