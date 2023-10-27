@@ -112,7 +112,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Pernickety Blogging
 
-My broken hip is fixed.
+I am still in hospital, and my broken hip has been fixed.
 The main screw is 7.3 mm x 180 mm.
 They would have preferred to use 190 mm length but didn't have any available.
 I have big bones.
@@ -122,6 +122,18 @@ My friend Madlee has a nice email footer in the smartphone, saying:
 - Alles isch gued; wenn's no nid gued isch denn isch es au no nid am End aacho!
 <span style="text-align: right; font-style: italic">&ndash;  [Alemannic](https://en.wikipedia.org/wiki/Alemannic_German) saying
 &ndash; All is well; if it's not well, it's not over yet</span>
+
+My colleague George published his first Revit-API-related blog post,
+[How to use ToElements Method correctly](https://adndevblog.typepad.com/aec/2023/10/how-to-use-toelements-method-correctly.html).
+
+Congratulations on that, George, and many thanks for your work and contributions!
+
+I checked it in advance and gave it my OK.
+In spite of that, it makes a total difference to me actually seeing it "in print", in its final published version.
+The difference and effect it has on my perception is tremendous, astounding, and I use it for my own blog posts as well, correcting, previewing and making a huge number of minute corrections and improvements (?) in the final stages of publication, just before hitting the ultimate pblish button.
+
+In this case, I was astoubnded by the number and irrelevance of the little improvement possibilities that struck my eye.
+
 
 
 Many thanks to George for publishing his first Revit API blog post.
