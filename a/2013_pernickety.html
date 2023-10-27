@@ -1,9 +1,8 @@
-<head>
+<p><head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<link rel="stylesheet" type="text/css" href="bc.css">
+<link rel="stylesheet" type="text/css" href="bc.css"></p>
 <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
-</head>
-
+<p></head></p>
 <!---
 
 - pernickety blogging
@@ -110,21 +109,18 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Pernickety Blogging
-
-My broken hip is fixed.
+<h3>Pernickety Blogging</h3>
+<p>My broken hip is fixed.
 The main screw is 7.3 mm x 180 mm.
 They would have preferred to use 190 mm length but didn't have any available.
-I have big bones.
-
-My friend Madlee has a nice email footer in the smartphone, saying:
-
-- Alles isch gued; wenn's no nid gued isch denn isch es au no nid am End aacho!
-<span style="text-align: right; font-style: italic">&ndash;  [Alemannic](https://en.wikipedia.org/wiki/Alemannic_German) saying
-&ndash; All is well; if it's not well, it's not over yet</span>
-
-
-Many thanks to George for publishing his first Revit API blog post.
+I have big bones.</p>
+<p>My friend Madlee has a nice email footer in the smartphone, saying:</p>
+<ul>
+<li>Alles isch gued; wenn's no nid gued isch denn isch es au no nid am End aacho!
+<span style="text-align: right; font-style: italic">&ndash;  <a href="https://en.wikipedia.org/wiki/Alemannic_German">Alemannic</a> saying
+&ndash; All is well; if it's not well, it's not over yet</span></li>
+</ul>
+<p>Many thanks to George for publishing his first Revit API blog post.
 It is perfect in every way.
 And yet, it also provides an opportunity for me to share one slightly crazy aspect of my personality: exaggerated perfectionism.
 George's post looks like this, and is perfectly OK as it is.
@@ -136,84 +132,55 @@ Title case in title, Capital U and C: How to Use ToElements Method Correctly
 Plural 'couple of questions': There have been a couple of questions
 Missing 'the'
 ToElements is code, so should be noted as such typographically, e.g., using Courier font
-The HTML `pre` and `code` keywords can be achieved using a backtick in markdown, i.e. `ToElements`
-The word 'method' is lowercase: usage of `ToElements` Method
-The word 'class' is lowercase: `FilteredElementCollector` class
-Typo, missing `n`: ToElemets
+The HTML <code>pre</code> and <code>code</code> keywords can be achieved using a backtick in markdown, i.e. <code>ToElements</code>
+The word 'method' is lowercase: usage of <code>ToElements</code> Method
+The word 'class' is lowercase: <code>FilteredElementCollector</code> class
+Typo, missing <code>n</code>: ToElemets
 Code indentation: leading spaces inside the loops
 Code colourisation: C# syntax and keywords in different colours
 Avoid very long lines in sample code; add line breaks to improve readability
 Readable link, not just the naked raw URL
-My corrected version ends up looking like this:
-
-
-
-
-How to Use ToElements Method Correctly
-
-There have been a couple of questions regarding the usage of the `ToElements` method while filtering elements using the `FilteredElementCollector` class.
-The `ToElements` method in the `FilteredElementCollector` class returns the complete set of elements that meet the specified filter criteria as a generic `IList`.
-
-However, it's also worth noting that some members of the Revit API community tend to use the ToElemets method after using the FilteredElementCollector which in turn increases memory usage and slows down the performance of the same.
-
-One reason for using ToElements is to obtain the element count. However, that can also be achieved by calling GetElementCount.
-
-Another more valid reason is to access the elements in the list by index, e.g., you have 1000 elements in the list and you want to read their data in a specific order, e.g., #999, #1, #998, #2 or whatever. Then, you need the index provided by the list, and cannot just iterate over them on the predefined order provided by the enumerator.
-
-Here are examples that demonstrates the usage of the two:
-
-Example 1, using FilteredElementCollector alone to iterate over all Wall elements:
-
-```
+My corrected version ends up looking like this:</p>
+<p>How to Use ToElements Method Correctly</p>
+<p>There have been a couple of questions regarding the usage of the <code>ToElements</code> method while filtering elements using the <code>FilteredElementCollector</code> class.
+The <code>ToElements</code> method in the <code>FilteredElementCollector</code> class returns the complete set of elements that meet the specified filter criteria as a generic <code>IList</code>.</p>
+<p>However, it's also worth noting that some members of the Revit API community tend to use the ToElemets method after using the FilteredElementCollector which in turn increases memory usage and slows down the performance of the same.</p>
+<p>One reason for using ToElements is to obtain the element count. However, that can also be achieved by calling GetElementCount.</p>
+<p>Another more valid reason is to access the elements in the list by index, e.g., you have 1000 elements in the list and you want to read their data in a specific order, e.g., #999, #1, #998, #2 or whatever. Then, you need the index provided by the list, and cannot just iterate over them on the predefined order provided by the enumerator.</p>
+<p>Here are examples that demonstrates the usage of the two:</p>
+<p>Example 1, using FilteredElementCollector alone to iterate over all Wall elements:</p>
+<p>```
   IEnumerable walls
     = new FilteredElementCollector(doc)
-      .OfClass(typeof(Wall));
-
-  foreach (Element item in walls)
+      .OfClass(typeof(Wall));</p>
+<p>foreach (Element item in walls)
   {
     ElementId id = item.Id;
   }
-```
-
-Example 2, using both FilteredElementCollector and ToElements to iterate over all Wall elements:
-
-```
+```</p>
+<p>Example 2, using both FilteredElementCollector and ToElements to iterate over all Wall elements:</p>
+<p>```
   IList wallList = new FilteredElementCollector(doc)
     .OfClass(typeof(Wall))
-      .ToElements();
-
-  foreach (Element item in wallList)
+      .ToElements();</p>
+<p>foreach (Element item in wallList)
   {
     ElementId id = item.Id;
   }
-```
-
-More details and links to further related discussions are provided in the analysis of
-the [performance](https://thebuildingcoder.typepad.com/blog/2016/04/how-to-distinguish-redundant-rooms.html#2)
-in [how to distinguish redundant rooms](https://thebuildingcoder.typepad.com/blog/2016/04/how-to-distinguish-redundant-rooms.html).
-
-For the C# code colourisation, I used to use Visual Studio and its tools:
-
-Lately, I have switched to instead.
-
-However, this tool is no longer bein maintained, so it may be time to switch to yet another solution...
-
-Sorry to you all, George, my colleagues and readers, and all the rest of the universe for being pernickety, but that seems to be my naturure, so best accept it and let it be...
-
-Does it bring any advantages? Are they worth the effort? Up to each and every person to decide for herself, I would say...
-
-
-<center>
+```</p>
+<p>More details and links to further related discussions are provided in the analysis of
+the <a href="https://thebuildingcoder.typepad.com/blog/2016/04/how-to-distinguish-redundant-rooms.html#2">performance</a>
+in <a href="https://thebuildingcoder.typepad.com/blog/2016/04/how-to-distinguish-redundant-rooms.html">how to distinguish redundant rooms</a>.</p>
+<p>For the C# code colourisation, I used to use Visual Studio and its tools:</p>
+<p>Lately, I have switched to instead.</p>
+<p>However, this tool is no longer bein maintained, so it may be time to switch to yet another solution...</p>
+<p>Sorry to you all, George, my colleagues and readers, and all the rest of the universe for being pernickety, but that seems to be my naturure, so best accept it and let it be...</p>
+<p>Does it bring any advantages? Are they worth the effort? Up to each and every person to decide for herself, I would say...</p>
+<p><center>
 <img src="img/" alt="" title="" width="100"/>
-</center>
-
-
-####<a name="2"></a>
-
-####<a name="3"></a>
-
+</center></p>
+<h4><a name="2"></a></h4>
+<h4><a name="3"></a></h4>
 <pre class="prettyprint">
 
 </pre>
-
-
