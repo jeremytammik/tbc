@@ -8,7 +8,6 @@
 
 - pernickety blogging
 
-
 twitter:
 
 Important, less important and absolutely pernickety recommendations on perfecting API-related blog posts for the @AutodeskAPS @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS https://autode.sk/pernickety
@@ -19,6 +18,9 @@ Some important, some less important and some absolutely pernickety recommendatio
 
 linkedin:
 
+Important, less important and absolutely pernickety recommendations on perfecting API-related blog posts for the #RevitAPI
+
+https://autode.sk/pernickety
 
 #BIM #DynamoBIM #AutodeskAPS #Revit #API #IFC #SDK #Autodesk #AEC #adsk
 
