@@ -112,48 +112,50 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Pernickety Blogging
 
-I am still in hospital, convelescent after my broken was screwed tpgether front and back , and with 9 fractured ribs.
+I am still in hospital, convelescent with 9 fractured ribs and the right broken hip screwed back together again front and back.
 The main screw is 7.3 mm x 180 mm.
-They would have preferred to use 190 mm length but didn't have any available.
+They would have preferred to use 190 mm length, but didn't have any available.
 I have big bones.
 
-My friend Madlee has a nice saying in her smartphone email footer, saying:
+My friend Madlee has a nice saying in her smartphone email footer:
 
 - Alles isch gued; wenn's no nid gued isch denn isch es au no nid am End aacho!
 <span style="text-align: right; font-style: italic">&ndash;  [Alemannic](https://en.wikipedia.org/wiki/Alemannic_German) saying
 &ndash; All is well; if it's not well, it's not over yet</span>
 
-That applies to my broken hip, basically to all of life, and also to every blogger's personal taste and inclinations.
+That applies to my broken hip, basically to all of life, and also to every blog post.
 
 My colleague George published his first Revit-API-related blog post last week,
 [How to use ToElements Method correctly](https://adndevblog.typepad.com/aec/2023/10/how-to-use-toelements-method-correctly.html).
 
 Congratulations on that, George, and many thanks for your work and contributions!
-
-I checked it in advance before publication and gave it my OK.
-In spite of that, it makes a total difference to me actually seeing it "in print", in its final published version.
-The difference and effect it has on my perception is tremendous, astounding, and I use it for my own blog posts as well, correcting, previewing and making a huge number of minute corrections and improvements (?) in the final stages of publication, just before hitting the ultimate pblish button.
-
-In this case, I was astounded by the number and irrelevance of the little improvement possibilities that struck my eye.
-
-Except for a typo, all my suggestions can be ignored.
-And yet, re-reading them, I decided to share them both with George and Carol, who is also justarting bloging, and with you, dear reader, t ponder, maybe wonder; please also feel perfectly free to ignore, refute, reject and ridicule:
-
-
-Many thanks to George for publishing his first Revit API blog post.
 It is perfect in every way.
 And yet, it also provides an opportunity for me to share one slightly crazy aspect of my personality: exaggerated perfectionism.
 
-George's post looks like this, and is perfectly OK as it is:
+I checked it in advance before publication and gave it my OK.
+However, to me, it makes a total difference checking it in advance or actually seeing it in print, in its final published version.
+The effect of that difference on my perception is tremendous and astounding.
+I use this effect myself writing my own blog posts, correcting, previewing, checking, fixing, twiddling and often making a huge number of minute corrections and improvements in the final stages of publication, just before hitting the ultimate publish button.
+
+In this case, I noticed a typo to correct.
+When I was about to tell George, I noticed another little detail to improve, and another.
+I was astounded by the number and irrelevance of the improvement possibilities that struck my eye.
+
+Except for the two typos, all my suggestions can be ignored.
+And yet, re-reading them, I decided to share them both with George and Carol, who is also just starting to blog, and with you, dear reader, to ponder; please also feel perfectly free to ignore, refute, reject and ridicule:
+
+The post currently looks like this:
 
 <center>
-<img src="img/pernickety_blogging.png" alt="Pernickety blogging" title="Pernickety blogging" width="500"/>
+<img src="img/pernickety_blogging.png" alt="Pernickety blogging" title="Pernickety blogging" width="600"/>
 </center>
 
+<!--
 
-Still, I made a not of one or two things to improve, e.g., the typo in one of the repetitions of the methos name.
+Still, I made a note of one or two things to improve, e.g., the typo in one of the repetitions of the methos name.
 Once I'd started, I fiound it hard to stop. One thing added to another, and I ended up with an absolutely shocking list of possible enhancement.
 Since I want to praise George and not criticise in any way whatsoever, I pondered my options and ended up deciding that I am crazy and willing to share the fact including this list of suggestions for pernickety blogging:
+-->
 
 Here are my pernickety suggestions for enhancement:
 
@@ -161,10 +163,12 @@ Here are my pernickety suggestions for enhancement:
 - Plural 'couple of questions': There *have* been a couple of questions
 - Missing 'the'
 - `ToElements` is code, so should be noted as such typographically, e.g., using a monospace font such as Courier
-- In HTML, code is normally tagged using `pre` or `code`; in Markdown, you can use a backtick, i.e., `\`ToElements\``
+- In HTML, code is normally tagged using `pre` or `code`;
+  in [Markdown](https://en.wikipedia.org/wiki/Markdown), you can use a backtick, i.e., <code>&grave;ToElements&grave;</code>
 - The word 'method' is lowercase: usage of `ToElements` Method
 - The word 'class' is lowercase: `FilteredElementCollector` class
 - Typo, missing 'n': ToElemets
+- Typo, 'examples' is plural: examples that demonstrate
 - Code indentation: leading spaces inside the loops
 - Code colourisation: C# syntax and keywords in different colours
 - Avoid long lines in sample code; add line breaks to improve readability
@@ -184,11 +188,11 @@ One reason for using ToElements is to obtain the element count. However, that ca
 
 Another more valid reason is to access the elements in the list by index, e.g., you have 1000 elements in the list and you want to read their data in a specific order, e.g., #999, #1, #998, #2 or whatever. Then, you need the index provided by the list, and cannot just iterate over them on the predefined order provided by the enumerator.
 
-Here are examples that demonstrates the usage of the two:
+Here are examples that demonstrate the usage of the two:
 
 Example 1, using FilteredElementCollector alone to iterate over all Wall elements:
 
-```
+<pre class="prettyprint">
   IEnumerable walls
     = new FilteredElementCollector(doc)
       .OfClass(typeof(Wall));
@@ -197,20 +201,21 @@ Example 1, using FilteredElementCollector alone to iterate over all Wall element
   {
     ElementId id = item.Id;
   }
-```
+</pre>
 
 Example 2, using both FilteredElementCollector and ToElements to iterate over all Wall elements:
 
-```
-  IList wallList = new FilteredElementCollector(doc)
-    .OfClass(typeof(Wall))
-      .ToElements();
+<pre class="prettyprint">
+  IList wallList
+    = new FilteredElementCollector(doc)
+      .OfClass(typeof(Wall))
+        .ToElements();
 
   foreach (Element item in wallList)
   {
     ElementId id = item.Id;
   }
-```
+</pre>
 
 More details and links to further related discussions are provided in the analysis of
 the [performance](https://thebuildingcoder.typepad.com/blog/2016/04/how-to-distinguish-redundant-rooms.html#2)
@@ -218,7 +223,7 @@ in [how to distinguish redundant rooms](https://thebuildingcoder.typepad.com/blo
 
 <hr/>
 
-Here is a link to the markkdown source code for this blog post:
+Here is a link to the markdown source code for this blog post:
 
 For the C# code colourisation, I used to use Visual Studio and its tools:
 
