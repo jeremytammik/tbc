@@ -223,20 +223,25 @@ in [how to distinguish redundant rooms](https://thebuildingcoder.typepad.com/blo
 
 <hr/>
 
-Here is a link to the markdown source code for this blog post:
+Here is a link to the markdown source code for this blog post,
+[2013_pernickety.md](https://github.com/jeremytammik/tbc/blob/gh-pages/a/2013_pernickety.md),
+where you can see the Markdown text I edited to produce this.
 
-For the C# code colourisation, I used to use Visual Studio and its tools:
+I have used a varietey
+of [tools for C&#35;, Python and VB code colourisation](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.36) in
+the past.
 
-Lately, I have switched to ... instead.
+In this post, I just employed the [Google JavaScript code prettifier `code-prettify`](https://github.com/googlearchive/code-prettify) instead.
 
 However, this tool is no longer being maintained, so it is actually time to switch to yet another solution...
 
-Please excuse me for being so pernickety, George, Carol, other colleagues, readers, and rest of the universe.
+Another reason to replace it would be that it requires me to manually replace `<` and `>` signs the their HTML escape characters `&lt;` and `&gt;`.
 
+So, to wrap up:
+
+Please excuse me for being pernickety, George and Carol.
 It seems to be my nature, so best accept it and let it be...
-
 Does is have advantages after all, with all the extra work entailed that I burden myself with seeing it through?
-
-Are they worth the effort? Up to each and every person to decide for herself, I would say...
-
+Are they worth the effort?
+Up to each and every person to decide for herself, I would say...
 
