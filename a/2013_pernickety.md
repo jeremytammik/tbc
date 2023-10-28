@@ -132,6 +132,10 @@ Congratulations on that, George, and many thanks for your work and contributions
 It is perfect in every way.
 And yet, it also provides an opportunity for me to share one slightly crazy aspect of my personality: exaggerated perfectionism.
 
+Before getting to the exaggerated perfectionism, let me point out
+the more important [blogging tips and tricks](https://thebuildingcoder.typepad.com/blog/2014/07/wishlist-blogging-smartgeometry-dynamo-and-formit.html) that
+I listed for earlier colleagues getting started with this.
+
 I checked it in advance before publication and gave it my OK.
 However, to me, it makes a total difference checking it in advance or actually seeing it in print, in its final published version.
 The effect of that difference on my perception is tremendous and astounding.
