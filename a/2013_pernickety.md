@@ -112,9 +112,9 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Pernickety Blogging
 
-I am still in hospital, convelescent with 9 fractured ribs and the right broken hip screwed back together again front and back.
+I am still in hospital, convalescent with 9 fractured ribs and the right broken hip screwed back together again front and back.
 The main screw is 7.3 mm x 180 mm.
-They would have preferred to use 190 mm length, but didn't have any available.
+They would have preferred to use 190 mm length but didn't have any available.
 I have big bones.
 
 My friend Madlee has a nice saying in her smartphone email footer:
@@ -227,7 +227,7 @@ Here is a link to the markdown source code for this blog post,
 [2013_pernickety.md](https://github.com/jeremytammik/tbc/blob/gh-pages/a/2013_pernickety.md),
 where you can see the Markdown text I edited to produce this.
 
-I have used a varietey
+I have used a variety
 of [tools for C&#35;, Python and VB code colourisation](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.36) in
 the past.
 
@@ -235,7 +235,7 @@ In this post, I just employed the [Google JavaScript code prettifier `code-prett
 
 However, this tool is no longer being maintained, so it is actually time to switch to yet another solution...
 
-Another reason to replace it would be that it requires me to manually replace `<` and `>` signs the their HTML escape characters `&lt;` and `&gt;`.
+Another reason to replace it would be that it requires me to manually replace `<` and `>` signs with their HTML escape characters `&lt;` and `&gt;`.
 
 So, to wrap up:
 
