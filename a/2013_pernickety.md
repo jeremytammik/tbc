@@ -11,7 +11,7 @@
 
 twitter:
 
-@AutodeskAPS @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS
+Important, less important and absolutely pernickety recommendations on perfecting API-related blog posts for the @AutodeskAPS @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS https://autode.sk/pernickety
 
 Some important, some less important and some absolutely pernickety recommendations on perfecting API-related blog posts...
 
