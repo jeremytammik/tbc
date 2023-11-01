@@ -45,13 +45,20 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Batch Processor Project and Dynamo Shapely
 
-####<a name="2"></a> Revit Batch Processor Project
+####<a name="2"></a> Revit Batch Processor Sample Code
 
-Revit Batch Processor project
-Jan Christel <jan.r.christel@gmail.com>
-I’ve been following your website for a number of years by know and would like to say thank you for your posts and insights. They are a really great help when getting started with the Revit API.
+Several  years ago, we pointed out the
+powerful [Revit Batch Processor (RBP)](https://thebuildingcoder.typepad.com/blog/2019/11/the-revit-batch-processor-rbp.html).
+
+[Jan Christel](https://github.com/jchristel) has imoplemented and shared
+a number of Python code samples makinmg use of it in
+his [Code samples for the Revit Batch Processor](https://github.com/jchristel/SampleCodeRevitBatchProcessor),
+explaining:
+
+>I’ve been following your website for a number of years by know and would like to say thank you for your posts and insights. They are a really great help when getting started with the Revit API.
 For the last 3 years I’ve been developing code using the Revit API in context of the Revit Batch Processor project which you are familiar with. The library has now grown to reasonable size and might be useful for others too. It focusses mainly on reporting / modifying element data and families. It show cases how to start a number of batch processor sessions concurrently using either .bat or power shell to process a large number of files.
-A link to the GitHub repo: https://github.com/jchristel/SampleCodeRevitBatchProcessor and the pypi package: https://pypi.org/project/DuHast/
+A link to the [SampleCodeRevitBatchProcessor GitHub repo](https://github.com/jchristel/SampleCodeRevitBatchProcessor) and
+the [DuHast PyPI package](https://pypi.org/project/DuHast/).
 
 ####<a name="3"></a> Shapely for Dynamo
 
