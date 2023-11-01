@@ -86,19 +86,19 @@ I am one of those people who think open-source is important!
 
 Here are some examples:
 
-- ShapelytoDynamo  &ndash; It converts a dynamo geometry into a "Shapely" geometry without any data loss.
+- ShapelytoDynamo &ndash; It converts a dynamo geometry into a "Shapely" geometry without any data loss.
   There is also a transformation of the shapely geometry obtained in a similar way to the dynamo geometry.
-- DynamotoShapely  &ndash; It converts a shapely geometry into a dynamo geometry without any data loss.
-- ShapelyBuffer  &ndash; Using a dynamo geometry (polygon, polycurve), it creates a new geometry by looking at the user’s offset distance in the same line of the units that make up the geometry. The user can decide the sharpness of the edges of the created geometry.
-- ShapelyDifference  &ndash; It allows us to analyse the relationship between 2 geometries. It subtracts one geometry from the other and returns a new closed geometry containing the remaining geometry.
-- Shapelyİntersection  &ndash; Allows us to analyse the relationship between 2 geometries. It extracts 2 geometries from each other and returns a new closed geometry. The result is always a polygon, polycurve and a list of points that make up the geometry.
-- ShapelyUnion  &ndash; Allows us to analyse the relationship between 2 geometries. It combines 2 geometries and returns a closed new geometry. The result is always a polygon, polycurve and a list of points that make up the geometry.
-- ShapelySnap  &ndash; It allows us to analyse the relationship between 2 geometries. It returns a new closed geometry that adapts to the contours of the geometry approaching the distance specified by the user. The result is always a polygon, polycurve and a list of points that make up that geometry.
-- ShapelyConvexHull  &ndash; Dynamo uses the points to create the outermost polygon that the points will form. The result is always a polygon, polycurve and a list of points that form that geometry.
-- ShapelyRotateSkew  &ndash; Using a 2D dynamo geometry (polygon), it rotates the geometry in the ground plane in the X and Y axes as if it were a 3D geometry and creates a new geometry.
-- ShapelyOffset  &ndash; Using a dynamo geometry (polygon, polycurve), it creates a new geometry by looking at the user’s offset distance in the same line of the units that make up the geometry. The generated geometry is always meaningful and stable. The user can decide the sharpness of the edges of the generated geometry.
-- ShapelySetPrecision  &ndash; Using a dynamo geometry (polygon, polycurve), it allows the user to specify the points that make up the geometry and returns a new geometry. This geometry differs from the parent geometry because the position of the vertices that make up the geometry has changed.
-- ShapelyTouchesDistance  &ndash; Using a dynamo geometry (polygon, polycurve) allows us to analyse geometries within a distance specified by the user. For this purpose, it finds the points at right angles of all geometries around it and analyses the distance between the main geometry and returns "True" and "False".
+- DynamotoShapely &ndash; It converts a shapely geometry into a dynamo geometry without any data loss.
+- ShapelyBuffer &ndash; Using a dynamo geometry (polygon, polycurve), it creates a new geometry by looking at the user’s offset distance in the same line of the units that make up the geometry. The user can decide the sharpness of the edges of the created geometry.
+- ShapelyDifference &ndash; It allows us to analyse the relationship between 2 geometries. It subtracts one geometry from the other and returns a new closed geometry containing the remaining geometry.
+- Shapelyİntersection &ndash; Allows us to analyse the relationship between 2 geometries. It extracts 2 geometries from each other and returns a new closed geometry. The result is always a polygon, polycurve and a list of points that make up the geometry.
+- ShapelyUnion &ndash; Allows us to analyse the relationship between 2 geometries. It combines 2 geometries and returns a closed new geometry. The result is always a polygon, polycurve and a list of points that make up the geometry.
+- ShapelySnap &ndash; It allows us to analyse the relationship between 2 geometries. It returns a new closed geometry that adapts to the contours of the geometry approaching the distance specified by the user. The result is always a polygon, polycurve and a list of points that make up that geometry.
+- ShapelyConvexHull &ndash; Dynamo uses the points to create the outermost polygon that the points will form. The result is always a polygon, polycurve and a list of points that form that geometry.
+- ShapelyRotateSkew &ndash; Using a 2D dynamo geometry (polygon), it rotates the geometry in the ground plane in the X and Y axes as if it were a 3D geometry and creates a new geometry.
+- ShapelyOffset &ndash; Using a dynamo geometry (polygon, polycurve), it creates a new geometry by looking at the user’s offset distance in the same line of the units that make up the geometry. The generated geometry is always meaningful and stable. The user can decide the sharpness of the edges of the generated geometry.
+- ShapelySetPrecision &ndash; Using a dynamo geometry (polygon, polycurve), it allows the user to specify the points that make up the geometry and returns a new geometry. This geometry differs from the parent geometry because the position of the vertices that make up the geometry has changed.
+- ShapelyTouchesDistance &ndash; Using a dynamo geometry (polygon, polycurve) allows us to analyse geometries within a distance specified by the user. For this purpose, it finds the points at right angles of all geometries around it and analyses the distance between the main geometry and returns "True" and "False".
 
 Many thanks to Durmuş for sharing this powerful tool!
 
