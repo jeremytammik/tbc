@@ -172,3 +172,15 @@ Does this extra work have any advantages?
 Is it worth the effort?
 Up to each and every person to decide for herself, I would say...
 
+[Jonathon Broughton adds](https://www.linkedin.com/feed/update/urn:li:activity:7124104311315279872?commentUrn=urn%3Ali%3Acomment%3A%28activity%3A7124104311315279872%2C7124255520466554880%29&dashCommentUrn=urn%3Ali%3Afsd_comment%3A%287124255520466554880%2Curn%3Ali%3Aactivity%3A7124104311315279872%29):
+
+The second paragraph of your corrected version contains a typo.
+`ToElemets` should be `ToElements`.
+
+It takes a persnickety practitioner to know one 😎
+
+*Response:* Great.
+I wonder should I leave it for other practitioners to pick up as well?
+I think it would be appreciated...
+I'll add your correction to the post and out myself (yet again) as a pernickety failure.
+
