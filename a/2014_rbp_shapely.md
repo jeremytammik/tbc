@@ -111,9 +111,25 @@ Here are some examples:
 
 Many thanks to Durmuş for implementing and sharing this powerful tool!
 
-####<a name="4"></a> Internet Artifacts
+####<a name="4"></a> Retrieve Toposolid Contour Lines
 
-Let's close with a very entertaining collection
-of [Internet Artifacts](https://neal.fun/internet-artifacts/) by Neal.fun.
+Ning Zhou raised the question
+on [how to get contour lines from toposolid\(https://forums.autodesk.com/t5/revit-api-forum/how-to-get-contour-lines-from-toposolid/m-p/12315476) and
+subsequently discovered, tested and shared the solution.
 
+The gist of it is that the contour lines are view dependent, so you need to be specific about which view to use to retrieve the toposolid geometry.
+
+My colleague Carol Gitonga picked up this thread to published her first Revit API blog post,
+on [how to get contour lines from Toposolid](https://adndevblog.typepad.com/aec/2023/11/how-to-get-contour-lines-from-toposolid.html).
+
+Congratulations, Ning, on solving the issue!
+
+Congratulations, Carol, on a very nice blogging debut!
+
+Thank you both for your work and sharing the results!
+
+####<a name="5"></a> Internet Artifacts
+
+Finally, let's close with an entertaining look back into time through a collection
+of [internet artifacts](https://neal.fun/internet-artifacts/) by Neal.fun.
 
