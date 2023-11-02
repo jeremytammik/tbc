@@ -75,9 +75,9 @@ Many thanks to Jan for sharing these.
 ####<a name="3"></a> Shapely for Dynamo
 
 We recently discussed
-The [Shapely Python 2D geometry library](https://thebuildingcoder.typepad.com/blog/2023/09/element-diff-compare-shapely-and-rdbe.html#4_ and
+the [Shapely Python 2D geometry library](https://thebuildingcoder.typepad.com/blog/2023/09/element-diff-compare-shapely-and-rdbe.html#4) and
 how it can be used
-to [find and fix a hole](https://thebuildingcoder.typepad.com/blog/2023/09/element-diff-compare-shapely-and-rdbe.html#4.1)
+to [find and fix a hole](https://thebuildingcoder.typepad.com/blog/2023/09/element-diff-compare-shapely-and-rdbe.html#4.1).
 
 Durmuş Cesur (Bayryam) of [BPA Architecture](https://bpa.archi/) announced an associated Dynamo package to wrap it and provide access to its functionality:
 
@@ -98,8 +98,8 @@ the [Shapely Machine Learning relationship in Dynamo](https://www.linkedin.com/p
 Shapely is a great Python library that helps us analyse and manipulate geometries.
 We think it is important to include this library in Dynamo.
 Shapely uses its own geometry language.
-Therefore, transformations must be made between each other without losing data. In this package you will find a dynamo version of shapely geometry.
-I made a tutorial for you on the Github page, you can use it to get a feel for the polygons and let me know if you have any questions or corrections.
+Therefore, transformations must be made between each other without losing data. In this package you will find a Dynamo version of Shapely geometry.
+I made a tutorial for you on the Github page; you can use it to get a feel for the polygons and let me know if you have any questions or corrections.
 The package is completely open-source.
 I am one of those people who think open-source is important!
 
@@ -124,13 +124,13 @@ Many thanks to Durmuş for implementing and sharing this powerful tool!
 ####<a name="4"></a> Retrieve Toposolid Contour Lines
 
 Ning Zhou raised the question
-on [how to get contour lines from toposolid\(https://forums.autodesk.com/t5/revit-api-forum/how-to-get-contour-lines-from-toposolid/m-p/12315476) and
+on [how to get contour lines from toposolid](https://forums.autodesk.com/t5/revit-api-forum/how-to-get-contour-lines-from-toposolid/m-p/12315476) and
 subsequently discovered, tested and shared the solution.
 
 The gist of it is that the contour lines are view dependent, so you need to be specific about which view to use to retrieve the toposolid geometry.
 
-My colleague Carol Gitonga picked up this thread to published her first Revit API blog post,
-on [how to get contour lines from Toposolid](https://adndevblog.typepad.com/aec/2023/11/how-to-get-contour-lines-from-toposolid.html).
+My colleague Carol Gitonga picked up this thread to publish her first Revit API blog post,
+also titled [how to get contour lines from Toposolid](https://adndevblog.typepad.com/aec/2023/11/how-to-get-contour-lines-from-toposolid.html).
 
 Congratulations, Ning, on solving the issue!
 
@@ -140,6 +140,6 @@ Thank you both for your work and sharing the results!
 
 ####<a name="5"></a> Internet Artifacts
 
-Finally, let's close with an entertaining look back into time through a collection
+Finally, let's close with an entertaining look back in time through a collection
 of [internet artifacts](https://neal.fun/internet-artifacts/) by Neal.fun.
 
