@@ -58,7 +58,7 @@ Several  years ago, we pointed out the
 powerful [Revit Batch Processor (RBP)](https://thebuildingcoder.typepad.com/blog/2019/11/the-revit-batch-processor-rbp.html).
 
 [Jan Christel](https://github.com/jchristel) has implemented and shared
-a number of Python code samples makinmg use of it in
+a number of Python code samples making use of it in
 his [code samples for the Revit Batch Processor](https://github.com/jchristel/SampleCodeRevitBatchProcessor),
 explaining:
 
@@ -100,8 +100,8 @@ We think it is important to include this library in Dynamo.
 Shapely uses its own geometry language.
 Therefore, transformations must be made between each other without losing data. In this package you will find a Dynamo version of Shapely geometry.
 I made a tutorial for you on the Github page; you can use it to get a feel for the polygons and let me know if you have any questions or corrections.
-The package is completely open-source.
-I am one of those people who think open-source is important!
+The package is completely open source.
+I am one of those people who think open source is important!
 
 Here are some examples:
 
