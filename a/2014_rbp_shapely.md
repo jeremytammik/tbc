@@ -28,7 +28,11 @@ twitter:
 
 the @AutodeskAPS @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS
 
-&ndash; ...
+Powerful tools and solutions for batch processing, 2D geometric analysis and toposolids
+&ndash; Revit batch processor sample code
+&ndash; Shapely for Dynamo
+&ndash; Retrieve Toposolid contour lines
+&ndash; Internet artifacts...
 
 linkedin:
 
@@ -43,12 +47,13 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Batch Processor Project and Dynamo Shapely
+### Contour Lines, Batch Processor and Dynamo Shapely
 
 Powerful tools and solutions for batch processing, 2D geometric analysis and toposolids:
 
 - [Revit batch processor sample code](#2)
 - [Shapely for Dynamo](#3)
+- [Machine learning in Dynamo](#3.1)
 - [Retrieve Toposolid contour lines](#4)
 - [Internet artifacts](#5)
 
@@ -120,6 +125,21 @@ Here are some examples:
 - ShapelyTouchesDistance &ndash; Using a dynamo geometry (polygon, polycurve) allows us to analyse geometries within a distance specified by the user. For this purpose, it finds the points at right angles of all geometries around it and analyses the distance between the main geometry and returns "True" and "False".
 
 Many thanks to Durmuş for implementing and sharing this powerful tool!
+
+####<a name="3.1"></a> Machine Learning in Dynamo
+
+Durmuş adds: A few days ago I wrote an article about Machine Learning on DynamoBlog.
+Today a copy of this article was published somewhere at NASA.
+This is incredible news.
+I wanted to share it with you.
+You can find it here:
+[Machine Learning in Dynamo](https://dynamobim.org/machine-learning-in-dynamo/):
+
+> With advancing technology, we see the widespread use of Machine Learning in almost all industries.
+But can a vector-based numerical design program work with ML?
+The answer to this question is a definite “Yes, it can.”
+The “Shapely geometry” package not only allows users to manipulate 2D geometries but also integrates seamlessly with ML.
+In other words, the “Shapely” package comes equipped with ML capabilities, making it more functional and significantly expanding its processing capacity.
 
 ####<a name="4"></a> Retrieve Toposolid Contour Lines
 
