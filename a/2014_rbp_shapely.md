@@ -55,10 +55,12 @@ a number of Python code samples makinmg use of it in
 his [Code samples for the Revit Batch Processor](https://github.com/jchristel/SampleCodeRevitBatchProcessor),
 explaining:
 
->I’ve been following your website for a number of years by know and would like to say thank you for your posts and insights. They are a really great help when getting started with the Revit API.
+> I’ve been following your website for a number of years by know and would like to say thank you for your posts and insights. They are a really great help when getting started with the Revit API.
 For the last 3 years I’ve been developing code using the Revit API in context of the Revit Batch Processor project which you are familiar with. The library has now grown to reasonable size and might be useful for others too. It focusses mainly on reporting / modifying element data and families. It show cases how to start a number of batch processor sessions concurrently using either .bat or power shell to process a large number of files.
 A link to the [SampleCodeRevitBatchProcessor GitHub repo](https://github.com/jchristel/SampleCodeRevitBatchProcessor) and
 the [DuHast PyPI package](https://pypi.org/project/DuHast/).
+
+Many thank to Jan for sharing these.`
 
 ####<a name="3"></a> Shapely for Dynamo
 
@@ -107,13 +109,11 @@ Here are some examples:
 - ShapelySetPrecision &ndash; Using a dynamo geometry (polygon, polycurve), it allows the user to specify the points that make up the geometry and returns a new geometry. This geometry differs from the parent geometry because the position of the vertices that make up the geometry has changed.
 - ShapelyTouchesDistance &ndash; Using a dynamo geometry (polygon, polycurve) allows us to analyse geometries within a distance specified by the user. For this purpose, it finds the points at right angles of all geometries around it and analyses the distance between the main geometry and returns "True" and "False".
 
-Many thanks to Durmuş for sharing this powerful tool!
+Many thanks to Durmuş for implementing and sharing this powerful tool!
 
 ####<a name="4"></a> Internet Artifacts
 
-- https://neal.fun/internet-artifacts/
+Let's close with a very entertaining collection
+of [Internet Artifacts](https://neal.fun/internet-artifacts/) by Neal.fun.
 
-<pre class="prettyprint">
-
-</pre>
 
