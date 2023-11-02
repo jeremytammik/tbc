@@ -45,6 +45,13 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Batch Processor Project and Dynamo Shapely
 
+Powerful tools and solutions for batch processing, 2D geometric analysis and toposolids:
+
+- [Revit batch processor sample code](#2)
+- [Shapely for Dynamo](#3)
+- [Retrieve Toposolid contour lines](#4)
+- [Internet artifacts](#5)
+
 ####<a name="2"></a> Revit Batch Processor Sample Code
 
 Several  years ago, we pointed out the
