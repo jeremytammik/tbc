@@ -26,7 +26,12 @@ Hi Jeremy,  Whatever you need for that, you can tell me. I can do it for you
 
 twitter:
 
-the @AutodeskAPS @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS
+Powerful tools and solutions for batch processing,  and toposolids
+Revit batch processor sample code, 2D geometric analysis with Shapely for Dynamo, Machine learning in Dynamo
+&ndash; Retrieve Toposolid contour lines
+&ndash; Internet artifacts...
+
+the @AutodeskAPS @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS https://autode.sk/dynamoshapely
 
 Powerful tools and solutions for batch processing, 2D geometric analysis and toposolids
 &ndash; Revit batch processor sample code
