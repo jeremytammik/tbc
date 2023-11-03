@@ -36,6 +36,15 @@ Powerful tools and solutions for batch processing, 2D geometric analysis and top
 
 linkedin:
 
+Powerful tools and solutions for RFA and RVT batch processing, 2D geometric analysis with Shapely for Dynamo, machine learning in Dynamo, retrieving Toposolid contour lines with the #RevitAPI
+
+https://autode.sk/dynamoshapely
+
+- Revit batch processor sample code
+- Shapely for Dynamo
+- Retrieve Toposolid contour lines
+- Internet artifacts...
+
 #BIM #DynamoBIM #AutodeskAPS #Revit #API #IFC #SDK #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
