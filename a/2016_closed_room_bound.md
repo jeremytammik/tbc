@@ -61,12 +61,12 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ####<a name="2"></a>
 
-####<a name="3"></a>
+####<a name="3"></a> Closed Contiguous Room Boundary Loop
 
-- get closed contiguous boundary loop from room:
-  using GetRoomBoundaryAsCurveLoopArray from the ExporterIFC module
-  Creating a Generic Model from Area Boundaries
-  https://forums.autodesk.com/t5/revit-api-forum/creating-a-generic-model-from-area-boundaries/m-p/12371317#M75201
+get closed contiguous boundary loop from room:
+using GetRoomBoundaryAsCurveLoopArray from the ExporterIFC module
+Creating a Generic Model from Area Boundaries
+https://forums.autodesk.com/t5/revit-api-forum/creating-a-generic-model-from-area-boundaries/m-p/12371317#M75201
 Loren Routh
 San Francisco, California, US
 SDM Specialist
@@ -75,45 +75,48 @@ Building Owners
 https://www.gsa.gov/about-us/gsa-regions/region-9-pacific-rim/buildings-and-facilities/california
 https://www.gsa.gov/
 
-This just in:
-I tried the GetRoomBoundaryAsCurveLoopArray() method, and it totally worked!  You need to import the ExporterIFC module, etc.   This method eliminated a chunk of code, no sorting or extracting the curves.  It let me create an extrusion (manually) with no errors at all!  As you can see by the pic below, this was not a rectangle.  Definitely has my vote to be included in the regular Revit API.  Now to make it work with Generic Models...
+> This just in:
+I tried the `GetRoomBoundaryAsCurveLoopArray` method, and it totally worked!
+You need to import the `ExporterIFC` module, etc.
+This method eliminated a chunk of code, no sorting or extracting the curves.
+It let me create an extrusion (manually) with no errors at all!
+As you can see by the pic below, this was not a rectangle.
+Definitely has my vote to be included in the regular Revit API.
+Now to make it work with Generic Models...
 
-import clr
-clr.AddReferenceToFileAndPath(r'C:\Program Files\Autodesk\Revit 2023\AddIns\IFCExporterUI\Autodesk.IFC.Export.UI.dll')
+<pre class="prettyprint">
+  import clr
+  clr.AddReferenceToFileAndPath(r'C:\Program Files\Autodesk\Revit 2023\AddIns\IFCExporterUI\Autodesk.IFC.Export.UI.dll')
+  clr.AddReference("RevitAPIIFC")
+  from Autodesk.Revit.DB.IFC import ExporterIFC
+  from Autodesk.Revit.DB.IFC import ExporterIFCUtils
 
-clr.AddReference("RevitAPIIFC")
-from Autodesk.Revit.DB.IFC import ExporterIFC
-from Autodesk.Revit.DB.IFC import ExporterIFCUtils
+  opt = DB.SpatialElementBoundaryOptions()
 
-opt = DB.SpatialElementBoundaryOptions()
+  curve_loop = ExporterIFCUtils.GetRoomBoundaryAsCurveLoopArray(selected_area, opt, True)
 
-curve_loop = ExporterIFCUtils.GetRoomBoundaryAsCurveLoopArray(selected_area, opt, True)
-
-with DB.Transaction(doc, "Create Model Lines") as tx:
+  with DB.Transaction(doc, "Create Model Lines") as tx:
     tx.Start()
 
     sketch_plane = DB.SketchPlane.Create(doc,selected_area.LevelId)
 
     for loop in curve_loop:
-        for line in loop:
-            crv = doc_create.NewModelCurve(line, sketch_plane)
+      for line in loop:
+        crv = doc_create.NewModelCurve(line, sketch_plane)
 
     tx.Commit()
-
-/Users/jta/a/doc/revit/tbc/git/a/img/getroomboundaryascurvelooparray.png Pixel Height: 1,278 Pixel Width: 1,590
-
-
-####<a name="4"></a>
-
-
-- https://www.gatesnotes.com/AI-agents
-  THE FUTURE OF AGENTS
-  AI is about to completely change how you use computers
-  And upend the software industry.
-
+</pre>
 
 <center>
-<img src="img/.png" alt="" title="" width="500"/>
+<img src="img/getroomboundaryascurvelooparray.png" alt="GetRoomBoundaryAsCurveLoopArray" title="GetRoomBoundaryAsCurveLoopArray" width="500"/> <!-- Pixel Height: 1,278 Pixel Width: 1,590 -->
 </center>
+
+Many thanks to Loren for sharing this valuable hint.
+
+####<a name="4"></a> AI May Obsolete All Apps
+
+Bill Gates present an interesting vision of the future of personal computing
+in [The future of agents &ndash; AI is about to completely change how you use computers &ndash; and upend the software industry](https://www.gatesnotes.com/AI-agents).
+
 
 
