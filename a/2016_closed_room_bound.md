@@ -39,6 +39,13 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Closed Room Boundary
 
+Taking a look at jounral files, room boundaries, adjacent rooms, a ForgeTypeId question and one view of where AI might lead:
+
+- [Harry's journal file magic](#2)
+- [Closed contiguous room boundary loop](#3)
+- [Challenges identifying adjacent rooms](#4)
+- [ForgeTypeId for 'Other' parameter group](#5)
+- [AI may obsolete all apps](#6)
 
 ####<a name="2"></a> Harry's Journal File Magic
 
@@ -49,6 +56,8 @@ To be precise, it consists of three instalments:
 - [Journal File Magic &amp; Exporting Groups to File (part 1)](https://boostyourbim.wordpress.com/2023/11/01/journal-file-magic-exporting-groups-to-file-part-1/)
 - [Journal File Magic &amp; Exporting Groups to File (part 2)](https://boostyourbim.wordpress.com/2023/11/02/journal-file-magic-exporting-groups-to-file-part-2/)
 - [Journal File Magic &amp; Exporting Groups to File (grand finale)](https://boostyourbim.wordpress.com/2023/11/03/journal-file-magic-exporting-groups-to-file-the-grand-finale/)
+
+Many thanks to Harry for implementaing anmd sharing this useful and educational solution.
 
 ####<a name="3"></a> Closed Contiguous Room Boundary Loop
 
@@ -93,7 +102,7 @@ Now to make it work with Generic Models...
 
 Many thanks to Loren for sharing this valuable hint.
 
-####<a name="3"></a> Challenges Identifying Adjacent Rooms
+####<a name="4"></a> Challenges Identifying Adjacent Rooms
 
 Ilia Krachkovskii [shared](https://www.linkedin.com/posts/ilia-krachkovskii_im-currently-working-on-a-so-called-spatial-activity-7125803558834167808-NXwt?utm_source=share&utm_medium=member_desktop) some
 thoughts and challenges identifying adjacent rooms
@@ -118,7 +127,7 @@ thoughts and challenges identifying adjacent rooms
 " alt="Retrieve adjacent rooms" title="Retrieve adjacent rooms" width="600"/> <!-- Pixel Height: 1,530 Pixel Width: 1,656 -->
 </center>
 
-####<a name="4"></a> ForgeTypeId for 'Other' Parameter Group
+####<a name="5"></a> ForgeTypeId for 'Other' Parameter Group
 
 Kevin Fielding shared a quick, easy and effective solution for replacing the `Other` parameter group or the `BuiltInParameterGroup` `INVALID` in his thread
 on [Revit 2024 'Other' parameter group\(https://forums.autodesk.com/t5/revit-api-forum/revit-2024-other-parameter-group/td-p/12086226):
@@ -146,8 +155,7 @@ on [Revit 2024 GroupTypeId missing ParameterGroup Other (Invalid)](https://forum
 
 Thanks, Kevin, for clarifying this!
 
-
-####<a name="5"></a> AI May Obsolete All Apps
+####<a name="6"></a> AI May Obsolete All Apps
 
 Bill Gates present an interesting vision of the future of personal computing
 in [The future of agents &ndash; AI is about to completely change how you use computers &ndash; and upend the software industry](https://www.gatesnotes.com/AI-agents).
