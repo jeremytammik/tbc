@@ -14,7 +14,6 @@
   Journal File Magic & Exporting Groups to File (part 1)
   https://boostyourbim.wordpress.com/2023/11/01/journal-file-magic-exporting-groups-to-file-part-1/
 
-
 - Revit server buffer size settings
   Synchronizing Revit Central Models between Offices over Internet-VPN
   https://forums.autodesk.com/t5/revit-api-forum/synchronizing-revit-central-models-between-offices-over-internet/td-p/12313273
@@ -22,20 +21,8 @@
 - https://stackoverflow.com/questions/77243537/revit-api-try-to-get-all-the-elements-from-revit-file
 
 - replacing [Revit 2024 'Other' Parameter Group] or BuiltInParameterGroup.INVALID
-  https://forums.autodesk.com/t5/revit-api-forum/revit-2024-other-parameter-group/td-p/12086226
-  Kevin Fielding
   Revit 2024 'Other' Parameter Group
-  With the change over to ForgeTypeId and GroupTypeId in Revit 2024 instead of BuiltInParameterGroup enumerations, I just wanted to share how to define the 'Other' group for parameters as it doesn't appear to be documented.
-  Whereas previously you would use
-  BuiltInParameterGroup.INVALID
-  In 2024 and beyond you need to use
-  new ForgeTypeId(string.Empty)
-  Other groups can be found using the GroupTypeId class like GroupTypeId.Data
-  Hope this helps others searching for this.
-  came up again in
-  Revit 2024 GroupTypeId missing ParameterGroup Other (Invalid)
-  https://forums.autodesk.com/t5/revit-api-forum/revit-2024-grouptypeid-missing-parametergroup-other-invalid/m-p/12288651/highlight/false#M74502
-  thanks to kevin
+  https://forums.autodesk.com/t5/revit-api-forum/revit-2024-other-parameter-group/td-p/12086226
 
 twitter:
 
@@ -129,8 +116,36 @@ thoughts and challenges identifying adjacent rooms
 " alt="Retrieve adjacent rooms" title="Retrieve adjacent rooms" width="600"/> <!-- Pixel Height: 1,530 Pixel Width: 1,656 -->
 </center>
 
+####<a name="4"></a> ForgeTypeId for 'Other' Parameter Group
 
-####<a name="4"></a> AI May Obsolete All Apps
+Kevin Fielding shared a quick, easy and effective solution for replacing the `Other` parameter group or the `BuiltInParameterGroup` `INVALID` in his thread
+on [Revit 2024 'Other' parameter group\(https://forums.autodesk.com/t5/revit-api-forum/revit-2024-other-parameter-group/td-p/12086226):
+
+With the change over to `ForgeTypeId` and `GroupTypeId` in Revit 2024 instead of the `BuiltInParameterGroup` enumerations, I just wanted to share how to define the 'Other' group for parameters, as it doesn't appear to be documented.
+
+Whereas previously you would use
+
+<pre class="prettyprint">
+  BuiltInParameterGroup.INVALID
+</pre>
+
+In 2024 and beyond you need to use
+
+<pre class="prettyprint">
+  new ForgeTypeId(string.Empty)
+</pre>
+
+Other groups can be found using the `GroupTypeId` class, like `GroupTypeId.Data`.
+
+Hope this helps others searching for this.
+
+In fact, the same question came up again in the question
+on [Revit 2024 GroupTypeId missing ParameterGroup Other (Invalid)](https://forums.autodesk.com/t5/revit-api-forum/revit-2024-grouptypeid-missing-parametergroup-other-invalid/m-p/12288651/highlight/false#M74502.
+
+Thanks, Kevin, for clarifying this!
+
+
+####<a name="5"></a> AI May Obsolete All Apps
 
 Bill Gates present an interesting vision of the future of personal computing
 in [The future of agents &ndash; AI is about to completely change how you use computers &ndash; and upend the software industry](https://www.gatesnotes.com/AI-agents).
