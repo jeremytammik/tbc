@@ -63,17 +63,8 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ####<a name="3"></a> Closed Contiguous Room Boundary Loop
 
-get closed contiguous boundary loop from room:
-using GetRoomBoundaryAsCurveLoopArray from the ExporterIFC module
-Creating a Generic Model from Area Boundaries
-https://forums.autodesk.com/t5/revit-api-forum/creating-a-generic-model-from-area-boundaries/m-p/12371317#M75201
-Loren Routh
-San Francisco, California, US
-SDM Specialist
-GSA
-Building Owners
-https://www.gsa.gov/about-us/gsa-regions/region-9-pacific-rim/buildings-and-facilities/california
-https://www.gsa.gov/
+Loren Routh of [GSA](https://www.gsa.gov) presents a quick and easy method to reliably retrieve a closed contiguous boundary loop for a room using `GetRoomBoundaryAsCurveLoopArray` from the `ExporterIFC` module in his answer
+to [creating a generic model from area boundaries](https://forums.autodesk.com/t5/revit-api-forum/creating-a-generic-model-from-area-boundaries/m-p/12371317#M75201):
 
 > This just in:
 I tried the `GetRoomBoundaryAsCurveLoopArray` method, and it totally worked!
@@ -112,6 +103,32 @@ Now to make it work with Generic Models...
 </center>
 
 Many thanks to Loren for sharing this valuable hint.
+
+####<a name="3"></a> Challenges Identifying Adjacent Rooms
+
+Ilia Krachkovskii [shared](https://www.linkedin.com/posts/ilia-krachkovskii_im-currently-working-on-a-so-called-spatial-activity-7125803558834167808-NXwt?utm_source=share&utm_medium=member_desktop) some
+thoughts and challenges identifying adjacent rooms
+
+> I'm currently working on a so-called "Spatial Breakdown System" that identifies location and generates corresponding location code for each element in Revit model. It will allow architects at Marco Casamonti & Partners / Archea Associati to create very flexible schedules and will help with data management inside the projects.
+
+> I have been working with Revit API for quite some time, and just recently started to understand all the complaints one can find on countless threads: so far I have 15 different methods for calculating the room (or the nearest room) for various types of elements. Here are some of them:
+- non-bounding walls: place points on wall curve every X meters using Evaluate() method, check room on each point using GetRoomAtPoint() method.
+- bounding walls: same, but for each points I calculate the normal to the curve (using ComputeDerivatives() method) and check the points on a specified distance from wall curve.
+- roofs: usually they cover lots of rooms, so it's just excessive.
+- furniture: LocationPoint and LocationCurve don't always work, so the backup plan is just checking the centerpoint of a BoundingBox.
+- door and windows: fairly easy, since they have a built-in FromRoom and ToRoom property.
+- floors and ceilings: along with walls, one of the most tricky, but more precise method that features cross-referencing. Find all rooms that contain BoundingBox of a floor, get LocationPoint of each room, and shoot a checking ray from each point using ReferenceIntersector up or down, depending on the element class. If there is an intersection - boom, there's a room that contains your floor or ceiling. Pretty fascinating approach that deserves its own article.
+- stair runs and landings are harder to collect, since they act as a part of the Stair. Getting location can be done with GetRoomAtPoint() method using a BoundingBox centerpoint, however, it may be more reliable to calculate run curve midpoint using GetStairsPath().
+- model in place is the most atrocious piece to work with. They don't have built-in level parameters or anything else that easily identifies them in space. They have only geometry, so the easiest approach, again, would be simply checking the bounding box points - which has many accuracy issues.
+- curtain wall panels and mullions: one could get the location from the host wall, but they usually cover several rooms. My approach: take BoundingBox, enlarge X and Y dimensions by K meters and check for intersection with any rooms in the project.
+
+> Code sample below is used to calculate all the rooms that are formed by (or those that are very near to) a particular wall:
+
+<center>
+<img src="img/wall_get_all_adjacent_rooms.jpg
+" alt="Retrieve adjacent rooms" title="Retrieve adjacent rooms" width="600"/> <!-- Pixel Height: 1,530 Pixel Width: 1,656 -->
+</center>
+
 
 ####<a name="4"></a> AI May Obsolete All Apps
 
