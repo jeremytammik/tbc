@@ -14,12 +14,6 @@
   Journal File Magic & Exporting Groups to File (part 1)
   https://boostyourbim.wordpress.com/2023/11/01/journal-file-magic-exporting-groups-to-file-part-1/
 
-- Revit server buffer size settings
-  Synchronizing Revit Central Models between Offices over Internet-VPN
-  https://forums.autodesk.com/t5/revit-api-forum/synchronizing-revit-central-models-between-offices-over-internet/td-p/12313273
-
-- https://stackoverflow.com/questions/77243537/revit-api-try-to-get-all-the-elements-from-revit-file
-
 - replacing [Revit 2024 'Other' Parameter Group] or BuiltInParameterGroup.INVALID
   Revit 2024 'Other' Parameter Group
   https://forums.autodesk.com/t5/revit-api-forum/revit-2024-other-parameter-group/td-p/12086226
@@ -46,7 +40,15 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 ### Closed Room Boundary
 
 
-####<a name="2"></a>
+####<a name="2"></a> Harry's Journal File Magic
+
+Boost Your BIM by Harry Mattison published a nice series
+on [journal file magic and exporting groups to file](https://boostyourbim.wordpress.com/2023/11/03/journal-file-magic-exporting-groups-to-file-the-grand-finale/).
+To be precise, it consists of three instalments:
+
+- [Journal File Magic &amp; Exporting Groups to File (part 1)](https://boostyourbim.wordpress.com/2023/11/01/journal-file-magic-exporting-groups-to-file-part-1/)
+- [Journal File Magic &amp; Exporting Groups to File (part 2)](https://boostyourbim.wordpress.com/2023/11/02/journal-file-magic-exporting-groups-to-file-part-2/)
+- [Journal File Magic &amp; Exporting Groups to File (grand finale)](https://boostyourbim.wordpress.com/2023/11/03/journal-file-magic-exporting-groups-to-file-the-grand-finale/)
 
 ####<a name="3"></a> Closed Contiguous Room Boundary Loop
 
