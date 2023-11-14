@@ -20,7 +20,7 @@
 
 twitter:
 
- with the @AutodeskAPS @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS
+Journal file magic, closed contiguous room boundary loop, challenges identifying adjacent rooms and ForgeTypeId for 'Other' parameter group with the @AutodeskAPS @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS https://autode.sk/roomboundary
 
 Taking a look at journal files, room boundaries, adjacent rooms, a ForgeTypeId question and where AI might lead
 &ndash; Harry's journal file magic
@@ -136,7 +136,7 @@ thoughts and challenges identifying adjacent rooms
 ####<a name="5"></a> ForgeTypeId for 'Other' Parameter Group
 
 Kevin Fielding shared a quick, easy and effective solution for replacing the `Other` parameter group or the `BuiltInParameterGroup` `INVALID` in his thread
-on [Revit 2024 'Other' parameter group\(https://forums.autodesk.com/t5/revit-api-forum/revit-2024-other-parameter-group/td-p/12086226):
+on [Revit 2024 'Other' parameter group](https://forums.autodesk.com/t5/revit-api-forum/revit-2024-other-parameter-group/td-p/12086226):
 
 With the changeover to `ForgeTypeId` and `GroupTypeId` in Revit 2024 instead of the `BuiltInParameterGroup` enumerations, I just wanted to share how to define the 'Other' group for parameters, as it doesn't appear to be documented.
 
