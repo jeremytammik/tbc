@@ -39,7 +39,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Closed Room Boundary
 
-Taking a look at jounral files, room boundaries, adjacent rooms, a ForgeTypeId question and one view of where AI might lead:
+Taking a look at journal files, room boundaries, adjacent rooms, a ForgeTypeId question and one view of where AI might lead:
 
 - [Harry's journal file magic](#2)
 - [Closed contiguous room boundary loop](#3)
@@ -57,7 +57,7 @@ To be precise, it consists of three instalments:
 - [Journal File Magic &amp; Exporting Groups to File (part 2)](https://boostyourbim.wordpress.com/2023/11/02/journal-file-magic-exporting-groups-to-file-part-2/)
 - [Journal File Magic &amp; Exporting Groups to File (grand finale)](https://boostyourbim.wordpress.com/2023/11/03/journal-file-magic-exporting-groups-to-file-the-grand-finale/)
 
-Many thanks to Harry for implementaing anmd sharing this useful and educational solution.
+Many thanks to Harry for implementing and sharing this useful and educational solution.
 
 ####<a name="3"></a> Closed Contiguous Room Boundary Loop
 
@@ -111,7 +111,7 @@ thoughts and challenges identifying adjacent rooms
 
 > I have been working with Revit API for quite some time, and just recently started to understand all the complaints one can find on countless threads: so far I have 15 different methods for calculating the room (or the nearest room) for various types of elements. Here are some of them:
 - non-bounding walls: place points on wall curve every X meters using Evaluate() method, check room on each point using GetRoomAtPoint() method.
-- bounding walls: same, but for each points I calculate the normal to the curve (using ComputeDerivatives() method) and check the points on a specified distance from wall curve.
+- bounding walls: same, but for each point I calculate the normal to the curve (using ComputeDerivatives() method) and check the points on a specified distance from wall curve.
 - roofs: usually they cover lots of rooms, so it's just excessive.
 - furniture: LocationPoint and LocationCurve don't always work, so the backup plan is just checking the centerpoint of a BoundingBox.
 - door and windows: fairly easy, since they have a built-in FromRoom and ToRoom property.
@@ -132,7 +132,7 @@ thoughts and challenges identifying adjacent rooms
 Kevin Fielding shared a quick, easy and effective solution for replacing the `Other` parameter group or the `BuiltInParameterGroup` `INVALID` in his thread
 on [Revit 2024 'Other' parameter group\(https://forums.autodesk.com/t5/revit-api-forum/revit-2024-other-parameter-group/td-p/12086226):
 
-With the change over to `ForgeTypeId` and `GroupTypeId` in Revit 2024 instead of the `BuiltInParameterGroup` enumerations, I just wanted to share how to define the 'Other' group for parameters, as it doesn't appear to be documented.
+With the changeover to `ForgeTypeId` and `GroupTypeId` in Revit 2024 instead of the `BuiltInParameterGroup` enumerations, I just wanted to share how to define the 'Other' group for parameters, as it doesn't appear to be documented.
 
 Whereas previously you would use
 
