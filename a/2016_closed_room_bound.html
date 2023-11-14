@@ -21,7 +21,12 @@ twitter:
 
  with the @AutodeskAPS @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS
 
-&ndash; ...
+Taking a look at journal files, room boundaries, adjacent rooms, a ForgeTypeId question and where AI might lead
+&ndash; Harry's journal file magic
+&ndash; Closed contiguous room boundary loop
+&ndash; Challenges identifying adjacent rooms
+&ndash; ForgeTypeId for 'Other' parameter group
+&ndash; AI may obsolete all apps...
 
 linkedin:
 
@@ -36,7 +41,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-<h3>Closed Room Boundary</h3>
+<h3>Journal Magic, Adjacent Rooms and Room Boundary</h3>
 <p>Taking a look at journal files, room boundaries, adjacent rooms, a ForgeTypeId question and one view of where AI might lead:</p>
 <ul>
 <li><a href="#2">Harry's journal file magic</a></li>
@@ -100,16 +105,18 @@ Now to make it work with Generic Models...</p>
 thoughts and challenges identifying adjacent rooms</p>
 <blockquote>
 <p>I'm currently working on a so-called "Spatial Breakdown System" that identifies location and generates corresponding location code for each element in Revit model. It will allow architects at Marco Casamonti &amp; Partners / Archea Associati to create very flexible schedules and will help with data management inside the projects.</p>
-<p>I have been working with Revit API for quite some time, and just recently started to understand all the complaints one can find on countless threads: so far I have 15 different methods for calculating the room (or the nearest room) for various types of elements. Here are some of them:
-- non-bounding walls: place points on wall curve every X meters using Evaluate() method, check room on each point using GetRoomAtPoint() method.
-- bounding walls: same, but for each point I calculate the normal to the curve (using ComputeDerivatives() method) and check the points on a specified distance from wall curve.
-- roofs: usually they cover lots of rooms, so it's just excessive.
-- furniture: LocationPoint and LocationCurve don't always work, so the backup plan is just checking the centerpoint of a BoundingBox.
-- door and windows: fairly easy, since they have a built-in FromRoom and ToRoom property.
-- floors and ceilings: along with walls, one of the most tricky, but more precise method that features cross-referencing. Find all rooms that contain BoundingBox of a floor, get LocationPoint of each room, and shoot a checking ray from each point using ReferenceIntersector up or down, depending on the element class. If there is an intersection - boom, there's a room that contains your floor or ceiling. Pretty fascinating approach that deserves its own article.
-- stair runs and landings are harder to collect, since they act as a part of the Stair. Getting location can be done with GetRoomAtPoint() method using a BoundingBox centerpoint, however, it may be more reliable to calculate run curve midpoint using GetStairsPath().
-- model in place is the most atrocious piece to work with. They don't have built-in level parameters or anything else that easily identifies them in space. They have only geometry, so the easiest approach, again, would be simply checking the bounding box points - which has many accuracy issues.
-- curtain wall panels and mullions: one could get the location from the host wall, but they usually cover several rooms. My approach: take BoundingBox, enlarge X and Y dimensions by K meters and check for intersection with any rooms in the project.</p>
+<p>I have been working with Revit API for quite some time, and just recently started to understand all the complaints one can find on countless threads: so far I have 15 different methods for calculating the room (or the nearest room) for various types of elements. Here are some of them:</p>
+<ul>
+<li>non-bounding walls: place points on wall curve every X meters using Evaluate() method, check room on each point using GetRoomAtPoint() method.</li>
+<li>bounding walls: same, but for each point I calculate the normal to the curve (using ComputeDerivatives() method) and check the points on a specified distance from wall curve.</li>
+<li>roofs: usually they cover lots of rooms, so it's just excessive.</li>
+<li>furniture: LocationPoint and LocationCurve don't always work, so the backup plan is just checking the centerpoint of a BoundingBox.</li>
+<li>door and windows: fairly easy, since they have a built-in FromRoom and ToRoom property.</li>
+<li>floors and ceilings: along with walls, one of the most tricky, but more precise method that features cross-referencing. Find all rooms that contain BoundingBox of a floor, get LocationPoint of each room, and shoot a checking ray from each point using ReferenceIntersector up or down, depending on the element class. If there is an intersection - boom, there's a room that contains your floor or ceiling. Pretty fascinating approach that deserves its own article.</li>
+<li>stair runs and landings are harder to collect, since they act as a part of the Stair. Getting location can be done with GetRoomAtPoint() method using a BoundingBox centerpoint, however, it may be more reliable to calculate run curve midpoint using GetStairsPath().</li>
+<li>model in place is the most atrocious piece to work with. They don't have built-in level parameters or anything else that easily identifies them in space. They have only geometry, so the easiest approach, again, would be simply checking the bounding box points - which has many accuracy issues.</li>
+<li>curtain wall panels and mullions: one could get the location from the host wall, but they usually cover several rooms. My approach: take BoundingBox, enlarge X and Y dimensions by K meters and check for intersection with any rooms in the project.</li>
+</ul>
 <p>Code sample below is used to calculate all the rooms that are formed by (or those that are very near to) a particular wall:</p>
 </blockquote>
 <p><center>
@@ -133,8 +140,8 @@ on [Revit 2024 'Other' parameter group(https://forums.autodesk.com/t5/revit-api-
 <p>Other groups can be found using the <code>GroupTypeId</code> class, like <code>GroupTypeId.Data</code>.</p>
 <p>Hope this helps others searching for this.</p>
 <p>In fact, the same question came up again in the question
-on [Revit 2024 GroupTypeId missing ParameterGroup Other (Invalid)](https://forums.autodesk.com/t5/revit-api-forum/revit-2024-grouptypeid-missing-parametergroup-other-invalid/m-p/12288651/highlight/false#M74502.</p>
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/revit-2024-grouptypeid-missing-parametergroup-other-invalid/m-p/12288651/highlight/false#M74502">Revit 2024 GroupTypeId missing ParameterGroup Other (Invalid)</a>.</p>
 <p>Thanks, Kevin, for clarifying this!</p>
 <h4><a name="6"></a> AI May Obsolete All Apps</h4>
-<p>Bill Gates present an interesting vision of the future of personal computing
+<p>Bill Gates presents an interesting vision of the future of personal computing
 in <a href="https://www.gatesnotes.com/AI-agents">The future of agents &ndash; AI is about to completely change how you use computers &ndash; and upend the software industry</a>.</p>

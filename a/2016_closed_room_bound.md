@@ -22,7 +22,12 @@ twitter:
 
  with the @AutodeskAPS @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS
 
-&ndash; ...
+Taking a look at journal files, room boundaries, adjacent rooms, a ForgeTypeId question and where AI might lead
+&ndash; Harry's journal file magic
+&ndash; Closed contiguous room boundary loop
+&ndash; Challenges identifying adjacent rooms
+&ndash; ForgeTypeId for 'Other' parameter group
+&ndash; AI may obsolete all apps...
 
 linkedin:
 
@@ -37,7 +42,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Closed Room Boundary
+### Journal Magic, Adjacent Rooms and Room Boundary
 
 Taking a look at journal files, room boundaries, adjacent rooms, a ForgeTypeId question and one view of where AI might lead:
 
@@ -110,7 +115,8 @@ thoughts and challenges identifying adjacent rooms
 > I'm currently working on a so-called "Spatial Breakdown System" that identifies location and generates corresponding location code for each element in Revit model. It will allow architects at Marco Casamonti & Partners / Archea Associati to create very flexible schedules and will help with data management inside the projects.
 
 > I have been working with Revit API for quite some time, and just recently started to understand all the complaints one can find on countless threads: so far I have 15 different methods for calculating the room (or the nearest room) for various types of elements. Here are some of them:
-- non-bounding walls: place points on wall curve every X meters using Evaluate() method, check room on each point using GetRoomAtPoint() method.
+
+> - non-bounding walls: place points on wall curve every X meters using Evaluate() method, check room on each point using GetRoomAtPoint() method.
 - bounding walls: same, but for each point I calculate the normal to the curve (using ComputeDerivatives() method) and check the points on a specified distance from wall curve.
 - roofs: usually they cover lots of rooms, so it's just excessive.
 - furniture: LocationPoint and LocationCurve don't always work, so the backup plan is just checking the centerpoint of a BoundingBox.
@@ -151,13 +157,13 @@ Other groups can be found using the `GroupTypeId` class, like `GroupTypeId.Data`
 Hope this helps others searching for this.
 
 In fact, the same question came up again in the question
-on [Revit 2024 GroupTypeId missing ParameterGroup Other (Invalid)](https://forums.autodesk.com/t5/revit-api-forum/revit-2024-grouptypeid-missing-parametergroup-other-invalid/m-p/12288651/highlight/false#M74502.
+on [Revit 2024 GroupTypeId missing ParameterGroup Other (Invalid)](https://forums.autodesk.com/t5/revit-api-forum/revit-2024-grouptypeid-missing-parametergroup-other-invalid/m-p/12288651/highlight/false#M74502).
 
 Thanks, Kevin, for clarifying this!
 
 ####<a name="6"></a> AI May Obsolete All Apps
 
-Bill Gates present an interesting vision of the future of personal computing
+Bill Gates presents an interesting vision of the future of personal computing
 in [The future of agents &ndash; AI is about to completely change how you use computers &ndash; and upend the software industry](https://www.gatesnotes.com/AI-agents).
 
 
