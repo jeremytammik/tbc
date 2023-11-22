@@ -126,9 +126,9 @@ That enables launching all the Revit SDK external commands, but implements a muc
 The new sample browser also supports external applications as well as external commands!
 Great job!
 
-####<a name="6"></a> purge add-in with rave reviews searching for new maintainer
+####<a name="6"></a> Purge Add-In with Rave Reviews
 
-purge add-in with rave reviews searching for new maintainer
+purge add-in with rave reviews searching for new name and new maintainer
 https://forums.autodesk.com/t5/revit-api-forum/project-sweeper-revved-and-other-apps-now-open-source/m-p/12386626
 
 ####<a name="7"></a> SpeedCad Tools OptionsBar and StatusBar
