@@ -71,42 +71,7 @@ to [Sergey Nefyodov](https://github.com/SergeyNefyodov)
 and Raman [@Nice3point](https://t.me/nice3point) Karpovich, aka Роман Карпович,
 for all their contributions and maintenance work!
 
-####<a name="4"></a> https://forum.dynamobim.com/t/revitpythondocs-for-dynamo-and-pyrevit-request-for-feedback/95280?u=jacob.small
-
-https://forum.dynamobim.com/t/revitpythondocs-for-dynamo-and-pyrevit-request-for-feedback/95280?u=jacob.small
-
-####<a name="5"></a> interactive open source Revit SDK sample browser and launcher
-
-interactive open source Revit SDK sample browser and launcher
-https://forums.autodesk.com/t5/revit-api-forum/feedback-requested-on-open-source-revit-api-sample-browser/m-p/12386403
-
-####<a name="6"></a> purge add-in with rave reviews searching for new maintainer
-
-purge add-in with rave reviews searching for new maintainer
-https://forums.autodesk.com/t5/revit-api-forum/project-sweeper-revved-and-other-apps-now-open-source/m-p/12386626
-
-####<a name="7"></a> speedcad tools: OptionsBar, StatusBar
-
-speedcad tools: OptionsBar, StatusBar
-https://forums.autodesk.com/t5/revit-api-forum/optionsbar/m-p/12377344
-https://github.com/SpeedCAD/SCADtools.Revit.UI.ProgressMeter
-https://github.com/SpeedCAD/SCADtools.Revit.UI.OptionsBar
-cf. Roman's Open-Source OptionsBar
-https://thebuildingcoder.typepad.com/blog/2023/09/optionsbar-and-bye-bye-to-da4r-2018.html#2
-
-####<a name="8"></a> Jean-Marc Couffin pointed out some interesting solutions to manage multiple versions of API on the pyRevit forum
-
-Jean-Marc Couffin pointed out some interesting solutions to manage multiple versions of API on the pyRevit forum
-Support multiple versions of Revit in invokebuttons (dll projects, Visual Studio)
-https://discourse.pyrevitlabs.io/t/support-multiple-versions-of-revit-in-invokebuttons-dll-projects-visual-studio/1849/9?u=ali.tehami
-
-####<a name="9"></a> designscript, rhino, and other geometry libraries in revit add-in
-
-designscript, rhino, and other geometry libraries in revit add-in
-Using DesignScript in Revit addin
-https://forums.autodesk.com/t5/revit-api-forum/using-designscript-in-revit-addin/td-p/8203199
-
-####<a name="10"></a> RevitPythonDocs for Dynamo and pyRevit
+####<a name="4"></a> RevitPythonDocs for Dynamo and pyRevit
 
 [Gerhard P](https://forum.dynamobim.com/u/gerhard.p)
 shared a new Dynamo and pyRevit initiative,
@@ -133,6 +98,60 @@ shared a new Dynamo and pyRevit initiative,
 
 Many thanks to Gerhard for the initiative and to Jacob Small for pointing it out.
 
+####<a name="5"></a> New Revit SDK Sample Browser and Launcher
+
+Christopher Diggins presents a new interactive open-source Revit SDK sample browser and launcher:
+[feedback requested on open-source Revit API sample browser](https://forums.autodesk.com/t5/revit-api-forum/feedback-requested-on-open-source-revit-api-sample-browser/m-p/12386403):
+
+> I do a fair amount of development using the Revit API.
+For my own reference, and to test some other plug-ins I am developing, I aggregated all of the Revit C# SDK Sample into a single project.
+I provided a simple UI so that each of the Commands and Applications can be launched by double clicking on the names.
+Selecting an items load the associated readme file in a rich text edit box:
+
+<center>
+<img src="img/cd_revit_sample_browser.png" alt="" title="" width="442"/> <!-- Pixel Height: 613 Pixel Width: 881 -->
+</center>
+
+> I've posted the code to Github here:
+
+> - [Ara 3D Revit Sample Browser])https://github.com/ara3d/revit-sample-browser)
+
+> I haven't had time to test all of the samples, but it seems to be working.
+I'd appreciate any feedback!
+
+This looks like an absolutely brilliant project and a great piece of work.
+Thanks ever so much to Christopher for picking it up, tackling and sharing it.
+It has some slight similarity Are you aware ofto my own RvtSamples project, as aged and old-fashioned as many of the SDK samples.
+That enables launching all the Revit SDK external commands, but implements a much more primitive UI and provides no built-in access to the sample documentation.
+The new sample browser also supports external applications as well as external commands!
+Great job!
+
+####<a name="6"></a> purge add-in with rave reviews searching for new maintainer
+
+purge add-in with rave reviews searching for new maintainer
+https://forums.autodesk.com/t5/revit-api-forum/project-sweeper-revved-and-other-apps-now-open-source/m-p/12386626
+
+####<a name="7"></a> SpeedCad Tools OptionsBar and StatusBar
+
+speedcad tools: OptionsBar, StatusBar
+https://forums.autodesk.com/t5/revit-api-forum/optionsbar/m-p/12377344
+https://github.com/SpeedCAD/SCADtools.Revit.UI.ProgressMeter
+https://github.com/SpeedCAD/SCADtools.Revit.UI.OptionsBar
+cf. Roman's Open-Source OptionsBar
+https://thebuildingcoder.typepad.com/blog/2023/09/optionsbar-and-bye-bye-to-da4r-2018.html#2
+
+####<a name="8"></a> Managing Multiple Revit API Versions
+
+Andrea Tassera, Jean-Marc Couffin and others discuss some interesting solutions to manage multiple versions of API on the pyRevit forum thread on how
+to [support multiple versions of Revit in invokebuttons (dll projects, Visual Studio)](https://discourse.pyrevitlabs.io/t/support-multiple-versions-of-revit-in-invokebuttons-dll-projects-visual-studio).
+
+
+####<a name="9"></a> DesignScript, Rhino, and other Geometry Libraries
+
+Some interesting and illuminating aspects of using DesignScript, Rhino, and other geometry libraries with the Revit API are discussed in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on [using DesignScript in Revit addin](https://forums.autodesk.com/t5/revit-api-forum/using-designscript-in-revit-addin/td-p/8203199).
+
 ####<a name="11"></a> Trading Glass Beads for AI IP
 
 Not too long ago, some people acquired coveteted goods from less business savvy folks with glass beads.
@@ -152,7 +171,3 @@ Nowadays, the coveteted goods are AI IP, the glass beads are compute time, the l
 <pre class="prettyprint">
 
 </pre>
-
-<center>
-<img src="img/.png" alt="" title="" width="100"/> <!-- Pixel Height: 1,278 Pixel Width: 1,590 -->
-</center>
