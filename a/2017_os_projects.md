@@ -8,6 +8,8 @@
 
 - https://github.com/jeremytammik/RevitLookup/releases
 
+- https://forum.dynamobim.com/t/revitpythondocs-for-dynamo-and-pyrevit-request-for-feedback/95280?u=jacob.small
+
 - interactive open source Revit SDK sample browser and launcher
   https://forums.autodesk.com/t5/revit-api-forum/feedback-requested-on-open-source-revit-api-sample-browser/m-p/12386403
 
@@ -51,12 +53,95 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Many Open Source Projects
 
+####<a name="2"></a> Revit Preview Release with C&#35; 7
+
+As my colleague George just pointed out, the current Revit preview release includes access to the a more modern .NET framework.
+
+The new preview is now available from
+the [Revit Preview Project](https://feedback.autodesk.com/key/LHMJFVHGJK085G2M).
+
+####<a name="3"></a> RevitLookup 2024.0.9 is here
+
+Check out the numerous enhancements in
+the [https://github.com/jeremytammik/RevitLookup/releases](https://github.com/jeremytammik/RevitLookup/releases).
+
+Many thanks
+to [Sergey Nefyodov](https://github.com/SergeyNefyodov)
+and Raman [@Nice3point](https://t.me/nice3point) Karpovich, aka Роман Карпович,
+for all their contributions and maintenance work!
 
 
+https://github.com/jeremytammik/RevitLookup/releases
 
-####<a name="2"></a>
+####<a name="2"></a> https://forum.dynamobim.com/t/revitpythondocs-for-dynamo-and-pyrevit-request-for-feedback/95280?u=jacob.small
 
-####<a name="3"></a>
+https://forum.dynamobim.com/t/revitpythondocs-for-dynamo-and-pyrevit-request-for-feedback/95280?u=jacob.small
+
+####<a name="2"></a> interactive open source Revit SDK sample browser and launcher
+
+interactive open source Revit SDK sample browser and launcher
+https://forums.autodesk.com/t5/revit-api-forum/feedback-requested-on-open-source-revit-api-sample-browser/m-p/12386403
+
+####<a name="2"></a> purge add-in with rave reviews searching for new maintainer
+
+purge add-in with rave reviews searching for new maintainer
+https://forums.autodesk.com/t5/revit-api-forum/project-sweeper-revved-and-other-apps-now-open-source/m-p/12386626
+
+####<a name="2"></a> speedcad tools: OptionsBar, StatusBar
+
+speedcad tools: OptionsBar, StatusBar
+https://forums.autodesk.com/t5/revit-api-forum/optionsbar/m-p/12377344
+https://github.com/SpeedCAD/SCADtools.Revit.UI.ProgressMeter
+https://github.com/SpeedCAD/SCADtools.Revit.UI.OptionsBar
+cf. Roman's Open-Source OptionsBar
+https://thebuildingcoder.typepad.com/blog/2023/09/optionsbar-and-bye-bye-to-da4r-2018.html#2
+
+####<a name="2"></a> Jean-Marc Couffin pointed out some interesting solutions to manage multiple versions of API on the pyRevit forum
+
+Jean-Marc Couffin pointed out some interesting solutions to manage multiple versions of API on the pyRevit forum
+Support multiple versions of Revit in invokebuttons (dll projects, Visual Studio)
+https://discourse.pyrevitlabs.io/t/support-multiple-versions-of-revit-in-invokebuttons-dll-projects-visual-studio/1849/9?u=ali.tehami
+
+####<a name="2"></a> designscript, rhino, and other geometry libraries in revit add-in
+
+designscript, rhino, and other geometry libraries in revit add-in
+Using DesignScript in Revit addin
+https://forums.autodesk.com/t5/revit-api-forum/using-designscript-in-revit-addin/td-p/8203199
+
+
+gerhard.p
+Gerhard
+https://forum.dynamobim.com/u/gerhard.p
+
+shared
+
+RevitPythonDocs for Dynamo and pyRevit - Request for Feedback
+Revit
+python
+Nov 7
+3d
+
+gerhard.p
+
+Hello Dynamo Friends :slight_smile:
+
+Going the first steps at creating a collection of python scripts for Dynamo and pyRevit 1, I´d like to know what are your needs when you are looking for code, classes, methods.
+
+http://www.revitpythondocs.com/ 13
+It will for sure get search and filter options, but for now it´s more of creating a good naming convention and finding out what code is really needed. In the following what I have come up with so far and I´m looking forward to your thoughts and hopefully contributions! The code is on Github.
+
+Some rules for the code:
+
+Every script is a full working code including imports.
+Necessary imports only.
+No inputs from dynamo needed, necessary elements are created in the code.
+Dynamo code: tabs as indent only.
+pyRevit 1 code: spaces as indent only.
+No comments, just clean code.
+snake_case only, for variables, functions, everything.
+No “for i in a:”, proper names for everything (except list comprehension).
+Code is available in different versions, here are examples to explain the naming convention (which is far from perfect right now!):
+
 
 <pre class="prettyprint">
 
@@ -70,4 +155,10 @@ Many thanks to ... for sharing this valuable hint.
 
 ####<a name="4"></a>
 
+
+####<a name="2"></a> Trading Glass Beads for AI IP
+
+people used to acquire coveteted goods from less business savvy folks with glass beads.
+
+nowadays, the coveteted goods arer AI IP, the glass beads are compute time, the less business savvy are the AI enthusiasts of Open AI, and guess who is business savvy?
 
