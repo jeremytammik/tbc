@@ -79,7 +79,7 @@ shared a new Dynamo and pyRevit initiative,
 
 > Going the first steps at creating a collection of python scripts for Dynamo and pyRevit 1, I´d like to know what are your needs when you are looking for code, classes, methods.
 
-> http://www.revitpythondocs.com/
+> - [Revit Python Docs](http://www.revitpythondocs.com/)
 
 > It will for sure get search and filter options, but for now it´s more of creating a good naming convention and finding out what code is really needed. In the following what I have come up with so far and I´m looking forward to your thoughts and hopefully contributions! The code is on Github.
 
@@ -128,23 +128,31 @@ Great job!
 
 ####<a name="6"></a> Purge Add-In with Rave Reviews
 
-purge add-in with rave reviews searching for new name and new maintainer
-https://forums.autodesk.com/t5/revit-api-forum/project-sweeper-revved-and-other-apps-now-open-source/m-p/12386626
+[Kfpopeye shared several useful open-source Revit API projects](https://thebuildingcoder.typepad.com/blog/2021/09/kfpopeye-open-source-avf-and-other-cleanup.html#2) two years ago.
+
+Some of them received rave reviews and a lot of interest was expressed to update them and find a new name and maintainer in the recent continuation of
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on [Project Sweeper, ReVVed, and other apps now open source](https://forums.autodesk.com/t5/revit-api-forum/project-sweeper-revved-and-other-apps-now-open-source/m-p/12386626).
+
+It will be interesting to see where this leads.
 
 ####<a name="7"></a> SpeedCad Tools OptionsBar and StatusBar
 
-speedcad tools: OptionsBar, StatusBar
-https://forums.autodesk.com/t5/revit-api-forum/optionsbar/m-p/12377344
-https://github.com/SpeedCAD/SCADtools.Revit.UI.ProgressMeter
-https://github.com/SpeedCAD/SCADtools.Revit.UI.OptionsBar
-cf. Roman's Open-Source OptionsBar
-https://thebuildingcoder.typepad.com/blog/2023/09/optionsbar-and-bye-bye-to-da4r-2018.html#2
+In yet another discussion on open-source code sharing or not and the absolute must of adding a suitable license in order to enable anyone at all to make use of their code, Speed_CAD shared
+their [ProgressMeter](https://forums.autodesk.com/t5/revit-api-forum/progressmeter/td-p/12363674)
+and [OptionsBar](https://forums.autodesk.com/t5/revit-api-forum/optionsbar/m-p/12377344) utility DLLs.
+Here are the two associated GitHub repositories:
+
+- [ProgressMeter](https://github.com/SpeedCAD/SCADtools.Revit.UI.ProgressMeter)
+- [OptionsBar](https://github.com/SpeedCAD/SCADtools.Revit.UI.OptionsBar)
+
+By the way, the latter is comparable with Roman's recent
+fully [Open-Source OptionsBar](https://thebuildingcoder.typepad.com/blog/2023/09/optionsbar-and-bye-bye-to-da4r-2018.html#2).
 
 ####<a name="8"></a> Managing Multiple Revit API Versions
 
 Andrea Tassera, Jean-Marc Couffin and others discuss some interesting solutions to manage multiple versions of API on the pyRevit forum thread on how
 to [support multiple versions of Revit in invokebuttons (dll projects, Visual Studio)](https://discourse.pyrevitlabs.io/t/support-multiple-versions-of-revit-in-invokebuttons-dll-projects-visual-studio).
-
 
 ####<a name="9"></a> DesignScript, Rhino, and other Geometry Libraries
 
@@ -160,14 +168,3 @@ Nowadays, the coveteted goods are AI IP, the glass beads are compute time, the l
 
 - [OpenAI’s Misalignment and Microsoft’s Gain](https://stratechery.com/2023/openais-misalignment-and-microsofts-gain/)
 
-
-
-
-
-
-
-
-
-<pre class="prettyprint">
-
-</pre>
