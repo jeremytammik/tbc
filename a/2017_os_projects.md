@@ -53,6 +53,18 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Many Open Source Projects
 
+A lot of open-source related interaction going on, plus other interesing Revit API and AI related news:
+
+- [Revit preview release with C&#35; 7](#2)
+- [RevitLookup 2024.0.9 is here](#3)
+- [RevitPythonDocs for Dynamo and pyRevit](#4)
+- [New Revit SDK sample browser and launcher](#5)
+- [Purge add-in with rave reviews](#6)
+- [SpeedCad tools OptionsBar and StatusBar](#7)
+- [Managing multiple Revit API versions](#8)
+- [DesignScript, Rhino, and other geometry libraries](#9)
+- [Trading glass beads for AI IP](#10)
+
 ####<a name="2"></a> Revit Preview Release with C&#35; 7
 
 As my colleague George just pointed out, the current Revit preview release includes access to the a more modern .NET framework.
@@ -60,7 +72,7 @@ As my colleague George just pointed out, the current Revit preview release inclu
 The new preview is now available from
 the [Revit Preview Project](https://feedback.autodesk.com/key/LHMJFVHGJK085G2M).
 
-####<a name="3"></a> RevitLookup 2024.0.9 is here
+####<a name="3"></a> RevitLookup 2024.0.9 is Here
 
 A new version RevitLookup 2024.0.9 has been released.
 Check out the numerous enhancements in
@@ -160,7 +172,7 @@ Some interesting and illuminating aspects of using DesignScript, Rhino, and othe
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [using DesignScript in Revit addin](https://forums.autodesk.com/t5/revit-api-forum/using-designscript-in-revit-addin/td-p/8203199).
 
-####<a name="11"></a> Trading Glass Beads for AI IP
+####<a name="10"></a> Trading Glass Beads for AI IP
 
 Not too long ago, some people acquired coveteted goods from less business savvy folks with glass beads.
 
