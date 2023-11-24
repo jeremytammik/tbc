@@ -134,8 +134,8 @@ I'd appreciate any feedback!
 
 This looks like an absolutely brilliant project and a great piece of work.
 Thanks ever so much to Christopher for picking it up, tackling and sharing it.
-It has some slight similarity Are you aware ofto my own RvtSamples project, as aged and old-fashioned as many of the SDK samples.
-That enables launching all the Revit SDK external commands, but implements a much more primitive UI and provides no built-in access to the sample documentation.
+It has some slight similarity to my own RvtSamples project, as aged and old-fashioned as many of the SDK samples.
+That enables launching all the Revit SDK external commands but implements a more primitive UI and provides no built-in access to the sample documentation.
 The new sample browser also supports external applications as well as external commands!
 Great job!
 
@@ -175,9 +175,9 @@ on [using DesignScript in Revit addin](https://forums.autodesk.com/t5/revit-api-
 
 ####<a name="10"></a> Trading Glass Beads for AI IP
 
-Not too long ago, some people acquired coveteted goods from less business savvy folks with glass beads.
+Not too long ago, some people acquired coveted goods from less business savvy folks with glass beads.
 
-Nowadays, the coveteted goods are AI IP, the glass beads are compute time, the less business savvy seem to be the AI enthusiasts of OpenAI, and guess who is business savvy?
+Nowadays, one example of coveted goods are AI IP, the glass beads are compute time, the less business savvy seem to be the AI enthusiasts of OpenAI, and guess who is business savvy?
 
 - [OpenAI’s Misalignment and Microsoft’s Gain](https://stratechery.com/2023/openais-misalignment-and-microsofts-gain/)
 
