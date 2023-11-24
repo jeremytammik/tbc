@@ -35,7 +35,16 @@ twitter:
 
  with the @AutodeskAPS @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS
 
-&ndash;  ...
+Open-source related discussions, interesting Revit API and AI related news
+&ndash; Revit preview release with C&#35; 7
+&ndash; RevitLookup 2024.0.9 is here
+&ndash; RevitPythonDocs for Dynamo and pyRevit
+&ndash; New Revit SDK sample browser and launcher
+&ndash; Purge add-in with rave reviews
+&ndash; SpeedCad tools OptionsBar and StatusBar
+&ndash; Managing multiple Revit API versions
+&ndash; DesignScript, Rhino, and other geometry libraries
+&ndash; Trading glass beads for AI IP...
 
 linkedin:
 
@@ -51,7 +60,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Many Open Source Projects
+### .NET Core Preview and Open Source Add-In Projects
 
 A lot of open-source related interaction going on, plus other interesting Revit API and AI related news:
 
@@ -122,7 +131,7 @@ I provided a simple UI so that each of the Commands and Applications can be laun
 Selecting an item's load the associated readme file in a rich text edit box:
 
 <center>
-<img src="img/cd_revit_sample_browser.png" alt="" title="" width="442"/> <!-- Pixel Height: 613 Pixel Width: 881 -->
+<img src="img/cd_revit_sample_browser.png" alt="Revit SDK sample browser" title="Revit SDK sample browser" width="442"/> <!-- Pixel Height: 613 Pixel Width: 881 -->
 </center>
 
 > I've posted the code to Github here:
