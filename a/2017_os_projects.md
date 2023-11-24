@@ -119,7 +119,7 @@ Christopher Diggins presents a new interactive open-source Revit SDK sample brow
 > I do a fair amount of development using the Revit API.
 For my own reference, and to test some other plug-ins I am developing, I aggregated all of the Revit C# SDK Sample into a single project.
 I provided a simple UI so that each of the Commands and Applications can be launched by double clicking on the names.
-Selecting an items load the associated readme file in a rich text edit box:
+Selecting an item's load the associated readme file in a rich text edit box:
 
 <center>
 <img src="img/cd_revit_sample_browser.png" alt="" title="" width="442"/> <!-- Pixel Height: 613 Pixel Width: 881 -->
