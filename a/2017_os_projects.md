@@ -33,7 +33,7 @@
 
 twitter:
 
-Revit preview release with C# 7, RevitLookup, RevitPythonDocs, Revit SDK sample browser, purge add-in, OptionsBar, StatusBar, multiple API versions, DesignScript, Rhino, and other geometry libraries with the @AutodeskAPS @AutodeskRevit #RevitAPI #BIM @DynamoBIM @AutodeskAPS https://autode.sk/dotnetcorepreview
+#RevitAPI preview C# 7, RevitPythonDocs, Revit SDK sample browser, purge add-in, OptionsBar, StatusBar, multiple API versions, DesignScript, Rhino, and other geometry libraries with @AutodeskAPS @AutodeskRevit #BIM @DynamoBIM https://autode.sk/dotnetcorepreview
 
 Open-source related discussions, interesting Revit API and AI related news
 &ndash; Revit preview release with C&#35; 7
@@ -48,6 +48,19 @@ Open-source related discussions, interesting Revit API and AI related news
 
 linkedin:
 
+#RevitAPI preview C# 7, RevitPythonDocs, Revit SDK sample browser, purge add-in, OptionsBar, StatusBar, multiple API versions, DesignScript, Rhino, and other geometry libraries
+
+https://autode.sk/dotnetcorepreview
+
+- Revit preview release with C&#35; 7
+- RevitLookup 2024.0.9 is here
+- RevitPythonDocs for Dynamo and pyRevit
+- New Revit SDK sample browser and launcher
+- Purge add-in with rave reviews
+- SpeedCad tools OptionsBar and StatusBar
+- Managing multiple Revit API versions
+- DesignScript, Rhino, and other geometry libraries
+- Trading glass beads for AI IP...
 
 #BIM #DynamoBIM #AutodeskAPS #Revit #API #IFC #SDK #Autodesk #AEC #adsk
 
