@@ -53,7 +53,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Many Open Source Projects
 
-A lot of open-source related interaction going on, plus other interesing Revit API and AI related news:
+A lot of open-source related interaction going on, plus other interesting Revit API and AI related news:
 
 - [Revit preview release with C&#35; 7](#2)
 - [RevitLookup 2024.0.9 is here](#3)
@@ -67,7 +67,8 @@ A lot of open-source related interaction going on, plus other interesing Revit A
 
 ####<a name="2"></a> Revit Preview Release with C&#35; 7
 
-As my colleague George just pointed out, the current Revit preview release includes access to the a more modern .NET framework.
+As my colleague George points out, the current Revit preview release includes access to the a more modern .NET framework:
+[Revit API is moving to .NET Core 7.0](https://adndevblog.typepad.com/aec/2023/11/revit-api-is-moving-to-net-core-70.html).
 
 The new preview is now available from
 the [Revit Preview Project](https://feedback.autodesk.com/key/LHMJFVHGJK085G2M).
@@ -76,11 +77,11 @@ the [Revit Preview Project](https://feedback.autodesk.com/key/LHMJFVHGJK085G2M).
 
 A new version RevitLookup 2024.0.9 has been released.
 Check out the numerous enhancements in
-the [https://github.com/jeremytammik/RevitLookup/releases](https://github.com/jeremytammik/RevitLookup/releases).
+the [RevitLookup releases](https://github.com/jeremytammik/RevitLookup/releases).
 
 Many thanks
 to [Sergey Nefyodov](https://github.com/SergeyNefyodov)
-and Raman [@Nice3point](https://t.me/nice3point) Karpovich, aka Роман Карпович,
+and Roman [@Nice3point](https://t.me/nice3point) Karpovich, aka Роман Карпович,
 for all their contributions and maintenance work!
 
 ####<a name="4"></a> RevitPythonDocs for Dynamo and pyRevit
@@ -89,7 +90,7 @@ for all their contributions and maintenance work!
 shared a new Dynamo and pyRevit initiative,
 [RevitPythonDocs for Dynamo and pyRevit &ndash; request for feedback](https://forum.dynamobim.com/t/revitpythondocs-for-dynamo-and-pyrevit-request-for-feedback/95280):
 
-> Going the first steps at creating a collection of python scripts for Dynamo and pyRevit 1, I´d like to know what are your needs when you are looking for code, classes, methods.
+> Going the first steps at creating a collection of Python scripts for Dynamo and pyRevit 1, I´d like to know what are your needs when you are looking for code, classes, methods.
 
 > - [Revit Python Docs](http://www.revitpythondocs.com/)
 
@@ -126,7 +127,7 @@ Selecting an items load the associated readme file in a rich text edit box:
 
 > I've posted the code to Github here:
 
-> - [Ara 3D Revit Sample Browser])https://github.com/ara3d/revit-sample-browser)
+> - [Ara 3D Revit Sample Browser](https://github.com/ara3d/revit-sample-browser)
 
 > I haven't had time to test all of the samples, but it seems to be working.
 I'd appreciate any feedback!
@@ -150,10 +151,10 @@ It will be interesting to see where this leads.
 
 ####<a name="7"></a> SpeedCad Tools OptionsBar and StatusBar
 
-In yet another discussion on open-source code sharing or not and the absolute must of adding a suitable license in order to enable anyone at all to make use of their code, Speed_CAD shared
+In yet another discussion on open-source code sharing and the importance of adding a suitable license in order to enable people to make use of their code, Speed_CAD shared
 their [ProgressMeter](https://forums.autodesk.com/t5/revit-api-forum/progressmeter/td-p/12363674)
 and [OptionsBar](https://forums.autodesk.com/t5/revit-api-forum/optionsbar/m-p/12377344) utility DLLs.
-Here are the two associated GitHub repositories:
+Here are the associated GitHub repositories:
 
 - [ProgressMeter](https://github.com/SpeedCAD/SCADtools.Revit.UI.ProgressMeter)
 - [OptionsBar](https://github.com/SpeedCAD/SCADtools.Revit.UI.OptionsBar)
@@ -176,7 +177,7 @@ on [using DesignScript in Revit addin](https://forums.autodesk.com/t5/revit-api-
 
 Not too long ago, some people acquired coveteted goods from less business savvy folks with glass beads.
 
-Nowadays, the coveteted goods are AI IP, the glass beads are compute time, the less business savvy are the AI enthusiasts of OpenAI, and guess who is business savvy?
+Nowadays, the coveteted goods are AI IP, the glass beads are compute time, the less business savvy seem to be the AI enthusiasts of OpenAI, and guess who is business savvy?
 
 - [OpenAI’s Misalignment and Microsoft’s Gain](https://stratechery.com/2023/openais-misalignment-and-microsofts-gain/)
 
