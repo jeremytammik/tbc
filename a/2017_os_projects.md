@@ -105,7 +105,7 @@ Deniz Maral [adds a correction](https://www.linkedin.com/feed/update/urn:li:acti
 .NET Core 7 comes with C# 11.0, not 7.0.
 In .NET Framework 4.8 we had already C# 7.3 &nbsp; :)
 
-Thank you for the correction, Pedro!
+Thank you for your thoughts and corrections, Pedro and Deniz!
 
 ####<a name="3"></a> RevitLookup 2024.0.9 is Here
 
