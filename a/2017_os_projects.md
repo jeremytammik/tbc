@@ -95,6 +95,18 @@ As my colleague George points out, the current Revit preview release includes ac
 The new preview is now available from
 the [Revit Preview Project](https://feedback.autodesk.com/key/LHMJFVHGJK085G2M).
 
+[First reactions](https://www.linkedin.com/feed/update/urn:li:activity:7133897795630985216):
+
+Pedro Nadal [says](https://www.linkedin.com/feed/update/urn:li:activity:7133897795630985216?commentUrn=urn%3Ali%3Acomment%3A%28activity%3A7133897795630985216%2C7133910174628524032%29&dashCommentUrn=urn%3Ali%3Afsd_comment%3A%287133910174628524032%2Curn%3Ali%3Aactivity%3A7133897795630985216%29):
+The possibility of being able to develop Revit addins in .NET Core is one of the most awaited news for a long time!
+Fantastic, hopefully the project will go ahead and we will have news soon.
+
+Deniz Maral [adds a correction](https://www.linkedin.com/feed/update/urn:li:activity:7133897795630985216?commentUrn=urn%3Ali%3Acomment%3A%28activity%3A7133897795630985216%2C7133915379029925888%29&dashCommentUrn=urn%3Ali%3Afsd_comment%3A%287133915379029925888%2Curn%3Ali%3Aactivity%3A7133897795630985216%29):
+.NET Core 7 comes with C# 11.0, not 7.0.
+In .NET Framework 4.8 we had already C# 7.3 &nbsp; :)
+
+Thank you for the correction, Pedro!
+
 ####<a name="3"></a> RevitLookup 2024.0.9 is Here
 
 A new version RevitLookup 2024.0.9 has been released.
