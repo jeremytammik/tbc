@@ -6,8 +6,15 @@
 
 <!---
 
-https://autodesk.slack.com/archives/C0SR6NAP8/p1700155564738649
-The creation of the type is based on this thread: https://autodesk.slack.com/archives/C0SR6NAP8/p1673638599787309
+- Toposolid
+  https://autodesk.slack.com/archives/C0SR6NAP8/p1700155564738649
+  The creation of the type is based on this thread: https://autodesk.slack.com/archives/C0SR6NAP8/p1673638599787309
+
+- Camera Target
+  https://autodesk.slack.com/archives/C0SR6NAP8/p1700492804688869
+  Jeff Hotchkiss
+  I'm looking to convert Revit views for transfer into cloud REST API calls e.g. into LMV. Looking over supplied Revit help on the subject, I've found most of what I need but I'm curious if there's any way in API to retrieve the view camera target point as listed in that documentation? The docs suggest that the target can be reset to the fov centre, but not how to get the existing value, or whether the value has any significance to Revit e.g. orbit point. Thanks in advance for any assistance. (edited)
+  Alex Pytel
 
 twitter:
 
@@ -30,7 +37,11 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Camera Target and Toposolid Subdivision Material
 
-Today, lets take a look at two illuminating internal conversation that
+Today, lets take a quick look at CefSharp and two conversations shedding light on specific aspects of Toposolids and camera settings:
+
+- [Using the built-in CefSharp browser](#2)
+- [Toposolid subdivision material](#3)
+- [Camera target](#4)
 
 ####<a name="2"></a> Using the Built-In CefSharp Browser
 
@@ -142,45 +153,77 @@ Please check out the following code for reference:
 <img src="img/toposolid_subdiv_mat_3.gif" alt="Toposolid subdivision material" title="Toposolid subdivision material" width="800"/>
 </center>
 
+Thanks to Greg Marr and Yueqiang Ni for this explanation.
+
 ####<a name="4"></a> Camera Target
 
-https://autodesk.slack.com/archives/C0SR6NAP8/p1700492804688869
-Jeff Hotchkiss
-I'm looking to convert Revit views for transfer into cloud REST API calls e.g. into LMV. Looking over supplied Revit help on the subject, I've found most of what I need but I'm curious if there's any way in API to retrieve the view camera target point as listed in that documentation? The docs suggest that the target can be reset to the fov centre, but not how to get the existing value, or whether the value has any significance to Revit e.g. orbit point. Thanks in advance for any assistance. (edited)
-Alex Pytel
-I am not finding a way to get the target using the API. As a workaround, I can suggest trying to fake the target location. For example, if you look from above, the field of view makes a triangle. If you know the horizontal extent of the view, you can find how far the base of the triangle is from the camera's eye. Note that this is different from the distance to near / far planes. You could also perform a calculation based on the bounding box of the scene (view outline). If you can get the outline in view coordinates (and have it axis-aligned), then you can assume that the target is on the far face of the box. (This is still different from the far clipping plane.)
-Unfortunately, the target is not used consistently in Revit, including for navigation. So, it is fair to say that the significance of the location is not great. This might  explain why it has been neglected in API.
-Jeff Hotchkiss
-I think I grasp the fundamentals you mean, but am unsure which components in the API describe them. For example, you mention a distinction between the base of the view's frustum (triangle as seen from above when including the origin) and the far clipping plane. Yet the diagram in the docs (lets' start with perspective) shows the Crop Box of the view as describing the clipping planes. Not clear to me which object contains this smaller frustum you reference. (of course this is all hard to convey in text, we might need a diagram :laughing:).
-I should also have been specific in that the views of interest for us are 3D at this time.
-Alex Pytel
-The crop box is view aligned and all six sides are potentially clipping planes.
-Near/Far as used with perspective are generally independently managed.
-For your case, I would suggest that you disregard perspective near/far and just try to obtain some sensible values based on the crop box and view outline.
-In other words, a workaround for not having a target position is to try to locate the target based on scene depth. You could place the fake target in the center of some bounding volume of the scene or on its far side.
-You could even try to shoot a ray and intersect the closest object. I think that can be done using the API.
-It will not be the camera's exact target, however. But, as I said, it is not consistently used for navigation, so it might not be that useful anyway.
-Jeff Hotchkiss
-Sounds good - I think my current code uses the far side of the crop box at the moment. I'll experiment further. Some of this will likely depend on what LMV and related tooling does with the input anyway.
-a followup if you know - is it feasible to find out from the Revit API the actual navigation pivot point?
-Alex Pytel
-I doubt it, because it is a dynamic concept. For example, if you have something selected then the pivot point can be the center of selection.
-It looks like you might be able to get/set a home camera using ViewNavigationToolSettings.
-And it has a pivot point (but no target). That seems to be the closest one can get...
-For completeness, there is a target value one can get during the custom exporter process, but it is a fake value, which is computed as I roughly described above. It's something like 0.5 * view width / tan(fov / 2).
-Jeff Hotchkiss
-Thanks very much!
-And target and pivot are npt the same.
+**Question:**
+I'm looking to convert Revit views for transfer into cloud REST API calls e.g. into LMV.
+Looking over supplied Revit help on the subject, I've found most of what I need but I'm curious if there's any way in API to retrieve the view camera target point as listed in that documentation?
+The docs suggest that the target can be reset to the FOV centre, but not how to get the existing value, or whether the value has any significance to Revit e.g. orbit point.
+
+I looked at some existing related articles, e.g.:
 
 - [Custom Exporter GetCameraInfo](http://thebuildingcoder.typepad.com/blog/2014/09/custom-exporter-getcamerainfo.html)
 - [Revit Camera Settings, Project Plasma, DA4R and AI](https://thebuildingcoder.typepad.com/blog/2019/06/revit-camera-settings-project-plasma-da4r-and-ai.html)
 - [Revit Camera FOV, Forge Partner Talks and Jobs](https://thebuildingcoder.typepad.com/blog/2020/04/revit-camera-fov-forge-partner-talks-and-jobs.html)
 - [Save and Restore 3D View Camera Settings](https://thebuildingcoder.typepad.com/blog/2020/10/save-and-restore-3d-view-camera-settings.html)
 
+They help confirm aspects covered by the linked documentation.
+The challenge is that going the other way, creating a valid target for APS, is less easily grasped since Revit doesn't expose this in the API.
+So far I'm extrapolating from the crop box, and it doesn't seem to matter if I pick e.g. a ray through the near clipping plane or far clipping plane, LMV gets the general idea.
+It's not quite right in result yet, though.
 
+**Answer:**
+I am not finding a way to get the target using the API.
+As a workaround, I can suggest trying to fake the target location.
+For example, if you look from above, the field of view makes a triangle.
+If you know the horizontal extent of the view, you can find how far the base of the triangle is from the camera's eye.
+Note that this is different from the distance to near / far planes.
+You could also perform a calculation based on the bounding box of the scene (view outline).
+If you can get the outline in view coordinates (and have it axis-aligned), then you can assume that the target is on the far face of the box. (This is still different from the far clipping plane.)
+Unfortunately, the target is not used consistently in Revit, including for navigation.
+So, it is fair to say that the significance of the location is not great.
+This might explain why it has been neglected in API.
 
+**Response:**
+I think I grasp the fundamentals you mean, but am unsure which components in the API describe them.
+For example, you mention a distinction between the base of the view's frustum (triangle as seen from above when including the origin) and the far clipping plane.
+Yet the diagram in the docs (lets' start with perspective) shows the Crop Box of the view as describing the clipping planes.
+Not clear to me which object contains this smaller frustum you reference. (of course this is all hard to convey in text, we might need a diagram :laughing:).
+I should also have been specific in that the views of interest for us are 3D at this time.
 
-####<a name="5"></a>
+**Answer:**
+The crop box is view aligned and all six sides are potentially clipping planes.
+Near/Far as used with perspective are generally independently managed.
+For your case, I would suggest that you disregard perspective near/far and just try to obtain some sensible values based on the crop box and view outline.
+In other words, a workaround for not having a target position is to try to locate the target based on scene depth.
+You could place the fake target in the center of some bounding volume of the scene or on its far side.
+You could even try to shoot a ray and intersect the closest object.
+I think that can be done using the API.
+It will not be the camera's exact target, however.
+But, as I said, it is not consistently used for navigation, so it might not be that useful anyway.
 
+**Response:** Sounds good &ndash; I think my current code uses the far side of the crop box at the moment.
+I'll experiment further.
+Some of this will likely depend on what LMV and related tooling does with the input anyway.
+a followup, if you know &ndash; is it feasible to find out from the Revit API the actual navigation pivot point?
 
+**Answer:**
+I doubt it, because it is a dynamic concept.
+For example, if you have something selected, then the pivot point can be the center of selection.
+It looks like you might be able to get/set a home camera using ViewNavigationToolSettings.
+And it has a pivot point (but no target).
+That seems to be the closest one can get...
+For completeness, there is a target value one can get during the custom exporter process, but it is a fake value, which is computed as I roughly described above.
+It's something like
 
+<pre class="prettyprint">
+  0.5 * view width / tan(fov / 2)
+</pre>
+
+**Response:**
+Thanks very much!
+And target and pivot are not the same.
+
+Thanks to Jeff Hotchkiss and Alex Pytel for this clarification.
