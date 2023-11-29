@@ -6,7 +6,6 @@
 
 <!---
 
-
 twitter:
 
 #RevitAPI @AutodeskAPS @AutodeskRevit #BIM @DynamoBIM
@@ -30,131 +29,137 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 Today, lets take a look at two illuminating internal conversation that
 
-####<a name="2"></a> Revit Preview Release with C&#35; 7
+####<a name="2"></a> Using the Built-In CefSharp Browser
 
-As my colleague George points out, the current Revit preview release includes access to the a more modern .NET framework:
-[Revit API is moving to .NET Core 7.0](https://adndevblog.typepad.com/aec/2023/11/revit-api-is-moving-to-net-core-70.html).
+Andrej Licanin of [Bimexperts](https://bimexperts.com/sr/home) shared
+a nice succint little solution demonstrating how to use the Revit built-in CefSharp installation to display a browser in a WPF control
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on [simple WPF with a chromium browser guide](https://forums.autodesk.com/t5/revit-api-forum/simple-wpf-with-a-chromium-browser-guide/td-p/12396552):
 
-The new preview is now available from
-the [Revit Preview Project](https://feedback.autodesk.com/key/LHMJFVHGJK085G2M).
+> This is for the all lost souls out there, may you avoid my suffering.
 
-[First reactions](https://www.linkedin.com/feed/update/urn:li:activity:7133897795630985216):
+> To create a chromium web browser in your Revit addin, you need to reference cefsharp dlls.
+This is where I had a major hiccup, because I just installed the newest one by nuget.
+Don't do this.
+Revit already has them and it initializes them on start-up.
+You just need to add references to them like the other Revit API .dlls.
+They are in the CefSharp folder.
+For me, that is *C:\Program Files\Autodesk\Revit 2022\CefSharp*,
+and the files are:
 
-Pedro Nadal [says](https://www.linkedin.com/feed/update/urn:li:activity:7133897795630985216?commentUrn=urn%3Ali%3Acomment%3A%28activity%3A7133897795630985216%2C7133910174628524032%29&dashCommentUrn=urn%3Ali%3Afsd_comment%3A%287133910174628524032%2Curn%3Ali%3Aactivity%3A7133897795630985216%29):
-The possibility of being able to develop Revit addins in .NET Core is one of the most awaited news for a long time!
-Fantastic, hopefully the project will go ahead and we will have news soon.
+> - CefSharp
+- CefSharp.BrowserSubprocess.Core
+- CefSharp.Core
+- CefSharp.Wpf
 
-Deniz Maral [adds a correction](https://www.linkedin.com/feed/update/urn:li:activity:7133897795630985216?commentUrn=urn%3Ali%3Acomment%3A%28activity%3A7133897795630985216%2C7133915379029925888%29&dashCommentUrn=urn%3Ali%3Afsd_comment%3A%287133915379029925888%2Curn%3Ali%3Aactivity%3A7133897795630985216%29):
-.NET Core 7 comes with C# 11.0, not 7.0.
-In .NET Framework 4.8 we had already C# 7.3 &nbsp; :)
+Once installed, you can just add a WPF window, reference the namespace and embed a chromium browser like this:
 
-Thank you for your thoughts and corrections, Pedro and Deniz!
+<pre class="prettyprint">
+&lt;Window x:Class="RevitTestProject.TestWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:local="clr-namespace:RevitTestProject"
+        xmlns:cef="clr-namespace:CefSharp.Wpf;assembly=CefSharp.Wpf"
+        mc:Ignorable="d"
+        Width="1000" Height="500"&gt;
+    &lt;Grid Background="PapayaWhip"&gt;
 
-####<a name="3"></a> RevitLookup 2024.0.9 is Here
+        &lt;cef:ChromiumWebBrowser Name="ChromiumBrowser" Address="http://www.google.com" Width="900" Height="450"  /&gt;
+    &lt;/Grid&gt;
+&lt;/Window&gt;
+</pre>
 
-A new version RevitLookup 2024.0.9 has been released.
-Check out the numerous enhancements in
-the [RevitLookup releases](https://github.com/jeremytammik/RevitLookup/releases).
+Hope this helps someone, as I lost an entire day figuring this out.
 
-Many thanks
-to [Sergey Nefyodov](https://github.com/SergeyNefyodov)
-and Roman [@Nice3point](https://t.me/nice3point) Karpovich, aka Роман Карпович,
-for all their contributions and maintenance work!
+Thank you very much, Andrej!
+
+####<a name="3"></a> Toposolid Subdivision Material
+
+- toposolid subdivision material
+https://autodesk.slack.com/archives/C0SR6NAP8/p1700155564738649
+Thread in bid-guild-api | 13 Jan | View message
+Greg Marr
+In Revit 2024, I'm creating a Toposolid using a ToposolidType that has a finish layer with a texture in the material.  I then use Toposolid.CreateSubDivision to create a subdivision in the toposolid, but this subdivision is not inheriting the material from the hosting toposolid.  The creation of the type is based on this thread: https://autodesk.slack.com/archives/C0SR6NAP8/p1673638599787309  Any ideas what I need to do to get the material to show properly?
+Is there a way to set the material for the top face of a Toposolid?  We're trying to port the Spacemaker add-in from TopographySurface to Toposolid.
+image.png
+image.png
+The brown areas are the subdivisions.
+Yueqiang Ni
+the subdivision is designed NOT to inherit materials from the host toposolid. Also, "Edit Type" is not enabled in the UI. As an alternative, could you try to change the material Id of the subdivision element and see if that works?
+Greg Marr
+Toposolid does not have a MaterialID.  That's why I had to bake the material into the ToposolidType.
+Yueqiang Ni
+ the subdivision has a BuiltInParameter.TOPOSOLID_SUBDIVIDE_MATERIAL to control the material. It can only be set to  one material id. I did a quick example. Please check out the following code for reference:
+    [Transaction(TransactionMode.Manual)]
+    public class ChangeSubdivisionMaterial : IExternalCommand
+    {
+        public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
+        {
+            var uidoc = commandData.Application.ActiveUIDocument;
+            var doc = uidoc.Document;
+            var sel = uidoc.Selection;
+
+            Toposolid topo = doc.GetElement(sel.PickObject(ObjectType.Element, new ToposolidFilter())) as Toposolid;
+            ToposolidType topoType = doc.GetElement(topo.GetTypeId()) as ToposolidType;
+            ElementId materialId = topoType.GetCompoundStructure().GetLayers().First().MaterialId;
+
+            List&lt;Toposolid&gt; subdivisions = new FilteredElementCollector(doc).OfClass(typeof(Toposolid)).OfType&lt;Toposolid&gt;().Where(t =&gt; t.HostTopoId == topo.Id).ToList();
+            Transaction trans = new Transaction(doc, "change material");
+            trans.Start();
+            subdivisions.ForEach(t =&gt; t.get_Parameter(BuiltInParameter.TOPOSOLID_SUBDIVIDE_MATERIAL).Set(materialId));
+            trans.Commit();
+
+            return Result.Succeeded;
+        }
+    }
+ChangeSubdivisionMaterial.gif
+
+- camera target
+https://autodesk.slack.com/archives/C0SR6NAP8/p1700492804688869
+Jeff Hotchkiss
+I'm looking to convert Revit views for transfer into cloud REST API calls e.g. into LMV. Looking over supplied Revit help on the subject, I've found most of what I need but I'm curious if there's any way in API to retrieve the view camera target point as listed in that documentation? The docs suggest that the target can be reset to the fov centre, but not how to get the existing value, or whether the value has any significance to Revit e.g. orbit point. Thanks in advance for any assistance. (edited)
+Alex Pytel
+I am not finding a way to get the target using the API. As a workaround, I can suggest trying to fake the target location. For example, if you look from above, the field of view makes a triangle. If you know the horizontal extent of the view, you can find how far the base of the triangle is from the camera's eye. Note that this is different from the distance to near / far planes. You could also perform a calculation based on the bounding box of the scene (view outline). If you can get the outline in view coordinates (and have it axis-aligned), then you can assume that the target is on the far face of the box. (This is still different from the far clipping plane.)
+Unfortunately, the target is not used consistently in Revit, including for navigation. So, it is fair to say that the significance of the location is not great. This might  explain why it has been neglected in API.
+Jeff Hotchkiss
+I think I grasp the fundamentals you mean, but am unsure which components in the API describe them. For example, you mention a distinction between the base of the view's frustum (triangle as seen from above when including the origin) and the far clipping plane. Yet the diagram in the docs (lets' start with perspective) shows the Crop Box of the view as describing the clipping planes. Not clear to me which object contains this smaller frustum you reference. (of course this is all hard to convey in text, we might need a diagram :laughing:).
+I should also have been specific in that the views of interest for us are 3D at this time.
+Alex Pytel
+The crop box is view aligned and all six sides are potentially clipping planes.
+Near/Far as used with perspective are generally independently managed.
+For your case, I would suggest that you disregard perspective near/far and just try to obtain some sensible values based on the crop box and view outline.
+In other words, a workaround for not having a target position is to try to locate the target based on scene depth. You could place the fake target in the center of some bounding volume of the scene or on its far side.
+You could even try to shoot a ray and intersect the closest object. I think that can be done using the API.
+It will not be the camera's exact target, however. But, as I said, it is not consistently used for navigation, so it might not be that useful anyway.
+Jeff Hotchkiss
+Sounds good - I think my current code uses the far side of the crop box at the moment. I'll experiment further. Some of this will likely depend on what LMV and related tooling does with the input anyway.
+a followup if you know - is it feasible to find out from the Revit API the actual navigation pivot point?
+Alex Pytel
+I doubt it, because it is a dynamic concept. For example, if you have something selected then the pivot point can be the center of selection.
+It looks like you might be able to get/set a home camera using ViewNavigationToolSettings.
+And it has a pivot point (but no target). That seems to be the closest one can get...
+For completeness, there is a target value one can get during the custom exporter process, but it is a fake value, which is computed as I roughly described above. It's something like 0.5 * view width / tan(fov / 2).
+Jeff Hotchkiss
+Thanks very much!
+And target and pivot are npt the same.
+<ul> - [Custom Exporter GetCameraInfo](http://thebuildingcoder.typepad.com/blog/2014/09/custom-exporter-getcamerainfo.html) == - [Revit Camera Settings, Project Plasma, DA4R and AI](https://thebuildingcoder.typepad.com/blog/2019/06/revit-camera-settings-project-plasma-da4r-and-ai.html) == - [Revit Camera FOV, Forge Partner Talks and Jobs](https://thebuildingcoder.typepad.com/blog/2020/04/revit-camera-fov-forge-partner-talks-and-jobs.html) == - [Save and Restore 3D View Camera Settings](https://thebuildingcoder.typepad.com/blog/2020/10/save-and-restore-3d-view-camera-settings.html) == </ul>
+
+
+
+
+
 
 ####<a name="4"></a> RevitPythonDocs for Dynamo and pyRevit
 
-[Gerhard P](https://forum.dynamobim.com/u/gerhard.p)
-shared a new Dynamo and pyRevit initiative,
-[RevitPythonDocs for Dynamo and pyRevit &ndash; request for feedback](https://forum.dynamobim.com/t/revitpythondocs-for-dynamo-and-pyrevit-request-for-feedback/95280):
 
-> Going the first steps at creating a collection of Python scripts for Dynamo and pyRevit 1, I´d like to know what are your needs when you are looking for code, classes, methods.
+Many thanks to ... for the initiative and to Jacob Small for pointing it out.
 
-> - [Revit Python Docs](http://www.revitpythondocs.com/)
-
-> It will for sure get search and filter options, but for now it´s more of creating a good naming convention and finding out what code is really needed. In the following what I have come up with so far and I´m looking forward to your thoughts and hopefully contributions! The code is on Github.
-
-> Some rules for the code:
-
-> - Every script is a full working code including imports.
-- Necessary imports only.
-- No inputs from dynamo needed, necessary elements are created in the code.
-- Dynamo code: tabs as indent only.
-- pyRevit 1 code: spaces as indent only.
-- No comments, just clean code.
-- snake_case only, for variables, functions, everything.
-- No “for i in a:”, proper names for everything (except list comprehension).
-
-> Code is available in different versions, [check the original post for examples](https://forum.dynamobim.com/t/revitpythondocs-for-dynamo-and-pyrevit-request-for-feedback/95280)...
-
-Many thanks to Gerhard for the initiative and to Jacob Small for pointing it out.
-
-####<a name="5"></a> New Revit SDK Sample Browser and Launcher
-
-Christopher Diggins presents a new interactive open-source Revit SDK sample browser and launcher:
-[feedback requested on open-source Revit API sample browser](https://forums.autodesk.com/t5/revit-api-forum/feedback-requested-on-open-source-revit-api-sample-browser/m-p/12386403):
-
-> I do a fair amount of development using the Revit API.
-For my own reference, and to test some other plug-ins I am developing, I aggregated all of the Revit C# SDK Sample into a single project.
-I provided a simple UI so that each of the Commands and Applications can be launched by double clicking on the names.
-Selecting an item's load the associated readme file in a rich text edit box:
+####<a name="5"></a>
 
 <center>
-<img src="img/cd_revit_sample_browser.png" alt="Revit SDK sample browser" title="Revit SDK sample browser" width="442"/> <!-- Pixel Height: 613 Pixel Width: 881 -->
+<img src="img/.png" alt="" title="" width="100"/> <!-- Pixel Height: 613 Pixel Width: 881 -->
 </center>
 
-> I've posted the code to Github here:
-
-> - [Ara 3D Revit Sample Browser](https://github.com/ara3d/revit-sample-browser)
-
-> I haven't had time to test all of the samples, but it seems to be working.
-I'd appreciate any feedback!
-
-This looks like an absolutely brilliant project and a great piece of work.
-Thanks ever so much to Christopher for picking it up, tackling and sharing it.
-It has some slight similarity to my own RvtSamples project, as aged and old-fashioned as many of the SDK samples.
-That enables launching all the Revit SDK external commands but implements a more primitive UI and provides no built-in access to the sample documentation.
-The new sample browser also supports external applications as well as external commands!
-Great job!
-
-####<a name="6"></a> Purge Add-In with Rave Reviews
-
-[Kfpopeye shared several useful open-source Revit API projects](https://thebuildingcoder.typepad.com/blog/2021/09/kfpopeye-open-source-avf-and-other-cleanup.html#2) two years ago.
-
-Some of them received rave reviews and a lot of interest was expressed to update them and find a new name and maintainer in the recent continuation of
-the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
-on [Project Sweeper, ReVVed, and other apps now open source](https://forums.autodesk.com/t5/revit-api-forum/project-sweeper-revved-and-other-apps-now-open-source/m-p/12386626).
-
-It will be interesting to see where this leads.
-
-####<a name="7"></a> SpeedCad Tools OptionsBar and StatusBar
-
-In yet another discussion on open-source code sharing and the importance of adding a suitable license in order to enable people to make use of their code, Speed_CAD shared
-their [ProgressMeter](https://forums.autodesk.com/t5/revit-api-forum/progressmeter/td-p/12363674)
-and [OptionsBar](https://forums.autodesk.com/t5/revit-api-forum/optionsbar/m-p/12377344) utility DLLs.
-Here are the associated GitHub repositories:
-
-- [ProgressMeter](https://github.com/SpeedCAD/SCADtools.Revit.UI.ProgressMeter)
-- [OptionsBar](https://github.com/SpeedCAD/SCADtools.Revit.UI.OptionsBar)
-
-By the way, the latter is comparable with Roman's recent
-fully [Open-Source OptionsBar](https://thebuildingcoder.typepad.com/blog/2023/09/optionsbar-and-bye-bye-to-da4r-2018.html#2).
-
-####<a name="8"></a> Managing Multiple Revit API Versions
-
-Andrea Tassera, Jean-Marc Couffin and others discuss some interesting solutions to manage multiple versions of API on the pyRevit forum thread on how
-to [support multiple versions of Revit in invokebuttons (dll projects, Visual Studio)](https://discourse.pyrevitlabs.io/t/support-multiple-versions-of-revit-in-invokebuttons-dll-projects-visual-studio).
-
-####<a name="9"></a> DesignScript, Rhino, and other Geometry Libraries
-
-Some interesting and illuminating aspects of using DesignScript, Rhino, and other geometry libraries with the Revit API are discussed in
-the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
-on [using DesignScript in Revit addin](https://forums.autodesk.com/t5/revit-api-forum/using-designscript-in-revit-addin/td-p/8203199).
-
-####<a name="10"></a> Trading Glass Beads for AI IP
-
-Not too long ago, some people acquired coveted goods from less business savvy folks with glass beads.
-
-Nowadays, one example of coveted goods are AI IP, the glass beads are compute time, the less business savvy seem to be the AI enthusiasts of OpenAI, and guess who is business savvy?
-
-- [OpenAI’s Misalignment and Microsoft’s Gain](https://stratechery.com/2023/openais-misalignment-and-microsofts-gain/)
 
