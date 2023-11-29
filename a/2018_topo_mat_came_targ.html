@@ -35,7 +35,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 -->
 
 <h3>Camera Target and Toposolid Subdivision Material</h3>
-<p>Today, lets take a quick look at CefSharp and two conversations shedding light on specific aspects of Toposolids and camera settings:</p>
+<p>Today, let's take a quick look at CefSharp and two conversations shedding light on specific aspects of Toposolids and camera settings:</p>
 <ul>
 <li><a href="#2">Using the built-in CefSharp browser</a></li>
 <li><a href="#3">Toposolid subdivision material</a></li>
@@ -43,11 +43,11 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 </ul>
 <h4><a name="2"></a> Using the Built-In CefSharp Browser</h4>
 <p>Andrej Licanin of <a href="https://bimexperts.com/sr/home">Bimexperts</a> shared
-a nice succint little solution demonstrating how to use the Revit built-in CefSharp installation to display a browser in a WPF control
+a nice succinct little solution demonstrating how to use the Revit built-in CefSharp installation to display a browser in a WPF control
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/simple-wpf-with-a-chromium-browser-guide/td-p/12396552">simple WPF with a chromium browser guide</a>:</p>
 <blockquote>
-<p>This is for the all lost souls out there, may you avoid my suffering.</p>
+<p>This is for all the lost souls out there, may you avoid my suffering.</p>
 <p>To create a chromium web browser in your Revit addin, you need to reference cefsharp dlls.
 This is where I had a major hiccup, because I just installed the newest one by nuget.
 Don't do this.
@@ -171,7 +171,7 @@ Unfortunately, the target is not used consistently in Revit, including for navig
 So, it is fair to say that the significance of the location is not great.
 This might explain why it has been neglected in API.</p>
 <p><strong>Response:</strong>
-I think I grasp the fundamentals you mean, but am unsure which components in the API describe them.
+I think I grasp the fundamentals you mean but am unsure which components in the API describe them.
 For example, you mention a distinction between the base of the view's frustum (triangle as seen from above when including the origin) and the far clipping plane.
 Yet the diagram in the docs (lets' start with perspective) shows the Crop Box of the view as describing the clipping planes.
 Not clear to me which object contains this smaller frustum you reference. (of course this is all hard to convey in text, we might need a diagram :laughing:).
@@ -189,7 +189,7 @@ But, as I said, it is not consistently used for navigation, so it might not be t
 <p><strong>Response:</strong> Sounds good &ndash; I think my current code uses the far side of the crop box at the moment.
 I'll experiment further.
 Some of this will likely depend on what LMV and related tooling does with the input anyway.
-a followup, if you know &ndash; is it feasible to find out from the Revit API the actual navigation pivot point?</p>
+a follow-up, if you know &ndash; is it feasible to find out from the Revit API the actual navigation pivot point?</p>
 <p><strong>Answer:</strong>
 I doubt it, because it is a dynamic concept.
 For example, if you have something selected, then the pivot point can be the center of selection.
