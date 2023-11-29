@@ -20,7 +20,10 @@ twitter:
 
 #RevitAPI @AutodeskAPS @AutodeskRevit #BIM @DynamoBIM
 
-&ndash; ...
+A quick look at CefSharp and conversations shedding light on Toposolids and camera settings
+&ndash; Using the built-in CefSharp browser
+&ndash; Toposolid subdivision material
+&ndash; Camera target...
 
 linkedin:
 
