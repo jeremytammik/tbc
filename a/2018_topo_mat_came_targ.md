@@ -6,6 +6,9 @@
 
 <!---
 
+https://autodesk.slack.com/archives/C0SR6NAP8/p1700155564738649
+The creation of the type is based on this thread: https://autodesk.slack.com/archives/C0SR6NAP8/p1673638599787309
+
 twitter:
 
 #RevitAPI @AutodeskAPS @AutodeskRevit #BIM @DynamoBIM
@@ -77,46 +80,70 @@ Thank you very much, Andrej!
 
 ####<a name="3"></a> Toposolid Subdivision Material
 
-- toposolid subdivision material
-https://autodesk.slack.com/archives/C0SR6NAP8/p1700155564738649
-Thread in bid-guild-api | 13 Jan | View message
-Greg Marr
-In Revit 2024, I'm creating a Toposolid using a ToposolidType that has a finish layer with a texture in the material.  I then use Toposolid.CreateSubDivision to create a subdivision in the toposolid, but this subdivision is not inheriting the material from the hosting toposolid.  The creation of the type is based on this thread: https://autodesk.slack.com/archives/C0SR6NAP8/p1673638599787309  Any ideas what I need to do to get the material to show properly?
-Is there a way to set the material for the top face of a Toposolid?  We're trying to port the Spacemaker add-in from TopographySurface to Toposolid.
-image.png
-image.png
+**Question:**
+In Revit 2024, I'm creating a Toposolid using a ToposolidType that has a finish layer with a texture in the material.
+I then use Toposolid.CreateSubDivision to create a subdivision in the toposolid, but this subdivision is not inheriting the material from the hosting toposolid.
+Any ideas what I need to do to get the material to show properly?
+Is there a way to set the material for the top face of a Toposolid?
+
+<center>
+<img src="img/toposolid_subdiv_mat_1.png" alt="Toposolid subdivision material" title="Toposolid subdivision material" width="600"/>
+<p/>
+<img src="img/toposolid_subdiv_mat_2.png" alt="Toposolid subdivision material" title="Toposolid subdivision material" width="600"/>
+</center>
+
 The brown areas are the subdivisions.
-Yueqiang Ni
-the subdivision is designed NOT to inherit materials from the host toposolid. Also, "Edit Type" is not enabled in the UI. As an alternative, could you try to change the material Id of the subdivision element and see if that works?
-Greg Marr
-Toposolid does not have a MaterialID.  That's why I had to bake the material into the ToposolidType.
-Yueqiang Ni
- the subdivision has a BuiltInParameter.TOPOSOLID_SUBDIVIDE_MATERIAL to control the material. It can only be set to  one material id. I did a quick example. Please check out the following code for reference:
-    [Transaction(TransactionMode.Manual)]
-    public class ChangeSubdivisionMaterial : IExternalCommand
+
+**Answer:** The subdivision is designed NOT to inherit materials from the host toposolid.
+Also, "Edit Type" is not enabled in the UI.
+As an alternative, could you try to change the material Id of the subdivision element and see if that works?
+
+**Response:** Toposolid does not have a MaterialID.
+That's why I had to bake the material into the ToposolidType.
+
+**Answer:** The subdivision has a `BuiltInParameter` `TOPOSOLID_SUBDIVIDE_MATERIAL` to control the material.
+It can only be set to one material id.
+I did a quick example.
+Please check out the following code for reference:
+
+<pre class="prettyprint">
+  [Transaction(TransactionMode.Manual)]
+  public class ChangeSubdivisionMaterial : IExternalCommand
+  {
+    public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
     {
-        public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
-        {
-            var uidoc = commandData.Application.ActiveUIDocument;
-            var doc = uidoc.Document;
-            var sel = uidoc.Selection;
+      var uidoc = commandData.Application.ActiveUIDocument;
+      var doc = uidoc.Document;
+      var sel = uidoc.Selection;
 
-            Toposolid topo = doc.GetElement(sel.PickObject(ObjectType.Element, new ToposolidFilter())) as Toposolid;
-            ToposolidType topoType = doc.GetElement(topo.GetTypeId()) as ToposolidType;
-            ElementId materialId = topoType.GetCompoundStructure().GetLayers().First().MaterialId;
+      Toposolid topo = doc.GetElement(sel.PickObject(
+        ObjectType.Element, new ToposolidFilter())) as Toposolid;
+      ToposolidType topoType = doc.GetElement(topo.GetTypeId()) as ToposolidType;
+      ElementId materialId = topoType.GetCompoundStructure().GetLayers().First().MaterialId;
 
-            List&lt;Toposolid&gt; subdivisions = new FilteredElementCollector(doc).OfClass(typeof(Toposolid)).OfType&lt;Toposolid&gt;().Where(t =&gt; t.HostTopoId == topo.Id).ToList();
-            Transaction trans = new Transaction(doc, "change material");
-            trans.Start();
-            subdivisions.ForEach(t =&gt; t.get_Parameter(BuiltInParameter.TOPOSOLID_SUBDIVIDE_MATERIAL).Set(materialId));
-            trans.Commit();
+      List&lt;Toposolid&gt; subdivisions = new FilteredElementCollector(doc)
+        .OfClass(typeof(Toposolid))
+        .OfType&lt;Toposolid&gt;()
+        .Where(t =&gt; t.HostTopoId == topo.Id)
+        .ToList();
+      Transaction trans = new Transaction(doc, "change material");
+      trans.Start();
+      subdivisions.ForEach(t =&gt; t.get_Parameter(
+        BuiltInParameter.TOPOSOLID_SUBDIVIDE_MATERIAL)
+          .Set(materialId));
+      trans.Commit();
 
-            return Result.Succeeded;
-        }
+      return Result.Succeeded;
     }
-ChangeSubdivisionMaterial.gif
+  }
+</pre>
 
-- camera target
+<center>
+<img src="img/toposolid_subdiv_mat_3.gif" alt="Toposolid subdivision material" title="Toposolid subdivision material" width="800"/>
+</center>
+
+####<a name="4"></a> Camera Target
+
 https://autodesk.slack.com/archives/C0SR6NAP8/p1700492804688869
 Jeff Hotchkiss
 I'm looking to convert Revit views for transfer into cloud REST API calls e.g. into LMV. Looking over supplied Revit help on the subject, I've found most of what I need but I'm curious if there's any way in API to retrieve the view camera target point as listed in that documentation? The docs suggest that the target can be reset to the fov centre, but not how to get the existing value, or whether the value has any significance to Revit e.g. orbit point. Thanks in advance for any assistance. (edited)
@@ -144,22 +171,16 @@ For completeness, there is a target value one can get during the custom exporter
 Jeff Hotchkiss
 Thanks very much!
 And target and pivot are npt the same.
-<ul> - [Custom Exporter GetCameraInfo](http://thebuildingcoder.typepad.com/blog/2014/09/custom-exporter-getcamerainfo.html) == - [Revit Camera Settings, Project Plasma, DA4R and AI](https://thebuildingcoder.typepad.com/blog/2019/06/revit-camera-settings-project-plasma-da4r-and-ai.html) == - [Revit Camera FOV, Forge Partner Talks and Jobs](https://thebuildingcoder.typepad.com/blog/2020/04/revit-camera-fov-forge-partner-talks-and-jobs.html) == - [Save and Restore 3D View Camera Settings](https://thebuildingcoder.typepad.com/blog/2020/10/save-and-restore-3d-view-camera-settings.html) == </ul>
+
+- [Custom Exporter GetCameraInfo](http://thebuildingcoder.typepad.com/blog/2014/09/custom-exporter-getcamerainfo.html)
+- [Revit Camera Settings, Project Plasma, DA4R and AI](https://thebuildingcoder.typepad.com/blog/2019/06/revit-camera-settings-project-plasma-da4r-and-ai.html)
+- [Revit Camera FOV, Forge Partner Talks and Jobs](https://thebuildingcoder.typepad.com/blog/2020/04/revit-camera-fov-forge-partner-talks-and-jobs.html)
+- [Save and Restore 3D View Camera Settings](https://thebuildingcoder.typepad.com/blog/2020/10/save-and-restore-3d-view-camera-settings.html)
 
 
 
-
-
-
-####<a name="4"></a> RevitPythonDocs for Dynamo and pyRevit
-
-
-Many thanks to ... for the initiative and to Jacob Small for pointing it out.
 
 ####<a name="5"></a>
 
-<center>
-<img src="img/.png" alt="" title="" width="100"/> <!-- Pixel Height: 613 Pixel Width: 881 -->
-</center>
 
 
