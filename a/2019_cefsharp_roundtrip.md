@@ -122,23 +122,16 @@ Yet another RevitLookup update, full roundtrip interaction between your own inst
 
 ####<a name="2"></a> RevitLookup 2024.0.10
 
-https://github.com/jeremytammik/RevitLookup/releases/tag/2024.0.10
+[RevitLookup 2024.0.10](https://github.com/jeremytammik/RevitLookup/releases/tag/2024.0.10) is now available with the following enhancements:
 
-General
-Introducing a brand new feature: Restore window size! Now, effortlessly you will open RevitLookup with your preferred window dimensions with a simple click
-Improvements
-Add MEPSystem.GetSectionByIndex support by @SergeyNefyodov in #189
-Add MEPSystem.GetSectionByNumber support by @SergeyNefyodov in #189
-Add MEPSection.GetElementIds support by @SergeyNefyodov in #192
-Add MEPSection.GetCoefficient support by @SergeyNefyodov in #192
-Add MEPSection.GetPressureDrop support by @SergeyNefyodov in #192
-Add MEPSection.GetSegmentLength support by @SergeyNefyodov in #192
-Add MEPSection.IsMain support
-Add show System.Object option (named Root hierarchy) by @SergeyNefyodov in #193
-Add generic types support for the help button
-Minor tooltip changes
-Bugs
-Fixed search that worked in the main thread
+- Introducing a brand new feature: Restore window size!
+  Now, effortlessly you will open RevitLookup with your preferred window dimensions with a simple click
+- Add `MEPSystem` and `MEPSection` support for GetSectionByIndex, GetSectionByNumber, GetElementIds,
+  GetCoefficient, GetPressureDrop,  GetSegmentLength and IsMain
+- Show System.Object option (named Root hierarchy)
+- Add generic types support for the help button
+- Minor tooltip changes
+- Fixed search that worked in the main thread
 
 ####<a name="3"></a> Calling Revit Command from Chromium Browser
 
