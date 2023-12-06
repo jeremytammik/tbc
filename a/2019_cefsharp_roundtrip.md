@@ -118,6 +118,7 @@ Yet another RevitLookup update, full roundtrip interaction between your own inst
 - [Carbon footprint of AI image generation](#8)
 - [Sending data by pigeon](#9)
 - [Permaculture farm regenerates natural habitat](#10)
+- [The Valley of Code](#11)
 
 ####<a name="2"></a> RevitLookup 2024.0.10
 
@@ -497,4 +498,34 @@ Presented by the [Coen Farm](https://www.coenfarm.ca), who say:
 Our mission is to provide nutrient-dense food, feed, and permaculture education to regenerate the planet and its people.
 
 Personally, I was very touched watching and listening to it.
+
+####<a name="11"></a> The Valley of Code
+
+Quick return to digital before I end for today.
+If you have friends or others wanting to quickly learn to code for the web, here is a great site to get them started:
+
+- [The Valley of Code](https://thevalleyofcode.com/)
+
+> Welcome to The Valley of Code.
+Your journey in Web Development starts here.
+In the fundamentals section you'll learn the basic building blocks of the Internet, the Web and how its fundamental protocol (HTTP) works.
+
+Toc:
+
+- Fundamentals
+- HTML and CSS
+- Tools
+- Deployment
+- JavaScript
+- TypeScript
+- More CSS
+- More JavaScript
+- DOM and Events
+- Networking
+- Server Runtimes
+- HTTP Servers
+- Forms
+- Databases
+- UI libraries
+- Frameworks
 
