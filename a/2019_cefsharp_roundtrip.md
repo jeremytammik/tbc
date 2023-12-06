@@ -107,6 +107,8 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ###
 
+Yet another RevitLookup update, full roundtrip interaction between your own instance of the built-in Revit CefSharp Chromium browser and your Revit API add-in external command, different ways to locate a BIM element, pure structural 3D view and curved section view creation, and more:
+
 - [RevitLookup 2024.0.10](#2)
 - [Calling Revit command from Chromium browser](#3)
 - [Chromium browser Js round trip callback](#4)
@@ -116,7 +118,6 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 - [Carbon footprint of AI image generation](#8)
 - [Sending data by pigeon](#9)
 - [Permaculture farm regenerates natural habitat](#10)
-
 
 ####<a name="2"></a> RevitLookup 2024.0.10
 
@@ -145,154 +146,135 @@ Calling Revit command from chromium browser
 https://forums.autodesk.com/t5/revit-api-forum/calling-revit-command-from-chromium-browser/td-p/12413281
 
 
-This is another guide on chromium browser using cef sharp. Hope some one finds it usefull.
+This is another guide on chromium browser using cef sharp. Hope some one finds it useful.
 This is a continuation of this post : Solved: Simple WPF with a chromium browser guide - Autodesk Community - Revit Products
 
 Basicly what I wanted was for a button in the browser (on a webpage) to trigger a command in revit. This works by "binding" a javascript method to a c# object and its method. In the Javascript we await for the object and call its function.
 
 So lets make a dummy object for binding and a method in it. In order to call a Revit method it will need a reference to an external event handler and its event.
 
-
-
-
+<pre class="prettyprint">
    public class BoundObject
    {
+     public int Add(int a, int b)
+     {
+       ExtApp.handler.a = a;
+       ExtApp.handler.b = b;
+       ExtApp.testEvent.Raise();
 
-       public int Add(int a, int b)
-       {
-           ExtApp.handler.a = a;
-           ExtApp.handler.b = b;
-           ExtApp.testEvent.Raise();
-
-           return a+b;
-       }
+       return a+b;
+     }
    }
-
-
+</pre>
 
 The event and its handler are saved in the External app as static for ease of access.
 
-
-
+<pre class="prettyprint">
   internal class ExtApp : IExternalApplication
   {
-      public static IExternalApplication MyApp;
-      public static ChromiumWebBrowser browser;
-      public static ExternalEvent testEvent;
-      public static MyEvent handler;
-      public Result OnShutdown(UIControlledApplication application)
-      {
-         // Cef.Shutdown();
-          return Result.Succeeded;
-      }
+    public static IExternalApplication MyApp;
+    public static ChromiumWebBrowser browser;
+    public static ExternalEvent testEvent;
+    public static MyEvent handler;
+    public Result OnShutdown(UIControlledApplication application)
+    {
+      // Cef.Shutdown();
+      return Result.Succeeded;
+    }
 
-      public Result OnStartup(UIControlledApplication application)
-      {
-          MyApp = this;
-          //code for making a button
+    public Result OnStartup(UIControlledApplication application)
+    {
+      MyApp = this;
+      //code for making a button
 
-          handler = new MyEvent();
-          testEvent= ExternalEvent.Create(handler);
+      handler = new MyEvent();
+      testEvent= ExternalEvent.Create(handler);
 
-
-          return Result.Succeeded;
-      }
+      return Result.Succeeded;
+    }
   }
+</pre>
 
+In the WPF control, the browser is embedded like this:
 
-
-In the wpf the browser is embeded like this
-
-
-
-
-<Window x:Class="RevitTestProject.TestWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:local="clr-namespace:RevitTestProject"
-        xmlns:cef="clr-namespace:CefSharp.Wpf;assembly=CefSharp.Wpf"
-        mc:Ignorable="d"
-        Width="1000" Height="500">
+<pre class="prettyprint">
+  <Window x:Class="RevitTestProject.TestWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:RevitTestProject"
+    xmlns:cef="clr-namespace:CefSharp.Wpf;assembly=CefSharp.Wpf"
+    mc:Ignorable="d"
+    Width="1000" Height="500">
     <Grid Background="PapayaWhip">
-
-        <cef:ChromiumWebBrowser Name="ChromiumBrowser" Address="http://www.google.com" Width="900" Height="450"  />
+      <cef:ChromiumWebBrowser Name="ChromiumBrowser" Address="http://www.google.com" Width="900" Height="450"  />
     </Grid>
-</Window>
+  </Window>
+</pre>
 
+The code behind  of the window is this:
 
+<pre class="prettyprint">
+    public TestWindow()
+    {
+      InitializeComponent();
+      ChromiumBrowser.Address = "https://www.google.com";
+      ChromiumBrowser.Address = "C:\\Users\\XXX\\Desktop\\index.html";
+      BoundObject bo = new BoundObject();
+      ChromiumBrowser.JavascriptObjectRepository.Register("boundAsync", bo, true, BindingOptions.DefaultBinder);
+    }
 
+    public void Dispose()
+    {
+      this.Dispose();
+    }
+</pre>
 
-and the code behind  of the window is :
+So, to use it make, an `index.html` and submit the path to it in the browser address.
 
+The Test webpage look like this:
 
-
-
-        public TestWindow()
-        {
-
-
-            InitializeComponent();
-            ChromiumBrowser.Address = "https://www.google.com";
-            ChromiumBrowser.Address = "C:\\Users\\XXX\\Desktop\\index.html";
-            BoundObject bo = new BoundObject();
-            ChromiumBrowser.JavascriptObjectRepository.Register("boundAsync", bo, true, BindingOptions.DefaultBinder);
-
-
-        }
-
-        public void Dispose()
-        {
-            this.Dispose();
-        }
-
-So to use it make an index.html and make the path to it in the browser address.
-
- The Test webpage look like this:
-
-
-
+<pre class="prettyprint">
 <html>
 <head>
-    <title>Bridge Test</title>
-    <!-- <script src="script.js"></script> -->
-    <script type="text/javascript">
-     async function callCSharpAction() {
-        await CefSharp.BindObjectAsync("boundAsync");
-
-        boundAsync.add(16, 2);
+  <title>Bridge Test</title>
+  <!-- <script src="script.js"></script> -->
+  <script type="text/javascript">
+    async function callCSharpAction() {
+      await CefSharp.BindObjectAsync("boundAsync");
+      boundAsync.add(16, 2);
     }
-    </script>
+  </script>
 </head>
 <body>
-    <button id="action1" onclick="callCSharpAction()">Action 1</button>
-    <button id="action2" onclick="alert('Button is working')">Action 2</button>
-    <button id="action3">Action 3</button>
+  <button id="action1" onclick="callCSharpAction()">Action 1</button>
+  <button id="action2" onclick="alert('Button is working')">Action 2</button>
+  <button id="action3">Action 3</button>
 </body>
 </html>
-
-
+</pre>
 
 The handler code:
 
-
-
+<pre class="prettyprint">
   internal class MyEvent : IExternalEventHandler
   {
-      public int a;
-      public int b;
-      public void Execute(UIApplication app)
-      {
-          TaskDialog.Show("yoyoy", "data is "+a.ToString()+" and "+b.ToString()+".");
-      }
+    public int a;
+    public int b;
+    public void Execute(UIApplication app)
+    {
+      TaskDialog.Show( "yoyoy",
+        "data is " + a.ToString()
+        + " and " + b.ToString() + ".");
+    }
 
-      public string GetName()
-      {
-          return "YOYOOY";
-      }
+    public string GetName()
+    {
+      return "YOYOOY";
+    }
   }
-
+</pre>
 
 ####<a name="4"></a> Chromium Browser Js Round Trip Callback
 
@@ -300,88 +282,93 @@ To make a callback from c# function to the browser, you just need an instance of
 
 here is an edited index.html
 
+<pre class="prettyprint">
 <html>
 <head>
-    <title>Bridge Test</title>
-    <!-- <script src="script.js"></script> -->
-    <script type="text/javascript">
-     async function callCSharpAction() {
-        await CefSharp.BindObjectAsync("boundAsync");
-
-        boundAsync.add(16, 2);
+  <title>Bridge Test</title>
+  <!-- <script src="script.js"></script> -->
+  <script type="text/javascript">
+    async function callCSharpAction() {
+      await CefSharp.BindObjectAsync("boundAsync");
+      boundAsync.add(16, 2);
     }
-
 
     function showAlert(arg1) {
-        // Your JavaScript logic here
-        alert("Function called with arguments: " + arg1);
-        return ;
+      // Your JavaScript logic here
+      alert("Function called with arguments: " + arg1);
+      return;
     }
-    </script>
+  </script>
 </head>
 <body>
-    <button id="action1" onclick="callCSharpAction()">Action 1</button>
-    <button id="action2" onclick="alert('Button is working')">Action 2</button>
-    <button id="action3">Action 3</button>
+  <button id="action1" onclick="callCSharpAction()">Action 1</button>
+  <button id="action2" onclick="alert('Button is working')">Action 2</button>
+  <button id="action3">Action 3</button>
 </body>
 </html>
+</pre>
 
 and in our bound class we save a instance to the browser so we can use it on command
 
-    public class BoundObject
+<pre class="prettyprint">
+  public class BoundObject
+  {
+    public int aS;
+    public int bS;
+    internal ChromiumWebBrowser browser;
+
+    public void CallCSharpMethod()
     {
-        public int aS;
-        public int bS;
-        internal ChromiumWebBrowser browser;
-
-        public void CallCSharpMethod()
-        {
-            MessageBox.Show("C# method called!");
-            // Add more code here as needed
-        }
-        public int Add(int a, int b)
-        {
-            ExtApp.handler.a = a;
-            ExtApp.handler.b = b;
-            ExtApp.testEvent.Raise();
-
-            return a+b;
-
-        }
-
-        public int SendSomeDataFromLocal(int a)
-        {
-            browser.ExecuteScriptAsync("showAlert("+a.ToString()+")");
-            return a;
-        }
+      MessageBox.Show("C# method called!");
+      // Add more code here as needed
     }
+    public int Add(int a, int b)
+    {
+      ExtApp.handler.a = a;
+      ExtApp.handler.b = b;
+      ExtApp.testEvent.Raise();
+
+      return a+b;
+    }
+
+    public int SendSomeDataFromLocal(int a)
+    {
+      browser.ExecuteScriptAsync("showAlert("+a.ToString()+")");
+      return a;
+    }
+  }
+</pre>
 
 i passed it when i created the browser in the window codebehind.
 
-public TestWindow()
-{
-
-
+<pre class="prettyprint">
+  public TestWindow()
+  {
     InitializeComponent();
     ChromiumBrowser.Address = "https://www.google.com";
     ChromiumBrowser.Address = "C:\\Users\\XXX\\Desktop\\index.html";
     BoundObject bo = new BoundObject();
     //ExtApp.boundObj = bo;
     bo.browser = ChromiumBrowser;
-    ChromiumBrowser.JavascriptObjectRepository.Register("boundAsync", bo, true, BindingOptions.DefaultBinder);
-
-
-}
+    ChromiumBrowser.JavascriptObjectRepository.Register(
+      "boundAsync", bo, true, BindingOptions.DefaultBinder);
+  }
+</pre>
 
 finally you can call it from revit
 
-   public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
-   {
-       ExtApp.boundObj.SendSomeDataFromLocal(999);
-       return Result.Succeeded;
-   }
+<pre class="prettyprint">
+  public Result Execute(
+    ExternalCommandData commandData,
+    ref string message,
+    ElementSet elements)
+  {
+    ExtApp.boundObj.SendSomeDataFromLocal(999);
+    return Result.Succeeded;
+  }
+</pre>
 
-this concludes a round trip from the browser and back. I hope anyone reading this finds it usefull.
+this concludes a round trip from the browser and back. I hope anyone reading this finds it useful.
 
 
 ####<a name="5"></a> Determine Element Location
