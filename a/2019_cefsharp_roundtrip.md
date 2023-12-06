@@ -105,7 +105,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-###
+### 3D View, Curved Section and Browser Round-Trip
 
 Yet another RevitLookup update, full roundtrip interaction between your own instance of the built-in Revit CefSharp Chromium browser and your Revit API add-in external command, different ways to locate a BIM element, pure structural 3D view and curved section view creation, and more:
 
