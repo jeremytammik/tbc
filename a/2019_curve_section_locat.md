@@ -164,22 +164,70 @@ https://forums.autodesk.com/t5/revit-api-forum/calling-revit-command-from-chromi
 
 ####<a name="4"></a> Determine Element Location
 
-determine element location
+We put together a nice little ovrview on various methods to determine the location of a BIM element discussing
+[how can the coordinates for a Revit fabrication part be obtained with the Revit API](https://stackoverflow.com/questions/77556660/how-can-the-coordinates-for-a-revit-fabricationpart-be-obtained-with-the-revit-a)?
 
-how can the coordinates for a revit fabricationpart be obtained with the revit api
-https://stackoverflow.com/questions/77556660/how-can-the-coordinates-for-a-revit-fabricationpart-be-obtained-with-the-revit-a
+**Question:** I need to obtain the coordinates for Revit MEP FabricationParts. All of the elements I get do have a location property but not all of them have either a LocationPoint or a LocationCurve. More specific, only for Pipe elements am I able to get XYZ values through the LocationCurve. Elements such as Threadolet, Elbow, Weld and Fishmouth don't have either a LocationPoint or a LocationCurve.
+
+**Answer:** Three options that can be used on almost all BIM elements are:
+
+- Use the `Location` property
+- Retrieve the element [`Geometry` property](https://www.revitapidocs.com/2024/d8a55a5b-2a69-d5ab-3e1f-6cf1ee43c8ec.htm), e.g., calculate the centroid of all the vertices
+- Use the element [`BoundingBox` property](https://www.revitapidocs.com/2024/def2f9f2-b23a-bcea-43a3-e6de41b014c8.htm), e.g., calculate its midpoint
+
+However, for these types of `FabricationParts` specifically, [egeer](https://stackoverflow.com/users/15534202/egeer) and [bootsch](https://stackoverflow.com/users/21999391/bootsch) suggest using the element's connector locations instead:
+
+For OLets and ThreadOLets, you can use the connector that connects to the main pipe as its insertion point, since that is technically where the element was inserted:
+
+<pre class="prettyprint">
+    Connector insertionPointConnector = OLet.ConnectorManager
+        .Connectors
+        .OfType&lt;Connector&gt;()
+        .FirstOrDefault(x => x.ConnectorType == ConnectorType.Curve);
+
+    XYZ insertionPoint = insertionPointConnector?.Origin;
+</pre>
+
+Since their connectors are atypical in that they do not connect to another connector, but instead a curve, you need to get the one that is `ConnectorType.Curve`.
+
+For welds, elbows and other inline elements, you can similarly use the connectors and get their origins.
+If you want the center of the element, you can use vector math to calculate that using the connector's direction and location.
+The direction that the connector points is the `BasisZ` property of the Connector's `CoordinateSystem`.
+
+<pre class="prettyprint">
+    XYZ connectorDirection = insertionPointConnector?.CoordinateSystem.BasisZ;
+</pre>
+
+The solution I end up with is a bit different from the answer given by egeer above:
+I ended up getting a Connector for each element (the ones without a `LocationCurve` or `LocationPoint`).
+Here's the code in VB:
+
+<pre class="prettyprint">
+    Dim insertionPointConnector As Connector = CType(e, FabricationPart).ConnectorManager.Connectors.OfType(Of Connector).FirstOrDefault()
+    Dim elementOrigin as XYZ = Connector.insertionPointConnector.Origin
+</pre>
+
+`e` is of type Element.
+
+Many thanks to egeer and bootsch for jumping in with these good solutions!
 
 ####<a name="4"></a> Create a Structural-Only 3D View
 
-Create a 3D view showing only #Revit wall structural layers
+Harry Mattison continues his AU solution spree presenting a nice code sample demonstrating how
+to [create a 3D view showing only Revit wall structural layers](https://boostyourbim.wordpress.com/2023/12/04/create-a-3d-view-showing-only-revit-wall-structural-layers/)
+which is discussed in further depth in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on how to [create new View3D that just displays wall layers of "Structure" function](https://forums.autodesk.com/t5/revit-api-forum/create-new-view3d-that-just-displays-wall-layers-of-quot/td-p/12344156).
+Harry's sample code performs the following steps:
 
-https://boostyourbim.wordpress.com/2023/12/04/create-a-3d-view-showing-only-revit-wall-structural-layers/
 - Create new 3D isometric view
-- Set parts visibility PartsVisibility.ShowPartsOnly
+- Set view parts visibility `PartsVisibility.ShowPartsOnly`
 - Create parts from all walls
-- For each part, retrieve its built-in parameter DPART_LAYER_INDEX
+- For each part, retrieve its built-in parameter `DPART_LAYER_INDEX`
 - Convert from string to wall compound structure layer index
-- Hide part if its compound structure layer function differs from MaterialFunctionAssignment.Structure
+- Hide part if its compound structure layer function differs from `MaterialFunctionAssignment.Structure`
+
+Many thanks to Harry for addressing this need!
 
 ####<a name="4"></a> Creating a Curved Section in Dynamo
 
