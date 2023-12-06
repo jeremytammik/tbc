@@ -107,36 +107,18 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ###
 
-####<a name="2"></a>
-
-<pre class="prettyprint">
-
-</pre>
-
-
-####<a name="3"></a>
-
-**Question:**
-
-
-<center>
-<img src="img/.png" alt="" title="" width="100"/>
-</center>
+- [RevitLookup 2024.0.10](#2)
+- [Calling Revit command from Chromium browser](#3)
+- [Chromium browser Js round trip callback](#4)
+- [Determine element location](#5)
+- [Create a structural-only 3D view](#6)
+- [Creating a curved section in Dynamo](#7)
+- [Carbon footprint of AI image generation](#8)
+- [Sending data by pigeon](#9)
+- [Permaculture farm regenerates natural habitat](#10)
 
 
-**Answer:**
-
-**Response:**
-
-
-Thanks to ??? for this explanation.
-
-####<a name="4"></a>
-
-
-
-
-####<a name="4"></a> RevitLookup 2024.0.10
+####<a name="2"></a> RevitLookup 2024.0.10
 
 https://github.com/jeremytammik/RevitLookup/releases/tag/2024.0.10
 
@@ -156,13 +138,253 @@ Minor tooltip changes
 Bugs
 Fixed search that worked in the main thread
 
-####<a name="4"></a> Calling Revit Command from Chromium Browser
+####<a name="3"></a> Calling Revit Command from Chromium Browser
 
 Calling Revit command from chromium browser
 
 https://forums.autodesk.com/t5/revit-api-forum/calling-revit-command-from-chromium-browser/td-p/12413281
 
-####<a name="4"></a> Determine Element Location
+
+This is another guide on chromium browser using cef sharp. Hope some one finds it usefull.
+This is a continuation of this post : Solved: Simple WPF with a chromium browser guide - Autodesk Community - Revit Products
+
+Basicly what I wanted was for a button in the browser (on a webpage) to trigger a command in revit. This works by "binding" a javascript method to a c# object and its method. In the Javascript we await for the object and call its function.
+
+So lets make a dummy object for binding and a method in it. In order to call a Revit method it will need a reference to an external event handler and its event.
+
+
+
+
+   public class BoundObject
+   {
+
+       public int Add(int a, int b)
+       {
+           ExtApp.handler.a = a;
+           ExtApp.handler.b = b;
+           ExtApp.testEvent.Raise();
+
+           return a+b;
+       }
+   }
+
+
+
+The event and its handler are saved in the External app as static for ease of access.
+
+
+
+  internal class ExtApp : IExternalApplication
+  {
+      public static IExternalApplication MyApp;
+      public static ChromiumWebBrowser browser;
+      public static ExternalEvent testEvent;
+      public static MyEvent handler;
+      public Result OnShutdown(UIControlledApplication application)
+      {
+         // Cef.Shutdown();
+          return Result.Succeeded;
+      }
+
+      public Result OnStartup(UIControlledApplication application)
+      {
+          MyApp = this;
+          //code for making a button
+
+          handler = new MyEvent();
+          testEvent= ExternalEvent.Create(handler);
+
+
+          return Result.Succeeded;
+      }
+  }
+
+
+
+In the wpf the browser is embeded like this
+
+
+
+
+<Window x:Class="RevitTestProject.TestWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:local="clr-namespace:RevitTestProject"
+        xmlns:cef="clr-namespace:CefSharp.Wpf;assembly=CefSharp.Wpf"
+        mc:Ignorable="d"
+        Width="1000" Height="500">
+    <Grid Background="PapayaWhip">
+
+        <cef:ChromiumWebBrowser Name="ChromiumBrowser" Address="http://www.google.com" Width="900" Height="450"  />
+    </Grid>
+</Window>
+
+
+
+
+and the code behind  of the window is :
+
+
+
+
+        public TestWindow()
+        {
+
+
+            InitializeComponent();
+            ChromiumBrowser.Address = "https://www.google.com";
+            ChromiumBrowser.Address = "C:\\Users\\XXX\\Desktop\\index.html";
+            BoundObject bo = new BoundObject();
+            ChromiumBrowser.JavascriptObjectRepository.Register("boundAsync", bo, true, BindingOptions.DefaultBinder);
+
+
+        }
+
+        public void Dispose()
+        {
+            this.Dispose();
+        }
+
+So to use it make an index.html and make the path to it in the browser address.
+
+ The Test webpage look like this:
+
+
+
+<html>
+<head>
+    <title>Bridge Test</title>
+    <!-- <script src="script.js"></script> -->
+    <script type="text/javascript">
+     async function callCSharpAction() {
+        await CefSharp.BindObjectAsync("boundAsync");
+
+        boundAsync.add(16, 2);
+    }
+    </script>
+</head>
+<body>
+    <button id="action1" onclick="callCSharpAction()">Action 1</button>
+    <button id="action2" onclick="alert('Button is working')">Action 2</button>
+    <button id="action3">Action 3</button>
+</body>
+</html>
+
+
+
+The handler code:
+
+
+
+  internal class MyEvent : IExternalEventHandler
+  {
+      public int a;
+      public int b;
+      public void Execute(UIApplication app)
+      {
+          TaskDialog.Show("yoyoy", "data is "+a.ToString()+" and "+b.ToString()+".");
+      }
+
+      public string GetName()
+      {
+          return "YOYOOY";
+      }
+  }
+
+
+####<a name="4"></a> Chromium Browser Js Round Trip Callback
+
+To make a callback from c# function to the browser, you just need an instance of the browser, and a function in the javascript code that will be called.
+
+here is an edited index.html
+
+<html>
+<head>
+    <title>Bridge Test</title>
+    <!-- <script src="script.js"></script> -->
+    <script type="text/javascript">
+     async function callCSharpAction() {
+        await CefSharp.BindObjectAsync("boundAsync");
+
+        boundAsync.add(16, 2);
+    }
+
+
+    function showAlert(arg1) {
+        // Your JavaScript logic here
+        alert("Function called with arguments: " + arg1);
+        return ;
+    }
+    </script>
+</head>
+<body>
+    <button id="action1" onclick="callCSharpAction()">Action 1</button>
+    <button id="action2" onclick="alert('Button is working')">Action 2</button>
+    <button id="action3">Action 3</button>
+</body>
+</html>
+
+and in our bound class we save a instance to the browser so we can use it on command
+
+    public class BoundObject
+    {
+        public int aS;
+        public int bS;
+        internal ChromiumWebBrowser browser;
+
+        public void CallCSharpMethod()
+        {
+            MessageBox.Show("C# method called!");
+            // Add more code here as needed
+        }
+        public int Add(int a, int b)
+        {
+            ExtApp.handler.a = a;
+            ExtApp.handler.b = b;
+            ExtApp.testEvent.Raise();
+
+            return a+b;
+
+        }
+
+        public int SendSomeDataFromLocal(int a)
+        {
+            browser.ExecuteScriptAsync("showAlert("+a.ToString()+")");
+            return a;
+        }
+    }
+
+i passed it when i created the browser in the window codebehind.
+
+public TestWindow()
+{
+
+
+    InitializeComponent();
+    ChromiumBrowser.Address = "https://www.google.com";
+    ChromiumBrowser.Address = "C:\\Users\\XXX\\Desktop\\index.html";
+    BoundObject bo = new BoundObject();
+    //ExtApp.boundObj = bo;
+    bo.browser = ChromiumBrowser;
+    ChromiumBrowser.JavascriptObjectRepository.Register("boundAsync", bo, true, BindingOptions.DefaultBinder);
+
+
+}
+
+finally you can call it from revit
+
+   public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
+   {
+       ExtApp.boundObj.SendSomeDataFromLocal(999);
+       return Result.Succeeded;
+   }
+
+this concludes a round trip from the browser and back. I hope anyone reading this finds it usefull.
+
+
+####<a name="5"></a> Determine Element Location
 
 We put together a nice little ovrview on various methods to determine the location of a BIM element discussing
 [how can the coordinates for a Revit fabrication part be obtained with the Revit API](https://stackoverflow.com/questions/77556660/how-can-the-coordinates-for-a-revit-fabricationpart-be-obtained-with-the-revit-a)?
@@ -211,7 +433,7 @@ Here's the code in VB:
 
 Many thanks to egeer and bootsch for jumping in with these good solutions!
 
-####<a name="4"></a> Create a Structural-Only 3D View
+####<a name="6"></a> Create a Structural-Only 3D View
 
 Harry Mattison continues his AU solution spree presenting a nice code sample demonstrating how
 to [create a 3D view showing only Revit wall structural layers](https://boostyourbim.wordpress.com/2023/12/04/create-a-3d-view-showing-only-revit-wall-structural-layers/)
@@ -229,7 +451,7 @@ Harry's sample code performs the following steps:
 
 Many thanks to Harry for addressing this need!
 
-####<a name="4"></a> Creating a Curved Section in Dynamo
+####<a name="7"></a> Creating a Curved Section in Dynamo
 
 I have heard several requests for a curved section view, e.g., Alex Vila in 2019:
 [Create curved sections!](https://forums.autodesk.com/t5/revit-api-forum/create-curved-sections/m-p/8931972)
@@ -244,7 +466,7 @@ on [Dynamo: Curved Sections By Line (Part 1)](https://youtu.be/Fic5BD-s3A8):
 
 Many thanks to Anna for this nice piece of work!
 
-####<a name="4"></a> Carbon Footprint of AI Image Generation
+####<a name="8"></a> Carbon Footprint of AI Image Generation
 
 Researchers quantify the carbon footprint of generating AI images
 
@@ -252,7 +474,7 @@ Creating a photograph using artificial intelligence is like charging your phone.
 https://www.engadget.com/researchers-quantify-the-carbon-footprint-of-generating-ai-images-173538174.html
 img/ai_image_carbon_footprint.png
 
-####<a name="4"></a> Sending Data by Pigeon
+####<a name="9"></a> Sending Data by Pigeon
 
 Talking about carbon footprint and the cost and efficiency of digital data transmission, there is obviously a point at which transmission of large data can be speeded up by putting it on a storage device and moving that around rather physically than squeezing it through the limited bandwidth of the Internet:
 
@@ -270,7 +492,7 @@ cf. [Wikipedia on Sneakernet](https://en.wikipedia.org/wiki/Sneakernet).
 - Reminds of this thread from 2012
 about [transatlantic ping faster than sending a pixel to the screen](https://superuser.com/questions/419070/transatlantic-ping-faster-than-sending-a-pixel-to-the-screen)...
 
-####<a name="4"></a> Permaculture Farm Regenerates Natural Habitat
+####<a name="10"></a> Permaculture Farm Regenerates Natural Habitat
 
 Hope for the future from a five-minute video [drone tour of permaculture farm](https://youtu.be/TPxJtKob7Js):
 
