@@ -129,7 +129,7 @@ Yet another RevitLookup update, full roundtrip interaction between your own inst
 - Add `MEPSystem` and `MEPSection` support for GetSectionByIndex, GetSectionByNumber, GetElementIds,
   GetCoefficient, GetPressureDrop,  GetSegmentLength and IsMain
 - Show System.Object option (named Root hierarchy)
-- Add generic types support for the help button
+- Add generic type support for the help button
 - Minor tooltip changes
 - Fixed search that worked in the main thread
 
@@ -377,7 +377,7 @@ We put together a nice little overview on various methods to determine the locat
 
 **Question:** I need to obtain the coordinates for Revit MEP FabricationParts.
 All of the elements I get have a `Location` property, but not all of them have either a `LocationPoint` or a `LocationCurve`.
-More specifically, only for `Pipe` elements am I able to get `XYZ` values through the `LocationCurve`.
+More specifically, I am only able to get `XYZ` values through the `LocationCurve` for `Pipe` elements.
 Elements such as Threadolet, Elbow, Weld and Fishmouth don't have either a `LocationPoint` or a `LocationCurve`.
 
 **Answer:** Three options that can be used on almost all BIM elements are:
@@ -460,11 +460,12 @@ Many thanks to Anna for this nice piece of work!
 
 ####<a name="8"></a> Carbon Footprint of AI Image Generation
 
-Researchers quantify the carbon footprint of generating AI images
+Researchers quantify the carbon footprint of generating AI images:
+[creating a photograph using artificial intelligence is like charging your phone](https://www.engadget.com/researchers-quantify-the-carbon-footprint-of-generating-ai-images-173538174.html):
 
-Creating a photograph using artificial intelligence is like charging your phone.
-https://www.engadget.com/researchers-quantify-the-carbon-footprint-of-generating-ai-images-173538174.html
-img/ai_image_carbon_footprint.png
+<center>
+<img src="img/ai_image_carbon_footprint.png" alt="AI image generation carbon footprint" title="AI image generation carbon footprint" width="600"/>
+</center>
 
 ####<a name="9"></a> Sending Data by Pigeon
 
@@ -492,7 +493,7 @@ Hope for the future from a five-minute video [drone tour of permaculture farm](h
 <iframe width="480" height="270" src="https://www.youtube.com/embed/TPxJtKob7Js?si=QoImAfogIIMdU5Sp" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 </center>
 
-> In this video I narrate a drone tour of our entire 250 acre farm showcasing some of the swale,
+> In this video I narrate a drone tour of our entire 250-acre farm showcasing some of the swale,
 dam, dugout, aquaculture, livestock food forest, cover cropping and other permaculture
 systems we have on our regenerative farm.
 

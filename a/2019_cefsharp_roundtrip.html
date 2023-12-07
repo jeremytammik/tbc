@@ -126,7 +126,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 <li>Add <code>MEPSystem</code> and <code>MEPSection</code> support for GetSectionByIndex, GetSectionByNumber, GetElementIds,
   GetCoefficient, GetPressureDrop,  GetSegmentLength and IsMain</li>
 <li>Show System.Object option (named Root hierarchy)</li>
-<li>Add generic types support for the help button</li>
+<li>Add generic type support for the help button</li>
 <li>Minor tooltip changes</li>
 <li>Fixed search that worked in the main thread</li>
 </ul>
@@ -352,14 +352,20 @@ I hope anyone reading this finds it useful.</p>
 <h4><a name="5"></a> Determine Element Location</h4>
 <p>We put together a nice little overview on various methods to determine the location of a BIM element discussing
 <a href="https://stackoverflow.com/questions/77556660/how-can-the-coordinates-for-a-revit-fabricationpart-be-obtained-with-the-revit-a">how can the coordinates for a Revit fabrication part be obtained with the Revit API</a>?</p>
-<p><strong>Question:</strong> I need to obtain the coordinates for Revit MEP FabricationParts. All of the elements I get do have a location property but not all of them have either a LocationPoint or a LocationCurve. More specific, only for Pipe elements am I able to get XYZ values through the LocationCurve. Elements such as Threadolet, Elbow, Weld and Fishmouth don't have either a LocationPoint or a LocationCurve.</p>
+<p><strong>Question:</strong> I need to obtain the coordinates for Revit MEP FabricationParts.
+All of the elements I get have a <code>Location</code> property, but not all of them have either a <code>LocationPoint</code> or a <code>LocationCurve</code>.
+More specifically, I am only able to get <code>XYZ</code> values through the <code>LocationCurve</code> for <code>Pipe</code> elements.
+Elements such as Threadolet, Elbow, Weld and Fishmouth don't have either a <code>LocationPoint</code> or a <code>LocationCurve</code>.</p>
 <p><strong>Answer:</strong> Three options that can be used on almost all BIM elements are:</p>
 <ul>
 <li>Use the <code>Location</code> property</li>
 <li>Retrieve the element <a href="https://www.revitapidocs.com/2024/d8a55a5b-2a69-d5ab-3e1f-6cf1ee43c8ec.htm"><code>Geometry</code> property</a>, e.g., calculate the centroid of all the vertices</li>
 <li>Use the element <a href="https://www.revitapidocs.com/2024/def2f9f2-b23a-bcea-43a3-e6de41b014c8.htm"><code>BoundingBox</code> property</a>, e.g., calculate its midpoint</li>
 </ul>
-<p>However, for these types of <code>FabricationParts</code> specifically, <a href="https://stackoverflow.com/users/15534202/egeer">egeer</a> and <a href="https://stackoverflow.com/users/21999391/bootsch">bootsch</a> suggest using the element's connector locations instead:</p>
+<p>However, for these types of <code>FabricationParts</code> specifically,
+<a href="https://stackoverflow.com/users/15534202/egeer">egeer</a>
+and <a href="https://stackoverflow.com/users/21999391/bootsch">bootsch</a> suggest
+using the element's connector locations instead:</p>
 <p>For OLets and ThreadOLets, you can use the connector that connects to the main pipe as its insertion point, since that is technically where the element was inserted:</p>
 <pre class="prettyprint">
     Connector insertionPointConnector = OLet.ConnectorManager
@@ -415,10 +421,11 @@ on <a href="https://youtu.be/Fic5BD-s3A8">Dynamo: Curved Sections By Line (Part 
 <p></center></p>
 <p>Many thanks to Anna for this nice piece of work!</p>
 <h4><a name="8"></a> Carbon Footprint of AI Image Generation</h4>
-<p>Researchers quantify the carbon footprint of generating AI images</p>
-<p>Creating a photograph using artificial intelligence is like charging your phone.
-https://www.engadget.com/researchers-quantify-the-carbon-footprint-of-generating-ai-images-173538174.html
-img/ai_image_carbon_footprint.png</p>
+<p>Researchers quantify the carbon footprint of generating AI images:
+<a href="https://www.engadget.com/researchers-quantify-the-carbon-footprint-of-generating-ai-images-173538174.html">creating a photograph using artificial intelligence is like charging your phone</a>:</p>
+<p><center>
+<img src="img/ai_image_carbon_footprint.png" alt="AI image generation carbon footprint" title="AI image generation carbon footprint" width="600"/>
+</center></p>
 <h4><a name="9"></a> Sending Data by Pigeon</h4>
 <p>Talking about carbon footprint and the cost and efficiency of digital data transmission, there is obviously a point at which transmission of large data can be speeded up by putting it on a storage device and moving that around rather physically than squeezing it through the limited bandwidth of the Internet:</p>
 <p><center>
@@ -443,7 +450,7 @@ about <a href="https://superuser.com/questions/419070/transatlantic-ping-faster-
 <iframe width="480" height="270" src="https://www.youtube.com/embed/TPxJtKob7Js?si=QoImAfogIIMdU5Sp" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 <p></center></p>
 <blockquote>
-<p>In this video I narrate a drone tour of our entire 250 acre farm showcasing some of the swale,
+<p>In this video I narrate a drone tour of our entire 250-acre farm showcasing some of the swale,
 dam, dugout, aquaculture, livestock food forest, cover cropping and other permaculture
 systems we have on our regenerative farm.</p>
 </blockquote>
