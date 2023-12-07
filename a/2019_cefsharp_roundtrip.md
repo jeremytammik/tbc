@@ -192,7 +192,7 @@ The event and its handler are saved in the External app as static for ease of ac
 In the WPF control, the browser is embedded like this:
 
 <pre class="prettyprint">
-  <Window x:Class="RevitTestProject.TestWindow"
+  &lt;Window x:Class="RevitTestProject.TestWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -200,11 +200,11 @@ In the WPF control, the browser is embedded like this:
     xmlns:local="clr-namespace:RevitTestProject"
     xmlns:cef="clr-namespace:CefSharp.Wpf;assembly=CefSharp.Wpf"
     mc:Ignorable="d"
-    Width="1000" Height="500">
-    <Grid Background="PapayaWhip">
-      <cef:ChromiumWebBrowser Name="ChromiumBrowser" Address="http://www.google.com" Width="900" Height="450"  />
-    </Grid>
-  </Window>
+    Width="1000" Height="500"&gt;
+    &lt;Grid Background="PapayaWhip"&gt;
+      &lt;cef:ChromiumWebBrowser Name="ChromiumBrowser" Address="http://www.google.com" Width="900" Height="450"  /&gt;
+    &lt;/Grid&gt;
+  &lt;/Window&gt;
 </pre>
 
 The code behind  of the window is this:
@@ -230,23 +230,23 @@ So, to use it make, an `index.html` and submit the path to it in the browser add
 The Test webpage look like this:
 
 <pre class="prettyprint">
-<html>
-<head>
-  <title>Bridge Test</title>
-  <!-- <script src="script.js"></script> -->
-  <script type="text/javascript">
+&lt;html&gt;
+&lt;head&gt;
+  &lt;title&gt;Bridge Test&lt;/title&gt;
+  &lt;!-- &lt;script src="script.js"&gt;&lt;/script&gt; --&gt;
+  &lt;script type="text/javascript"&gt;
     async function callCSharpAction() {
       await CefSharp.BindObjectAsync("boundAsync");
       boundAsync.add(16, 2);
     }
-  </script>
-</head>
-<body>
-  <button id="action1" onclick="callCSharpAction()">Action 1</button>
-  <button id="action2" onclick="alert('Button is working')">Action 2</button>
-  <button id="action3">Action 3</button>
-</body>
-</html>
+  &lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;button id="action1" onclick="callCSharpAction()"&gt;Action 1&lt;/button&gt;
+  &lt;button id="action2" onclick="alert('Button is working')"&gt;Action 2&lt;/button&gt;
+  &lt;button id="action3"&gt;Action 3&lt;/button&gt;
+&lt;/body&gt;
+&lt;/html&gt;
 </pre>
 
 The handler code:
@@ -277,11 +277,11 @@ To make a callback from c# function to the browser, you just need an instance of
 here is an edited index.html
 
 <pre class="prettyprint">
-<html>
-<head>
-  <title>Bridge Test</title>
-  <!-- <script src="script.js"></script> -->
-  <script type="text/javascript">
+&lt;html&gt;
+&lt;head&gt;
+  &lt;title&gt;Bridge Test&lt;/title&gt;
+  &lt;!-- &lt;script src="script.js"&gt;&lt;/script&gt; --&gt;
+  &lt;script type="text/javascript"&gt;
     async function callCSharpAction() {
       await CefSharp.BindObjectAsync("boundAsync");
       boundAsync.add(16, 2);
@@ -292,14 +292,14 @@ here is an edited index.html
       alert("Function called with arguments: " + arg1);
       return;
     }
-  </script>
-</head>
-<body>
-  <button id="action1" onclick="callCSharpAction()">Action 1</button>
-  <button id="action2" onclick="alert('Button is working')">Action 2</button>
-  <button id="action3">Action 3</button>
-</body>
-</html>
+  &lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;button id="action1" onclick="callCSharpAction()"&gt;Action 1&lt;/button&gt;
+  &lt;button id="action2" onclick="alert('Button is working')"&gt;Action 2&lt;/button&gt;
+  &lt;button id="action3"&gt;Action 3&lt;/button&gt;
+&lt;/body&gt;
+&lt;/html&gt;
 </pre>
 
 and in our bound class we save a instance to the browser so we can use it on command
@@ -386,7 +386,7 @@ For OLets and ThreadOLets, you can use the connector that connects to the main p
     Connector insertionPointConnector = OLet.ConnectorManager
         .Connectors
         .OfType&lt;Connector&gt;()
-        .FirstOrDefault(x => x.ConnectorType == ConnectorType.Curve);
+        .FirstOrDefault(x =&gt; x.ConnectorType == ConnectorType.Curve);
 
     XYZ insertionPoint = insertionPointConnector?.Origin;
 </pre>
