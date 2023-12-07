@@ -277,9 +277,9 @@ The handler code:
 
 ####<a name="4"></a> Chromium Browser Js Round Trip Callback
 
-To make a callback from c# function to the browser, you just need an instance of the browser, and a function in the javascript code that will be called.
-
-here is an edited index.html
+Next step: round-trip callback:
+To make a callback from C# function to the browser, you just need an instance of the browser, and a function in the javascript code that will be called.
+Here is an edited index.html with such a function to call:
 
 <pre class="prettyprint">
 &lt;html&gt;
@@ -307,7 +307,7 @@ here is an edited index.html
 &lt;/html&gt;
 </pre>
 
-and in our bound class we save a instance to the browser so we can use it on command
+In our bound class, we save a instance to the browser so we can use it on command:
 
 <pre class="prettyprint">
   public class BoundObject
@@ -338,7 +338,7 @@ and in our bound class we save a instance to the browser so we can use it on com
   }
 </pre>
 
-i passed it when i created the browser in the window codebehind.
+Pass it in when creating the browser in the window codebehind:
 
 <pre class="prettyprint">
   public TestWindow()
@@ -354,7 +354,7 @@ i passed it when i created the browser in the window codebehind.
   }
 </pre>
 
-finally you can call it from revit
+Finally, now, you can call it from Revit:
 
 <pre class="prettyprint">
   public Result Execute(
@@ -367,8 +367,8 @@ finally you can call it from revit
   }
 </pre>
 
-this concludes a round trip from the browser and back. I hope anyone reading this finds it useful.
-
+This concludes a round trip from the browser and back.
+I hope anyone reading this finds it useful.
 
 ####<a name="5"></a> Determine Element Location
 

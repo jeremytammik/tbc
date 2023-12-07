@@ -261,8 +261,9 @@ In order to call a Revit method it will need a reference to an external event ha
 </pre>
 
 <h4><a name="4"></a> Chromium Browser Js Round Trip Callback</h4>
-<p>To make a callback from c# function to the browser, you just need an instance of the browser, and a function in the javascript code that will be called.</p>
-<p>here is an edited index.html</p>
+<p>Next step: round-trip callback:
+To make a callback from C# function to the browser, you just need an instance of the browser, and a function in the javascript code that will be called.
+Here is an edited index.html with such a function to call:</p>
 <pre class="prettyprint">
 &lt;html&gt;
 &lt;head&gt;
@@ -289,7 +290,7 @@ In order to call a Revit method it will need a reference to an external event ha
 &lt;/html&gt;
 </pre>
 
-<p>and in our bound class we save a instance to the browser so we can use it on command</p>
+<p>In our bound class, we save a instance to the browser so we can use it on command:</p>
 <pre class="prettyprint">
   public class BoundObject
   {
@@ -319,7 +320,7 @@ In order to call a Revit method it will need a reference to an external event ha
   }
 </pre>
 
-<p>i passed it when i created the browser in the window codebehind.</p>
+<p>Pass it in when creating the browser in the window codebehind:</p>
 <pre class="prettyprint">
   public TestWindow()
   {
@@ -334,7 +335,7 @@ In order to call a Revit method it will need a reference to an external event ha
   }
 </pre>
 
-<p>finally you can call it from revit</p>
+<p>Finally, now, you can call it from Revit:</p>
 <pre class="prettyprint">
   public Result Execute(
     ExternalCommandData commandData,
@@ -346,7 +347,8 @@ In order to call a Revit method it will need a reference to an external event ha
   }
 </pre>
 
-<p>this concludes a round trip from the browser and back. I hope anyone reading this finds it useful.</p>
+<p>This concludes a round trip from the browser and back.
+I hope anyone reading this finds it useful.</p>
 <h4><a name="5"></a> Determine Element Location</h4>
 <p>We put together a nice little ovrview on various methods to determine the location of a BIM element discussing
 <a href="https://stackoverflow.com/questions/77556660/how-can-the-coordinates-for-a-revit-fabricationpart-be-obtained-with-the-revit-a">how can the coordinates for a Revit fabrication part be obtained with the Revit API</a>?</p>
