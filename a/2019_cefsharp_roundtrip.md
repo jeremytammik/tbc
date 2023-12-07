@@ -146,7 +146,7 @@ of the [simple WPF with a Chromium browser guide](https://forums.autodesk.com/t5
 Hope someone finds it useful.
 
 Basically, what I wanted was for a button in the browser (on a webpage) to trigger a command in Revit.
-This works by "binding" a javascript method to a c# object and its method.
+This works by "binding" a JavaScript method to a C# object and its method.
 In the Javascript we `await` for the object and call its function.
 
 So, let's make a dummy object for binding and a method in it.
@@ -475,7 +475,7 @@ Talking about carbon footprint and the cost and efficiency of digital data trans
 <img src="img/send_data_by_pigeon.jpg" alt="Send data by pigeon" title="Send data by pigeon" width="600"/> <!-- Pixel Height: 1,218 Pixel Width: 1,080 -->
 </center>
 
-- There is even an RFC RFC 1149 for this concept,
+- There is even an RFC 1149 for this concept,
 the [Standard for the Transmission of IP Datagrams on Avian Carriers](https://datatracker.ietf.org/doc/html/rfc1149).
 > This memo describes an experimental method for the encapsulation of IP datagrams in avian carriers.
 This specification is primarily useful in Metropolitan Area Networks.
