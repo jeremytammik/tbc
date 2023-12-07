@@ -135,17 +135,22 @@ Yet another RevitLookup update, full roundtrip interaction between your own inst
 
 ####<a name="3"></a> Calling Revit Command from Chromium Browser
 
-Calling Revit command from chromium browser
+last week, Andrej Licanin of [Bimexperts](https://bimexperts.com/sr/home) shared
+a nice solution demonstrating [how to use the Revit built-in CefSharp browser in WPF](https://thebuildingcoder.typepad.com/blog/2023/11/camera-target-and-toposolid-subdivision-material.html#2).
 
-https://forums.autodesk.com/t5/revit-api-forum/calling-revit-command-from-chromium-browser/td-p/12413281
+This week he expanded on that in his contribution
+on [calling Revit command from Chromium browser](https://forums.autodesk.com/t5/revit-api-forum/calling-revit-command-from-chromium-browser/td-p/12413281):
 
+This is another guide on Chromium browser using CefSharp, a continuation
+of the [simple WPF with a Chromium browser guide](https://forums.autodesk.com/t5/revit-api-forum/simple-wpf-with-a-chromium-browser-guide/td-p/12396552).
+Hope someone finds it useful.
 
-This is another guide on chromium browser using cef sharp. Hope some one finds it useful.
-This is a continuation of this post : Solved: Simple WPF with a chromium browser guide - Autodesk Community - Revit Products
+Basically, what I wanted was for a button in the browser (on a webpage) to trigger a command in Revit.
+This works by "binding" a javascript method to a c# object and its method.
+In the Javascript we `await` for the object and call its function.
 
-Basicly what I wanted was for a button in the browser (on a webpage) to trigger a command in revit. This works by "binding" a javascript method to a c# object and its method. In the Javascript we await for the object and call its function.
-
-So lets make a dummy object for binding and a method in it. In order to call a Revit method it will need a reference to an external event handler and its event.
+So, let's make a dummy object for binding and a method in it.
+In order to call a Revit method it will need a reference to an external event handler and its event:
 
 <pre class="prettyprint">
    public class BoundObject
@@ -161,7 +166,7 @@ So lets make a dummy object for binding and a method in it. In order to call a R
    }
 </pre>
 
-The event and its handler are saved in the External app as static for ease of access.
+The event and its handler are saved in the External app as `static` for ease of access.
 
 <pre class="prettyprint">
   internal class ExtApp : IExternalApplication
@@ -207,7 +212,7 @@ In the WPF control, the browser is embedded like this:
   &lt;/Window&gt;
 </pre>
 
-The code behind  of the window is this:
+Here is the code behind the window:
 
 <pre class="prettyprint">
     public TestWindow()
@@ -225,7 +230,7 @@ The code behind  of the window is this:
     }
 </pre>
 
-So, to use it make, an `index.html` and submit the path to it in the browser address.
+So, to use it, make an `index.html` and submit the path to it in the browser address.
 
 The Test webpage look like this:
 

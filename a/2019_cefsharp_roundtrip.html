@@ -131,12 +131,18 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 <li>Fixed search that worked in the main thread</li>
 </ul>
 <h4><a name="3"></a> Calling Revit Command from Chromium Browser</h4>
-<p>Calling Revit command from chromium browser</p>
-<p>https://forums.autodesk.com/t5/revit-api-forum/calling-revit-command-from-chromium-browser/td-p/12413281</p>
-<p>This is another guide on chromium browser using cef sharp. Hope some one finds it useful.
-This is a continuation of this post : Solved: Simple WPF with a chromium browser guide - Autodesk Community - Revit Products</p>
-<p>Basicly what I wanted was for a button in the browser (on a webpage) to trigger a command in revit. This works by "binding" a javascript method to a c# object and its method. In the Javascript we await for the object and call its function.</p>
-<p>So lets make a dummy object for binding and a method in it. In order to call a Revit method it will need a reference to an external event handler and its event.</p>
+<p>last week, Andrej Licanin of <a href="https://bimexperts.com/sr/home">Bimexperts</a> shared
+a nice solution demonstrating <a href="https://thebuildingcoder.typepad.com/blog/2023/11/camera-target-and-toposolid-subdivision-material.html#2">how to use the Revit built-in CefSharp browser in WPF</a>.</p>
+<p>This week he expanded on that in his contribution
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/calling-revit-command-from-chromium-browser/td-p/12413281">calling Revit command from Chromium browser</a>:</p>
+<p>This is another guide on Chromium browser using CefSharp, a continuation
+of the <a href="https://forums.autodesk.com/t5/revit-api-forum/simple-wpf-with-a-chromium-browser-guide/td-p/12396552">simple WPF with a Chromium browser guide</a>.
+Hope someone finds it useful.</p>
+<p>Basically, what I wanted was for a button in the browser (on a webpage) to trigger a command in Revit.
+This works by "binding" a javascript method to a c# object and its method.
+In the Javascript we <code>await</code> for the object and call its function.</p>
+<p>So, let's make a dummy object for binding and a method in it.
+In order to call a Revit method it will need a reference to an external event handler and its event:</p>
 <pre class="prettyprint">
    public class BoundObject
    {
@@ -151,7 +157,7 @@ This is a continuation of this post : Solved: Simple WPF with a chromium browser
    }
 </pre>
 
-<p>The event and its handler are saved in the External app as static for ease of access.</p>
+<p>The event and its handler are saved in the External app as <code>static</code> for ease of access.</p>
 <pre class="prettyprint">
   internal class ExtApp : IExternalApplication
   {
@@ -195,7 +201,7 @@ This is a continuation of this post : Solved: Simple WPF with a chromium browser
   &lt;/Window&gt;
 </pre>
 
-<p>The code behind  of the window is this:</p>
+<p>Here is the code behind the window:</p>
 <pre class="prettyprint">
     public TestWindow()
     {
@@ -212,7 +218,7 @@ This is a continuation of this post : Solved: Simple WPF with a chromium browser
     }
 </pre>
 
-<p>So, to use it make, an <code>index.html</code> and submit the path to it in the browser address.</p>
+<p>So, to use it, make an <code>index.html</code> and submit the path to it in the browser address.</p>
 <p>The Test webpage look like this:</p>
 <pre class="prettyprint">
 &lt;html&gt;
