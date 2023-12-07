@@ -131,7 +131,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 <li>Fixed search that worked in the main thread</li>
 </ul>
 <h4><a name="3"></a> Calling Revit Command from Chromium Browser</h4>
-<p>last week, Andrej Licanin of <a href="https://bimexperts.com/sr/home">Bimexperts</a> shared
+<p>Last week, Andrej Licanin of <a href="https://bimexperts.com/sr/home">Bimexperts</a> shared
 a nice solution demonstrating <a href="https://thebuildingcoder.typepad.com/blog/2023/11/camera-target-and-toposolid-subdivision-material.html#2">how to use the Revit built-in CefSharp browser in WPF</a>.</p>
 <p>This week he expanded on that in his contribution
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/calling-revit-command-from-chromium-browser/td-p/12413281">calling Revit command from Chromium browser</a>:</p>
@@ -157,7 +157,7 @@ In order to call a Revit method it will need a reference to an external event ha
    }
 </pre>
 
-<p>The event and its handler are saved in the External app as <code>static</code> for ease of access.</p>
+<p>The event and its handler are saved in the external app as <code>static</code> for ease of access:</p>
 <pre class="prettyprint">
   internal class ExtApp : IExternalApplication
   {
@@ -350,7 +350,7 @@ Here is an edited index.html with such a function to call:</p>
 <p>This concludes a round trip from the browser and back.
 I hope anyone reading this finds it useful.</p>
 <h4><a name="5"></a> Determine Element Location</h4>
-<p>We put together a nice little ovrview on various methods to determine the location of a BIM element discussing
+<p>We put together a nice little overview on various methods to determine the location of a BIM element discussing
 <a href="https://stackoverflow.com/questions/77556660/how-can-the-coordinates-for-a-revit-fabricationpart-be-obtained-with-the-revit-a">how can the coordinates for a Revit fabrication part be obtained with the Revit API</a>?</p>
 <p><strong>Question:</strong> I need to obtain the coordinates for Revit MEP FabricationParts. All of the elements I get do have a location property but not all of them have either a LocationPoint or a LocationCurve. More specific, only for Pipe elements am I able to get XYZ values through the LocationCurve. Elements such as Threadolet, Elbow, Weld and Fishmouth don't have either a LocationPoint or a LocationCurve.</p>
 <p><strong>Answer:</strong> Three options that can be used on almost all BIM elements are:</p>

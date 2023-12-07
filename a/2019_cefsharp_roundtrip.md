@@ -135,7 +135,7 @@ Yet another RevitLookup update, full roundtrip interaction between your own inst
 
 ####<a name="3"></a> Calling Revit Command from Chromium Browser
 
-last week, Andrej Licanin of [Bimexperts](https://bimexperts.com/sr/home) shared
+Last week, Andrej Licanin of [Bimexperts](https://bimexperts.com/sr/home) shared
 a nice solution demonstrating [how to use the Revit built-in CefSharp browser in WPF](https://thebuildingcoder.typepad.com/blog/2023/11/camera-target-and-toposolid-subdivision-material.html#2).
 
 This week he expanded on that in his contribution
@@ -166,7 +166,7 @@ In order to call a Revit method it will need a reference to an external event ha
    }
 </pre>
 
-The event and its handler are saved in the External app as `static` for ease of access.
+The event and its handler are saved in the external app as `static` for ease of access:
 
 <pre class="prettyprint">
   internal class ExtApp : IExternalApplication
@@ -372,10 +372,13 @@ I hope anyone reading this finds it useful.
 
 ####<a name="5"></a> Determine Element Location
 
-We put together a nice little ovrview on various methods to determine the location of a BIM element discussing
+We put together a nice little overview on various methods to determine the location of a BIM element discussing
 [how can the coordinates for a Revit fabrication part be obtained with the Revit API](https://stackoverflow.com/questions/77556660/how-can-the-coordinates-for-a-revit-fabricationpart-be-obtained-with-the-revit-a)?
 
-**Question:** I need to obtain the coordinates for Revit MEP FabricationParts. All of the elements I get do have a location property but not all of them have either a LocationPoint or a LocationCurve. More specific, only for Pipe elements am I able to get XYZ values through the LocationCurve. Elements such as Threadolet, Elbow, Weld and Fishmouth don't have either a LocationPoint or a LocationCurve.
+**Question:** I need to obtain the coordinates for Revit MEP FabricationParts.
+All of the elements I get have a `Location` property, but not all of them have either a `LocationPoint` or a `LocationCurve`.
+More specifically, only for `Pipe` elements am I able to get `XYZ` values through the `LocationCurve`.
+Elements such as Threadolet, Elbow, Weld and Fishmouth don't have either a `LocationPoint` or a `LocationCurve`.
 
 **Answer:** Three options that can be used on almost all BIM elements are:
 
@@ -383,7 +386,10 @@ We put together a nice little ovrview on various methods to determine the locati
 - Retrieve the element [`Geometry` property](https://www.revitapidocs.com/2024/d8a55a5b-2a69-d5ab-3e1f-6cf1ee43c8ec.htm), e.g., calculate the centroid of all the vertices
 - Use the element [`BoundingBox` property](https://www.revitapidocs.com/2024/def2f9f2-b23a-bcea-43a3-e6de41b014c8.htm), e.g., calculate its midpoint
 
-However, for these types of `FabricationParts` specifically, [egeer](https://stackoverflow.com/users/15534202/egeer) and [bootsch](https://stackoverflow.com/users/21999391/bootsch) suggest using the element's connector locations instead:
+However, for these types of `FabricationParts` specifically,
+[egeer](https://stackoverflow.com/users/15534202/egeer)
+and [bootsch](https://stackoverflow.com/users/21999391/bootsch) suggest
+using the element's connector locations instead:
 
 For OLets and ThreadOLets, you can use the connector that connects to the main pipe as its insertion point, since that is technically where the element was inserted:
 
