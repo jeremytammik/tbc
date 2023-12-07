@@ -57,7 +57,7 @@ Today, let's take a quick look at CefSharp and two conversations shedding light 
 ####<a name="2"></a> Using the Built-In CefSharp Browser
 
 Andrej Licanin of [Bimexperts](https://bimexperts.com/sr/home) shared
-a nice succinct little solution demonstrating how to use the Revit built-in CefSharp installation to display a browser in a WPF control
+a nice succinct little solution demonstrating how to use the Revit built-in CefSharp installation to display a browser in a WPF control in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [simple WPF with a chromium browser guide](https://forums.autodesk.com/t5/revit-api-forum/simple-wpf-with-a-chromium-browser-guide/td-p/12396552):
 
