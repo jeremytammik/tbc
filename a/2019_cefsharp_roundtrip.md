@@ -94,7 +94,17 @@ twitter:
 
  @AutodeskRevit  the #RevitAPI @AutodeskAPS  #BIM @DynamoBIM
 
-&ndash; ...
+RevitLookup update, roundtrip interaction between your own browser instance and external command, BIM element location, structural 3D view, curved section view
+&ndash; RevitLookup 2024.0.10
+&ndash; Calling Revit command from Chromium browser
+&ndash; Chromium browser Js round trip callback
+&ndash; Element location
+&ndash; Create a structural-only 3D view
+&ndash; Creating a curved section in Dynamo
+&ndash; Carbon footprint of AI
+&ndash; Sending data by pigeon
+&ndash; Permaculture farm
+&ndash; The Valley of Code...
 
 linkedin:
 
