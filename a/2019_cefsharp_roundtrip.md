@@ -1,7 +1,11 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <link rel="stylesheet" type="text/css" href="bc.css">
-<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+<!-- <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script> -->
+<!-- https://highlightjs.org/#usage -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
 </head>
 
 <!---
@@ -152,7 +156,7 @@ In the Javascript we `await` for the object and call its function.
 So, let's make a dummy object for binding and a method in it.
 In order to call a Revit method it will need a reference to an external event handler and its event:
 
-<pre class="prettyprint">
+<pre><code>
    public class BoundObject
    {
      public int Add(int a, int b)
@@ -164,11 +168,11 @@ In order to call a Revit method it will need a reference to an external event ha
        return a+b;
      }
    }
-</pre>
+</code></pre>
 
 The event and its handler are saved in the external app as `static` for ease of access:
 
-<pre class="prettyprint">
+<pre><code>
   internal class ExtApp : IExternalApplication
   {
     public static IExternalApplication MyApp;
@@ -192,11 +196,11 @@ The event and its handler are saved in the external app as `static` for ease of 
       return Result.Succeeded;
     }
   }
-</pre>
+</code></pre>
 
 In the WPF control, the browser is embedded like this:
 
-<pre class="prettyprint">
+<pre><code>
   &lt;Window x:Class="RevitTestProject.TestWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -210,11 +214,11 @@ In the WPF control, the browser is embedded like this:
       &lt;cef:ChromiumWebBrowser Name="ChromiumBrowser" Address="http://www.google.com" Width="900" Height="450"  /&gt;
     &lt;/Grid&gt;
   &lt;/Window&gt;
-</pre>
+</code></pre>
 
 Here is the code behind the window:
 
-<pre class="prettyprint">
+<pre><code>
     public TestWindow()
     {
       InitializeComponent();
@@ -228,13 +232,13 @@ Here is the code behind the window:
     {
       this.Dispose();
     }
-</pre>
+</code></pre>
 
 So, to use it, make an `index.html` and submit the path to it in the browser address.
 
 The Test webpage look like this:
 
-<pre class="prettyprint">
+<pre><code>
 &lt;html&gt;
 &lt;head&gt;
   &lt;title&gt;Bridge Test&lt;/title&gt;
@@ -252,11 +256,11 @@ The Test webpage look like this:
   &lt;button id="action3"&gt;Action 3&lt;/button&gt;
 &lt;/body&gt;
 &lt;/html&gt;
-</pre>
+</code></pre>
 
 The handler code:
 
-<pre class="prettyprint">
+<pre><code>
   internal class MyEvent : IExternalEventHandler
   {
     public int a;
@@ -273,7 +277,7 @@ The handler code:
       return "YOYOOY";
     }
   }
-</pre>
+</code></pre>
 
 ####<a name="4"></a> Chromium Browser Js Round Trip Callback
 
@@ -281,7 +285,7 @@ Next step: round-trip callback:
 To make a callback from C# function to the browser, you just need an instance of the browser, and a function in the javascript code that will be called.
 Here is an edited index.html with such a function to call:
 
-<pre class="prettyprint">
+<pre><code>
 &lt;html&gt;
 &lt;head&gt;
   &lt;title&gt;Bridge Test&lt;/title&gt;
@@ -305,11 +309,11 @@ Here is an edited index.html with such a function to call:
   &lt;button id="action3"&gt;Action 3&lt;/button&gt;
 &lt;/body&gt;
 &lt;/html&gt;
-</pre>
+</code></pre>
 
 In our bound class, we save a instance to the browser so we can use it on command:
 
-<pre class="prettyprint">
+<pre><code>
   public class BoundObject
   {
     public int aS;
@@ -336,11 +340,11 @@ In our bound class, we save a instance to the browser so we can use it on comman
       return a;
     }
   }
-</pre>
+</code></pre>
 
 Pass it in when creating the browser in the window codebehind:
 
-<pre class="prettyprint">
+<pre><code>
   public TestWindow()
   {
     InitializeComponent();
@@ -352,11 +356,11 @@ Pass it in when creating the browser in the window codebehind:
     ChromiumBrowser.JavascriptObjectRepository.Register(
       "boundAsync", bo, true, BindingOptions.DefaultBinder);
   }
-</pre>
+</code></pre>
 
 Finally, now, you can call it from Revit:
 
-<pre class="prettyprint">
+<pre><code>
   public Result Execute(
     ExternalCommandData commandData,
     ref string message,
@@ -365,7 +369,7 @@ Finally, now, you can call it from Revit:
     ExtApp.boundObj.SendSomeDataFromLocal(999);
     return Result.Succeeded;
   }
-</pre>
+</code></pre>
 
 This concludes a round trip from the browser and back.
 I hope anyone reading this finds it useful.
@@ -393,14 +397,14 @@ using the element's connector locations instead:
 
 For OLets and ThreadOLets, you can use the connector that connects to the main pipe as its insertion point, since that is technically where the element was inserted:
 
-<pre class="prettyprint">
+<pre><code>
     Connector insertionPointConnector = OLet.ConnectorManager
         .Connectors
         .OfType&lt;Connector&gt;()
         .FirstOrDefault(x =&gt; x.ConnectorType == ConnectorType.Curve);
 
     XYZ insertionPoint = insertionPointConnector?.Origin;
-</pre>
+</code></pre>
 
 Since their connectors are atypical in that they do not connect to another connector, but instead a curve, you need to get the one that is `ConnectorType.Curve`.
 
@@ -408,18 +412,18 @@ For welds, elbows and other inline elements, you can similarly use the connector
 If you want the center of the element, you can use vector math to calculate that using the connector's direction and location.
 The direction that the connector points is the `BasisZ` property of the Connector's `CoordinateSystem`.
 
-<pre class="prettyprint">
+<pre><code>
     XYZ connectorDirection = insertionPointConnector?.CoordinateSystem.BasisZ;
-</pre>
+</code></pre>
 
 The solution I end up with is a bit different from the answer given by egeer above:
 I ended up getting a Connector for each element (the ones without a `LocationCurve` or `LocationPoint`).
 Here's the code in VB:
 
-<pre class="prettyprint">
+<pre><code>
     Dim insertionPointConnector As Connector = CType(e, FabricationPart).ConnectorManager.Connectors.OfType(Of Connector).FirstOrDefault()
     Dim elementOrigin as XYZ = Connector.insertionPointConnector.Origin
-</pre>
+</code></pre>
 
 `e` is of type Element.
 
