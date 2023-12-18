@@ -108,6 +108,21 @@ RevitLookup update, roundtrip interaction between your own browser instance and 
 
 linkedin:
 
+Round-trip interaction between your own browser instance and #RevitAPI external command, BIM element location, creating a structural 3D view, and a curved section view in #DynamoBIM
+
+https://autode.sk/browserroundtrip
+
+- RevitLookup 2024.0.10
+- Calling Revit command from Chromium browser
+- Chromium browser Js round trip callback
+- Element location
+- Create a structural-only 3D view
+- Creating a curved section in Dynamo
+- Carbon footprint of AI
+- Sending data by pigeon
+- Permaculture farm
+- The Valley of Code...
+
 #BIM #DynamoBIM #AutodeskAPS #Revit #API #IFC #SDK #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
