@@ -46,7 +46,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### .NET Core Webinar, EOY
 
-Let's end this year with two notes on parameters and a reminder of the upcoming shift to .NET Core:
+Let's end this year with some notes on parameters and a reminder of the upcoming shift to .NET Core:
 
 - [.NET Core migration webinar](#2)
 - [Adding a parameter with a specific GUID](#3)
@@ -74,7 +74,7 @@ Tentative Agenda:
     - Revit
     - Inventor
     - Others
-- Q&A
+- Q&amp;A
 
 To join this webinar, you will need to agree to a non-disclosure agreement NDA.
 To do so, please sign up through one of feedback portal projects for the respective products or the ADN extranet:
@@ -220,7 +220,7 @@ Thank you very much, Adrian, for kindly implementing and sharing this solution!
 
 [Archi](https://goto.archi/) shared a nice series of articles describing step by step how get started with the parameter service:
 
-> a much antecipated cloud service from Autodesk that spreads across the entire ecosystem,
+> ... a much anticipated cloud service from Autodesk that spreads across the entire ecosystem,
 not just Revit, and comes to improve parameter management and collaboration for teams.
 For BIM managers with access to the Autodesk Construction Cloud, you can now say goodbye
 to the old shared parameter txt files, and instead use a centralized cloud service that
@@ -238,7 +238,9 @@ Many thanks to Archi for putting together this comprehensive tutorial!
 
 ####<a name="5"></a> Happy Holidays!
 
-I wish you a peaceful end of the year and a restful holiday!
+I wish you a peaceful end of the year,
+calm [twelve nights](https://en.wikipedia.org/wiki/Twelfth_Night_(holiday)) and
+restful holidays!
 
 <center>
 <img src="img/dino_in_snow_669_cropped_500.jpg" alt="Dino in snow" title="Dino in snow" width="500"/>
