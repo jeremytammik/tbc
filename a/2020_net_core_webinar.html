@@ -1,0 +1,225 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css"></p>
+<!-- <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script> -->
+<!-- https://highlightjs.org/#usage -->
+<p><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css"></p>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+<p></head></p>
+<!---
+
+- Autodesk Desktop API Updates: .NET Core Migration Webinar
+  https://aps.autodesk.com/blog/autodesk-desktop-api-updates-net-core-migration-webinar
+
+- Adding Parameters with a specific GUID
+  https://forums.autodesk.com/t5/revit-api-forum/adding-parameters-with-a-specific-guid/m-p/12455887#M76040
+
+- parameter service:
+  How to enable the Autodesk Parameter Service
+  https://goto.archi/blog/post/how-to-enable-the-autodesk-parameter-service
+  How to use the Autodesk Parameter Service in Revit
+  https://goto.archi/blog/post/how-to-use-the-autodesk-parameter-service-in-revit
+  How to migrate Revit parameters into the Parameter Service
+  https://goto.archi/blog/post/how-to-migrate-revit-parameters-into-the-parameter-service
+
+twitter:
+
+ @AutodeskRevit  the #RevitAPI @AutodeskAPS  #BIM @DynamoBIM
+
+
+&ndash; ...
+
+linkedin:
+
+#BIM #DynamoBIM #AutodeskAPS #Revit #API #IFC #SDK #Autodesk #AEC #adsk
+
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+
+<center>
+<img src="img/" alt="" title="" width="600"/>
+<p style="font-size: 80%; font-style:italic"></p>
+</center>
+
+-->
+
+<h3>.NET Core Webinar, EOY</h3>
+<p>Let's end this year with two notes on parameters and a reminder of the upcoming shift to .NET Core:</p>
+<ul>
+<li><a href="#2">.NET Core migration webinar</a></li>
+<li><a href="#3">Adding a parameter with a specific GUID</a></li>
+<li><a href="#4">Getting started with the parameter service</a></li>
+<li><a href="#5">Happy holidays!</a></li>
+</ul>
+<h4><a name="2"></a> .NET Core Migration Webinar</h4>
+<p>Before we end for the year, let's recapitulate the announcement of
+the <a href="https://aps.autodesk.com/blog/autodesk-desktop-api-updates-net-core-migration-webinar">Autodesk Desktop API Updates: .NET Core Migration Webinar</a> end of next month:</p>
+<p>Do you have an application running on one of the Autodesk desktop products or on Design Automation, such as AutoCAD/Revit/Inventor?
+If so, please join the upcoming webinar where we will discuss next major releases of hero desktop product APIs moving to .NET Core.</p>
+<ul>
+<li>Title: Autodesk Desktop API Updates: .NET Core Migration</li>
+<li>Date: Tuesday, January 30, 2024</li>
+<li>Time: 8AM PST / 11AM EST / 5PM CET</li>
+<li>Duration: approx. 40 min</li>
+</ul>
+<p>Tentative Agenda:</p>
+<ul>
+<li>General overview of .NET Core</li>
+<li>Product specifics<ul>
+<li>AutoCAD + verticals</li>
+<li>Revit</li>
+<li>Inventor</li>
+<li>Others</li>
+</ul>
+</li>
+<li>Q&amp;A</li>
+</ul>
+<p>To join this webinar, you will need to agree to a non-disclosure agreement NDA.
+To do so, please sign up through one of feedback portal projects for the respective products or the ADN extranet:</p>
+<ul>
+<li><a href="https://feedback.autodesk.com/project/forum/thread.html?cap=e7f9d0d1828b48b9b0fa1eb608dc91b5&amp;forid=%7Baf68f836-722f-4e0a-a1cd-dcaee47b96d2%7D&amp;topid=%7B518782FF-39F1-4349-9CCF-E7DDE8809FD0%7D&amp;j=518782ff39f143499ccfe7dde8809fd0">AutoCAD feedback portal</a></li>
+<li><a href="https://feedback.autodesk.com/project/forum/thread.html?cap=e7f9d0d1828b48b9b0fa1eb608dc91b5&amp;forid=%7Baf68f836-722f-4e0a-a1cd-dcaee47b96d2%7D&amp;topid=%7B518782FF-39F1-4349-9CCF-E7DDE8809FD0%7D&amp;j=518782ff39f143499ccfe7dde8809fd0">Revit Preview feedback portal</a></li>
+<li><a href="https://feedback.autodesk.com/project/forum/thread.html?cap=fb14413735ee42c99624e3793b19a0b2&amp;forid=%7bdeb2224c-a845-44a8-a857-a54f58c97618%7d&amp;topid=%7bB1A00199-A0E0-44B7-83E2-1DD98CCC649B%7d">Inventor feedback portal</a></li>
+<li><a href="https://adn.autodesk.io/index.php?r=custom_pages%2Fview&amp;id=312">ADN extranet</a></li>
+</ul>
+<p>If you haven't so already, please join the feedback projects now, and start testing your application against the preview/beta releases.</p>
+<p>Reminder: ADN members can join the feedback portal through the ADN extranet by selecting SOFTWARE &gt;&gt; "Beta Portal."
+This will take you to the <a href="https://feedback.autodesk.com">Autodesk feedback portal</a>, Autodesk Developer Network Beta Program.
+Go to "Product Beta Access" and join the AutoCAD, Revit, or Inventor feedback project there.</p>
+<h4><a name="3"></a> Adding a Parameter with a Specific GUID</h4>
+<p>Adrian Crisan of <a href="http://www.studio-a-int.com">Studio A International, LLC</a> shared a very nice solution in both Python and C#
+for <a href="https://forums.autodesk.com/t5/revit-api-forum/adding-parameters-with-a-specific-guid/m-p/12455887">adding parameters with a specific GUID</a>:</p>
+<p><strong>Question:</strong> I have a requirement to add parameters and bind them to most if not all elements in a model (and one parameter to be bound to a type instead; the blog was most helpful with that), but I'm running into a few issues.</p>
+<p>Currently, my code creates a shared parameter file if not found, creates a group, and then adds the parameters to it. The problem comes as follows:</p>
+<ul>
+<li>Sometimes the parameters are "duplicated" because I can't seem to specify a GUID for the parameter; I can only search for it by name - and the shared parameter file was not sent to me for testing, only the Revit File. Revit GUIDs seem to be type 4, which is frustrating because those are fully random and that means I can't predict them at all, which means I can't really test for a specific GUID.</li>
+<li>If the file is already created (because I was using another Revit document) the parameters "exist" in the document but aren't bound to anything, which frustrates the dupe checks because the parameter exists by name; however an insert/reinsert rebinding will work.</li>
+<li>I can determine via code right now if I have to write the file from scratch, but I haven't yet run into the situation where the customer has a parameter file and I just need to add to it (which I'm sure happens all the time).</li>
+<li>If the file does exist, I would rather be able to set a specific GUID instead of clobbering the user's file with our own (that seems the only way to set a particular GUID is to write a shared parameter file with the GUID and then tell Revit to use that file).</li>
+<li>The goal here is that the user can click one button and our parameters are set up to facilitate two-way data binding between our system and the Revit Model.</li>
+</ul>
+<p>Am I missing something in the API that allows me to specify a GUID? What are the best practices around this? Does the Revit API have some way to modify the shared parameter file or only the binding functions?</p>
+<p>I found a related issue
+on <a href="https://stackoverflow.com/questions/77652588/editing-sharedparameterfile-deleting-shared-parameter-entry">editing SharedParameterFile/deleting shared parameter entry</a>;
+however, it does not answer nor is it exactly my problem.</p>
+<p><strong>Answer:</strong> Is this what you are looking for?</p>
+<ul>
+<li><a href="https://www.revitapidocs.com/2024/c86d0033-8200-15ee-070c-d0a606ed3b2a.htm">ExternalDefinitionCreationOptions.GUID Property</a> &rarr; C# <code>public Guid GUID { get; set; }</code></li>
+</ul>
+<blockquote>
+<p>The GUID to use for this parameter definition.
+If not explicitly set, a random GUID is used.</p>
+</blockquote>
+<p>We use this day in / day out for our new shared parameters.</p>
+<p>You can use either the Visual Studio Tools <code>Create GUID</code> or the Python code below to generate the GUID:</p>
+<pre><code>
+import uuid
+yourGuid = str(uuid.uuid4())
+# Your GUID will be like 8-4-4-4-12
+yourGuid = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+</code></pre>
+
+<p>We do not recommend, but of course if you want to change the GUID as you want, make the changes.</p>
+<p>Keep in mind the algorithms to create global unique id are developed to prevent as much as possible duplicates in large dynamic systems.</p>
+<p>Then you can use the following Python code to create a new Shared Parameter definition with your own GUID:</p>
+<pre><code>
+app = DocumentManager.Instance.CurrentUIApplication.Application
+yourSharedParamDefFile = r"yourDefinitionFile.txt"
+app.SharedParametersFilename = yourSharedParamDefFile
+sharedParametersFileName = app.OpenSharedParameterFile().Filename
+paraGroup = app.OpenSharedParameterFile().Groups.get_Item("YourParameterGroup") # verify in your Definition File the name of the Group under which you want to create the Shared Parameter
+newParaOptions = ExternalDefinitionCreationOptions("yourSharedParaName", ParameterType.Text) # Text, Integer, Number, Length, Area, Volume, etc. - look at the API for Parameter Type enumerations
+newParaOptions.UserModifiable = False # Users cannot modify it, only Revit API
+newParaOptions.Visible = False # Users cannot see it in the properties, but the parameter appears in schedules, etc.
+newParaOptions.GUID = Guid(yourGuid) # set the Guid
+createYourNewParameter = paraGroup.Definitions.Create(newParaOptions)
+</code></pre>
+
+<p>Here is the agnostic method in C#.</p>
+<pre><code>
+public void createSharedParameterDefinition()
+{
+  // Code provided courtesy of:
+  // Studio A International, LLC
+  // http://www.studio-a-int.com
+  // The below code creates a new Shared Parameter in an existing Definition File
+  // If a Shared Parameter with the same name is already in the Definition File,
+  // the execution code will end with an error
+  // You can generate your own GUID to assign it to the Shared Parameter
+  // Use either Visual Studio Tools -&gt; Create GUID
+  // Or Python code to generate the GUID
+  // import uuid
+  // yourGuid = str(uuid.uuid4())
+  // or other programming tools of your choice
+  System.Guid yourGuid = new Guid("2778bb70-c715-4a9d-bdc1-76add223f228");
+  // Shared Parameters Definition file
+  string yourSharedParamDefFile = @"YourDrive\YourSharedParametersDefinitionFile.txt";
+  // Shared Parameter name
+  string yourSharedParaName = "NewSharedParaNameUnitTesting";
+  // Initialize a StringBuilder to collect execution results/errors.
+  StringBuilder sbCreateSharedParameterDefinition = new StringBuilder();
+  try
+  {
+    Autodesk.Revit.DB.Document activeDoc = CreateSharedParameterDefinitionCommand.doc;
+    Autodesk.Revit.ApplicationServices.Application app = activeDoc.Application;
+    app.SharedParametersFilename = yourSharedParamDefFile;
+    // Open the Shared Parameters File
+    Autodesk.Revit.DB.DefinitionFile sharedParametersFile = app.OpenSharedParameterFile();
+    string sharedParametersFileName = app.OpenSharedParameterFile().Filename;
+    // Select under which Definition Group the new Shared Parameter will be placed
+    DefinitionGroup paraGroup = app.OpenSharedParameterFile().Groups.get_Item("YOURGROUP");
+    // Create new Options for the Shared Parameter
+    // older APIs uses below method
+    // Autodesk.Revit.DB.ExternalDefinitionCreationOptions newParaOptions = new ExternalDefinitionCreationOptions(yourSharedParaName, ParameterType.Text); // # Text, Integer, Number, Length, Area, Volume, etc. - look at the API for Parameter Type enumerations
+    // newer APIs uses below method
+    Autodesk.Revit.DB.ExternalDefinitionCreationOptions newParaOptions = new ExternalDefinitionCreationOptions(yourSharedParaName, SpecTypeId.String.Text);
+    newParaOptions.UserModifiable = false; // Users cannot modify it, only Revit API can modify this parameter
+    newParaOptions.Visible = false; // Users cannot see it in the properties, but the parameter appears in schedules, etc.
+    newParaOptions.GUID = yourGuid; // set the above GUID to this new Shared Parameter
+    paraGroup.Definitions.Create(newParaOptions);
+  }
+  catch (Exception ex)
+  {
+    sbCreateSharedParameterDefinition.AppendLine(ex.Message.ToString());
+  }
+  if (sbCreateSharedParameterDefinition.Length &lt; 1)
+  {
+    System.Windows.Forms.MessageBox.Show("Shared Parameter Definition:" +
+    "\r\n" +
+    "\r\n" + " " + yourSharedParaName +
+    "\r\n" +
+    "\r\n" + "was created.", "Task complete");
+  }
+  else if (sbCreateSharedParameterDefinition.Length &gt; 0)
+  {
+    System.Windows.Forms.MessageBox.Show("Shared Parameter Definition was not created because:" +
+    "\r\n" +
+    "\r\n" + " " + sbCreateSharedParameterDefinition.ToString(), "Error");
+  }
+}
+</code></pre>
+
+<p>Thank you very much, Adrian, for kindly implementing and sharing this solution!</p>
+<h4><a name="4"></a> Getting Started with the Parameter Service</h4>
+<p><a href="https://goto.archi/">Archi</a> shared a nice series of articles describing step by step how get started with the parameter service:</p>
+<blockquote>
+<p>a much antecipated cloud service from Autodesk that spreads across the entire ecosystem,
+not just Revit, and comes to improve parameter management and collaboration for teams.
+For BIM managers with access to the Autodesk Construction Cloud, you can now say goodbye
+to the old shared parameter txt files, and instead use a centralized cloud service that
+allows bulk operation, tagging and search capabilities.</p>
+</blockquote>
+<ul>
+<li><a href="https://goto.archi/blog/post/how-to-enable-the-autodesk-parameter-service">How to enable the Autodesk Parameter Service</a></li>
+<li><a href="https://goto.archi/blog/post/how-to-use-the-autodesk-parameter-service-in-revit">How to use the Autodesk Parameter Service in Revit</a></li>
+<li><a href="https://goto.archi/blog/post/how-to-migrate-revit-parameters-into-the-parameter-service">How to migrate Revit parameters into the Parameter Service</a></li>
+</ul>
+<p>Many thanks to Archi for putting together this comprehensive tutorial!</p>
+<p><center>
+<img src="img/archi_param_service.jpg" alt="Parameter Service" title="Parameter Service" width="500"/>
+</center></p>
+<h4><a name="5"></a> Happy Holidays!</h4>
+<p>I wish you a peaceful end of the year and a restful holiday!</p>
+<p><center>
+<img src="img/dino_in_snow_669_cropped_500.jpg" alt="Dino in snow" title="Dino in snow" width="500"/>
+</center></p>

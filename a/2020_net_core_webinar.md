@@ -48,6 +48,10 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 Let's end this year with two notes on parameters and a reminder of the upcoming shift to .NET Core:
 
+- [.NET Core migration webinar](#2)
+- [Adding a parameter with a specific GUID](#3)
+- [Getting started with the parameter service](#4)
+- [Happy holidays!](#5)
 
 ####<a name="2"></a> .NET Core Migration Webinar
 
@@ -235,4 +239,8 @@ Many thanks to Archi for putting together this comprehensive tutorial!
 ####<a name="5"></a> Happy Holidays!
 
 I wish you a peaceful end of the year and a restful holiday!
+
+<center>
+<img src="img/dino_in_snow_669_cropped_500.jpg" alt="Dino in snow" title="Dino in snow" width="500"/>
+</center>
 
