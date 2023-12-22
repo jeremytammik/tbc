@@ -28,8 +28,11 @@ twitter:
 
  @AutodeskRevit  the #RevitAPI @AutodeskAPS  #BIM @DynamoBIM
 
-
-&ndash; ...
+Let's end this year with some notes on parameters and a reminder of the upcoming shift to .NET Core
+&ndash; .NET Core migration webinar
+&ndash; Adding a parameter with a specific GUID
+&ndash; Getting started with the parameter service
+&ndash; Happy holidays! ...
 
 linkedin:
 
@@ -44,7 +47,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### .NET Core Webinar, EOY
+### Parameters and .NET Core Webinar
 
 Let's end this year with some notes on parameters and a reminder of the upcoming shift to .NET Core:
 
@@ -84,7 +87,7 @@ To do so, please sign up through one of feedback portal projects for the respect
 - [Inventor feedback portal](https://feedback.autodesk.com/project/forum/thread.html?cap=fb14413735ee42c99624e3793b19a0b2&forid=%7bdeb2224c-a845-44a8-a857-a54f58c97618%7d&topid=%7bB1A00199-A0E0-44B7-83E2-1DD98CCC649B%7d)
 - [ADN extranet](https://adn.autodesk.io/index.php?r=custom_pages%2Fview&id=312)
 
-If you haven't so already, please join the feedback projects now, and start testing your application against the preview/beta releases.
+If you haven't already, please join the feedback projects now, and start testing your application against the preview/beta releases.
 
 Reminder: ADN members can join the feedback portal through the ADN extranet by selecting SOFTWARE &gt;&gt; "Beta Portal."
 This will take you to the [Autodesk feedback portal](https://feedback.autodesk.com), Autodesk Developer Network Beta Program.
