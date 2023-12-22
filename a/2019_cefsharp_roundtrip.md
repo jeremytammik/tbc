@@ -92,7 +92,7 @@
 
 twitter:
 
-Round-trip interaction between your own browser instance and @AutodeskRevit #RevitAPI external command, BIM element location, creating a structural 3D view, and a curved section view in @DynamoBIM @AutodeskAPS #BIM  https://autode.sk/browserroundtrip
+Round-trip interaction between your own browser instance and @AutodeskRevit #RevitAPI external command, BIM element location, creating a structural 3D view, and a curved section view in @DynamoBIM @AutodeskAPS #BIM https://autode.sk/browserroundtrip
 
 RevitLookup update, roundtrip interaction between your own browser instance and external command, BIM element location, structural 3D view, curved section view
 &ndash; RevitLookup 2024.0.10
