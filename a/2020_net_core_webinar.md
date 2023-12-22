@@ -89,8 +89,128 @@ Go to "Product Beta Access" and join the AutoCAD, Revit, or Inventor feedback pr
 
 ####<a name="3"></a> Adding a Parameter with a Specific GUID
 
-- Adding Parameters with a specific GUID
-  https://forums.autodesk.com/t5/revit-api-forum/adding-parameters-with-a-specific-guid/m-p/12455887#M76040
+Adrian Crisan of [Studio A International, LLC](http://www.studio-a-int.com) shared a very nice solution in both Python and C#
+for [adding parameters with a specific GUID](https://forums.autodesk.com/t5/revit-api-forum/adding-parameters-with-a-specific-guid/m-p/12455887):
+
+**Question:** I have a requirement to add parameters and bind them to most if not all elements in a model (and one parameter to be bound to a type instead; the blog was most helpful with that), but I'm running into a few issues.
+
+Currently, my code creates a shared parameter file if not found, creates a group, and then adds the parameters to it. The problem comes as follows:
+
+- Sometimes the parameters are "duplicated" because I can't seem to specify a GUID for the parameter; I can only search for it by name - and the shared parameter file was not sent to me for testing, only the Revit File. Revit GUIDs seem to be type 4, which is frustrating because those are fully random and that means I can't predict them at all, which means I can't really test for a specific GUID.
+- If the file is already created (because I was using another Revit document) the parameters "exist" in the document but aren't bound to anything, which frustrates the dupe checks because the parameter exists by name; however an insert/reinsert rebinding will work.
+- I can determine via code right now if I have to write the file from scratch, but I haven't yet run into the situation where the customer has a parameter file and I just need to add to it (which I'm sure happens all the time).
+- If the file does exist, I would rather be able to set a specific GUID instead of clobbering the user's file with our own (that seems the only way to set a particular GUID is to write a shared parameter file with the GUID and then tell Revit to use that file).
+- The goal here is that the user can click one button and our parameters are set up to facilitate two-way data binding between our system and the Revit Model.
+
+Am I missing something in the API that allows me to specify a GUID? What are the best practices around this? Does the Revit API have some way to modify the shared parameter file or only the binding functions?
+
+I found a related issue
+on [editing SharedParameterFile/deleting shared parameter entry](https://stackoverflow.com/questions/77652588/editing-sharedparameterfile-deleting-shared-parameter-entry);
+however, it does not answer nor is it exactly my problem.
+
+**Answer:** Is this what you are looking for?
+
+- [ExternalDefinitionCreationOptions.GUID Property](https://www.revitapidocs.com/2024/c86d0033-8200-15ee-070c-d0a606ed3b2a.htm) &rarr; C# <code>public Guid GUID { get; set; }</code>
+
+> The GUID to use for this parameter definition.
+If not explicitly set, a random GUID is used.
+
+We use this day in / day out for our new shared parameters.
+
+You can use either the Visual Studio Tools `Create GUID` or the Python code below to generate the GUID:
+
+<pre><code>
+import uuid
+yourGuid = str(uuid.uuid4())
+# Your GUID will be like 8-4-4-4-12
+yourGuid = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+</code></pre>
+
+We do not recommend, but of course if you want to change the GUID as you want, make the changes.
+
+Keep in mind the algorithms to create global unique id are developed to prevent as much as possible duplicates in large dynamic systems.
+
+Then you can use the following Python code to create a new Shared Parameter definition with your own GUID:
+
+<pre><code>
+app = DocumentManager.Instance.CurrentUIApplication.Application
+yourSharedParamDefFile = r"yourDefinitionFile.txt"
+app.SharedParametersFilename = yourSharedParamDefFile
+sharedParametersFileName = app.OpenSharedParameterFile().Filename
+paraGroup = app.OpenSharedParameterFile().Groups.get_Item("YourParameterGroup") # verify in your Definition File the name of the Group under which you want to create the Shared Parameter
+newParaOptions = ExternalDefinitionCreationOptions("yourSharedParaName", ParameterType.Text) # Text, Integer, Number, Length, Area, Volume, etc. - look at the API for Parameter Type enumerations
+newParaOptions.UserModifiable = False # Users cannot modify it, only Revit API
+newParaOptions.Visible = False # Users cannot see it in the properties, but the parameter appears in schedules, etc.
+newParaOptions.GUID = Guid(yourGuid) # set the Guid
+createYourNewParameter = paraGroup.Definitions.Create(newParaOptions)
+</code></pre>
+
+Here is the agnostic method in C#.
+
+<pre><code>
+public void createSharedParameterDefinition()
+{
+  // Code provided courtesy of:
+  // Studio A International, LLC
+  // http://www.studio-a-int.com
+  // The below code creates a new Shared Parameter in an existing Definition File
+  // If a Shared Parameter with the same name is already in the Definition File,
+  // the execution code will end with an error
+  // You can generate your own GUID to assign it to the Shared Parameter
+  // Use either Visual Studio Tools -&gt; Create GUID
+  // Or Python code to generate the GUID
+  // import uuid
+  // yourGuid = str(uuid.uuid4())
+  // or other programming tools of your choice
+  System.Guid yourGuid = new Guid("2778bb70-c715-4a9d-bdc1-76add223f228");
+  // Shared Parameters Definition file
+  string yourSharedParamDefFile = @"YourDrive\YourSharedParametersDefinitionFile.txt";
+  // Shared Parameter name
+  string yourSharedParaName = "NewSharedParaNameUnitTesting";
+  // Initialize a StringBuilder to collect execution results/errors.
+  StringBuilder sbCreateSharedParameterDefinition = new StringBuilder();
+  try
+  {
+    Autodesk.Revit.DB.Document activeDoc = CreateSharedParameterDefinitionCommand.doc;
+    Autodesk.Revit.ApplicationServices.Application app = activeDoc.Application;
+    app.SharedParametersFilename = yourSharedParamDefFile;
+    // Open the Shared Parameters File
+    Autodesk.Revit.DB.DefinitionFile sharedParametersFile = app.OpenSharedParameterFile();
+    string sharedParametersFileName = app.OpenSharedParameterFile().Filename;
+    // Select under which Definition Group the new Shared Parameter will be placed
+    DefinitionGroup paraGroup = app.OpenSharedParameterFile().Groups.get_Item("YOURGROUP");
+    // Create new Options for the Shared Parameter
+    // older APIs uses below method
+    // Autodesk.Revit.DB.ExternalDefinitionCreationOptions newParaOptions = new ExternalDefinitionCreationOptions(yourSharedParaName, ParameterType.Text); // # Text, Integer, Number, Length, Area, Volume, etc. - look at the API for Parameter Type enumerations
+    // newer APIs uses below method
+    Autodesk.Revit.DB.ExternalDefinitionCreationOptions newParaOptions = new ExternalDefinitionCreationOptions(yourSharedParaName, SpecTypeId.String.Text);
+    newParaOptions.UserModifiable = false; // Users cannot modify it, only Revit API can modify this parameter
+    newParaOptions.Visible = false; // Users cannot see it in the properties, but the parameter appears in schedules, etc.
+    newParaOptions.GUID = yourGuid; // set the above GUID to this new Shared Parameter
+    paraGroup.Definitions.Create(newParaOptions);
+  }
+  catch (Exception ex)
+  {
+    sbCreateSharedParameterDefinition.AppendLine(ex.Message.ToString());
+  }
+  if (sbCreateSharedParameterDefinition.Length &lt; 1)
+  {
+    System.Windows.Forms.MessageBox.Show("Shared Parameter Definition:" +
+    "\r\n" +
+    "\r\n" + " " + yourSharedParaName +
+    "\r\n" +
+    "\r\n" + "was created.", "Task complete");
+  }
+  else if (sbCreateSharedParameterDefinition.Length &gt; 0)
+  {
+    System.Windows.Forms.MessageBox.Show("Shared Parameter Definition was not created because:" +
+    "\r\n" +
+    "\r\n" + " " + sbCreateSharedParameterDefinition.ToString(), "Error");
+  }
+}
+</code></pre>
+
+Thank you very much, Adrian, for kindly implementing and sharing this solution!
 
 ####<a name="4"></a> Getting Started with the Parameter Service
 
@@ -115,20 +235,4 @@ Many thanks to Archi for putting together this comprehensive tutorial!
 ####<a name="5"></a> Happy Holidays!
 
 I wish you a peaceful end of the year and a restful holiday!
-
-
-
-
-<pre><code>
-</code></pre>
-
-
-
-**Question:**
-
-**Answer:**
-
-
-
-
 
