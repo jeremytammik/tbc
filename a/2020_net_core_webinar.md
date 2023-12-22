@@ -236,7 +236,7 @@ allows bulk operation, tagging and search capabilities.
 Many thanks to Archi for putting together this comprehensive tutorial!
 
 <center>
-<img src="img/archi_param_service.jpg" alt="Parameter Service" title="Parameter Service" width="500"/>
+<img src="img/archi_param_service.jpg" alt="Parameter Service" title="Parameter Service" width="400"/>
 </center>
 
 ####<a name="5"></a> Happy Holidays!
@@ -246,6 +246,6 @@ calm [twelve nights](https://en.wikipedia.org/wiki/Twelfth_Night_(holiday)) and
 restful holidays!
 
 <center>
-<img src="img/dino_in_snow_669_cropped_500.jpg" alt="Dino in snow" title="Dino in snow" width="500"/>
+<img src="img/dino_in_snow_669_cropped_500.jpg" alt="Dino in snow" title="Dino in snow" width="300"/>
 </center>
 
