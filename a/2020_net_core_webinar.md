@@ -46,6 +46,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### .NET Core Webinar, EOY
 
+Let's end this year with two notes on parameters and a reminder of the upcoming shift to .NET Core:
 
 
 ####<a name="2"></a> .NET Core Migration Webinar
@@ -86,34 +87,48 @@ This will take you to the [Autodesk feedback portal](https://feedback.autodesk.c
 Go to "Product Beta Access" and join the AutoCAD, Revit, or Inventor feedback project there.
 
 
-####<a name="3"></a>
+####<a name="3"></a> Adding a Parameter with a Specific GUID
+
+- Adding Parameters with a specific GUID
+  https://forums.autodesk.com/t5/revit-api-forum/adding-parameters-with-a-specific-guid/m-p/12455887#M76040
+
+####<a name="4"></a> Getting Started with the Parameter Service
+
+[Archi](https://goto.archi/) shared a nice series of articles describing step by step how get started with the parameter service:
+
+> a much antecipated cloud service from Autodesk that spreads across the entire ecosystem,
+not just Revit, and comes to improve parameter management and collaboration for teams.
+For BIM managers with access to the Autodesk Construction Cloud, you can now say goodbye
+to the old shared parameter txt files, and instead use a centralized cloud service that
+allows bulk operation, tagging and search capabilities.
+
+- [How to enable the Autodesk Parameter Service](https://goto.archi/blog/post/how-to-enable-the-autodesk-parameter-service)
+- [How to use the Autodesk Parameter Service in Revit](https://goto.archi/blog/post/how-to-use-the-autodesk-parameter-service-in-revit)
+- [How to migrate Revit parameters into the Parameter Service](https://goto.archi/blog/post/how-to-migrate-revit-parameters-into-the-parameter-service)
+
+Many thanks to Archi for putting together this comprehensive tutorial!
+
+<center>
+<img src="img/archi_param_service.jpg" alt="Parameter Service" title="Parameter Service" width="500"/>
+</center>
+
+####<a name="5"></a> Happy Holidays!
+
+I wish you a peaceful end of the year and a restful holiday!
+
+
+
 
 <pre><code>
 </code></pre>
 
 
 
-
-####<a name="4"></a>
-
-
-####<a name="5"></a>
-
 **Question:**
 
 **Answer:**
 
-####<a name="6"></a>
 
 
-####<a name="7"></a>
-
-Many thanks to ??? for this nice piece of work!
-
-####<a name="8"></a>
-
-<center>
-<img src="img/.png" alt="" title="" width="100"/>
-</center>
 
 
