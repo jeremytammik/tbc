@@ -78,15 +78,6 @@ https://forums.autodesk.com/t5/revit-api-forum/dependency-injection-for-revit-ap
 model checker api:
 https://forums.autodesk.com/t5/revit-api-forum/setting-up-iprebuiltoptionsservice-options-for-checkset-in-ait/td-p/12455815
 
-####<a name="5"></a> fuzz
-
-fuzz
-There will always be a deviation in the Z-value of the coordinates of the riser
-https://forums.autodesk.com/t5/revit-api-forum/there-will-always-be-a-deviation-in-the-z-value-of-the/m-p/12446685
-What is Fuzz?
-https://thebuildingcoder.typepad.com/blog/2023/03/uv-emergence-fuzz-and-the-get_-prefix.html#4
-Again, the Need for Fuzz
-https://thebuildingcoder.typepad.com/blog/2022/08/instances-in-room-and-need-for-fuzz.html#3
 
 ####<a name="6"></a> Maestro AI for Revit scripting
 
