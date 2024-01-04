@@ -58,7 +58,7 @@ Lets begin gently with the following notes on topics that caught my eye and inte
 
 - [AU 2023 classes](#2)
 - [Dependency injection for Revit API](#3)
-- [Model checker API](#4)
+- [Model checker API docs](#4)
 - [Maestro AI for Revit scripting](#5)
 - [Construction spending rising in the US](#6)
 - [Free Will](#7)
@@ -72,8 +72,8 @@ of [Autodesk University 2023 classes online](https://www.autodesk.com/autodesk-u
 ####<a name="3"></a> Dependency Injection for Revit API
 
 Between Christmas and New Year,
-Luiz Henrique [@ricaun](https://ricaun.com/) Cassettari implemented, socuymented and shared a complete solution
-for [Dependency Injection for Revit API](https://forums.autodesk.com/t5/revit-api-forum/dependency-injection-for-revit-api/td-p/12467760),
+Luiz Henrique [@ricaun](https://ricaun.com/) Cassettari implemented, documented and shared a complete solution
+for [dependency injection for Revit API](https://forums.autodesk.com/t5/revit-api-forum/dependency-injection-for-revit-api/td-p/12467760),
 saying:
 
 > I created a library to help create a container for Dependency Injection, designed to work with Revit API.
@@ -82,17 +82,19 @@ It is open-source and has a package in the Nuget:
 > - [github.com/ricaun-io/ricaun.Revit.DI](https://github.com/ricaun-io/ricaun.Revit.DI)
 - [www.nuget.org/packages/ricaun.Revit.DI](https://www.nuget.org/packages/ricaun.Revit.DI)
 
-> I created this [22-minute video](https://youtu.be/Q_greabHlUQ) on how to add the package and a simple example with an ICommand implementation:
+> I created this [22-minute video](https://youtu.be/Q_greabHlUQ) on how to add the package and a simple example with an `ICommand` implementation:
 
-> [github.com/ricaun-io/RevitAddin.DI.Example](https://github.com/ricaun-io/RevitAddin.DI.Example)
+> - [github.com/ricaun-io/RevitAddin.DI.Example](https://github.com/ricaun-io/RevitAddin.DI.Example)
 
 <center>
 <iframe width="480" height="270" src="https://www.youtube.com/embed/Q_greabHlUQ?si=7pyYCcqMuyy3XL-J" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 </center>
 
-> That's it for this year, Happy New Year with best regards!
+> That's it for the year 2023; Happy New Year with best regards!
 
-####<a name="4"></a> Model Checker API
+Hapy New Year to you too, <i>ricaun</i>, and to the entire community from me as well!
+
+####<a name="4"></a> Model Checker API Docs
 
 <i>Shrey_shahE5SN4</i> very kindly points to
 the [Model Checker API documentation](https://help.autodesk.com/view/AIT4RVT/ENU/?guid=InteroperabilityToolsForRevit_040mcxr_0404mcxr_html) in
