@@ -59,7 +59,7 @@ Lets begin gently with the following notes on topics that caught my eye and inte
 - [AU 2023 classes](#2)
 - [Dependency injection for Revit API](#3)
 - [Model checker API docs](#4)
-- [Maestro AI for Revit scripting](#5)
+- [ChatGPT and Maestro AI for Revit scripting](#5)
 - [Construction spending rising in the US](#6)
 - [Free Will](#7)
 
@@ -109,11 +109,18 @@ Following the provided guidelines, I am progressing through the necessary steps:
 
 Thank you for that hint, Shrey_shahE5SN4.
 
-####<a name="5"></a> Maestro AI for Revit Scripting
+####<a name="5"></a> ChatGPT and Maestro AI for Revit Scripting
 
-AI tools for programming are saving huge amounts of work and time.
+AI programming assistants are boosting developer effectivity in many areas.
 Here is one dedicated to Revit customisation:
 [Maestro AI for Revit scripting](https://maestro.bltsmrt.com/).
+Looking forward to hearing how it shapes out.
+
+Eric Boehlke of [Truevis](https://truevis.com) has been attempting to focus LLMs to work better with programming Revit nd pointed out:
+
+> My latest attempt: https://chat.openai.com/g/g-7gcy5wueV-bim-coding-coach and
+its repository https://github.com/truevis/BIM-Coding-Coach.
+I haven't tested it with C&#35; yet, but it is working well with Python and DesignScript.
 
 ####<a name="6"></a> Construction Spending Rising in the US
 
