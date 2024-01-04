@@ -18,14 +18,6 @@
 - model checker api:
   https://forums.autodesk.com/t5/revit-api-forum/setting-up-iprebuiltoptionsservice-options-for-checkset-in-ait/td-p/12455815
 
-- fuzz:
-  There will always be a deviation in the Z-value of the coordinates of the riser
-  https://forums.autodesk.com/t5/revit-api-forum/there-will-always-be-a-deviation-in-the-z-value-of-the/m-p/12446685
-  What is Fuzz?
-  https://thebuildingcoder.typepad.com/blog/2023/03/uv-emergence-fuzz-and-the-get_-prefix.html#4
-  Again, the Need for Fuzz
-  https://thebuildingcoder.typepad.com/blog/2022/08/instances-in-room-and-need-for-fuzz.html#3
-
 - Maestro AI for Revit scripting
   https://maestro.bltsmrt.com/
   https://www.linkedin.com/posts/christopher-wiesen-b9693b67_maestroforrevit-aectech-automation-activity-7143312975838232576-gLEv?utm_source=share&utm_medium=member_desktop
@@ -62,51 +54,72 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 Happy New Year!
 
+Lets begin gently with the following notes on topics that caught my eye and interest:
+
+
+
 
 ####<a name="2"></a> AU 2023 classes
 
-AU 2023 classes
-https://www.autodesk.com/autodesk-university/search?fields.year=2023
+Did you miss an interesting class at AU?
+Check out the entire collection
+of [Autodesk University 2023 classes online](https://www.autodesk.com/autodesk-university/search?fields.year=2023).
 
 ####<a name="3"></a> Dependency Injection for Revit API
 
-Dependency Injection for Revit API
-https://forums.autodesk.com/t5/revit-api-forum/dependency-injection-for-revit-api/td-p/12467760
+Between Christmas and New Year,
+Luiz Henrique [@ricaun](https://ricaun.com/) Cassettari implemented, socuymented and shared a complete solution
+for [Dependency Injection for Revit API](https://forums.autodesk.com/t5/revit-api-forum/dependency-injection-for-revit-api/td-p/12467760),
+saying:
 
-####<a name="4"></a> model checker api:
+> I created a library to help create a container for Dependency Injection, designed to work with Revit API.
+It is open-source and has a package in the Nuget:
 
-model checker api:
-https://forums.autodesk.com/t5/revit-api-forum/setting-up-iprebuiltoptionsservice-options-for-checkset-in-ait/td-p/12455815
+> - [github.com/ricaun-io/ricaun.Revit.DI](https://github.com/ricaun-io/ricaun.Revit.DI)
+- [www.nuget.org/packages/ricaun.Revit.DI](https://www.nuget.org/packages/ricaun.Revit.DI)
 
+> I created this [22-minute video](https://youtu.be/Q_greabHlUQ) on how to add the package and a simple example with an ICommand implementation:
 
-####<a name="6"></a> Maestro AI for Revit scripting
-
-Maestro AI for Revit scripting
-https://maestro.bltsmrt.com/
-https://www.linkedin.com/posts/christopher-wiesen-b9693b67_maestroforrevit-aectech-automation-activity-7143312975838232576-gLEv?utm_source=share&utm_medium=member_desktop
-Christopher Wiesen, President, BLT SMRT LLC, Las Vegas, Nevada, United States
-
-####<a name="7"></a> Total Construction Spending: Manufacturing in the United States (TLMFGCONS)
-
-Total Construction Spending: Manufacturing in the United States (TLMFGCONS)
-https://fred.stlouisfed.org/series/TLMFGCONS#0
-
-####<a name="8"></a> most interesting philosophical discussion i have seen for a long tim:
-
-most interesting philosophical discussion i have seen for a long tim:
-Dennett vs Sapolsky on free will: A clash over different claims?
-https://philosophy.stackexchange.com/questions/106926/dennett-vs-sapolsky-on-free-will-a-clash-over-different-claims?utm_source=iterable&utm_medium=email&utm_campaign=the-overflow-newsletter
-comparing a boulder crashing down a mountain and a skier who skis down the mountain
-
-
-**Question:**
-
-**Answer:**
-
-<pre><code>
-</code></pre>
+> [github.com/ricaun-io/RevitAddin.DI.Example](https://github.com/ricaun-io/RevitAddin.DI.Example)
 
 <center>
-<img src="img/.jpg" alt="" title="" width="100"/>
+<iframe width="480" height="270" src="https://www.youtube.com/embed/Q_greabHlUQ?si=7pyYCcqMuyy3XL-J" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 </center>
+
+> That's it for this year, Happy New Year with best regards!
+
+####<a name="4"></a> Model Checker API
+
+<i>Shrey_shahE5SN4</i> very kindly points to
+the [Model Checker API documentation](https://help.autodesk.com/view/AIT4RVT/ENU/?guid=InteroperabilityToolsForRevit_040mcxr_0404mcxr_html) in
+his question
+on [setting up `IPreBuiltOptionsService` options for CheckSet in AIT](https://forums.autodesk.com/t5/revit-api-forum/setting-up-iprebuiltoptionsservice-options-for-checkset-in-ait/td-p/12455815):
+
+> I am... building an add-in button.
+When clicked, it will execute the Model Checker from Autodesk Interoperability Tools.
+Following the provided guidelines, I am progressing through the necessary steps:
+
+> [Model Checker API](https://help.autodesk.com/view/AIT4RVT/ENU/?guid=InteroperabilityToolsForRevit_040mcxr_0404mcxr_html)
+
+####<a name="5"></a> Maestro AI for Revit scripting
+
+AI tools for programming are saving huge amounts of work and time.
+Here is one dedicated to Revit customisation:
+[Maestro AI for Revit scripting](https://maestro.bltsmrt.com/).
+
+####<a name="6"></a> Construction Spending Rising in the US
+
+An impressive positive jump
+in [total construction spending: manufacturing in the United States (TLMFGCONS)](https://fred.stlouisfed.org/series/TLMFGCONS#0):
+
+<center>
+<img src="img/total_construction_us.png" alt="Total construction spending" title="Total construction spending" width="1200"/> <!-- Pixel Height: 848 Pixel Width: 2,598 -->
+</center>
+
+####<a name="7"></a> Free Will
+
+As a scientifically and technically minded person, I often find philosophical pondering too vague.
+I was therefore very please to read the interesting and very precise analytical philosophical discussion
+on [Dennett vs Sapolsky on free will: A clash over different claims?](https://philosophy.stackexchange.com/questions/106926/dennett-vs-sapolsky-on-free-will-a-clash-over-different-claims?utm_source=iterable&utm_medium=email&utm_campaign=the-overflow-newsletter),
+comparing the volition and predetermination of a boulder crashing down a mountain and a skier who skis down the mountain.
 
