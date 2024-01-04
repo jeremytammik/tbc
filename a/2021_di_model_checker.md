@@ -96,7 +96,7 @@ Hapy New Year to you too, <i>ricaun</i>, and to the entire community from me as 
 
 ####<a name="4"></a> Model Checker API Docs
 
-<i>Shrey_shahE5SN4</i> very kindly points to
+<i>Shrey_shahE5SN4</i> very kindly points out
 the [Model Checker API documentation](https://help.autodesk.com/view/AIT4RVT/ENU/?guid=InteroperabilityToolsForRevit_040mcxr_0404mcxr_html) in
 his question
 on [setting up `IPreBuiltOptionsService` options for CheckSet in AIT](https://forums.autodesk.com/t5/revit-api-forum/setting-up-iprebuiltoptionsservice-options-for-checkset-in-ait/td-p/12455815):
@@ -106,6 +106,8 @@ When clicked, it will execute the Model Checker from Autodesk Interoperability T
 Following the provided guidelines, I am progressing through the necessary steps:
 
 > [Model Checker API](https://help.autodesk.com/view/AIT4RVT/ENU/?guid=InteroperabilityToolsForRevit_040mcxr_0404mcxr_html)
+
+Thank you for that hint, Shrey_shahE5SN4.
 
 ####<a name="5"></a> Maestro AI for Revit Scripting
 
