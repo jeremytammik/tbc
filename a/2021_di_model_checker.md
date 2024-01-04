@@ -92,7 +92,16 @@ It is open-source and has a package in the Nuget:
 
 > That's it for the year 2023; Happy New Year with best regards!
 
-Hapy New Year to you too, <i>ricaun</i>, and to the entire community from me as well!
+Happy New Year to you too, <i>ricaun</i>, and to the entire community from me as well!
+
+####<a name="4"></a> RevitLookup Updates
+
+Before the DI project, ricaun also contributed heavily to RevitLookup, producing
+
+RevitLookup] Release 2024.0.12 - 2024.0.12
+Release 2024.0.11 - 2024.0.11
+
+together with Roman ...
 
 ####<a name="4"></a> Model Checker API Docs
 
@@ -134,7 +143,7 @@ in [total construction spending: manufacturing in the United States (TLMFGCONS)]
 ####<a name="7"></a> Free Will
 
 As a scientifically and technically minded person, I often find philosophical pondering rather vague.
-I was therefore very pleased to read the interesting and very precise analytical philosophical discussion
-on [Dennett vs Sapolsky on free will: A clash over different claims?](https://philosophy.stackexchange.com/questions/106926/dennett-vs-sapolsky-on-free-will-a-clash-over-different-claims?utm_source=iterable&utm_medium=email&utm_campaign=the-overflow-newsletter),
+I was therefore very pleased to read the interesting and precise analytical philosophical discussion
+on [Dennett vs Sapolsky on free will: a clash over different claims?](https://philosophy.stackexchange.com/questions/106926/dennett-vs-sapolsky-on-free-will-a-clash-over-different-claims),
 comparing the volition and predetermination of a boulder crashing down a mountain and a skier who skis down the mountain, including the possible influence of quantum mechanical effects.
 
