@@ -56,10 +56,14 @@ Happy New Year!
 
 Lets begin gently with the following notes on topics that caught my eye and interest:
 
+- [AU 2023 classes](#2)
+- [Dependency injection for Revit API](#3)
+- [Model checker API](#4)
+- [Maestro AI for Revit scripting](#5)
+- [Construction spending rising in the US](#6)
+- [Free Will](#7)
 
-
-
-####<a name="2"></a> AU 2023 classes
+####<a name="2"></a> AU 2023 Classes
 
 Did you miss an interesting class at AU?
 Check out the entire collection
@@ -101,7 +105,7 @@ Following the provided guidelines, I am progressing through the necessary steps:
 
 > [Model Checker API](https://help.autodesk.com/view/AIT4RVT/ENU/?guid=InteroperabilityToolsForRevit_040mcxr_0404mcxr_html)
 
-####<a name="5"></a> Maestro AI for Revit scripting
+####<a name="5"></a> Maestro AI for Revit Scripting
 
 AI tools for programming are saving huge amounts of work and time.
 Here is one dedicated to Revit customisation:
@@ -109,7 +113,7 @@ Here is one dedicated to Revit customisation:
 
 ####<a name="6"></a> Construction Spending Rising in the US
 
-An impressive positive jump
+Good news for the AEC industry: an impressive positive jump
 in [total construction spending: manufacturing in the United States (TLMFGCONS)](https://fred.stlouisfed.org/series/TLMFGCONS#0):
 
 <center>
@@ -118,8 +122,8 @@ in [total construction spending: manufacturing in the United States (TLMFGCONS)]
 
 ####<a name="7"></a> Free Will
 
-As a scientifically and technically minded person, I often find philosophical pondering too vague.
-I was therefore very please to read the interesting and very precise analytical philosophical discussion
+As a scientifically and technically minded person, I often find philosophical pondering rather vague.
+I was therefore very pleased to read the interesting and very precise analytical philosophical discussion
 on [Dennett vs Sapolsky on free will: A clash over different claims?](https://philosophy.stackexchange.com/questions/106926/dennett-vs-sapolsky-on-free-will-a-clash-over-different-claims?utm_source=iterable&utm_medium=email&utm_campaign=the-overflow-newsletter),
-comparing the volition and predetermination of a boulder crashing down a mountain and a skier who skis down the mountain.
+comparing the volition and predetermination of a boulder crashing down a mountain and a skier who skis down the mountain, including the possible influence of quantum mechanical effects.
 
