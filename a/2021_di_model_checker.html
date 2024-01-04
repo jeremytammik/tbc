@@ -1,0 +1,113 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css"></p>
+<!-- <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script> -->
+<!-- https://highlightjs.org/#usage -->
+<p><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css"></p>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+<p></head></p>
+<!---
+
+- AU 2023 classes -- https://www.autodesk.com/autodesk-university/search?fields.year=2023
+
+- Dependency Injection for Revit API
+  https://forums.autodesk.com/t5/revit-api-forum/dependency-injection-for-revit-api/td-p/12467760
+
+- model checker api:
+  https://forums.autodesk.com/t5/revit-api-forum/setting-up-iprebuiltoptionsservice-options-for-checkset-in-ait/td-p/12455815
+
+- Maestro AI for Revit scripting
+  https://maestro.bltsmrt.com/
+  https://www.linkedin.com/posts/christopher-wiesen-b9693b67_maestroforrevit-aectech-automation-activity-7143312975838232576-gLEv?utm_source=share&utm_medium=member_desktop
+  Christopher Wiesen, President, BLT SMRT LLC, Las Vegas, Nevada, United States
+
+- Total Construction Spending: Manufacturing in the United States (TLMFGCONS)
+  https://fred.stlouisfed.org/series/TLMFGCONS#0
+
+- most interesting philosophical discussion i have seen for a long tim:
+  Dennett vs Sapolsky on free will: A clash over different claims?
+  https://philosophy.stackexchange.com/questions/106926/dennett-vs-sapolsky-on-free-will-a-clash-over-different-claims?utm_source=iterable&utm_medium=email&utm_campaign=the-overflow-newsletter
+  comparing a boulder crashing down a mountain and a skier who skis down the mountain
+
+twitter:
+
+on @AutodeskRevit  the #RevitAPI  Happy  @AutodeskAPS #BIM @DynamoBIM
+
+&ndash;  ...
+
+linkedin:
+
+#BIM #DynamoBIM #AutodeskAPS #Revit #API #IFC #SDK #Autodesk #AEC #adsk
+
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+
+<center>
+<img src="img/" alt="" title="" width="600"/>
+<p style="font-size: 80%; font-style:italic"></p>
+</center>
+
+-->
+
+<h3>Model Checker API, Fuzz and DI</h3>
+<p>Happy New Year!</p>
+<p>Lets begin gently with the following notes on topics that caught my eye and interest:</p>
+<ul>
+<li><a href="#2">AU 2023 classes</a></li>
+<li><a href="#3">Dependency injection for Revit API</a></li>
+<li><a href="#4">Model checker API</a></li>
+<li><a href="#5">Maestro AI for Revit scripting</a></li>
+<li><a href="#6">Construction spending rising in the US</a></li>
+<li><a href="#7">Free Will</a></li>
+</ul>
+<h4><a name="2"></a> AU 2023 Classes</h4>
+<p>Did you miss an interesting class at AU?
+Check out the entire collection
+of <a href="https://www.autodesk.com/autodesk-university/search?fields.year=2023">Autodesk University 2023 classes online</a>.</p>
+<h4><a name="3"></a> Dependency Injection for Revit API</h4>
+<p>Between Christmas and New Year,
+Luiz Henrique <a href="https://ricaun.com/">@ricaun</a> Cassettari implemented, socuymented and shared a complete solution
+for <a href="https://forums.autodesk.com/t5/revit-api-forum/dependency-injection-for-revit-api/td-p/12467760">Dependency Injection for Revit API</a>,
+saying:</p>
+<blockquote>
+<p>I created a library to help create a container for Dependency Injection, designed to work with Revit API.
+It is open-source and has a package in the Nuget:</p>
+<ul>
+<li><a href="https://github.com/ricaun-io/ricaun.Revit.DI">github.com/ricaun-io/ricaun.Revit.DI</a></li>
+<li><a href="https://www.nuget.org/packages/ricaun.Revit.DI">www.nuget.org/packages/ricaun.Revit.DI</a></li>
+</ul>
+<p>I created this <a href="https://youtu.be/Q_greabHlUQ">22-minute video</a> on how to add the package and a simple example with an ICommand implementation:</p>
+<p><a href="https://github.com/ricaun-io/RevitAddin.DI.Example">github.com/ricaun-io/RevitAddin.DI.Example</a></p>
+</blockquote>
+<p><center></p>
+<iframe width="480" height="270" src="https://www.youtube.com/embed/Q_greabHlUQ?si=7pyYCcqMuyy3XL-J" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+<p></center></p>
+<blockquote>
+<p>That's it for this year, Happy New Year with best regards!</p>
+</blockquote>
+<h4><a name="4"></a> Model Checker API</h4>
+<p><i>Shrey_shahE5SN4</i> very kindly points to
+the <a href="https://help.autodesk.com/view/AIT4RVT/ENU/?guid=InteroperabilityToolsForRevit_040mcxr_0404mcxr_html">Model Checker API documentation</a> in
+his question
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/setting-up-iprebuiltoptionsservice-options-for-checkset-in-ait/td-p/12455815">setting up <code>IPreBuiltOptionsService</code> options for CheckSet in AIT</a>:</p>
+<blockquote>
+<p>I am... building an add-in button.
+When clicked, it will execute the Model Checker from Autodesk Interoperability Tools.
+Following the provided guidelines, I am progressing through the necessary steps:</p>
+<p><a href="https://help.autodesk.com/view/AIT4RVT/ENU/?guid=InteroperabilityToolsForRevit_040mcxr_0404mcxr_html">Model Checker API</a></p>
+</blockquote>
+<h4><a name="5"></a> Maestro AI for Revit Scripting</h4>
+<p>AI tools for programming are saving huge amounts of work and time.
+Here is one dedicated to Revit customisation:
+<a href="https://maestro.bltsmrt.com/">Maestro AI for Revit scripting</a>.</p>
+<h4><a name="6"></a> Construction Spending Rising in the US</h4>
+<p>Good news for the AEC industry: an impressive positive jump
+in <a href="https://fred.stlouisfed.org/series/TLMFGCONS#0">total construction spending: manufacturing in the United States (TLMFGCONS)</a>:</p>
+<p><center>
+<img src="img/total_construction_us.png" alt="Total construction spending" title="Total construction spending" width="1200"/> <!-- Pixel Height: 848 Pixel Width: 2,598 -->
+</center></p>
+<h4><a name="7"></a> Free Will</h4>
+<p>As a scientifically and technically minded person, I often find philosophical pondering rather vague.
+I was therefore very pleased to read the interesting and very precise analytical philosophical discussion
+on <a href="https://philosophy.stackexchange.com/questions/106926/dennett-vs-sapolsky-on-free-will-a-clash-over-different-claims?utm_source=iterable&amp;utm_medium=email&amp;utm_campaign=the-overflow-newsletter">Dennett vs Sapolsky on free will: A clash over different claims?</a>,
+comparing the volition and predetermination of a boulder crashing down a mountain and a skier who skis down the mountain, including the possible influence of quantum mechanical effects.</p>
