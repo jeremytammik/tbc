@@ -54,7 +54,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 Happy New Year!
 
-Lets begin gently with the following notes on topics that caught my eye and interest:
+Lets begin it gently with the following notes on topics that caught my eye and interest:
 
 - [AU 2023 classes](#2)
 - [Dependency injection for Revit API](#3)
@@ -62,6 +62,7 @@ Lets begin gently with the following notes on topics that caught my eye and inte
 - [ChatGPT and Maestro AI for Revit scripting](#5)
 - [Construction spending rising in the US](#6)
 - [Free Will](#7)
+- [Vuca](#8)
 
 ####<a name="2"></a> AU 2023 Classes
 
@@ -146,4 +147,14 @@ As a scientifically and technically minded person, I often find philosophical po
 I was therefore very pleased to read the interesting and precise analytical philosophical discussion
 on [Dennett vs Sapolsky on free will: a clash over different claims?](https://philosophy.stackexchange.com/questions/106926/dennett-vs-sapolsky-on-free-will-a-clash-over-different-claims),
 comparing the volition and predetermination of a boulder crashing down a mountain and a skier who skis down the mountain, including the possible influence of quantum mechanical effects.
+
+####<a name="8"></a> Vuca
+
+Have you ever heard the term "vuca"?
+I had not.
+Apparently, it stands for volatility, uncertainty, complexity and ambiguity.
+Facing us in the past and probably in coming years.
+Which leads to the dread of a long-term state, a “permavucalution”.
+Oh dear.
+Let's hope that our humanity and free will can help handle it.
 
