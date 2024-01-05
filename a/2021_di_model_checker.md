@@ -54,15 +54,16 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 Happy New Year!
 
-Lets begin it gently with the following notes on topics that caught my eye and interest:
+Let's begin it gently with the following notes on topics that caught my eye and interest:
 
 - [AU 2023 classes](#2)
 - [Dependency injection for Revit API](#3)
-- [Model checker API docs](#4)
-- [ChatGPT and Maestro AI for Revit scripting](#5)
-- [Construction spending rising in the US](#6)
-- [Free Will](#7)
-- [Vuca](#8)
+- [RevitLookup updates](#4)
+- [Model checker API docs](#5)
+- [ChatGPT and Maestro AI for Revit scripting](#6)
+- [Construction spending rising in the US](#7)
+- [Free Will](#8)
+- [Vuca](#9)
 
 ####<a name="2"></a> AU 2023 Classes
 
@@ -97,14 +98,41 @@ Happy New Year to you too, <i>ricaun</i>, and to the entire community from me as
 
 ####<a name="4"></a> RevitLookup Updates
 
-Before the DI project, ricaun also contributed heavily to RevitLookup, producing
+Before the DI project, ricaun also contributed to RevitLookup, working with
+Roman [Nice3point](https://github.com/Nice3point), principle maintainer, helping to produce:
 
-RevitLookup] Release 2024.0.12 - 2024.0.12
-Release 2024.0.11 - 2024.0.11
+- [RevitLookup release 2024.0.11](https://github.com/jeremytammik/RevitLookup/releases/tag/2024.0.11)
+- [RevitLookup release 2024.0.12](https://github.com/jeremytammik/RevitLookup/releases/tag/2024.0.12)
 
-together with Roman ...
+RevitLookup 2024.0.11 welcomes you with improved visuals, support for templates to fine-tune data display, improved navigation, in-depth color support:
 
-####<a name="4"></a> Model Checker API Docs
+- Navigation. Updated navigation allows `Ctrl + Click` in the tree or grid to open any selected item or group of items in a new tab.
+This also allows you to analyze items that RevitLookup doesn't support, e.g., looking at StackTrace for exceptions.
+- Color Preview. Changes to the user interface give us the ability to customize the display of any type of data.
+Now you will be able to visually see how materials or ribbon look.
+`Autodesk.Revit.DB.Color` and `System.Windows.Media.Color` are supported.
+- Update available notification**. Updates are now checked automatically and an icon is displayed in the navigation area if a new version is available.
+- Background effects. Available on windows 11 only: Acrylic, Blur; the visual representation of the background depends on your desktop image and current theme.
+- Color extensions. Convert color to other formats HEX, CMYK, etc. Color name identification, `en` and `ru` localizations available. `Autodesk.Revit.DB.Color` and `System.Windows.Media.Color` are supported.
+- Fixed incorrect display when switching themes on Windows 10.
+- Returned deleted notification when checking for updates.
+- Updated developer's [guide](https://github.com/jeremytammik/RevitLookup/blob/dev/Contributing.md#styles).
+
+Full changelog: https://github.com/jeremytammik/RevitLookup/compare/2024.0.10...2024.0.11
+
+Here, I'm wrapping things up. Wishing everyone a splendid New Year and a joyous Christmas ahead. As always, yours truly &ndash; @Nice3point
+
+RevitLookup 2024.0.12 is the last corrective update for 2023, bringing minor tweaks and improvements:
+
+- Add theme update for all open RevitLookup instances by @ricaun in [#200](https://github.com/jeremytammik/RevitLookup/pull/200)
+- Fix incorrect Hue calculation for some colour formats
+- Disable all background effects for Windows 10. Thanks @ricaun for help and testing [#194](https://github.com/jeremytammik/RevitLookup/issues/194)
+- Full changelog: [2024.0.11...2024.0.12](https://github.com/jeremytammik/RevitLookup/compare/2024.0.11...2024.0.12)
+
+That's all for now.
+Again, wishing you all a Happy New Year with best regards, do what you love, evolve, travel, don't forget to have a rest and keep coding! &ndash; @ricaun
+
+####<a name="5"></a> Model Checker API Docs
 
 <i>Shrey_shahE5SN4</i> very kindly points out
 the [Model Checker API documentation](https://help.autodesk.com/view/AIT4RVT/ENU/?guid=InteroperabilityToolsForRevit_040mcxr_0404mcxr_html) in
@@ -119,20 +147,20 @@ Following the provided guidelines, I am progressing through the necessary steps:
 
 Thank you for that hint, Shrey_shahE5SN4.
 
-####<a name="5"></a> ChatGPT and Maestro AI for Revit Scripting
+####<a name="6"></a> ChatGPT and Maestro AI for Revit Scripting
 
 AI programming assistants are boosting developer effectivity in many areas.
 Here is one dedicated to Revit customisation:
 [Maestro AI for Revit scripting](https://maestro.bltsmrt.com/).
 Looking forward to hearing how it shapes out.
 
-Eric Boehlke of [Truevis](https://truevis.com) has been attempting to focus LLMs to work better with programming Revit nd pointed out:
+Eric Boehlke of [Truevis](https://truevis.com) has also been working to focus LLMs to work better with programming Revit and shared some results:
 
 > My latest attempt: https://chat.openai.com/g/g-7gcy5wueV-bim-coding-coach and
 its repository https://github.com/truevis/BIM-Coding-Coach.
 I haven't tested it with C&#35; yet, but it is working well with Python and DesignScript.
 
-####<a name="6"></a> Construction Spending Rising in the US
+####<a name="7"></a> Construction Spending Rising in the US
 
 Good news for the AEC industry: an impressive positive jump
 in [total construction spending: manufacturing in the United States (TLMFGCONS)](https://fred.stlouisfed.org/series/TLMFGCONS#0):
@@ -141,19 +169,19 @@ in [total construction spending: manufacturing in the United States (TLMFGCONS)]
 <img src="img/total_construction_us.png" alt="Total construction spending" title="Total construction spending" width="1200"/> <!-- Pixel Height: 848 Pixel Width: 2,598 -->
 </center>
 
-####<a name="7"></a> Free Will
+####<a name="8"></a> Free Will
 
 As a scientifically and technically minded person, I often find philosophical pondering rather vague.
-I was therefore very pleased to read the interesting and precise analytical philosophical discussion
+I was therefore pleased to read the interesting and precise analytical philosophical discussion
 on [Dennett vs Sapolsky on free will: a clash over different claims?](https://philosophy.stackexchange.com/questions/106926/dennett-vs-sapolsky-on-free-will-a-clash-over-different-claims),
 comparing the volition and predetermination of a boulder crashing down a mountain and a skier who skis down the mountain, including the possible influence of quantum mechanical effects.
 
-####<a name="8"></a> Vuca
+####<a name="9"></a> Vuca
 
 Have you ever heard the term "vuca"?
 I had not.
 Apparently, it stands for volatility, uncertainty, complexity and ambiguity.
-Facing us in the past and probably in coming years.
+Facing us in the recent past, and possibly in coming years as well.
 Which leads to the dread of a long-term state, a “permavucalution”.
 Oh dear.
 Let's hope that our humanity and free will can help handle it.
