@@ -35,7 +35,15 @@ twitter:
 
 on @AutodeskRevit  the #RevitAPI  Happy  @AutodeskAPS #BIM @DynamoBIM
 
-&ndash;  ...
+Happy New Year!
+&ndash; AU 2023 classes
+&ndash; Dependency injection for Revit API
+&ndash; RevitLookup updates
+&ndash; Model checker API docs
+&ndash; ChatGPT and Maestro AI for Revit scripting
+&ndash; Construction spending rising in the US
+&ndash; Free Will
+&ndash; Vuca...
 
 linkedin:
 
@@ -50,7 +58,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Model Checker API, Fuzz and DI
+### Dependency Injection and Model Checker API
 
 Happy New Year!
 
@@ -117,8 +125,7 @@ Now you will be able to visually see how materials or ribbon look.
 - Fixed incorrect display when switching themes on Windows 10.
 - Returned deleted notification when checking for updates.
 - Updated developer's [guide](https://github.com/jeremytammik/RevitLookup/blob/dev/Contributing.md#styles).
-
-Full changelog: https://github.com/jeremytammik/RevitLookup/compare/2024.0.10...2024.0.11
+- Full changelog: [2024.0.10...2024.0.11](https://github.com/jeremytammik/RevitLookup/compare/2024.0.10...2024.0.11)
 
 Here, I'm wrapping things up. Wishing everyone a splendid New Year and a joyous Christmas ahead. As always, yours truly &ndash; @Nice3point
 
@@ -156,9 +163,12 @@ Looking forward to hearing how it shapes out.
 
 Eric Boehlke of [Truevis](https://truevis.com) has also been working to focus LLMs to work better with programming Revit and shared some results:
 
-> My latest attempt: https://chat.openai.com/g/g-7gcy5wueV-bim-coding-coach and
-its repository https://github.com/truevis/BIM-Coding-Coach.
-I haven't tested it with C&#35; yet, but it is working well with Python and DesignScript.
+> My latest attempt:
+
+> - [OpenAI bim-coding-coach](https://chat.openai.com/g/g-7gcy5wueV-bim-coding-coach)
+- [BIM-Coding-Coach GitHub repository](https://github.com/truevis/BIM-Coding-Coach)
+
+> I haven't tested it with C&#35; yet, but it is working well with Python and DesignScript.
 
 ####<a name="7"></a> Construction Spending Rising in the US
 
