@@ -99,7 +99,7 @@ Happy New Year to you too, <i>ricaun</i>, and to the entire community from me as
 ####<a name="4"></a> RevitLookup Updates
 
 Before the DI project, ricaun also contributed to RevitLookup, working with
-Roman [Nice3point](https://github.com/Nice3point), principle maintainer, helping to produce:
+Roman [Nice3point](https://github.com/Nice3point), principal maintainer, helping to produce:
 
 - [RevitLookup release 2024.0.11](https://github.com/jeremytammik/RevitLookup/releases/tag/2024.0.11)
 - [RevitLookup release 2024.0.12](https://github.com/jeremytammik/RevitLookup/releases/tag/2024.0.12)
