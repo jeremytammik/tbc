@@ -47,6 +47,21 @@ Happy New Year!
 
 linkedin:
 
+Happy New Year!
+
+AU 2023 classes, dependency injection for #RevitAPI, RevitLookup updates, model checker API docs, AI for Revit scripting:
+
+https://autode.sk/dependencyinjection
+
+- AU 2023 classes
+- Dependency injection for Revit API
+- RevitLookup updates
+- Model checker API docs
+- ChatGPT and Maestro AI for Revit scripting
+- Construction spending rising in the US
+- Free Will
+- Vuca...
+
 #BIM #DynamoBIM #AutodeskAPS #Revit #API #IFC #SDK #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
