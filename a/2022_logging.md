@@ -185,21 +185,30 @@ developed at [EPFL](https://www.epfl.ch), the École Polytechnique Fédérale de
 Is our perception accurate?
 Take our quiz to develop an intuition about how to reduce your carbon footprint, and to help us understand how people perceive the impact of their actions.
 
+####<a name="2"></a> Now You See It, Now You Don't
+
+Interesting proof that we perceive subtle details that we are completely unaware of is provided by research proving
+that [Images altered to trick machine vision can influence humans too](https://deepmind.google/discover/blog/images-altered-to-trick-machine-vision-can-influence-humans-too/).
+
+####<a name="2"></a> IKEA Life at Home Report
+
+Talking about AEC, let's also think about the occupants, their thoughts, and wishes.
+
+IKEA asked them, many of them, worldwide, and hazarded some projections into the future as well:
+
+- [IKEA Life at Home Report 2023](https://lifeathome.ikea.com/the-2023-report/)
+- [Life at Home Report 2023 PDF](https://lifeathome.ikea.com/wp-content/uploads/2024/01/Life-at-Home-Report-2023.pdf)
+- Fast Company article
+  on [Algae wallpaper, pod homes, and mushroom furniture: Ikea’s predictions for life in 2030 are semi-apocalyptic](https://www.fastcompany.com/91006861/algae-wallpaper-pod-housing-and-mushroom-furniture-ikeas-predictions-for-life-in-2030-are-semi-apocalyptic)
+  > Ikea explores how our idea of home might evolve in a scarce future
+
+
+
+
 ####<a name="2"></a>
 
-####<a name="3"></a>
-
-####<a name="4"></a>
-
-####<a name="5"></a> Model Checker API Docs
-
-
 Thank you for that
-
-
 
 <center>
 <img src="img/.png" alt="" title="" width="100"/> <!-- Pixel Height: 848 Pixel Width: 2,598 -->
 </center>
-
-
