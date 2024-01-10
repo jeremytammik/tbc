@@ -178,7 +178,8 @@ https://thume.ca/2023/12/02/tracing-methods/
 
 - aec greenwashing -- https://www.linkedin.com/pulse/can-construction-refrain-from-greenwashing-aarni-heiskanen-dqfuf/?midToken=AQFbSE8RCQ2a5g&midSig=3AqoWZGBDAwH41&trk=eml-email_series_follow_newsletter_01-newsletter_hero_banner-0-open_on_linkedin_cta&trkEmail=eml-email_series_follow_newsletter_01-newsletter_hero_banner-0-open_on_linkedin_cta-null-7371t~lr3k4lr6~ie-null-null&eid=7371t-lr3k4lr6-ie
 
-- https://climpact.ch
+- Climpact carbon footprint action comparison
+[Climpact](https://climpact.ch)
 developed at [EPFL](https://www.epfl.ch), the École Polytechnique Fédérale de Lausanne,
 > Our actions have an impact on the climate.
 Is our perception accurate?
