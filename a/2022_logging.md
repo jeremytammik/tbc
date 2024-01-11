@@ -75,11 +75,11 @@ https://forums.autodesk.com/t5/revit-api-forum/the-syntax-and-structure-of-the-j
 
 ####<a name="2"></a> WPF Progress Bar with Abort Button
 
-Can anyone share a working implementation of WPF progress bar with abort button?
-https://forums.autodesk.com/t5/revit-api-forum/can-anyone-share-a-working-implementation-of-wpf-progress-bar/m-p/12427800#M75752
-already blogged about:
-https://github.com/SpeedCAD/SCADtools.Revit.UI.ProgressMeter
-
+Various solutions are discussed in the question
+on [a working implementation of WPF progress bar with abort button](https://forums.autodesk.com/t5/revit-api-forum/can-anyone-share-a-working-implementation-of-wpf-progress-bar/m-p/12427800).
+A promising one is provided by
+the [SpeedCAD ProgressMeter](https://github.com/SpeedCAD/SCADtools.Revit.UI.ProgressMeter)
+that [we recently discussed](https://thebuildingcoder.typepad.com/blog/2023/11/net-core-preview-and-open-source-add-in-projects.html#7).
 
 ####<a name="2"></a> Sublime Text
 
