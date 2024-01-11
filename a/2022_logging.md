@@ -203,29 +203,16 @@ like [BIM-GPT, a prompt-based virtual assistant framework for BIM information re
 <img src="img/bim_gpt_prompt_manager_nl_processing.png" alt="BIM-GPT NL query prompt processing" title="BIM-GPT NL query prompt processing" width="800"/> <!-- Pixel Height: 605 Pixel Width: 900 -->
 </center>
 
-####<a name="2"></a> aec greenwashing -- https://www.linkedin.com/pulse/can-construction-refrain-from-greenwashing-aarni-heiskanen-dqfuf/?midToken=AQFbSE8RCQ2a5g&midSig=3AqoWZGBDAwH41&trk=eml-email_series_follow_newsletter_01-newsletter_hero_banner-0-open_on_linkedin_cta&trkEmail=eml-email_series_follow_newsletter_01-newsletter_hero_banner-0-open_on_linkedin_cta-null-7371t~lr3k4lr6~ie-null-null&eid=7371t-lr3k4lr6-ie
+####<a name="2"></a> AEC Greenwashing
 
-aec greenwashing -- https://www.linkedin.com/pulse/can-construction-refrain-from-greenwashing-aarni-heiskanen-dqfuf/?midToken=AQFbSE8RCQ2a5g&midSig=3AqoWZGBDAwH41&trk=eml-email_series_follow_newsletter_01-newsletter_hero_banner-0-open_on_linkedin_cta&trkEmail=eml-email_series_follow_newsletter_01-newsletter_hero_banner-0-open_on_linkedin_cta-null-7371t~lr3k4lr6~ie-null-null&eid=7371t-lr3k4lr6-ie
-
-####<a name="2"></a> Climpact carbon footprint action comparison
-
-Climpact carbon footprint action comparison
-[Climpact](https://climpact.ch)
-developed at [EPFL](https://www.epfl.ch), the École Polytechnique Fédérale de Lausanne,
-> Our actions have an impact on the climate.
-Is our perception accurate?
-Take our quiz to develop an intuition about how to reduce your carbon footprint, and to help us understand how people perceive the impact of their actions.
-
-####<a name="2"></a> Now You See It, Now You Don't
-
-Interesting proof that we perceive subtle details that we are completely unaware of is provided by research proving
-that [Images altered to trick machine vision can influence humans too](https://deepmind.google/discover/blog/images-altered-to-trick-machine-vision-can-influence-humans-too/).
+Aarni Heiskanen shared an interesting article on the imminent danger
+of [AEC greenwashing](https://www.linkedin.com/pulse/can-construction-refrain-from-greenwashing-aarni-heiskanen-dqfuf/).
 
 ####<a name="2"></a> IKEA Life at Home Report
 
-Talking about AEC, let's also think about the occupants, their thoughts, and wishes.
+Talking about AEC and sustainability, let's also think about the occupants, their thoughts and wishes.
 
-IKEA asked them, many of them, worldwide, and hazarded some projections into the future as well:
+IKEA asked them, in large numbers, worldwide, compiled the results and hazarded some projections into the future as well:
 
 - [IKEA Life at Home Report 2023](https://lifeathome.ikea.com/the-2023-report/)
 - [Life at Home Report 2023 PDF](https://lifeathome.ikea.com/wp-content/uploads/2024/01/Life-at-Home-Report-2023.pdf)
@@ -233,10 +220,20 @@ IKEA asked them, many of them, worldwide, and hazarded some projections into the
   on [Algae wallpaper, pod homes, and mushroom furniture: Ikea’s predictions for life in 2030 are semi-apocalyptic](https://www.fastcompany.com/91006861/algae-wallpaper-pod-housing-and-mushroom-furniture-ikeas-predictions-for-life-in-2030-are-semi-apocalyptic)
   > Ikea explores how our idea of home might evolve in a scarce future
 
+####<a name="2"></a> Climpact Carbon Footprint Action Comparison
 
+A great possibility to test your carbon footprint understanding or learn more about the sometimes surprising emmissions produced by various actions and behaviour is provided by
+the [Climpact](https://climpact.ch) tool,
+developed at [EPFL](https://www.epfl.ch),
+the École Polytechnique Fédérale de Lausanne, one of the main Swiss technical universities.
 
+> Our actions have an impact on the climate.
+Is our perception accurate?
+Take our quiz to develop an intuition about how to reduce your carbon footprint, and to help us understand how people perceive the impact of their actions.
 
-####<a name="2"></a>
+####<a name="2"></a> Now You See It, Now You Don't
 
-Thank you for that
+Finally, an AI-related note on pattern recogniton and adversarial images to prevent it provides
+interesting proof that we humans perceive subtle details that we are completely unaware of, showing
+that [images altered to trick machine vision can influence humans too](https://deepmind.google/discover/blog/images-altered-to-trick-machine-vision-can-influence-humans-too/).
 
