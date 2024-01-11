@@ -69,7 +69,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 ### Logging
 
 
-####<a name="2"></a> logging:
+####<a name="2"></a> Journal Files and Logging
 
 logging:
 21768403 [Assistance Required with Revit Journal Files]
@@ -77,7 +77,7 @@ https://forums.autodesk.com/t5/revit-api-forum/api-access-to-user-history-quot-s
 AdWindows -- https://forums.autodesk.com/t5/revit-api-forum/intercepting-commands-executed-by-keyboard-shortcuts/td-p/12457597
 https://forums.autodesk.com/t5/revit-api-forum/the-syntax-and-structure-of-the-journal-file-in-revit/m-p/12490089
 
-####<a name="2"></a> Can anyone share a working implementation of WPF progress bar with abort button?
+####<a name="2"></a> WPF Progress Bar with Abort Button
 
 Can anyone share a working implementation of WPF progress bar with abort button?
 https://forums.autodesk.com/t5/revit-api-forum/can-anyone-share-a-working-implementation-of-wpf-progress-bar/m-p/12427800#M75752
@@ -171,10 +171,24 @@ https://forums.autodesk.com/t5/revit-api-forum/revit-ids/td-p/12418195
 <li><a href="https://thebuildingcoder.typepad.com/blog/2022/07/immutable-uniqueid-and-revit-database-explorer.html">Immutable UniqueId and Revit Database Explorer</a></li>
 </ul>
 
-####<a name="2"></a> sublime text
+####<a name="2"></a> Sublime Text
 
-sublime text
-https://thume.ca/2017/03/04/my-text-editor-journey-vim-spacemacs-atom-and-sublime-text/
+I mentioned a year ago that I switched to
+the [Sublime Text](https://thebuildingcoder.typepad.com/blog/2023/02/pyramid-builder-commandloader-et-al.html#8) editor.
+
+I am still using it and am perfectly satisfied with my choice.
+It was nice to note that I am in the good company of [Tristan Hume](https://thume.ca/),
+who documented his own experiences
+in [my text editor journey: Vim, Spacemacs, Atom and Sublime Text](https://thume.ca/2017/03/04/my-text-editor-journey-vim-spacemacs-atom-and-sublime-text/).
+
+####<a name="2"></a> interesting AI motivation: ensure it goes well:
+
+I browsed Tristan's very interesting web site and was impressed by the compelling motivation to to get involved with AI development that he expresses in his discussion
+of tracing methods,
+[all my favorite tracing tools: eBPF, QEMU, Perfetto, new ones I built and more](https://thume.ca/2023/12/02/tracing-methods/):
+
+> AI now is still missing a lot, but progress is incredibly fast. It’s hard for me to say the coming decade of progress won’t lead to AI as good as us at nearly all jobs, which would be the biggest event in history. Anthropic is unusually full of people who joined because they really care about ensuring this goes well. I think we have the world’s best alignment, interpretability research, and AI policy teams, and I personally work on performance optimization here because I think it’s the best way to leverage my comparative advantage to help the rest of our efforts succeed at steering towards AI going well for the world in the event it keeps up this pace.
+
 
 ####<a name="2"></a> BIM-GPT: a Prompt-Based Virtual Assistant Framework for BIM Information Retrieval
 
@@ -182,14 +196,6 @@ BIM-GPT: a Prompt-Based Virtual Assistant Framework for BIM Information Retrieva
 https://arxiv.org/abs/2304.09333
 > Efficient information retrieval (IR) from building information models (BIMs) poses significant challenges due to the necessity for deep BIM knowledge or extensive engineering efforts for automation. We introduce BIM-GPT, a prompt-based virtual assistant (VA) framework integrating BIM and generative pre-trained transformer (GPT) technologies to support NL-based IR. A prompt manager and dynamic template generate prompts for GPT models, enabling interpretation of NL queries, summarization of retrieved information, and answering BIM-related questions. In tests on a BIM IR dataset, our approach achieved 83.5% and 99.5% accuracy rates for classifying NL queries with no data and 2% data incorporated in prompts, respectively. Additionally, we validated the functionality of BIM-GPT through a VA prototype for a hospital building. This research contributes to the development of effective and versatile VAs for BIM IR in the construction industry, significantly enhancing BIM accessibility and reducing engineering efforts and training data requirements for processing NL queries.
 bim_gpt_prompt_manager_nl_processing.png
-
-####<a name="2"></a> interesting AI motivation: ensure it goes well:
-
-interesting AI motivation: ensure it goes well:
-Tristan Hume https://thume.ca/
-All my favorite tracing tools: eBPF, QEMU, Perfetto, new ones I built and more
-https://thume.ca/2023/12/02/tracing-methods/
-> AI now is still missing a lot, but progress is incredibly fast. It’s hard for me to say the coming decade of progress won’t lead to AI as good as us at nearly all jobs, which would be the biggest event in history. Anthropic is unusually full of people who joined because they really care about ensuring this goes well. I think we have the world’s best alignment, interpretability research, and AI policy teams, and I personally work on performance optimization here because I think it’s the best way to leverage my comparative advantage to help the rest of our efforts succeed at steering towards AI going well for the world in the event it keeps up this pace.
 
 ####<a name="2"></a> aec greenwashing -- https://www.linkedin.com/pulse/can-construction-refrain-from-greenwashing-aarni-heiskanen-dqfuf/?midToken=AQFbSE8RCQ2a5g&midSig=3AqoWZGBDAwH41&trk=eml-email_series_follow_newsletter_01-newsletter_hero_banner-0-open_on_linkedin_cta&trkEmail=eml-email_series_follow_newsletter_01-newsletter_hero_banner-0-open_on_linkedin_cta-null-7371t~lr3k4lr6~ie-null-null&eid=7371t-lr3k4lr6-ie
 
