@@ -64,6 +64,17 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Logging
 
+A nice collection of Revit API, AI and AEC related topics:
+
+- [Journal files and logging](#2)
+- [WPF progress bar with abort button](#3)
+- [Sublime text](#4)
+- [Interesting AI motivation: ensure it goes well](#5)
+- [Now you see it, now you don't](#6)
+- [BIM-GPT AI BIM information retrieval](#7)
+- [AEC greenwashing](#8)
+- [IKEA life at home report](#9)
+- [Climpact carbon footprint action comparison](#10)
 
 ####<a name="2"></a> Journal Files and Logging
 
@@ -73,7 +84,7 @@ https://forums.autodesk.com/t5/revit-api-forum/api-access-to-user-history-quot-s
 AdWindows -- https://forums.autodesk.com/t5/revit-api-forum/intercepting-commands-executed-by-keyboard-shortcuts/td-p/12457597
 https://forums.autodesk.com/t5/revit-api-forum/the-syntax-and-structure-of-the-journal-file-in-revit/m-p/12490089
 
-####<a name="2"></a> WPF Progress Bar with Abort Button
+####<a name="3"></a> WPF Progress Bar with Abort Button
 
 Various solutions are discussed in the question
 on [a working implementation of WPF progress bar with abort button](https://forums.autodesk.com/t5/revit-api-forum/can-anyone-share-a-working-implementation-of-wpf-progress-bar/m-p/12427800).
@@ -81,7 +92,7 @@ A promising one is provided by
 the [SpeedCAD ProgressMeter](https://github.com/SpeedCAD/SCADtools.Revit.UI.ProgressMeter)
 that [we recently discussed](https://thebuildingcoder.typepad.com/blog/2023/11/net-core-preview-and-open-source-add-in-projects.html#7).
 
-####<a name="2"></a> Sublime Text
+####<a name="4"></a> Sublime Text
 
 I mentioned a year ago that I switched to
 the [Sublime Text](https://thebuildingcoder.typepad.com/blog/2023/02/pyramid-builder-commandloader-et-al.html#8) editor.
@@ -91,7 +102,7 @@ It was nice to note that I am in the good company of [Tristan Hume](https://thum
 who documented his own experiences
 in [my text editor journey: Vim, Spacemacs, Atom and Sublime Text](https://thume.ca/2017/03/04/my-text-editor-journey-vim-spacemacs-atom-and-sublime-text/).
 
-####<a name="2"></a> Interesting AI Motivation: Ensure It Goes Well
+####<a name="5"></a> Interesting AI Motivation: Ensure It Goes Well
 
 I browsed Tristan's very interesting web site and was impressed by the compelling motivation to to get involved with AI development that he expresses in his discussion
 of tracing methods,
@@ -102,9 +113,14 @@ It’s hard for me to say the coming decade of progress won’t lead to AI as go
 Anthropic is unusually full of people who joined because they really care about ensuring this goes well.
 I think we have the world’s best alignment, interpretability research, and AI policy teams, and I personally work on performance optimization here because I think it’s the best way to leverage my comparative advantage to help the rest of our efforts succeed at steering towards AI going well for the world in the event it keeps up this pace.
 
-####<a name="2"></a> BIM-GPT: a Prompt-Based Virtual Assistant Framework for BIM Information Retrieval
+####<a name="6"></a> Now You See It, Now You Don't
 
-To ensure that things go well in the BIM domain, AI-assisted information retrieval might help; maybe something
+Talking about AI, an interesting note on human perception of pattern recogniton and adversarial images to prevent it showing that we subconciously notice subtle details that we are completely unaware of and
+that [images altered to trick machine vision can influence humans too](https://deepmind.google/discover/blog/images-altered-to-trick-machine-vision-can-influence-humans-too/).
+
+####<a name="7"></a> BIM-GPT AI BIM Information Retrieval
+
+Getting back to AEC related topics, to ensure that things go well in the BIM domain, AI-assisted information retrieval might help; maybe something
 like [BIM-GPT, a prompt-based virtual assistant framework for BIM information retrieval](https://arxiv.org/abs/2304.09333):
 
 > Efficient information retrieval (IR) from building information models (BIMs) poses significant challenges due to the necessity for deep BIM knowledge or extensive engineering efforts for automation. We introduce BIM-GPT, a prompt-based virtual assistant (VA) framework integrating BIM and generative pre-trained transformer (GPT) technologies to support NL-based IR. A prompt manager and dynamic template generate prompts for GPT models, enabling interpretation of NL queries, summarization of retrieved information, and answering BIM-related questions. In tests on a BIM IR dataset, our approach achieved 83.5% and 99.5% accuracy rates for classifying NL queries with no data and 2% data incorporated in prompts, respectively. Additionally, we validated the functionality of BIM-GPT through a VA prototype for a hospital building. This research contributes to the development of effective and versatile VAs for BIM IR in the construction industry, significantly enhancing BIM accessibility and reducing engineering efforts and training data requirements for processing NL queries.
@@ -113,12 +129,12 @@ like [BIM-GPT, a prompt-based virtual assistant framework for BIM information re
 <img src="img/bim_gpt_prompt_manager_nl_processing.png" alt="BIM-GPT NL query prompt processing" title="BIM-GPT NL query prompt processing" width="800"/> <!-- Pixel Height: 605 Pixel Width: 900 -->
 </center>
 
-####<a name="2"></a> AEC Greenwashing
+####<a name="8"></a> AEC Greenwashing
 
 Aarni Heiskanen shared an interesting article on the imminent danger
 of [AEC greenwashing](https://www.linkedin.com/pulse/can-construction-refrain-from-greenwashing-aarni-heiskanen-dqfuf/).
 
-####<a name="2"></a> IKEA Life at Home Report
+####<a name="9"></a> IKEA Life at Home Report
 
 Talking about AEC and sustainability, let's also think about the occupants, their thoughts and wishes.
 
@@ -130,7 +146,7 @@ IKEA asked them, in large numbers, worldwide, compiled the results and hazarded 
   on [Algae wallpaper, pod homes, and mushroom furniture: Ikea’s predictions for life in 2030 are semi-apocalyptic](https://www.fastcompany.com/91006861/algae-wallpaper-pod-housing-and-mushroom-furniture-ikeas-predictions-for-life-in-2030-are-semi-apocalyptic)
   > Ikea explores how our idea of home might evolve in a scarce future
 
-####<a name="2"></a> Climpact Carbon Footprint Action Comparison
+####<a name="10"></a> Climpact Carbon Footprint Action Comparison
 
 A great possibility to test your carbon footprint understanding or learn more about the sometimes surprising emmissions produced by various actions and behaviour is provided by
 the [Climpact](https://climpact.ch) tool,
@@ -140,10 +156,4 @@ the École Polytechnique Fédérale de Lausanne, one of the main Swiss technical
 > Our actions have an impact on the climate.
 Is our perception accurate?
 Take our quiz to develop an intuition about how to reduce your carbon footprint, and to help us understand how people perceive the impact of their actions.
-
-####<a name="2"></a> Now You See It, Now You Don't
-
-Finally, an AI-related note on pattern recogniton and adversarial images to prevent it provides
-interesting proof that we humans perceive subtle details that we are completely unaware of, showing
-that [images altered to trick machine vision can influence humans too](https://deepmind.google/discover/blog/images-altered-to-trick-machine-vision-can-influence-humans-too/).
 
