@@ -80,9 +80,25 @@ A nice collection of Revit API, AI and AEC related topics:
 
 logging:
 21768403 [Assistance Required with Revit Journal Files]
-https://forums.autodesk.com/t5/revit-api-forum/api-access-to-user-history-quot-show-history-quot/m-p/12472116
-AdWindows -- https://forums.autodesk.com/t5/revit-api-forum/intercepting-commands-executed-by-keyboard-shortcuts/td-p/12457597
-https://forums.autodesk.com/t5/revit-api-forum/the-syntax-and-structure-of-the-journal-file-in-revit/m-p/12490089
+
+[API Access to user history? "Show History"](https://forums.autodesk.com/t5/revit-api-forum/api-access-to-user-history-quot-show-history-quot/m-p/12472116)
+
+<center>
+<img src="img/bim_dashboard.png" alt="BIM dashboard" title="BIM dashboard" width="400"/> <!-- Pixel Height: 999 Pixel Width: 999 -->
+
+<img src="img/bim_dashboard2.png" alt="BIM dashboard" title="BIM dashboard" width="400"/> <!-- Pixel Height: 1,024 Pixel Width: 1,024 -->
+</center>
+
+Ricaun shared another useful pointer in his answer
+on [The syntax and structure of the Journal file in Revit](https://forums.autodesk.com/t5/revit-api-forum/the-syntax-and-structure-of-the-journal-file-in-revit/m-p/12490089):
+
+> Journal is used by Autodesk internally to replicate the same steps to make sure the Revit does not break in development.
+If you want to know more, there is a great AU class from AU 2023 by Brian Mackey and Zach Kron about Revit Journal:
+
+> - [Revit Journal Files: They Aren’t Just for Autodesk Support](https://www.autodesk.com/autodesk-university/class/Revit-Journal-Files-They-Arent-Just-Autodesk-Support-2018#video)
+
+Finally, looking at journal file entries is also mentioned as an alternative to `AdWindows`
+for [intercepting commands executed by keyboard shortcuts](https://forums.autodesk.com/t5/revit-api-forum/intercepting-commands-executed-by-keyboard-shortcuts/td-p/12457597).
 
 ####<a name="3"></a> WPF Progress Bar with Abort Button
 
