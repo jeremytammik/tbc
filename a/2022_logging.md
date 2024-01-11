@@ -10,6 +10,12 @@
 
 <!---
 
+- logging:
+  21768403 [Assistance Required with Revit Journal Files]
+  https://forums.autodesk.com/t5/revit-api-forum/api-access-to-user-history-quot-show-history-quot/m-p/12472116
+  AdWindows -- https://forums.autodesk.com/t5/revit-api-forum/intercepting-commands-executed-by-keyboard-shortcuts/td-p/12457597
+  https://forums.autodesk.com/t5/revit-api-forum/the-syntax-and-structure-of-the-journal-file-in-revit/m-p/12490089
+
 - aec greenwashing -- https://www.linkedin.com/pulse/can-construction-refrain-from-greenwashing-aarni-heiskanen-dqfuf/?midToken=AQFbSE8RCQ2a5g&midSig=3AqoWZGBDAwH41&trk=eml-email_series_follow_newsletter_01-newsletter_hero_banner-0-open_on_linkedin_cta&trkEmail=eml-email_series_follow_newsletter_01-newsletter_hero_banner-0-open_on_linkedin_cta-null-7371t~lr3k4lr6~ie-null-null&eid=7371t-lr3k4lr6-ie
 
 - https://climpact.ch
@@ -17,11 +23,6 @@
   > Our actions have an impact on the climate.
   Is our perception accurate?
   Take our quiz to develop an intuition about how to reduce your carbon footprint, and to help us understand how people perceive the impact of their actions.
-
-- logging:
-  21768403 [Assistance Required with Revit Journal Files]
-  https://forums.autodesk.com/t5/revit-api-forum/api-access-to-user-history-quot-show-history-quot/m-p/12472116
-  AdWindows -- https://forums.autodesk.com/t5/revit-api-forum/intercepting-commands-executed-by-keyboard-shortcuts/td-p/12457597
 
 - interesting AI motivation: ensure it goes well:
   Tristan Hume https://thume.ca/
@@ -67,17 +68,25 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Logging
 
-- logging:
+
+####<a name="2"></a> logging:
+
+logging:
 21768403 [Assistance Required with Revit Journal Files]
 https://forums.autodesk.com/t5/revit-api-forum/api-access-to-user-history-quot-show-history-quot/m-p/12472116
 AdWindows -- https://forums.autodesk.com/t5/revit-api-forum/intercepting-commands-executed-by-keyboard-shortcuts/td-p/12457597
+https://forums.autodesk.com/t5/revit-api-forum/the-syntax-and-structure-of-the-journal-file-in-revit/m-p/12490089
 
-- Can anyone share a working implementation of WPF progress bar with abort button?
+####<a name="2"></a> Can anyone share a working implementation of WPF progress bar with abort button?
+
+Can anyone share a working implementation of WPF progress bar with abort button?
 https://forums.autodesk.com/t5/revit-api-forum/can-anyone-share-a-working-implementation-of-wpf-progress-bar/m-p/12427800#M75752
 already blogged about:
 https://github.com/SpeedCAD/SCADtools.Revit.UI.ProgressMeter
 
-- Revit ID Compilation
+####<a name="2"></a> Revit ID Compilation
+
+Revit ID Compilation
 Revit IDs
 https://forums.autodesk.com/t5/revit-api-forum/revit-ids/td-p/12418195
 >>>>Element Id
@@ -162,23 +171,33 @@ https://forums.autodesk.com/t5/revit-api-forum/revit-ids/td-p/12418195
 <li><a href="https://thebuildingcoder.typepad.com/blog/2022/07/immutable-uniqueid-and-revit-database-explorer.html">Immutable UniqueId and Revit Database Explorer</a></li>
 </ul>
 
-- sublime text
+####<a name="2"></a> sublime text
+
+sublime text
 https://thume.ca/2017/03/04/my-text-editor-journey-vim-spacemacs-atom-and-sublime-text/
 
-- BIM-GPT: a Prompt-Based Virtual Assistant Framework for BIM Information Retrieval
+####<a name="2"></a> BIM-GPT: a Prompt-Based Virtual Assistant Framework for BIM Information Retrieval
+
+BIM-GPT: a Prompt-Based Virtual Assistant Framework for BIM Information Retrieval
 https://arxiv.org/abs/2304.09333
 > Efficient information retrieval (IR) from building information models (BIMs) poses significant challenges due to the necessity for deep BIM knowledge or extensive engineering efforts for automation. We introduce BIM-GPT, a prompt-based virtual assistant (VA) framework integrating BIM and generative pre-trained transformer (GPT) technologies to support NL-based IR. A prompt manager and dynamic template generate prompts for GPT models, enabling interpretation of NL queries, summarization of retrieved information, and answering BIM-related questions. In tests on a BIM IR dataset, our approach achieved 83.5% and 99.5% accuracy rates for classifying NL queries with no data and 2% data incorporated in prompts, respectively. Additionally, we validated the functionality of BIM-GPT through a VA prototype for a hospital building. This research contributes to the development of effective and versatile VAs for BIM IR in the construction industry, significantly enhancing BIM accessibility and reducing engineering efforts and training data requirements for processing NL queries.
 bim_gpt_prompt_manager_nl_processing.png
 
-- interesting AI motivation: ensure it goes well:
+####<a name="2"></a> interesting AI motivation: ensure it goes well:
+
+interesting AI motivation: ensure it goes well:
 Tristan Hume https://thume.ca/
 All my favorite tracing tools: eBPF, QEMU, Perfetto, new ones I built and more
 https://thume.ca/2023/12/02/tracing-methods/
 > AI now is still missing a lot, but progress is incredibly fast. It’s hard for me to say the coming decade of progress won’t lead to AI as good as us at nearly all jobs, which would be the biggest event in history. Anthropic is unusually full of people who joined because they really care about ensuring this goes well. I think we have the world’s best alignment, interpretability research, and AI policy teams, and I personally work on performance optimization here because I think it’s the best way to leverage my comparative advantage to help the rest of our efforts succeed at steering towards AI going well for the world in the event it keeps up this pace.
 
-- aec greenwashing -- https://www.linkedin.com/pulse/can-construction-refrain-from-greenwashing-aarni-heiskanen-dqfuf/?midToken=AQFbSE8RCQ2a5g&midSig=3AqoWZGBDAwH41&trk=eml-email_series_follow_newsletter_01-newsletter_hero_banner-0-open_on_linkedin_cta&trkEmail=eml-email_series_follow_newsletter_01-newsletter_hero_banner-0-open_on_linkedin_cta-null-7371t~lr3k4lr6~ie-null-null&eid=7371t-lr3k4lr6-ie
+####<a name="2"></a> aec greenwashing -- https://www.linkedin.com/pulse/can-construction-refrain-from-greenwashing-aarni-heiskanen-dqfuf/?midToken=AQFbSE8RCQ2a5g&midSig=3AqoWZGBDAwH41&trk=eml-email_series_follow_newsletter_01-newsletter_hero_banner-0-open_on_linkedin_cta&trkEmail=eml-email_series_follow_newsletter_01-newsletter_hero_banner-0-open_on_linkedin_cta-null-7371t~lr3k4lr6~ie-null-null&eid=7371t-lr3k4lr6-ie
 
-- Climpact carbon footprint action comparison
+aec greenwashing -- https://www.linkedin.com/pulse/can-construction-refrain-from-greenwashing-aarni-heiskanen-dqfuf/?midToken=AQFbSE8RCQ2a5g&midSig=3AqoWZGBDAwH41&trk=eml-email_series_follow_newsletter_01-newsletter_hero_banner-0-open_on_linkedin_cta&trkEmail=eml-email_series_follow_newsletter_01-newsletter_hero_banner-0-open_on_linkedin_cta-null-7371t~lr3k4lr6~ie-null-null&eid=7371t-lr3k4lr6-ie
+
+####<a name="2"></a> Climpact carbon footprint action comparison
+
+Climpact carbon footprint action comparison
 [Climpact](https://climpact.ch)
 developed at [EPFL](https://www.epfl.ch), the École Polytechnique Fédérale de Lausanne,
 > Our actions have an impact on the climate.
