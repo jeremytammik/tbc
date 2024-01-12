@@ -47,7 +47,16 @@ twitter:
 
  #RevitAPI @AutodeskRevit @AutodeskAPS #BIM @DynamoBIM
 
-&ndash; ...
+A nice new collection of Revit API, AI and AEC related topics
+&ndash; Accountability, Logging and Journals
+&ndash; WPF progress bar with abort button
+&ndash; Sublime text
+&ndash; Interesting AI motivation: ensure it goes well
+&ndash; Now you see it, now you don't
+&ndash; BIM-GPT AI BIM information retrieval
+&ndash; AEC greenwashing
+&ndash; IKEA life at home report
+&ndash; Climpact carbon footprint action comparison...
 
 linkedin:
 
@@ -62,7 +71,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Logging
+### Journals, Logging, Progress Bar, AEC, AI and CO2
 
 A nice new collection of Revit API, AI and AEC related topics:
 
@@ -127,7 +136,7 @@ launch the built-in `Show History` command and then use the Windows API to harve
 
 You can certainly also scrape the required into from the journal or SLOG files, if you prefer, cf. above.
 
-The development team add:
+The development team adds:
 
 A: This "history" is the list of synchronizations if I am not mistaken.
 While journals can catch this, you can also pull it from the SLOG associated to the model and that catches all users instead of one by one (which is what the journal would return).
@@ -262,7 +271,9 @@ IKEA asked them, in large numbers, worldwide, compiled the results and hazarded 
   on [Algae wallpaper, pod homes, and mushroom furniture: Ikea’s predictions for life in 2030 are semi-apocalyptic](https://www.fastcompany.com/91006861/algae-wallpaper-pod-housing-and-mushroom-furniture-ikeas-predictions-for-life-in-2030-are-semi-apocalyptic)
   > Ikea explores how our idea of home might evolve in a scarce future
 
-####<a name="10"></a> Climpact Carbon Footprint Action Comparison
+<a name="10"></a>
+
+#### Climpact Carbon Footprint Action Comparison
 
 A great possibility to test your carbon footprint understanding or learn more about the sometimes surprising emissions produced by various actions and behaviour is provided by
 the [Climpact](https://climpact.ch) tool,
