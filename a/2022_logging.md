@@ -66,7 +66,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 A nice collection of Revit API, AI and AEC related topics:
 
-- [Journal files and logging](#2)
+- [Accountability, Logging and Journals](#2)
 - [WPF progress bar with abort button](#3)
 - [Sublime text](#4)
 - [Interesting AI motivation: ensure it goes well](#5)
@@ -76,18 +76,118 @@ A nice collection of Revit API, AI and AEC related topics:
 - [IKEA life at home report](#9)
 - [Climpact carbon footprint action comparison](#10)
 
-####<a name="2"></a> Journal Files and Logging
+####<a name="2"></a> Accountability, Logging and Journals
 
-logging:
-21768403 [Assistance Required with Revit Journal Files]
+**Question:** I want to analyze the usage of Revit by our staff.
+Our goal is to evaluate the patterns of Revit usage and propose actionable insights based on these findings.
+We have chosen to use Revit Journal Files as our primary data source since they do not impede Revit's performance.
 
-[API Access to user history? "Show History"](https://forums.autodesk.com/t5/revit-api-forum/api-access-to-user-history-quot-show-history-quot/m-p/12472116)
+Challenge: we find it hard to extract relevant data from the Journal Files.
+The complexity arises from the extensive amount of data within these files, which combines user activity with computer and hardware information.
+This has been a stumbling block in progressing with our project.
+
+We are particularly interested in deciphering user commands executed within Revit, such as zooming in/out, changing views, inserting elements, modifying parameters, etc.
+Despite efforts to utilize Regular Expressions (Regex) for parsing the Journal Files, we have not been successful. The format and volume of the data have proven to be challenging.
+
+How can we interprete Journal Files effectively?
+
+**Answer:** As you may know, Autodesk provides no official support for any use whatsoever of journal files, so you are basically on you own there.
+In spite of that, The Building Coder has occasionally performed some research in this area and also shared numerous results from other developers in the [category *Journal*](https://thebuildingcoder.typepad.com/blog/journal/).
+
+Possibly, the most complete documentation for interpreting journals is provided by
+the [Journalysis project](https://github.com/andydandy74/Journalysis/wiki), cf.
+The Building Coder not on [Journal File Analysis](https://thebuildingcoder.typepad.com/blog/2022/05/analysis-of-macros-journals-and-add-in-manager.html#4).
+
+I would like to point out the possible use
+of [`SLOG` files for monitoring purposes](https://thebuildingcoder.typepad.com/blog/2021/12/logging-and-monitoring-deleted-data.html),
+so it might be interesting to take a look at those also.
+
+A related question was raised
+by Samuel Arsenault-Brassard of [VIM AEC](https://www.vimaec.com/) in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on [API Access to user history? "Show History"](https://forums.autodesk.com/t5/revit-api-forum/api-access-to-user-history-quot-show-history-quot/m-p/12472116):
+
+**Question:** The data in the "Show History" button is extremely useful to analyse the work done on a file or detect plagiarism:
 
 <center>
-<img src="img/bim_dashboard.png" alt="BIM dashboard" title="BIM dashboard" width="400"/> <!-- Pixel Height: 999 Pixel Width: 999 -->
+<img src="img/user_history.jpg" alt="User history" title="User history" width="400"/> <!-- Pixel Height: 627 Pixel Width: 861 -->
+</center>
+
+Is it possible to obtain this data through the API?
+If not, is it possible to obtain it though BIM 360/ACC?
+We want to obtain the name of the users and when they saved or interacted with the project.
+
+**Answer:** I suspect no Revit API access.
+I also suspect that if no Revit API access, then even less so in more removed environments such as BIM 360 or ACC.
+However, you can certainly obtain the required information in various ways without any explicit API access to this specific functionality.
+
+A pretty direct approach might be to
+use [`PostCommand`](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.3) to
+launch the built-in `Show History` command and then use the Windows API to harvest the data displayed in the UI form that you show in the screen snapshot.
+
+You can certainly also scrape the required into from the journal or SLOG files, if you prefer, cf. above.
+
+The development team add:
+
+A: This "history" is the list of synchronizations if I am not mistaken.
+While journals can catch this, you can also pull it from the SLOG associated to the model and that catches all users instead of one by one (which is what the journal would return).
+There is a limit to the length of that history though (not sure how it compares with the history of the .rvt itself).
+
+B: Yes, it is the list of Syncs. I don’t think there is any Revit API to query this list.
+There is/are ForgeDM APIs that query ACC/BIM 360 model history, but it is the history of the publishes that push the versions from RCM to ACC/BIM 360, so it doesn’t include info for all syncs.
+
+C: Thinking outside of the box here… I removed the slog and all the associated files and the history was still extracted… Is there any chance that list of syncs is taken from the \global\history portion of the structured storage? Can that data be extracted easily?
+
+If so a stand-alone app that exposes the username/time/synch number for a list of .rvt files could likely be quite valuable for a good amount of companies and educational institutions…
+
+B: Right, the source for the data on Show History dialog is a stream in the RVT model, rather than the slog file. I agree it should be valuable to expose the data of sync history outside Revit, but afaik it is not feasible, as the data is binary, require Revit for the deserialization.
+
+D: When writing Revit data into AEC data model during sync is available in the future, I think the history of cloud models can be filtered and queried in the AECDM.
+
+As for file-based and server-based worksharing, we don't have backlog item on such request. SLOG file would be an incomplete workaround.  In my opinion, we may not invest the efforts on file-based and server-based worksharing workflow only. Cloud worksharing might be higher priority than the other two.
+
+By the way, the development team would be interested to learn about what you would like to achieve and what kind of insights you hope to get from this.
+What is the business value in this for you?
+
+**Response:** Teachers use it to see if students copied each other's work.
+I've detected firms that farmed their work to other firms without telling their clients.
+I've found users who worked at 3AM, showing a lack of time management (their Revit work was also pathetic).
+
+Often, engineering firms don't work on models for months.
+The engineers don't know Revit, refuse to learn it and don't hire enough "Revit technicians" to do the work as specified in the contract.
+Meanwhile, the architects are stuck doing the 3D work of the engineers.
+Or, a firm will say they have 10 employees working on the project, but it's really 1-2 underpaid employees doing all the work.
+
+I've also seen projects to major clients where all the users are interns that work for 2-3 months on the project and disappear.
+Then the client is surprised by the low quality of the Revit work and wonders why it's not following the BIM Execution plan.
+
+Sometimes a malicious or disgruntled user will go in and mess up a file on purpose or they are just bad and deny their actions.
+
+So, it's for accountability.
+To inspect all the warts and mold of the industry that pumps out students who don't know Revit into the workforce year after year.
+
+**Answer:** Thank you very much for your clarification and very sorry to hear of this dismal state of affairs. Where is the world getting to, one asks? Can we be saved? Will AI make it better? Or much, much worse? Interesting times...
+
+**Response:** When owners/clients understand the value/potential of their BIM, give clear BIM instructions (instead of minimal bid contract with no clear BIM requirements) and are able to easily check for compliance, the industry will be "fixed".
+
+Until then, owners don't know that they are receiving subpar BIM, have no vision about the (lost) potential of their BIM models and are unable to judge if what they paid for is good. Designers are not encouraged to deliver anything of value to get profit from the minimal bid contracts and so the cycle of no accountability, no effort & no skills continues.
+
+**Answer:** So, there is hope, and your tool can help &nbsp; :-)
+
+**Response:** Oh yes!
+Our tool will be an scalable accountability monster for those who know what they want and for deep BIM auditing in general.
+
+<center>
+<!-- <img src="img/bim_dashboard.png" alt="BIM dashboard" title="BIM dashboard" width="400"/> Pixel Height: 999 Pixel Width: 999 -->
 
 <img src="img/bim_dashboard2.png" alt="BIM dashboard" title="BIM dashboard" width="400"/> <!-- Pixel Height: 1,024 Pixel Width: 1,024 -->
 </center>
+
+**Answer:** Wow, great picture! DALL-E? Brilliant.
+None of my attempts have turned out that well.
+I guess I need to learn better prompting.
+
+**Response:** DALL-E prompt: "Can you make me an image of a BIM manager who is having the time of his life with a dashboard of data showing accountability. He's in a kind of puppet master moment, happy with all the power of the data, able to see where there are deficiencies, gains and issues throughout all his BIM models of complex architectural projects."
 
 Ricaun shared another useful pointer in his answer
 on [The syntax and structure of the Journal file in Revit](https://forums.autodesk.com/t5/revit-api-forum/the-syntax-and-structure-of-the-journal-file-in-revit/m-p/12490089):
@@ -97,7 +197,7 @@ If you want to know more, there is a great AU class from AU 2023 by Brian Mackey
 
 > - [Revit Journal Files: They Aren’t Just for Autodesk Support](https://www.autodesk.com/autodesk-university/class/Revit-Journal-Files-They-Arent-Just-Autodesk-Support-2018#video)
 
-Finally, looking at journal file entries is also mentioned as an alternative to `AdWindows`
+Finally, to round this off, looking at journal file entries is also mentioned as an alternative to `AdWindows`
 for [intercepting commands executed by keyboard shortcuts](https://forums.autodesk.com/t5/revit-api-forum/intercepting-commands-executed-by-keyboard-shortcuts/td-p/12457597).
 
 ####<a name="3"></a> WPF Progress Bar with Abort Button
