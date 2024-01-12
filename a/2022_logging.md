@@ -78,7 +78,7 @@ A nice new collection of Revit API, AI and AEC related topics:
 
 ####<a name="2"></a> Accountability, Logging and Journals
 
-**Question:** I want to analyze the usage of Revit by our staff.
+**Question:** I want to analyse the usage of Revit by our staff.
 Our goal is to evaluate the patterns of Revit usage and propose actionable insights based on these findings.
 We have chosen to use Revit Journal Files as our primary data source since they do not impede Revit's performance.
 
@@ -89,7 +89,7 @@ This has been a stumbling block in progressing with our project.
 We are particularly interested in deciphering user commands executed within Revit, such as zooming in/out, changing views, inserting elements, modifying parameters, etc.
 Despite efforts to utilize Regular Expressions (Regex) for parsing the Journal Files, we have not been successful. The format and volume of the data have proven to be challenging.
 
-How can we interprete Journal Files effectively?
+How can we interpret Journal Files effectively?
 
 **Answer:** As you may know, Autodesk provides no official support for any use whatsoever of journal files, so you are basically on you own there.
 In spite of that, The Building Coder has occasionally performed some research in this area and also shared numerous results from other developers in the [category *Journal*](https://thebuildingcoder.typepad.com/blog/journal/).
@@ -134,7 +134,7 @@ While journals can catch this, you can also pull it from the SLOG associated to 
 There is a limit to the length of that history though (not sure how it compares with the history of the .rvt itself).
 
 B: Yes, it is the list of Syncs. I don’t think there is any Revit API to query this list.
-There is/are ForgeDM APIs that query ACC/BIM 360 model history, but it is the history of the publishes that push the versions from RCM to ACC/BIM 360, so it doesn’t include info for all syncs.
+There is/are APS DM APIs that query ACC/BIM 360 model history, but it is the history of the publishes that push the versions from RCM to ACC/BIM 360, so it doesn’t include info for all syncs.
 
 C: Thinking outside of the box here… I removed the slog and all the associated files and the history was still extracted… Is there any chance that list of syncs is taken from the \global\history portion of the structured storage? Can that data be extracted easily?
 
@@ -164,7 +164,7 @@ Then the client is surprised by the low quality of the Revit work and wonders wh
 Sometimes a malicious or disgruntled user will go in and mess up a file on purpose or they are just bad and deny their actions.
 
 So, it's for accountability.
-To inspect all the warts and mold of the industry that pumps out students who don't know Revit into the workforce year after year.
+To inspect all the warts and mould of the industry that pumps out students who don't know Revit into the workforce year after year.
 
 **Answer:** Thank you very much for your clarification and very sorry to hear of this dismal state of affairs. Where is the world getting to, one asks? Can we be saved? Will AI make it better? Or much, much worse? Interesting times...
 
@@ -175,7 +175,7 @@ Until then, owners don't know that they are receiving subpar BIM, have no vision
 **Answer:** So, there is hope, and your tool can help &nbsp; :-)
 
 **Response:** Oh yes!
-Our tool will be an scalable accountability monster for those who know what they want and for deep BIM auditing in general.
+Our tool will be a scalable accountability monster for those who know what they want and for deep BIM auditing in general.
 
 <center>
 <!-- <img src="img/bim_dashboard.png" alt="BIM dashboard" title="BIM dashboard" width="400"/> Pixel Height: 999 Pixel Width: 999 -->
@@ -220,7 +220,7 @@ in [my text editor journey: Vim, Spacemacs, Atom and Sublime Text](https://thume
 
 ####<a name="5"></a> Interesting AI Motivation: Ensure It Goes Well
 
-I browsed Tristan's very interesting web site and was impressed by the compelling motivation to to get involved with AI development that he expresses in his discussion
+I browsed Tristan's very interesting web site and was impressed by the compelling motivation to get involved with AI development that he expresses in his discussion
 of tracing methods,
 [all my favorite tracing tools: eBPF, QEMU, Perfetto, new ones I built and more](https://thume.ca/2023/12/02/tracing-methods/):
 
@@ -231,12 +231,12 @@ I think we have the world’s best alignment, interpretability research, and AI 
 
 ####<a name="6"></a> Now You See It, Now You Don't
 
-Talking about AI, an interesting note on human perception of pattern recogniton and adversarial images to prevent it showing that we subconciously notice subtle details that we are completely unaware of and
+Talking about AI, an interesting note on human perception of pattern recognition and adversarial images to prevent it showing that we subconsciously notice subtle details that we are completely unaware of and
 that [images altered to trick machine vision can influence humans too](https://deepmind.google/discover/blog/images-altered-to-trick-machine-vision-can-influence-humans-too/).
 
 ####<a name="7"></a> BIM-GPT AI BIM Information Retrieval
 
-Getting back to AEC related apects, to ensure that things go well in the BIM domain, AI-assisted information retrieval might help; maybe something
+Getting back to AEC related aspects, to ensure that things go well in the BIM domain, AI-assisted information retrieval might help; maybe something
 like [BIM-GPT, a prompt-based virtual assistant framework for BIM information retrieval](https://arxiv.org/abs/2304.09333):
 
 > Efficient information retrieval (IR) from building information models (BIMs) poses significant challenges due to the necessity for deep BIM knowledge or extensive engineering efforts for automation. We introduce BIM-GPT, a prompt-based virtual assistant (VA) framework integrating BIM and generative pre-trained transformer (GPT) technologies to support NL-based IR. A prompt manager and dynamic template generate prompts for GPT models, enabling interpretation of NL queries, summarization of retrieved information, and answering BIM-related questions. In tests on a BIM IR dataset, our approach achieved 83.5% and 99.5% accuracy rates for classifying NL queries with no data and 2% data incorporated in prompts, respectively. Additionally, we validated the functionality of BIM-GPT through a VA prototype for a hospital building. This research contributes to the development of effective and versatile VAs for BIM IR in the construction industry, significantly enhancing BIM accessibility and reducing engineering efforts and training data requirements for processing NL queries.
@@ -264,7 +264,7 @@ IKEA asked them, in large numbers, worldwide, compiled the results and hazarded 
 
 ####<a name="10"></a> Climpact Carbon Footprint Action Comparison
 
-A great possibility to test your carbon footprint understanding or learn more about the sometimes surprising emmissions produced by various actions and behaviour is provided by
+A great possibility to test your carbon footprint understanding or learn more about the sometimes surprising emissions produced by various actions and behaviour is provided by
 the [Climpact](https://climpact.ch) tool,
 developed at [EPFL](https://www.epfl.ch),
 the École Polytechnique Fédérale de Lausanne, one of the main Swiss technical universities.
