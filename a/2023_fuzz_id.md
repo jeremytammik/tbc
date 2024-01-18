@@ -23,7 +23,7 @@
   0544:Comparing Element Id for Equality
   0948:Element Ids in Extensible Storage
   1144:Element Id &ndash; Export, Unique, Navisworks and Other Ids
-  1144:Negative Element Ids and Element Property Drop-down List Enumerations <!-- dropdown combo -->
+  1144:Negative Element Ids and Element Property Drop-down List Enumerations
   1182:How to Trigger a Dynamic Model Updater by Specific Element Ids
   1353:Family Category, Element Ids, Transaction and Updates
   1396:<"#6">WPF Element Id Converter
@@ -162,36 +162,50 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ####<a name="2"></a> Revit ID Compilation
 
-Revit ID Compilation
+Michael Pescht shared a very nice overview of the functionality provided by the different Revit BIM element identifiers in
+his [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on [Revit IDs](https://forums.autodesk.com/t5/revit-api-forum/revit-ids/td-p/12418195):
 
-  Revit IDs
-  https://forums.autodesk.com/t5/revit-api-forum/revit-ids/td-p/12418195
-  ####<a name="2"></a> Revit ID Compilation
-  Revit ID Compilation
-  Revit IDs
-  https://forums.autodesk.com/t5/revit-api-forum/revit-ids/td-p/12418195
-  >>>>Element Id
-  0344:Newly Created Element Retrieval Based on Monotonously Increasing Element Id Values
-  0344:Enhanced Parameter Filter for Greater Element Id Values
-  0544:Comparing Element Id for Equality
-  0948:Element Ids in Extensible Storage
-  1144:Element Id &ndash; Export, Unique, Navisworks and Other Ids
-  1144:Negative Element Ids and Element Property Drop-down List Enumerations <!-- dropdown combo -->
-  1182:How to Trigger a Dynamic Model Updater by Specific Element Ids
-  1353:Family Category, Element Ids, Transaction and Updates
-  1396:<"#6">WPF Element Id Converter
-  1577:<"#3">Access Revit BIM Data and Element Ids from BIM360
-  1628:Retrieving Newly Created Element Ids
-  1628:<"#3">Consecutive Element Ids
-  1634:<"#2">Search and Snoop by Element Id or Unique Id
-  1762:Element Identifiers in RVT, IFC, NW and Forge
-  1762:<"#3"> Revit Element Ids in Forge via Navisworks and IFC
-  1959:<"#2"> Immutable UniqueId, Mutable Element Id
-  1974:64-Bit Element Ids, Maybe?
-  1974:<"#2"> 64-Bit Element Ids
-  1992:<"#9"> Consuming Huge Numbers of Element Ids
-  1995:<"#4"> Backward Compatible 64 Bit Element Id
-  >>>>0344 0544 0948 1144 1182 1353 1396 1577 1628 1634 1762 1959 1974 1992 1995
+**Post:**
+There are several explainations for the IDs used in Revit.
+Unfortunately, I have not found a complete definition of all IDs in a document / post.
+Therefore, I would like to have my compilation checked here in the forum.
+Thanks in advance.
+
+- **Revit element Id**
+"Id"
+Example decimal: 895976
+Example hexadecimal: 000dabe8
+Is the unique identification for an element within a single project.
+- **Revit Element `UniqueId`**
+A stable unique identifier for an element within the document.
+Each element has such a unique identifier, which is returned by the API as a string, e.g.,
+"626f5187-9a17-4713-98b7-532ca3cc31b1-000dabe8".
+It is a hexadecimal sequence of 8-4-4-4-12-8 characters (GUID + 😎
+Revit: UniqueId = EpisodeId (8-4-4-4-12) + Hexadecimal(Id) (8)
+- **Revit EpisodeId**
+"EpisodeId"
+Is the first part of UniqueId, including the characters of the sequence 8-4-4-4-12 and refers to the project and the session.
+Beispiel: 626f5187-9a17-4713-98b7-532ca3cc31b1
+- **Revit DWF GUID (Export GUID)**
+"DwfGuid"
+Hexadecimal version of the ifcGUID
+Hex(IfcGUID) = DWF GUID
+Beispiel: 626f5187-9a17-4713-98b7-532ca3c19a59
+- **Revit ifcGUID**
+A 22 character code (string) using the 64 character base which includes numbers, upper and lower case letters and some special characters. Although it looks completely different from other GUIDs, the IFC GUID is completely identical to the DWF GUID, but is expressed with a different encoding to make it shorter and easier to understand.
+Compressed version of the DWF GUID.
+Hex(IfcGUID) = DWF GUID
+Beispiel: compress(626f5187-9a17-4713-98b7-532ca3c19a59)
+- **Revit ExternalId**
+The external ID of a geometry object.
+Beispiel: 626f5187-9a17-4713-98b7-532ca3c19a59-000dabe8
+Revit: ExternalId = DwfGUID + "-" + Hex(ElementId)
+
+**Answer:** Many thanks to Michael for his valuable compilation.
+Here is a list of existing information on element ids and unique ids from The Building Coder:
+
+- Element Id
   <ul>
   <li><a href="http://thebuildingcoder.typepad.com/blog/2010/04/retrieving-newly-created-elements-in-revit-2011.html">Retrieving Newly Created Elements in Revit 2011</a></li>
   <li><a href="http://thebuildingcoder.typepad.com/blog/2011/02/comparing-element-id-for-equality.html">Comparing Element Id for Equality</a></li>
@@ -209,32 +223,7 @@ Revit ID Compilation
   <li><a href="https://thebuildingcoder.typepad.com/blog/2023/04/configuring-rvtsamples-2024.html">Configuring RvtSamples 2024 and Big Numbers</a></li>
   <li><a href="https://thebuildingcoder.typepad.com/blog/2023/05/64-bit-ids-revit-and-revitlookup-updates.html">64 Bit Ids, Revit and RevitLookup Updates</a></li>
   </ul>
-  >>>>Unique Id
-  0104:UniqueId versus DWF and IFC GUID
-  0104:GUID and UniqueId
-  0104:UniqueId to GUID Encoding
-  0104:IFC GUID and UniqueId Encoder and Decoder
-  0737:Retrieving Unique Geometry Vertices
-  0787:Geometry Traversal to Retrieve Unique Vertices
-  0819:IFC GUID Generation and Uniqueness
-  0943:Solving the Non-unique Unique Id Problem
-  1144:Element Id &ndash; Export, Unique, Navisworks and Other Ids
-  1144:Unique Id versus ElementId to Store in External Database
-  1144:Local Uniqueness of the Revit Unique Id
-  1144:Navisworks versus Revit Object Unique Ids
-  1144:Revit Id and UniqueId Lost On Reimporting Revised Model
-  1209:Unique Names and the NamingUtils Class
-  1277:Understanding the Use of the UniqueId
-  1304:Extracting Unique Building Element Geometry Vertices
-  1459:Consistency of IFC GUID and UniqueId
-  1577:<"#4">Unique IDs for Forge Viewer Elements
-  1634:RevitLookup Search by Element and Unique Id
-  1634:<"#2">Search and Snoop by Element Id or Unique Id
-  1949:Unique Id and IFC GUID Parameter
-  1949:<"#4"> You Cannot Control the Unique Id
-  1959:Immutable UniqueId and Revit Database Explorer
-  1959:<"#2"> Immutable UniqueId, Mutable Element Id
-  >>>> 0104 0737 0787 0819 0943 1144 1209 1277 1304 1459 1577 1634 1949 1959
+- Unique Id
   <ul>
   <li><a href="http://thebuildingcoder.typepad.com/blog/2009/02/uniqueid-dwf-and-ifc-guid.html">UniqueId, DWF and IFC GUID</a></li>
   <li><a href="http://thebuildingcoder.typepad.com/blog/2012/03/melbourne-day-two.html">Melbourne Day Two</a></li>
@@ -251,8 +240,6 @@ Revit ID Compilation
   <li><a href="https://thebuildingcoder.typepad.com/blog/2022/04/unique-id-and-ifc-guid.html">Unique Id and IFC GUID Parameter</a></li>
   <li><a href="https://thebuildingcoder.typepad.com/blog/2022/07/immutable-uniqueid-and-revit-database-explorer.html">Immutable UniqueId and Revit Database Explorer</a></li>
   </ul>
-
-Many thanks to
 
 ####<a name="2"></a> Unique Cross-Document Reference
 
