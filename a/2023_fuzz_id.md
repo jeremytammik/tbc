@@ -252,11 +252,26 @@ Revit ID Compilation
   <li><a href="https://thebuildingcoder.typepad.com/blog/2022/07/immutable-uniqueid-and-revit-database-explorer.html">Immutable UniqueId and Revit Database Explorer</a></li>
   </ul>
 
-####<a name="2"></a> https://forums.autodesk.com/t5/revit-api-forum/are-references-unique-across-documents/td-p/12381420
+Many thanks to
 
-https://forums.autodesk.com/t5/revit-api-forum/are-references-unique-across-documents/td-p/12381420
+####<a name="2"></a> Unique Cross-Document Reference
 
+In a related vein, grubdex and ricaun pondered:
+[are references unique across documents?](https://forums.autodesk.com/t5/revit-api-forum/are-references-unique-across-documents/td-p/12381420)
 
+**Question:** Are `Reference` objects unique across documents in my project?
+I know that UniqueIDs are and IDs are not.
+
+**Answer:** Probably yes; the `Reference` has the `UniqueId` embedded in the stable representation.
+Using a `UniqueId` of the element with `Reference.ParseFromStableRepresentation` will return the `Reference` of the element:
+
+<pre><code>
+  Reference reference
+    = Reference.ParseFromStableRepresentation(
+      document, element.UniqueId);
+</code></pre>
+
+Thank you both for this.
 
 ####<a name="2"></a> AU Class on DirectContext3D
 
