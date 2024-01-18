@@ -231,6 +231,14 @@ A promising one is provided by
 the [SpeedCAD ProgressMeter](https://github.com/SpeedCAD/SCADtools.Revit.UI.ProgressMeter)
 that [we recently discussed](https://thebuildingcoder.typepad.com/blog/2023/11/net-core-preview-and-open-source-add-in-projects.html#7).
 
+Ricaun adds: I created
+the package [ricaun.Revit.UI.StatusBar](https://www.nuget.org/packages/ricaun.Revit.UI.StatusBar) last year
+to add a progress bar similar to the default Revit progress bar.
+Its theme is automatically selected depending on the Revit version and theme your plugin is running.
+Here is a 17-minute [video with an example](https://youtu.be/oxD2XDxGL2U):
+
+- [ricaun-io/RevitAddin.ProgressBar.Example](https://github.com/ricaun-io/RevitAddin.ProgressBar.Example)
+
 ####<a name="4"></a> Sublime Text
 
 I mentioned a year ago that I switched to
