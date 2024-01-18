@@ -287,7 +287,7 @@ an Autodesk University 2023 class by Alex Pytel:
 
 - [DirectContext3D: API for Displaying External Graphics in Revit](https://www.autodesk.com/autodesk-university/class/DirectContext3D-API-Displaying-External-Graphics-Revit-2017#video)
 
-####<a name="2"></a> a novel method using tagging to
+####<a name="2"></a> Determining Elements Present in Section View
 
 Faced with the task of determining which elements are present in a given section view, we stumbled across a novel solution using tagging in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread on
@@ -306,56 +306,47 @@ to [Check if a point is inside bounding box](https://forums.autodesk.com/t5/revi
 
 However, it looks like the position returned in BoundingBox is outside of view.
 
-I use this solution to apply tags to linked elements without any problems (I left the code below just for example, as it is not part of the question):
+I use this solution to apply tags to linked elements without any problems:
 
-
-Reference refe = new
-Reference(itemconex)
-.CreateLinkReference(docsVinculados);
-
-IndependentTag tagConexao = IndependentTag.Create(
-Doc.Document, TagConexSelecionada.Id, Doc.ActiveView.Id, refe,
-true, TagOrientation.Horizontal, PosicaoFinal);
-
-
- Solved by jeremy_tammik. Go to Solution.
-Tags (0)
-Add tags
-Report
-Labels (3)
-"Linked models"  Bounding Box  RevitLinkInstance
-2 REPLIES
-Sort:
-MESSAGE 2 OF 3
-jeremy_tammik
-  Autodesk jeremy_tammik  in reply to: wl_santanna
-‎2024-01-11 12:49 AM
-
-The biggest challenge is probably the transformation. One possible approach would be to read and understand in depth all the transformations involved. Another possible approach, in case your tendency is stronger to hack and do rather than study and ponder, might be: create a very simple linked file with just an element or two, e.g., model lines. Host it. Analyse the resulting geometry in the host file. Reproduce the model lines in the host file until their appearance matches the original ones in the linked file. Basically, you just need to determine where a given bounding box in the linked file will end up on the host, don't you?
-
-Since you mention that you can successfully and automatically create tags for the linked elements, another idea comes to mind: before creating the tags, subscribe to the DocumentChanged method to be notified of the added elements. Then, you can query the tags for their locations. That will presumably approximate the host project locations of the linked elements.
-
-Jeremy Tammik,  Developer Advocacy and Support, The Building Coder, Autodesk Developer Network, ADN Open
-Tags (0)
-Add tags
-Report
-MESSAGE 3 OF 3
-wl_santanna
-  Explorer wl_santanna  in reply to: jeremy_tammik
-‎2024-01-11 11:37 AM
-Hi Jeremy, thank you for your reply, you just opened my mind to a possible solution! I just add a new IndependentTag then check if it's BoundingBox is valid:
-
+<pre><code>
+Reference refe = new Reference(itemconex)
+  .CreateLinkReference(docsVinculados);
 
 IndependentTag tagConexao = IndependentTag.Create(
-Config.doc, Config.doc.ActiveView.Id, refe,
-true, TagMode.TM_ADDBY_CATEGORY, TagOrientation.Horizontal, PosicaoFinal);
+  Doc.Document, TagConexSelecionada.Id, Doc.ActiveView.Id,
+  refe, true, TagOrientation.Horizontal, PosicaoFinal);
+</code></pre>
+
+**Answer:** The biggest challenge is probably the transformation.
+One possible approach would be to read and understand in depth all the transformations involved.
+Another possible approach, in case your tendency is stronger to hack and do rather than study and ponder, might be: create a very simple linked file with just an element or two, e.g., model lines.
+Host it.
+Analyse the resulting geometry in the host file.
+Reproduce the model lines in the host file until their appearance matches the original ones in the linked file.
+Basically, you just need to determine where a given bounding box in the linked file will end up on the host, don't you?
+
+Since you mention that you can successfully and automatically create tags for the linked elements, another idea comes to mind: before creating the tags, subscribe to the `DocumentChanged` method to be notified of the added elements.
+Then, you can query the tags for their locations.
+That will presumably approximate the host project locations of the linked elements.
+
+**Response:** Hi Jeremy, thank you for your reply, you just opened my mind to a possible solution!
+I just add a new `IndependentTag` then check if it's `BoundingBox` is valid:
+
+<pre><code>
+IndependentTag tagConexao = IndependentTag.Create(
+  Config.doc, Config.doc.ActiveView.Id, refe, true,
+  TagMode.TM_ADDBY_CATEGORY, TagOrientation.Horizontal,
+  PosicaoFinal);
 
 if (null != tagConexao.get_BoundingBox(Config.doc.ActiveView))
 {
-// The element is in the view
+  // The element is in the view
 }
+</code></pre>
 
+Then, I collect the id's I need and RollBack the transaction in the final, it's working.
+Btw I'll study how transformations works when I have linked elements in some view.
+Thank you.
 
-Then i collect the id's i need and RollBack the transaction in the final, it's working. Btw i'll study how transformations works when i have linked elements in some view. Thank you
 
 
