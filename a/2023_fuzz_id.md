@@ -101,23 +101,6 @@
 
 - https://forums.autodesk.com/t5/revit-api-forum/are-references-unique-across-documents/td-p/12381420
 
-- thoughts on revit precision
-  SpatialElementGeometryCalculator not accurate
-  https://forums.autodesk.com/t5/revit-api-forum/spatialelementgeometrycalculator-not-accurate/m-p/12417416
-
-- need for fuzz:
-  What is Fuzz?
-  https://thebuildingcoder.typepad.com/blog/2023/03/uv-emergence-fuzz-and-the-get_-prefix.html#4
-  Again, the Need for Fuzz
-  https://thebuildingcoder.typepad.com/blog/2022/08/instances-in-room-and-need-for-fuzz.html#3
-  It is very important for every programmer dealing with geometry and CAD to understand that it is impossible to exactly represent a floating point number in a digital computer. Hence, the need for fuzz when comparing two numbers:
-  https://www.google.com/search?q=fuzz&as_sitesearch=thebuildingcoder.typepad.com
-  To avoid any deviation in a series P1, P2, ... Pn of vertical points, you can proceed as follows. Pick one of the collinear vertical points. It does not matter which one it is, and any one will do, e.g., the bottom one. Let's assume that is P1 with coordinates (x1,y1,z1). Now, replace the entire series of points P1,...Pn by a modified series P1,Q2,Q3,...Qn by defining each Q as follows:
-  Qi = (x1,y1,zi) for i = 2, 3, ... n
-  In other words, define all the Q so that they lie exactly vertically above P1.
-  Since the Pi are all supposed to be vertical, the difference between their x and y coordinates must be negligeable.
-  So, ignore it, and Bob's your uncle. Good luck.
-
 - DirectContext3D: API for Displaying External Graphics in Revit
   by Alex Pytel
   https://www.autodesk.com/autodesk-university/class/DirectContext3D-API-Displaying-External-Graphics-Revit-2017#video
@@ -145,19 +128,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Revit Ids and Precision versus Fuzz
-
-
-####<a name="2"></a>
-
-**Question:**
-
-**Answer:**
-
-<center>
-<img src="img/" alt="" title="" width="100"/> <!-- Pixel Height: 627 Pixel Width: 861 -->
-</center>
-
+### DirectContext3D at AU and Revit Element Ids
 
 
 ####<a name="2"></a> Revit ID Compilation
@@ -167,8 +138,8 @@ his [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 on [Revit IDs](https://forums.autodesk.com/t5/revit-api-forum/revit-ids/td-p/12418195):
 
 **Post:**
-There are several explainations for the IDs used in Revit.
-Unfortunately, I have not found a complete definition of all IDs in a document / post.
+There are several explanations available for the IDs used in Revit.
+Unfortunately, I have not found a complete definition of all IDs in a single document / post.
 Therefore, I would like to have my compilation checked here in the forum.
 Thanks in advance.
 
