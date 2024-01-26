@@ -43,19 +43,19 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Valid API Context Revisited
+### Valid Revit API Context, LLM and LTG
 
 We continue our exciting exploration of the Revit API and observations on where the world development in general
 &ndash; and climate, and AI, in particular &ndash; are leading:
 
-- [Valid API context](#2)
+- [Valid Revit API context](#2)
 - [Extensible storage in APS](#3)
 - [Large language model course](#4)
 - [Token-free selective state space model](#5)
 - [L'humanité en péril](#6)
 - [The limits to growth](#7)
 
-####<a name="2"></a> Valid API Context
+####<a name="2"></a> Valid Revit API Context
 
 The Revit API is almost completely event driven.
 Every event can be processed by an event handler.
