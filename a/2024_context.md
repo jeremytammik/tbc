@@ -121,8 +121,7 @@ That same piece of code might also be called from outside a Revit event (externa
 As it stands, the developer has to follow that callstack for any time they connect these events up and hope they know whether they're inside Revit at the start or not.
 What I'd like is a low-level dispatch that would be something like:
 
-<pre><code>
-if(InRevitContext)
+<pre><code>if(InRevitContext)
    // Run code inline for efficiency
 else
    // Not safe, must wrap code in external event and wait for it
@@ -182,6 +181,7 @@ Moving away from the Revit API to the ever exciting topic of AI and LLMs, here i
 a [Large Language Model Course](https://github.com/mlabonne/llm-course).
 
 > It is divided into three parts:
+
 > - LLM Fundamentals covers essential knowledge about mathematics, Python, and neural networks.
 - The LLM Scientist focuses on building the best possible LLMs using the latest techniques.
 - The LLM Engineer focuses on creating LLM-based applications and deploying them.
@@ -193,10 +193,8 @@ On the topic of LLMs, is the lo#ng LLM tokenisatio#n night#m#are possibly near#i
 [MambaByte: Token-free Selective State Space Model](https://arxiv.org/html/2401.13660v1) reports:
 
 > Token-free language models learn directly from raw bytes and remove the bias of subword tokenization. Operating on bytes, however, results in significantly longer sequences
-
-> ... experiments indicate the computational efficiency of MambaByte compared to other byte-level models.
-
-> ... findings establish the viability of MambaByte in enabling token-free language modeling.
+... experiments indicate the computational efficiency of MambaByte compared to other byte-level models.
+... findings establish the viability of MambaByte in enabling token-free language modeling.
 
 ####<a name="6"></a> L'Humanité en Péril
 
@@ -217,7 +215,7 @@ with finite supply of resources, studied by computer simulation.
 The study uses a computer model to simulate the consequence of interactions between the Earth and human systems.
 After reviewing their computer simulations, the research team came to the following conclusions:
 
-- If the present growth trends in world population, industrialization, pollution, food production, and resource depletion continue unchanged, the limits to growth on this planet will be reached sometime within the next one hundred years.[b] The most probable result will be a rather sudden and uncontrollable decline in both population and industrial capacity.
+- If the present growth trends in world population, industrialization, pollution, food production, and resource depletion continue unchanged, the limits to growth on this planet will be reached sometime within the next one hundred years. The most probable result will be a rather sudden and uncontrollable decline in both population and industrial capacity.
 - It is possible to alter these growth trends and to establish a condition of ecological and economic stability that is sustainable far into the future. The state of global equilibrium could be designed so that the basic material needs of each person on earth are satisfied and each person has an equal opportunity to realize his individual human potential.
 - If the world's people decide to strive for this second outcome rather than the first, the sooner they begin working to attain it, the greater will be their chances of success.
 
@@ -229,5 +227,5 @@ This improved parameter set results in a simulation that shows the same overshoo
 The main effect of the recalibration update is to raise the peaks of most variables and move them a few years into the future.
 
 <center>
-<img src="img/limits_to_growth.png" alt="Limits to growth" title="Limits to growth" width="400"/> <!-- Pixel Height: 674 Pixel Width: 564 -->
+<img src="img/limits_to_growth.png" alt="Limits to growth" title="Limits to growth" width="300"/> <!-- Pixel Height: 674 Pixel Width: 564 -->
 </center>
