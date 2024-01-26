@@ -10,28 +10,19 @@
 
 <!---
 
-- thoughts on revit precision
-  SpatialElementGeometryCalculator not accurate
-  https://forums.autodesk.com/t5/revit-api-forum/spatialelementgeometrycalculator-not-accurate/m-p/12417416
-
-- need for fuzz:
-  What is Fuzz?
-  https://thebuildingcoder.typepad.com/blog/2023/03/uv-emergence-fuzz-and-the-get_-prefix.html#4
-  Again, the Need for Fuzz
-  https://thebuildingcoder.typepad.com/blog/2022/08/instances-in-room-and-need-for-fuzz.html#3
-  It is very important for every programmer dealing with geometry and CAD to understand that it is impossible to exactly represent a floating point number in a digital computer. Hence, the need for fuzz when comparing two numbers:
-  https://www.google.com/search?q=fuzz&as_sitesearch=thebuildingcoder.typepad.com
-  To avoid any deviation in a series P1, P2, ... Pn of vertical points, you can proceed as follows. Pick one of the collinear vertical points. It does not matter which one it is, and any one will do, e.g., the bottom one. Let's assume that is P1 with coordinates (x1,y1,z1). Now, replace the entire series of points P1,...Pn by a modified series P1,Q2,Q3,...Qn by defining each Q as follows:
-  Qi = (x1,y1,zi) for i = 2, 3, ... n
-  In other words, define all the Q so that they lie exactly vertically above P1.
-  Since the Pi are all supposed to be vertical, the difference between their x and y coordinates must be negligeable.
-  So, ignore it, and Bob's your uncle. Good luck.
-
 - valid api context
   https://autodesk.slack.com/archives/C0SR6NAP8/p1705566333752629
   Jeff Hotchkiss
   what is the correct & efficient way to validate one's execution of code is in a Revit API context? I can see in the internal C++ code of Revit that Revit API objects perform checks - how does one do this equivalent check in C#? Background in :thread:
   Answers by Dimitar Venkov
+
+- Extensible Storage in APS
+  https://autodesk.slack.com/archives/C04R1THN78V/p1705949479594829
+  João Martins
+  Is Revit Extensible Storage supported by SVF ?
+  Petr Broz
+  Revit Extensible Storage Sounds like some kind of feature that lets you store custom data inside Revit elements.
+  Jeremy Tammik
 
 twitter:
 
@@ -69,28 +60,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 </center>
 
 
-####<a name="2"></a> thoughts on revit precision
-
-thoughts on revit precision
-SpatialElementGeometryCalculator not accurate
-https://forums.autodesk.com/t5/revit-api-forum/spatialelementgeometrycalculator-not-accurate/m-p/12417416
-
-####<a name="3"></a> need for fuzz:
-
-need for fuzz:
-What is Fuzz?
-https://thebuildingcoder.typepad.com/blog/2023/03/uv-emergence-fuzz-and-the-get_-prefix.html#4
-Again, the Need for Fuzz
-https://thebuildingcoder.typepad.com/blog/2022/08/instances-in-room-and-need-for-fuzz.html#3
-It is very important for every programmer dealing with geometry and CAD to understand that it is impossible to exactly represent a floating point number in a digital computer. Hence, the need for fuzz when comparing two numbers:
-https://www.google.com/search?q=fuzz&as_sitesearch=thebuildingcoder.typepad.com
-To avoid any deviation in a series P1, P2, ... Pn of vertical points, you can proceed as follows. Pick one of the collinear vertical points. It does not matter which one it is, and any one will do, e.g., the bottom one. Let's assume that is P1 with coordinates (x1,y1,z1). Now, replace the entire series of points P1,...Pn by a modified series P1,Q2,Q3,...Qn by defining each Q as follows:
-Qi = (x1,y1,zi) for i = 2, 3, ... n
-In other words, define all the Q so that they lie exactly vertically above P1.
-Since the Pi are all supposed to be vertical, the difference between their x and y coordinates must be negligeable.
-So, ignore it, and Bob's your uncle. Good luck.
-
-####<a name="4"></a> Valid API Context
+####<a name="2"></a> Valid API Context
 
 **Question:** What is the correct and efficient way to validate one's execution of code is in a Revit API context?
 I can see in the internal C++ code of Revit that Revit API objects perform checks &ndash; how does one do this equivalent check in C#?
@@ -188,9 +158,34 @@ Always helpful to have these needs confirmed too!
 
 Many thanks to Jeff Hotchkiss and Dimitar Venkov for this illuminating discussion.
 
+####<a name="3"></a> Extensible Storage in APS
+
+**Question:** Is Extensible Storage supported by `SVF`?
+
+**Answer:** SVF is an efficient compressed representation fo the BIM geometry and selected metadata resulting from a translation of the original BIM CAD seed file for
+the [Autodesk Platform Services APS](https://aps.autodesk.com/) environment.
+
+Revit [Extensible Storage](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.23) is
+a feature that lets add-ins store custom data inside Revit elements.
+
+The extensible storage data is only accessible to the add-in that creates it.
+Therefore, the Revit translation process has no access to it, so it cannot be translated to SVF.
+
+So, the answer is generally no.
+
+####<a name="4"></a> Large Language Model Course
+
+Moving away from the Revit API to the ever exciting topic of AI and LLMs, here is
+a [Large Language Model Course](https://github.com/mlabonne/llm-course).
+
+> It is divided into three parts:
+> - LLM Fundamentals covers essential knowledge about mathematics, Python, and neural networks.
+- The LLM Scientist focuses on building the best possible LLMs using the latest techniques.
+- The LLM Engineer focuses on creating LLM-based applications and deploying them.
+
 ####<a name="5"></a> Token-free Selective State Space Model
 
-Is the lo#ng LLM tokenisatio#n night#m#are almost o#ver?
+On the topic of LLMs, is the lo#ng LLM tokenisatio#n night#m#are possibly near#ing it#s end?
 
 [MambaByte: Token-free Selective State Space Model](https://arxiv.org/html/2401.13660v1) reports:
 
@@ -199,4 +194,34 @@ Is the lo#ng LLM tokenisatio#n night#m#are almost o#ver?
 > ... experiments indicate the computational efficiency of MambaByte compared to other byte-level models.
 
 > ... findings establish the viability of MambaByte in enabling token-free language modeling.
+
+####<a name="6"></a> L'Humanité en Péril
+
+One of my favourtite authors, Fred Vargas, took a break from detective stories and wrote whole book on climate change instead,
+[L'humanité en péril](https://editions.flammarion.com/lhumanite-en-peril/9782081490864).
+I just read it and agree to a large extent.
+The biggest takeaway:
+we need to take matters into our own hands;
+we cannot trust or wait for politicians, who are subservient to lobbies;
+eat less meat;
+avoid consuming mass agricultural industry products.
+
+####<a name="7"></a> The Limits to Growth
+
+Vargas also points out [The Limits to Growth or LTG](https://en.wikipedia.org/wiki/The_Limits_to_Growth),
+a 1972 report that discusses the possibility of exponential economic and population growth
+with finite supply of resources, studied by computer simulation.
+The study uses a computer model to simulate the consequence of interactions between the Earth and human systems.
+After reviewing their computer simulations, the research team came to the following conclusions:
+
+- If the present growth trends in world population, industrialization, pollution, food production, and resource depletion continue unchanged, the limits to growth on this planet will be reached sometime within the next one hundred years.[b] The most probable result will be a rather sudden and uncontrollable decline in both population and industrial capacity.
+- It is possible to alter these growth trends and to establish a condition of ecological and economic stability that is sustainable far into the future. The state of global equilibrium could be designed so that the basic material needs of each person on earth are satisfied and each person has an equal opportunity to realize his individual human potential.
+- If the world's people decide to strive for this second outcome rather than the first, the sooner they begin working to attain it, the greater will be their chances of success.
+
+In 2008, some researchers concluded that, "its approach remains useful and that its conclusions are still surprisingly valid...
+unfortunately, the report has been largely dismissed by critics as a doomsday prophecy that has not held up to scrutiny."
+
+In 2023, the parameters of the simulation model were recalibrated using empirical data up to 2022.
+This improved parameter set results in a simulation that shows the same overshoot and collapse mode in the coming decade as the original business-as-usual scenario of the Limits to Growth standard run.
+The main effect of the recalibration update is to raise the peaks of most variables and move them a few years into the future.
 
