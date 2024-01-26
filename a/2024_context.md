@@ -85,7 +85,7 @@ The most common class of errors here fall into three cases outside of just not k
 - Persisting & misusing Revit objects beyond their lifetime
 
 This often goes awry when mixed in with modern coding practices like DI, async, etc.
-I'm in the process of extending our low level libraries for using the Revit API to provide effectively Revit safe zones
+I'm in the process of extending our low-level libraries for using the Revit API to provide effectively Revit safe zones
 &ndash; if you're in one of these, you can call Revit, if not, you need to marshal into one.
 For example, a UI call might need to alter Revit and it's not immediately obvious if it's safe to do so without marshalling into an External Event.
 The wrong thread is easy to detect.
@@ -127,7 +127,7 @@ Thanks &ndash; I am aware of all of these; our library uses similar techniques t
 Lets' say I subscribe to a Revit event, and hook that to some piece of internal logic.
 That internal logic calls reentrantly into some other piece of code that needs to perform Revit functionality, e.g., altering the UI.
 That same piece of code might also be called from outside a Revit event (external or internal), and therefore, as I understand it, would need to move to an external event.
-As it stands, the developer has to follow that callstack for any time they connect these events up and hope they know whether they're inside Revit at the start or not.
+As it stands, the developer has to follow that call stack for any time they connect these events up and hope they know whether they're inside Revit at the start or not.
 What I'd like is a low-level dispatch that would be something like:
 
 <pre><code>if(InRevitContext)
@@ -173,7 +173,7 @@ Many thanks to Jeff Hotchkiss and Dimitar Venkov for this illuminating discussio
 
 **Question:** Is Extensible Storage supported by `SVF`?
 
-**Answer:** SVF is an efficient compressed representation fo the BIM geometry and selected metadata resulting from a translation of the original BIM CAD seed file for
+**Answer:** SVF is an efficient compressed representation of the BIM geometry and selected metadata resulting from a translation of the original BIM CAD seed file for
 the [Autodesk Platform Services APS](https://aps.autodesk.com/) environment.
 
 Revit [Extensible Storage](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.23) is
@@ -186,7 +186,7 @@ So, the answer is generally no.
 
 ####<a name="4"></a> Large Language Model Course
 
-Moving away from the Revit API to the ever exciting topic of AI and LLMs, here is
+Moving away from the Revit API to the ever-exciting topic of AI and LLMs, here is
 a [Large Language Model Course](https://github.com/mlabonne/llm-course).
 
 > It is divided into three parts:
@@ -207,7 +207,7 @@ On the topic of LLMs, is the lo#ng LLM tokenisatio#n night#m#are possibly near#i
 
 ####<a name="6"></a> L'Humanité en Péril
 
-One of my favourtite authors, Fred Vargas, took a break from detective stories and wrote whole book on climate change instead,
+One of my favourite authors, Fred Vargas, took a break from detective stories and wrote whole book on climate change instead,
 [L'humanité en péril](https://editions.flammarion.com/lhumanite-en-peril/9782081490864).
 I just read it and agree to a large extent.
 The biggest takeaway:
