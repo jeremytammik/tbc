@@ -188,3 +188,15 @@ Always helpful to have these needs confirmed too!
 
 Many thanks to Jeff Hotchkiss and Dimitar Venkov for this illuminating discussion.
 
+####<a name="5"></a> Token-free Selective State Space Model
+
+Is the lo#ng LLM tokenisatio#n night#m#are almost o#ver?
+
+[MambaByte: Token-free Selective State Space Model](https://arxiv.org/html/2401.13660v1) reports:
+
+> Token-free language models learn directly from raw bytes and remove the bias of subword tokenization. Operating on bytes, however, results in significantly longer sequences
+
+> ... experiments indicate the computational efficiency of MambaByte compared to other byte-level models.
+
+> ... findings establish the viability of MambaByte in enabling token-free language modeling.
+
