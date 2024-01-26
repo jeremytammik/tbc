@@ -28,7 +28,14 @@ twitter:
 
 the @AutodeskRevit #RevitAPI #BIM @AutodeskAPS @DynamoBIM
 
-&ndash;  ...
+
+Revit API, climate, and AI
+&ndash; Valid Revit API context
+&ndash; Extensible storage in APS
+&ndash; Large language model course
+&ndash; Token-free selective state space model
+&ndash; L'humanité en péril
+&ndash; The limits to growth...
 
 linkedin:
 
