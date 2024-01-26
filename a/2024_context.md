@@ -43,24 +43,27 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Context
-
-
-
-
-**Question:**
-
-**Answer:**
-
-<pre><code>
-</code></pre>
-
-<center>
-<img src="img/.png" alt="" title="" width="100"/> <!-- Pixel Height: 718 Pixel Width: 881 -->
-</center>
+### Valid API Context Revisited
 
 
 ####<a name="2"></a> Valid API Context
+
+The Revit API is almost completely event driven.
+Every event can be processed by an event handler.
+The best-known event is the external command `Execute` that is triggered by an end user launching the command by clicking the corresponding ribbon button.
+Within the event handler, Revit provides a valid Revit API context.
+Most Revit API methods can only be used within such a context, and nowhere else, cf.:
+
+- [Use of the Revit API requires a valid context](http://thebuildingcoder.typepad.com/blog/2015/12/external-event-and-10-year-forum-anniversary.html#2)
+- [Revit API context summary](https://thebuildingcoder.typepad.com/blog/2015/08/revit-api-context-and-form-creation-errors.html#2)
+- [Valid Revit API context and external events](https://thebuildingcoder.typepad.com/blog/2020/11/document-session-id-api-context-and-external-events.html#3)
+
+When automating Revit, one often wishes to trigger some action in the BIM from outside.
+This can be achieved by implementing an external event that can be raised from a non-modal context.
+This are has been discussed in depth by The Building Coder, cf. the topic group
+on [`Idling` and external events for modeless access and driving Revit from outside](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.28).
+
+Here are some other aspects of this theme, from an internal Revit developers point of view:
 
 **Question:** What is the correct and efficient way to validate one's execution of code is in a Revit API context?
 I can see in the internal C++ code of Revit that Revit API objects perform checks &ndash; how does one do this equivalent check in C#?
@@ -225,3 +228,6 @@ In 2023, the parameters of the simulation model were recalibrated using empirica
 This improved parameter set results in a simulation that shows the same overshoot and collapse mode in the coming decade as the original business-as-usual scenario of the Limits to Growth standard run.
 The main effect of the recalibration update is to raise the peaks of most variables and move them a few years into the future.
 
+<center>
+<img src="img/limits_to_growth.png" alt="Limits to growth" title="Limits to growth" width="400"/> <!-- Pixel Height: 674 Pixel Width: 564 -->
+</center>
