@@ -38,6 +38,17 @@ Revit API, climate, and AI
 
 linkedin:
 
+Revit API, climate, and AI news:
+
+https://autode.sk/apicontext
+
+- Valid Revit API context
+- Extensible storage in APS
+- Large language model course
+- Token-free selective state space model
+- L'humanité en péril
+- The limits to growth...
+
 #BIM #DynamoBIM #AutodeskAPS #Revit #API #IFC #SDK #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
@@ -244,3 +255,43 @@ The main effect of the recalibration update is to raise the peaks of most variab
 <center>
 <img src="img/limits_to_growth.png" alt="Limits to growth" title="Limits to growth" width="300"/> <!-- Pixel Height: 674 Pixel Width: 564 -->
 </center>
+
+####<a name="7.2"></a> Discussing the Limits to Growth
+
+Darren Young [commented](https://www.linkedin.com/feed/update/urn:li:activity:7156650982192398336?commentUrn=urn%3Ali%3Acomment%3A%28activity%3A7156650982192398336%2C7156889623992922112%29&dashCommentUrn=urn%3Ali%3Afsd_comment%3A%287156889623992922112%2Curn%3Ali%3Aactivity%3A7156650982192398336%29):
+
+Recalibrating the parameters and showing the same result is meaningless if the model is using the wrong, incomplete or flawed parameters.
+
+The world is more complicated than 6 inputs.
+
+The world was also at 3 billion people when we were told we’d run out of food to feed everybody. Yet today, aside from political reasons and political unrest, there was a no food starvation as a result of food shortages.
+
+The volume of food wasted is tremendous despite feeding 8 billion people.
+
+Human inginuity and innovation, political will, science and fiscal policy/investment are not parameters in that model.
+
+**Answer:** Absolutely right you are.
+I am still impressed that such a simplified model holds up so well after 50 years (!).
+Please point out one single other example that does equally well or better.
+Let's talk again in 2072 :-)
+
+**Response:** 2072? I hope I'm not around by then.
+I'm already over half a century under my belt. That's plenty. I'm really to go anytime. :-)
+
+I would tend to think the simpler the model, the more stable over time. What it lacks in parameters I suspect helps stability.
+
+I would be interested in seeing their methodology and data. (Ok, maybe not enough to research it myself).
+
+The chart suggests the population has far outpaced resources. Depending on the perspective, you could argue with reasonable utility that this has already happened long ago equally as well as that it's not even remotely true.
+
+That makes me question their methodology and measures.
+
+It could very well be a very stable long term incorrect model. The long term stability is interesting however.
+
+**Response:** I have not looked at the research in detail either, just read
+the [Wikipedia entry](https://en.wikipedia.org/wiki/The_Limits_to_Growth) summarising it.
+The authors back then did differentiate between different scenarios, mainly "business as usual" and "try to do something".
+So far, after fifty years of discussion, we remain very close indeed to the "business as usual" predictions.
+It seems that industry, including agricultural industry, and thus lobbies, and thus politics, are all still in favour of "business a usual" (for obvious reasons).
+So, it becomes the responsibility of the remaining part of humanity to take responsibility and do something, e.g., change patterns of consumption.
+
