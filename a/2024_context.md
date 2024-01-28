@@ -71,6 +71,7 @@ We continue our exciting exploration of the Revit API and observations on where 
 - [Token-free selective state space model](#5)
 - [L'humanité en péril](#6)
 - [The limits to growth](#7)
+- [Discussing the limits to growth](#7.2)
 
 ####<a name="2"></a> Valid Revit API Context
 
