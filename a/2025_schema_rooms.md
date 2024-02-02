@@ -44,7 +44,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Retrieve Rooms and Building a Schema
+### Retrieving Rooms and Building a Schema
 
 ####<a name="2"></a> Schema Builder Limitation
 
@@ -152,8 +152,6 @@ Then, GetBoundarySegments should be enough for this request.
 There are many solutions to this.
 So, it’s up to you.
 
-
-
 ####<a name="4"></a> Embed GIF in ToolTip
 
 Mauricio [SpeedCAD](https://github.com/SpeedCAD) Jorquera shared a nice solution
@@ -172,3 +170,86 @@ If anyone is interested in using or testing this class, you can download the DLL
 I hope this tool is useful!
 
 Many thanks to Mauricio for implementing sharing this!
+
+####<a name="%"></a> Control Draw Order of Detail Items
+
+Adrian Crisan of [Studio A International, LLC](http://www.studio-a-int.com) pointed out how to control
+the [draw order of detail items](https://forums.autodesk.com/t5/revit-api-forum/draw-order-of-detail-items/m-p/12531008) using
+the [DetailElementOrderUtils class](https://www.revitapidocs.com/2024/7153db7b-62cc-f36b-b6a5-0ded8af7b5be.htm).
+
+We very briefly mentioned it way back in 2013 as one of
+the [handy utility classes](https://thebuildingcoder.typepad.com/blog/2013/04/handy-utility-classes.html),
+and in the What's New notes for the 2013, 2014 and 2024 Revit API, but never previously shared a sample here.
+
+So, many thanks to Adrian for spelling it out for us:
+
+**Question:**
+I have seen a few old posts about this, but I still cant find it in the API.
+Is it possible in Revit 2022 to change the draw order of detail items in a family document?
+
+**Answer:**
+Use the code below to change order of Detail Items in a Family.
+Explanations are within the method.
+Assign the method to a button, so pressing the button
+consecutively will bring front/back the "Solid Fill - Blue":
+
+<pre><code>
+// Counter for how many button was pressed
+int ct = 0;
+void ChangeDetailItemDrawOrder()
+{
+// Code provided courtesy of:
+// Studio A International, LLC
+// http://www.studio-a-int.com
+// The below code assume you have 3 Detail Items overlapping in your Revit Family
+// They are arranged in order top to bottom as below
+// Each Detail Item is a Filled Region and their Type Names are:
+// "Solid Fill - Blue"
+// "Solid Fill - Yellow"
+// "Solid Fill - Red"
+// To bring a Detail Component to front, use API method
+// public static void BringToFront(Document pDocument, View pDBView, ElementId detailElementId)
+// https://www.revitapidocs.com/2019/055c8585-0e6c-13ae-c2af-891e0928a5a1.htm
+// To send Detail Component to back, use API method
+// public static void SendToBack(Document pDocument, View pDBView, ElementId detailElementId)
+// https://www.revitapidocs.com/2019/28209b7b-e75e-36d9-f916-d1cdaebe051d.htm
+if (activeDoc.IsFamilyDocument == true)
+{
+FilteredElementCollector frCollector = new FilteredElementCollector(activeDoc);
+// colect all Detail Components in the active document
+List<Autodesk.Revit.DB.FilledRegion> detailItems0 = frCollector.OfClass(typeof(Autodesk.Revit.DB.FilledRegion)).Cast<Autodesk.Revit.DB.FilledRegion>().ToList();
+// colect all the Views in the Active Family Document
+FilteredElementCollector vCollector = new FilteredElementCollector(activeDoc);
+IEnumerable<View> allViews0 = new FilteredElementCollector(activeDoc)
+.OfClass(typeof(View))
+.OfCategory(BuiltInCategory.OST_Views)
+.Cast<View>();
+Autodesk.Revit.DB.FilledRegion detailBlue = detailItems0.Where(i => activeDoc.GetElement(i.GetTypeId()).get_Parameter(BuiltInParameter.ALL_MODEL_TYPE_NAME).AsString() == "Solid Fill - Blue").ToList().FirstOrDefault();
+using (Transaction t = new Transaction(activeDoc, "Change drawing order"))
+{
+t.Start("Change drawing order for Detail Components");
+if (ct == 0)
+{
+// Send to back
+DetailElementOrderUtils.SendToBack(activeDoc, allViews0.ToList().FirstOrDefault(), detailBlue.Id);
+ct++;
+}
+else if (ct == 1)
+{
+// Bring to front
+DetailElementOrderUtils.BringToFront(activeDoc, allViews0.ToList().FirstOrDefault(), detailBlue.Id);
+ct = 0;
+}
+t.Commit();
+}
+}
+}
+private void buttonChangeDrawingOrder_Click(object sender, RoutedEventArgs e)
+{
+ChangeDetailItemDrawOrder();
+}
+</code></pre>
+
+**Response:**
+Thank you! Works like a charm!
+
