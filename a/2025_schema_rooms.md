@@ -26,9 +26,9 @@
 
 twitter:
 
- #RevitAPI  @AutodeskRevit #BIM @DynamoBIM
+Using the extensible storage schema builder, retrieving all adjacent apartment rooms, embedding a GIF animation in a ribbon tooltip and controlling detail item draw order with the #RevitAPI @AutodeskRevit #BIM @DynamoBIM https://autode.sk/schemabuilderquirks
 
-Using the extensible storage schema builder, retrieving adjacent rooms, embedding an animation in a tooltip and controlling detail items draw order
+Using the extensible storage schema builder, retrieving adjacent rooms, embedding an animation in a tooltip and controlling detail item draw order
 &ndash; Schema builder quirks
 &ndash; Get all apartment rooms
 &ndash; Embed GIF in tooltip
