@@ -113,11 +113,46 @@ schemaBuilder.AddSimpleField(DATAFIELD, typeof (string)).SetDocumentation("The d
 schemaBuilder.AddSimpleField(ZIPFIELD, typeof (bool)).SetDocumentation("Whether or not the stored data has been zipped.");
 </code></pre>
 
-####<a name="3"></a>
+####<a name="3"></a> Get All Apartment Rooms
 
-####<a name="4"></a>
+**Question:** I want to collect all room in a given apartment.
+The user just selects one external door.
+So far, I have implemented this collection of rooms in the apartment using the properties `FromRoom` and `ToRoom`.
+Now, I encountered a case where rooms are not separated by a door but by a room separator:
 
 <center>
-<img src="img/.png" alt="" title="" width="100"/> <!-- Pixel Height: 674 Pixel Width: 564 -->
+<img src="img/get_rooms_1.png" alt="Get adjacent rooms" title="Get adjacent rooms" width="500"/> <!-- Pixel Height: 743 Pixel Width: 1,176 -->
 </center>
+
+In this case, the logic above fails.
+How can I handle this case?
+
+**Answer:**
+You have to do both the doors and the room separations.
+So, after you pull the doors from the room, pull it's boundary segments using
+the [GetBoundarySegments method](https://www.revitapidocs.com/2024/8e0919af-6172-9d16-26d2-268e42f7e936.htm).
+Then, for each segment, check if the bounding element type is a room separation.
+If so, evaluate a point at the middle of the curve, and translate it just inside and just outside the curve.
+Pull the room at those points and you get the one room which is your active room, and one room which is the adjacent one.
+Add the adjacent one to your list of rooms to process, and the list of 'included' rooms.
+
+Some supplementary thoughts: there might be some complicated cases where one room separation line is the boundary of more than two rooms:
+
+<center>
+<img src="img/get_rooms_2.png" alt="Get adjacent rooms" title="Get adjacent rooms" width="200"/> <!-- Pixel Height: 269 Pixel Width: 377 -->
+</center>
+
+One way to handle this is to record the boundary information in a `Dictionary&lt;ElementId, List&lt;ElementId&gt;&gt;`, where the key is the element id of the boundary segment, and the value is the elements that are bounded by that segment.
+You can loop through all rooms to construct the dictionary.
+
+Possibly, though, the `GetBoundarySegments` call on room three returns a segment for the boundary to room one and a separate segment for the boundary to room 2, so there shouldn’t be much of a concern with tracking.
+Worth checking though.
+Then, GetBoundarySegments should be enough for this request.
+
+There are many solutions to this.
+So, it’s up to you.
+
+
+
+####<a name="4"></a>
 
