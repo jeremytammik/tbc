@@ -205,55 +205,69 @@ consecutively will bring front/back the "Solid Fill - Blue":
 int ct = 0;
 void ChangeDetailItemDrawOrder()
 {
-// Code provided courtesy of:
-// Studio A International, LLC
-// http://www.studio-a-int.com
-// The below code assume you have 3 Detail Items overlapping in your Revit Family
-// They are arranged in order top to bottom as below
-// Each Detail Item is a Filled Region and their Type Names are:
-// "Solid Fill - Blue"
-// "Solid Fill - Yellow"
-// "Solid Fill - Red"
-// To bring a Detail Component to front, use API method
-// public static void BringToFront(Document pDocument, View pDBView, ElementId detailElementId)
-// https://www.revitapidocs.com/2019/055c8585-0e6c-13ae-c2af-891e0928a5a1.htm
-// To send Detail Component to back, use API method
-// public static void SendToBack(Document pDocument, View pDBView, ElementId detailElementId)
-// https://www.revitapidocs.com/2019/28209b7b-e75e-36d9-f916-d1cdaebe051d.htm
-if (activeDoc.IsFamilyDocument == true)
-{
-FilteredElementCollector frCollector = new FilteredElementCollector(activeDoc);
-// colect all Detail Components in the active document
-List<Autodesk.Revit.DB.FilledRegion> detailItems0 = frCollector.OfClass(typeof(Autodesk.Revit.DB.FilledRegion)).Cast<Autodesk.Revit.DB.FilledRegion>().ToList();
-// colect all the Views in the Active Family Document
-FilteredElementCollector vCollector = new FilteredElementCollector(activeDoc);
-IEnumerable<View> allViews0 = new FilteredElementCollector(activeDoc)
-.OfClass(typeof(View))
-.OfCategory(BuiltInCategory.OST_Views)
-.Cast<View>();
-Autodesk.Revit.DB.FilledRegion detailBlue = detailItems0.Where(i => activeDoc.GetElement(i.GetTypeId()).get_Parameter(BuiltInParameter.ALL_MODEL_TYPE_NAME).AsString() == "Solid Fill - Blue").ToList().FirstOrDefault();
-using (Transaction t = new Transaction(activeDoc, "Change drawing order"))
-{
-t.Start("Change drawing order for Detail Components");
-if (ct == 0)
-{
-// Send to back
-DetailElementOrderUtils.SendToBack(activeDoc, allViews0.ToList().FirstOrDefault(), detailBlue.Id);
-ct++;
+  // Code provided courtesy of:
+  // Studio A International, LLC
+  // http://www.studio-a-int.com
+  // The below code assumes you have 3 Detail Items overlapping in your Revit Family
+  // They are arranged in order top to bottom as below
+  // Each Detail Item is a Filled Region and their Type Names are:
+  // "Solid Fill - Blue"
+  // "Solid Fill - Yellow"
+  // "Solid Fill - Red"
+  // To bring a Detail Component to front, use API method
+  // public static void BringToFront(Document pDocument, View pDBView, ElementId detailElementId)
+  // https://www.revitapidocs.com/2019/055c8585-0e6c-13ae-c2af-891e0928a5a1.htm
+  // To send Detail Component to back, use API method
+  // public static void SendToBack(Document pDocument, View pDBView, ElementId detailElementId)
+  // https://www.revitapidocs.com/2019/28209b7b-e75e-36d9-f916-d1cdaebe051d.htm
+
+  if (activeDoc.IsFamilyDocument == true)
+  {
+    FilteredElementCollector frCollector = new FilteredElementCollector(activeDoc);
+    // collect all Detail Components in the active document
+    List<Autodesk.Revit.DB.FilledRegion> detailItems0 = frCollector
+      .OfClass(typeof(Autodesk.Revit.DB.FilledRegion))
+      .Cast<Autodesk.Revit.DB.FilledRegion>()
+      .ToList();
+    // collect all the Views in the Active Family Document
+    FilteredElementCollector vCollector = new FilteredElementCollector(activeDoc);
+    IEnumerable<View> allViews0 = new FilteredElementCollector(activeDoc)
+      .OfClass(typeof(View))
+      .OfCategory(BuiltInCategory.OST_Views)
+      .Cast<View>();
+    Autodesk.Revit.DB.FilledRegion detailBlue = detailItems0
+      .Where(i => activeDoc.GetElement(i.GetTypeId())
+        .get_Parameter(BuiltInParameter.ALL_MODEL_TYPE_NAME).AsString()
+          == "Solid Fill - Blue")
+      .ToList()
+      .FirstOrDefault();
+    using (Transaction t = new Transaction(activeDoc, "Change drawing order"))
+    {
+      t.Start("Change drawing order for Detail Components");
+      if (ct == 0)
+      {
+        // Send to back
+        DetailElementOrderUtils.SendToBack(activeDoc,
+          allViews0.ToList().FirstOrDefault(), detailBlue.Id);
+        ct++;
+      }
+      else if (ct == 1)
+      {
+        // Bring to front
+        DetailElementOrderUtils.BringToFront(activeDoc,
+          allViews0.ToList().FirstOrDefault(), detailBlue.Id);
+        ct = 0;
+      }
+      t.Commit();
+    }
+  }
 }
-else if (ct == 1)
+
+private void buttonChangeDrawingOrder_Click(
+  object sender,
+  RoutedEventArgs e)
 {
-// Bring to front
-DetailElementOrderUtils.BringToFront(activeDoc, allViews0.ToList().FirstOrDefault(), detailBlue.Id);
-ct = 0;
-}
-t.Commit();
-}
-}
-}
-private void buttonChangeDrawingOrder_Click(object sender, RoutedEventArgs e)
-{
-ChangeDetailItemDrawOrder();
+  ChangeDetailItemDrawOrder();
 }
 </code></pre>
 
