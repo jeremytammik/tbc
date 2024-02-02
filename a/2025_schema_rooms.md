@@ -9,6 +9,21 @@
 
 <!---
 
+- schema builder crash
+  https://autodesk.slack.com/archives/C0SR6NAP8/p1706598868934699
+  https://forums.autodesk.com/t5/revit-api-forum/extensiblestorage-schemabuilder-addsimplefield-causes-quot/m-p/12529666
+
+- get rooms
+  https://autodesk.slack.com/archives/C0SR6NAP8/p1706701084426099
+  Want to collect the every room in apartment...
+
+- Embed Gif in ToolTip
+  https://forums.autodesk.com/t5/revit-api-forum/embed-gif-in-tooltip/m-p/12532476
+
+- Draw order of detail items
+  https://forums.autodesk.com/t5/revit-api-forum/draw-order-of-detail-items/m-p/12531008
+  very briefly mentioned in [Handy Utility Classes](https://thebuildingcoder.typepad.com/blog/2013/04/handy-utility-classes.html) and in the what's new notes for 2013, 2014 and 2024, but never tested
+
 twitter:
 
  #RevitAPI  @AutodeskRevit #BIM @DynamoBIM
@@ -31,21 +46,72 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Retrieve Rooms and Building a Schema
 
-####<a name="2"></a>
+####<a name="2"></a> Schema Builder Limitation
 
-**Question:**
+A couple of interesting aspects of using the `SchemaBuilder` came up in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on [`AddSimpleField` causes `ArchiveException 106`](https://forums.autodesk.com/t5/revit-api-forum/extensiblestorage-schemabuilder-addsimplefield-causes-quot/m-p/12529666):
 
-**Answer:**
-
-**Response:**
-
+**Question:** How can we fix an `InternalException` with `ArchiveException 106`, please? It is triggered by a third party plugin calling `SchemaBuilder.AddSimpleField`. The issue only occurs for 1 user; many users at the company are using the plugin and multiple users using the plugin are working in the same projects as the user having the issue. The user has 2 Autodesk accounts; the issue only occurs when they are using 1 of the accounts. The issue does not occur when they are on the other account. The issue occurs in all projects the user opens. The journal file entry reads:
 
 <pre><code>
+An ArchiveException 106 is raised at line 661 of E:\Ship\2023_px64\Source\Foundation\Utility\Archive\DataDict.cpp
 </code></pre>
 
+The plugin debug log lists this:
 
-Many thanks to
- for this illuminating discussion.
+<pre><code>
+Autodesk.Revit.Exceptions.InternalException: A managed exception was thrown by Revit or by one of its external applications.
+  at Autodesk.Revit.DB.ExtensibleStorage.SchemaBuilder.AddSimpleField(String fieldName, Type fieldType)
+</code></pre>
+
+Troubleshooting steps tried so far:
+
+- Deleting the extensible storage objects created by the plugin. The thought is perhaps the objects became corrupted so deleting them and allowing the plugin to recreate new ones may resolve the issue, this did not work.
+- Audit the model
+- Disabling the plugin. This resolves the issue but the problem to solve is having the plugin not causing the issue for this user, this issue does not and has never occurred for any other user of the plugin.
+- Switching to a different Autodesk account. This does resolve the issue but project requirements require the user to use the specific account that has the issue.
+
+What can we do to resolve this issue, please? -- https://forums.autodesk.com/t5/revit-api-forum/extensiblesotrage-schemabuilder-addsimplefield-causes-quot/td-p/12527389
+
+**Answer:** There is a known improvement logged in REVIT-156791.
+The issue is "the `fieldName` is too long".
+The current limitation in Revit is we only accept the field name with length less than 63.
+Why does the issue only happen on one specific user account?
+Please ask the user to check with the plugin owner about the `fieldName`.
+It is possible that this `fieldName` is generated based on the current user name.
+
+Another issue that can occur: given the following code to set up 3 simple fields for the schema and set the documentation for those fields:
+
+<pre><code>
+FieldBuilder theVersion = schemaBuilder.AddSimpleField(VERSIONFIELD, typeof (int)); // create a field to store the version number
+FieldBuilder theData = schemaBuilder.AddSimpleField(DATAFIELD, typeof (string)); // create a field to store the data
+FieldBuilder isZipped = schemaBuilder.AddSimpleField(ZIPFIELD, typeof (bool)); // create a field to store the data
+theVersion.SetDocumentation("The version number of the schema of the stored data.");
+theData.SetDocumentation("The data as XML serialized, possibly zipped and base64 coded string.");
+isZipped.SetDocumentation("Whether or not the stored data has been zipped.");
+</code></pre>
+
+he first `SetDocumentation` call may fail.
+The issue has to do with the way fields get added on each call to `AddSimpleField`.
+Internally, the fields are stored in a dynamic array and the return value of `AddSimpleField` is a pointer to the entry inside that array.
+Subsequent calls to `AddSimpleField` will add new entries into this array and return pointers to those.
+The problem is that each "add" is going to trigger the array to be "resized".
+This means that it is essentially reallocated and all entries moved to the new allocation.
+Thus, any reference pointers at that point are now pointing to the wrong/deleted thing.
+That can cause a crash as that memory has been written over to catch this case; release builds may seemingly work, but the memory is not the write (right) memory to place the string in.
+
+In general, when working with schemaBuilder and adding fields, it seems best to add the field, set its properties, then continue onto the next field etc.
+The code above can be fixed as follows:
+
+<pre><code>
+// create a field to store the version number
+schemaBuilder.AddSimpleField(VERSIONFIELD, typeof (int)).SetDocumentation("The version number of the schema of the stored data.");
+// create a field to store the data
+schemaBuilder.AddSimpleField(DATAFIELD, typeof (string)).SetDocumentation("The data as XML serialized, possibly zipped and base64 coded string.");
+// create a field to store the data
+schemaBuilder.AddSimpleField(ZIPFIELD, typeof (bool)).SetDocumentation("Whether or not the stored data has been zipped.");
+</code></pre>
 
 ####<a name="3"></a>
 
