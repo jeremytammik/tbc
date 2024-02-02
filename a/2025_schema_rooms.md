@@ -46,7 +46,14 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Retrieving Rooms and Building a Schema
 
-####<a name="2"></a> Schema Builder Limitation
+Today, we look at a couple of things to pay attention to when using the extensible storage schema builder, retrieving adjacent rooms, embedding an animation in a tooltip and controlling the draw order of detail items:
+
+- [Schema builder quirks](#2)
+- [Get all apartment rooms](#3)
+- [Embed GIF in tooltip](#4)
+- [Control draw order of detail items](#5)
+
+####<a name="2"></a> Schema Builder Quirks
 
 A couple of interesting aspects of using the `SchemaBuilder` came up in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
@@ -171,7 +178,7 @@ I hope this tool is useful!
 
 Many thanks to Mauricio for implementing sharing this!
 
-####<a name="%"></a> Control Draw Order of Detail Items
+####<a name="5"></a> Control Draw Order of Detail Items
 
 Adrian Crisan of [Studio A International, LLC](http://www.studio-a-int.com) pointed out how to control
 the [draw order of detail items](https://forums.autodesk.com/t5/revit-api-forum/draw-order-of-detail-items/m-p/12531008) using
