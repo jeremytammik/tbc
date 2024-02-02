@@ -176,19 +176,13 @@ If anyone is interested in using or testing this class, you can download the DLL
 
 I hope this tool is useful!
 
-Many thanks to Mauricio for implementing sharing this!
+Many thanks to Mauricio for implementing and sharing this!
 
 ####<a name="5"></a> Control Draw Order of Detail Items
 
 Adrian Crisan of [Studio A International, LLC](http://www.studio-a-int.com) pointed out how to control
 the [draw order of detail items](https://forums.autodesk.com/t5/revit-api-forum/draw-order-of-detail-items/m-p/12531008) using
-the [DetailElementOrderUtils class](https://www.revitapidocs.com/2024/7153db7b-62cc-f36b-b6a5-0ded8af7b5be.htm).
-
-We very briefly mentioned it way back in 2013 as one of
-the [handy utility classes](https://thebuildingcoder.typepad.com/blog/2013/04/handy-utility-classes.html),
-and in the What's New notes for the 2013, 2014 and 2024 Revit API, but never previously shared a sample here.
-
-So, many thanks to Adrian for spelling it out for us:
+the [DetailElementOrderUtils class](https://www.revitapidocs.com/2024/7153db7b-62cc-f36b-b6a5-0ded8af7b5be.htm):
 
 **Question:**
 I have seen a few old posts about this, but I still cant find it in the API.
@@ -273,4 +267,10 @@ private void buttonChangeDrawingOrder_Click(
 
 **Response:**
 Thank you! Works like a charm!
+
+We briefly mentioned `DetailElementOrderUtils` way back in 2013 as one of
+the [handy utility classes](https://thebuildingcoder.typepad.com/blog/2013/04/handy-utility-classes.html),
+and in the What's New notes for the 2013, 2014 and 2024 Revit API, but never previously shared a sample here.
+
+So, many thanks to Adrian for spelling it out for us!
 
