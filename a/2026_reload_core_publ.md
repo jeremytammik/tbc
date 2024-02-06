@@ -141,14 +141,17 @@ The most difficult part is probably the inter-process communication between the 
 
 Many thanks to Joel for sharing this exciting approach!
 
-
 ####<a name="5"></a> Hot Reloading in Visual Studio With Dynamo and Revit
 
-john pierson demonstrates another interactive trick in his three-minute video
-[Don't Show the Revit Python Users this C# Visual Studio Trick](https://youtu.be/Xcjlh3D7ieU):
+John Pierson demonstrates another interactive trick in his three-minute video
+[don't show the Revit Python users this C# Visual Studio trick](https://youtu.be/Xcjlh3D7ieU):
 
-Taking a look at the hot reload feature in Visual Studio 2022 and how it works with Dynamo and Revit to instantaneously update a live RVT model
-https://youtu.be/Xcjlh3D7ieU
+> Taking a look at the hot reload feature in Visual Studio 2022 and how it works with Dynamo and Revit to instantaneously update a live RVT model
+
+<center>
+<iframe width="480" height="270" src="https://www.youtube.com/embed/Xcjlh3D7ieU?si=w8TFFRObf0-OQe6T" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+</center>
+
 
 ####<a name="6"></a> Assigning Invisible Graphics Linestyle
 
