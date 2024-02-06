@@ -58,22 +58,27 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 </center>
 
 
-####<a name="2"></a> .net core migration webinar recording
+####<a name="2"></a> .NET Core Migration Webinar Recording
 
-discussed
+We repeatedly discussed how to use .NET Core with the Revit API, both in
+the [discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) and
+here in the blog, e.g.:
 
 - [.NET 5 and Core](https://thebuildingcoder.typepad.com/blog/2021/01/face-triangulation-lod-net-5-and-core.html#2)
 - [.NET Core](https://thebuildingcoder.typepad.com/blog/2023/08/15-years-polygon-areas-and-net-core.html#3)
 - [.NET Core Preview and Open Source Add-In Projects](https://thebuildingcoder.typepad.com/blog/2023/11/net-core-preview-and-open-source-add-in-projects.html)
-- [.NET Core Webinar](https://thebuildingcoder.typepad.com/blog/2023/12/parameters-and-net-core-webinar.html#2)
 
-solution
+Roman [Nice3point](https://github.com/Nice3point) Karpovich
+of [atomatiq](https://www.linkedin.com/company/atomatiq/), aka Роман Карпович, even presented
+a [solution using IPC to connect components using different .NET frameworks](https://thebuildingcoder.typepad.com/blog/2023/10/dll-paradise-and-a-fall.html).
 
-- [DLL Paradise and a Fall](https://thebuildingcoder.typepad.com/blog/2023/10/dll-paradise-and-a-fall.html)
+The development team is working on upgrading the Revit API to .NET Core and held
+the [.NET Core webinar](https://thebuildingcoder.typepad.com/blog/2023/12/parameters-and-net-core-webinar.html#2) to
+discuss the current state of things and migration issues.
 
-.net core migration webinar recording
-Recording from the webinar is posted in the feedback portal:
-https://feedback.autodesk.com/project/article/item.html?cap=cb0fd5af18bb49b791dfa3f5efc47a72&arttypeid={16363613-34f6-4dfa-9b97-3857dbbe9ade}&
+The [.NET Core migration webinar recording](https://feedback.autodesk.com/project/article/item.html?cap=cb0fd5af18bb49b791dfa3f5efc47a72&arttypeid={16363613-34f6-4dfa-9b97-3857dbbe9ade}&)
+has now been posted to the feedback portal.
+Note that an ADN or feedback portal membership is required to access that link.
 
 ####<a name="3"></a> API Access to Publish Settings
 
@@ -152,9 +157,9 @@ John Pierson demonstrates another interactive trick in his three-minute video
 <iframe width="480" height="270" src="https://www.youtube.com/embed/Xcjlh3D7ieU?si=w8TFFRObf0-OQe6T" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 </center>
 
-
 ####<a name="6"></a> Assigning Invisible Graphics Linestyle
 
+Back to a 'normal' non-interactive Revity API question,
 [Evan Geer](https://evangeer.github.io/) explains
 [how to assign category / graphics style `<Invisible lines>` to edges of titleblock via API](https://stackoverflow.com/questions/77942445/how-to-assign-category-graphics-style-invisible-lines-to-edges-of-titleblo):
 
