@@ -40,8 +40,13 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### .NET Core, C4R Views,
+### .NET Core, C4R Views and Interactive Hot Reload
 
+- [.NET Core migration webinar recording](#2)
+- [C4R publish view to cloud API](#3)
+- [Revit polyglot notebook](#4)
+- [Hot reloading in Visual Studio With Dynamo and Revit](#5)
+- [Assigning invisible graphics linestyle](#6)
 
 ####<a name="2"></a> .NET Core Migration Webinar Recording
 
