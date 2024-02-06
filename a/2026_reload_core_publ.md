@@ -40,27 +40,12 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-###
-
-
-####<a name="2"></a>
-
-**Question:**
-
-
-**Answer:**
-
-
-
-
-<center>
-<img src="img/.png" alt="" title="" width="100"/> <!-- Pixel Height: 743 Pixel Width: 1,176 -->
-</center>
+### .NET Core, C4R Views,
 
 
 ####<a name="2"></a> .NET Core Migration Webinar Recording
 
-We repeatedly discussed how to use .NET Core with the Revit API, both in
+The question on using .NET Core with the Revit API came up repeatedly, both in
 the [discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) and
 here in the blog, e.g.:
 
@@ -68,42 +53,91 @@ here in the blog, e.g.:
 - [.NET Core](https://thebuildingcoder.typepad.com/blog/2023/08/15-years-polygon-areas-and-net-core.html#3)
 - [.NET Core Preview and Open Source Add-In Projects](https://thebuildingcoder.typepad.com/blog/2023/11/net-core-preview-and-open-source-add-in-projects.html)
 
+Up until today, the Revit API system requirements require the .NET framework 4.8, and not Core.
+
 Roman [Nice3point](https://github.com/Nice3point) Karpovich
 of [atomatiq](https://www.linkedin.com/company/atomatiq/), aka Роман Карпович, even presented
 a [solution using IPC to connect components using different .NET frameworks](https://thebuildingcoder.typepad.com/blog/2023/10/dll-paradise-and-a-fall.html).
 
 The development team is working on upgrading the Revit API to .NET Core and held
-the [.NET Core webinar](https://thebuildingcoder.typepad.com/blog/2023/12/parameters-and-net-core-webinar.html#2) to
-discuss the current state of things and migration issues.
+the [.NET Core webinar](https://thebuildingcoder.typepad.com/blog/2023/12/parameters-and-net-core-webinar.html#2) on
+January 30, 2024, to discuss the current state of things and migration issues.
 
 The [.NET Core migration webinar recording](https://feedback.autodesk.com/project/article/item.html?cap=cb0fd5af18bb49b791dfa3f5efc47a72&arttypeid={16363613-34f6-4dfa-9b97-3857dbbe9ade}&)
 has now been posted to the feedback portal.
 Note that an ADN or feedback portal membership is required to access that link.
 
-####<a name="3"></a> API Access to Publish Settings
+####<a name="3"></a> C4R Publish View to Cloud API
 
-[How to Export Multiple 3D Views For View and Data API](https://adndevblog.typepad.com/cloud_and_mobile/2015/09/how-to-export-multiple-3d-views-for-view-and-data-api.html)
-[Selecting RVT 3D Views for Forge Translation](https://thebuildingcoder.typepad.com/blog/2016/07/selecting-views-for-forge-translation.html)
-[Select Rooms and Views to Publish to the Cloud](https://thebuildingcoder.typepad.com/blog/2017/09/revit-20181-nuget-packages-rooms-and-views-in-forge.html#2)
+The cloud collaboration for Revit tool C4R enables an end user
+[to export multiple 3D views for view and data API](https://adndevblog.typepad.com/cloud_and_mobile/2015/09/how-to-export-multiple-3d-views-for-view-and-data-api.html) in
+the UI, cf. also the official Revit online help on how
+to [publish cloud Models](https://help.autodesk.com/view/RVT/2024/ENU/?guid=GUID-A2444193-FCE8-4219-A590-62CA2B8B5C5D).
 
-- publish views and sheets to the cloud
-  https://forums.autodesk.com/t5/revit-api-forum/how-to-add-views-to-a-publishing-set/m-p/12396874/highlight/false#M75477
-  views_for_a360.png
-  c4r_views_for_a360.png
-  collaborate_publish_settings.png
-  collaborate_publish_settings2.png
-  collaborate_publish_settings3_rvt_views_to_cloud.png
-  https://help.autodesk.com/view/RVT/2023/ENU/?guid=GUID-A2444193-FCE8-4219-A590-62CA2B8B5C5D
+However, I am not aware of any official support to select them programmatically through the API, even though we did look at the issue
+of [selecting RVT 3D views for Forge translation](https://thebuildingcoder.typepad.com/blog/2016/07/selecting-views-for-forge-translation.html)
+and [selecting rooms and views to publish to the cloud](https://thebuildingcoder.typepad.com/blog/2017/09/revit-20181-nuget-packages-rooms-and-views-in-forge.html#2) years ago.
 
+The question was also raised in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on [how to add views to a publishing set](https://forums.autodesk.com/t5/revit-api-forum/how-to-add-views-to-a-publishing-set/m-p/12396874),
+noting that the required information is stored in extensible storage data on the `ProjectInfo` singleton:
 
+<!--
+views_for_a360.png
+c4r_views_for_a360.png
+collaborate_publish_settings.png
+collaborate_publish_settings2.png
+collaborate_publish_settings3_rvt_views_to_cloud.png
+-->
 
-1876_da4r_save_c4r.md
+<center>
+<img src="img/c4a_views_projectinfo.png" alt="ProjectInfo C4R publish views data" title="ProjectInfo C4R publish views data" width="800"/> <!-- Pixel Height: 852 Pixel Width: 1,304 -->
+</center>
 
-programmatic access to [make the "Publish settings" tool functions available in the API](https://forums.autodesk.com/t5/revit-ideas/make-the-quot-publish-settings-quot-tool-functions-available-in/idc-p/12538103)
+Now, a solution to programmatically access and manipulate this data has been shared by Peter Hirn and Charles Ciro in the Revit Idea Station wishlist item
+to [make the "Publish settings" tool functions available in the API](https://forums.autodesk.com/t5/revit-ideas/make-the-quot-publish-settings-quot-tool-functions-available-in/idc-p/12538103):
+
+> I am editing/creating the viewset with the `PrintManager`, `ViewSheetSet`, and `ViewSheetSetting` classes, and then I move on to publishing with the code you showed.
+The detail is that you must put AD`SK as the vendorId, which is not elegant:
+
+<pre><code>
+public static void PublishedViews(Document d)
+{
+  ViewSheetSet existingViewSet = new FilteredElementCollector(d)
+    .OfClass(typeof(ViewSheetSet))
+    .Cast&lt;ViewSheetSet&gt;()
+    .FirstOrDefault(vs =&gt; vs.Name == "existingViewSetName");
+
+  var schemaId = new Guid("57c66e83-4651-496b-aebb-69d085752c1b");
+
+  var schema =
+    Schema.ListSchemas().FirstOrDefault(schemaVS =&gt; schemaVS.GUID == schemaId)
+    ?? throw new InvalidOperationException("Schema ExportViewSheetSetListSchema not found");
+
+  var field =
+    schema.GetField("ExportViewViewSheetSetIdList")
+    ?? throw new InvalidOperationException("Field ExportViewViewSheetSetIdList not found");
+
+  var entity = d.ProjectInformation.GetEntity(schema);
+
+  var viewSheetSetIds = entity.Get&lt;IList&lt;int&gt;&gt;(field);
+  var viewSheetSets = viewSheetSetIds.Select(id =&gt; d.GetElement(new ElementId(id))).Cast&lt;ViewSheetSet&gt;();
+  var views = viewSheetSets.SelectMany(viewSheetSet =&gt; viewSheetSet.Views.Cast&lt;View&gt;());
+
+  // Add the additional ViewSheetSet
+
+  viewSheetSetIds.Add(existingViewSet.Id.IntegerValue);
+  entity.Set(field, viewSheetSetIds);
+  d.ProjectInformation.SetEntity(entity);
+}
+</code></pre>
+
+Many thanks to Charles and Peter for sharing this!
 
 ####<a name="4"></a> Revit Polyglot Notebook
 
-Joel Waldheim Saury, BIM Developer at [Sweco](https://www.sweco.se/) shares
+Joel Waldheim Saury, BIM Developer at [Sweco](https://www.sweco.se/), shares
 his interactive .NET BIM [Revit Polyglot Notebook project](https://github.com/jowsy/bim-net-interactive), saying:
 
 Thanks for a great blog!
@@ -216,21 +250,21 @@ The following worked for me:
 
 <pre><code>
 var graphicsStyles = new FilteredElementCollector(Document)
-    .WhereElementIsNotElementType()
-    .OfClass(typeof(GraphicsStyle))
-    .Cast<GraphicsStyle>()
-    .ToList();
+  .WhereElementIsNotElementType()
+  .OfClass(typeof(GraphicsStyle))
+  .Cast<GraphicsStyle>()
+  .ToList();
 
 var lineStyle = graphicsStyles.FirstOrDefault(x => x.Name == "<Invisible lines>");
 
 if (lineStyle != null)
 {
-    using (var t = new Transaction(Document, "update line type"))
-    {
-        t.Start();
-        lines.ForEach(line => line.LineStyle = lineStyle);
-        t.Commit();
-    }
+  using (var t = new Transaction(Document, "update line type"))
+  {
+    t.Start();
+    lines.ForEach(line => line.LineStyle = lineStyle);
+    t.Commit();
+  }
 }
 </code></pre>
 
