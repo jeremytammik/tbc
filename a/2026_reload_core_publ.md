@@ -96,14 +96,57 @@ https://feedback.autodesk.com/project/article/item.html?cap=cb0fd5af18bb49b791df
 
 programmatic access to [make the "Publish settings" tool functions available in the API](https://forums.autodesk.com/t5/revit-ideas/make-the-quot-publish-settings-quot-tool-functions-available-in/idc-p/12538103)
 
-####<a name="4"></a> https://github.com/jowsy/bim-net-interactive
+####<a name="4"></a> Revit Polyglot Notebook
 
-https://github.com/jowsy/bim-net-interactive
-email Saury Waldheim, Joel <joel.saury@sweco.se>
+Joel Waldheim Saury, BIM Developer at [Sweco](https://www.sweco.se/) shares
+his interactive .NET BIM [Revit Polyglot Notebook project](https://github.com/jowsy/bim-net-interactive), saying:
 
-####<a name="5"></a> Don't Show the Revit Python Users this C# Visual Studio Trick
+Thanks for a great blog!
+I’ve read it for many years and I’ve been at Autodesk University couple of times!
 
-Don't Show the Revit Python Users this C# Visual Studio Trick
+Reading your latest post
+about [valid Revit API context](https://thebuildingcoder.typepad.com/blog/2024/01/valid-revit-api-context-llm-and-ltg.html#2) inspired
+me to share a personal project I’ve been working on that touches this topic.
+
+I have been experimenting
+with [VS Code Polyglot Notebook](https://duckduckgo.com/?q=VS+Code+Polyglot+Notebook) extensions,
+how to run live Revit C# scripts, and tried to implement a NET interactive kernel embedded in Revit.
+
+Here is the result:
+
+- [Revit Polyglot Notebook project](https://github.com/jowsy/bim-net-interactive)
+
+The background is that I’ve been using ChatGPT to write some Revit API code for me and just wanted a fast way to test it in Revit.
+I also wanted to experiment with some open-source libraries and the variable sharing capabilities in .NET Interactive enables you to send values between Revit and for example a Python kernel running in Jupyter Notebook!
+
+So this tool was born.
+
+Hope you find it interesting!
+
+I also looked at the [hot-reload trick mentioned below](#5); it looks really useful.
+It’s somewhat related actually, and you could probably use my project as an IDE I guess.
+However, it has no debug.
+
+Every code cell is compiled into a small assembly and is loaded in runtime, similar to RevitAddinManager.
+The C# script is rewritten to full C# class by Roslyn and the notebook and Revit exchange data about variables to support referenceing between code cells.
+
+Taking a step back and trying to explain this from a less experienced user perspective, here is what I came up with:
+
+> This project aims to create documents or notebooks containing live Revit C#-scripts, visualizations, and narrative text.
+A simple way to document and demonstrate automations or simply experiment with code.
+This allows for cell-to-cell execution of Revit API code in any order where results can be shared by reference between "code cells" in a notebook.
+The solution consists of an extension to VS Code Polyglot Notebooks and an addin to Autodesk Revit that acts as a data environment where variables are stored in memory during an interactive session.
+
+The most difficult part is probably the inter-process communication between the notebook (.NET 8) and Revit; I have handed that over to NET Interactive.
+
+Many thanks to Joel for sharing this exciting approach!
+
+
+####<a name="5"></a> Hot Reloading in Visual Studio With Dynamo and Revit
+
+john pierson demonstrates another interactive trick in his three-minute video
+[Don't Show the Revit Python Users this C# Visual Studio Trick](https://youtu.be/Xcjlh3D7ieU):
+
 Taking a look at the hot reload feature in Visual Studio 2022 and how it works with Dynamo and Revit to instantaneously update a live RVT model
 https://youtu.be/Xcjlh3D7ieU
 
