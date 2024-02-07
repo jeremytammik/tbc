@@ -43,6 +43,8 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### .NET Core, C4R Views and Interactive Hot Reload
 
+Pondering .NET Core, publishing views the cloud, and some hot tips for hot reloading for interactive Revit API testing and debugging:
+
 - [.NET Core migration webinar recording](#2)
 - [C4R publish view to cloud API](#3)
 - [Revit polyglot notebook](#4)
