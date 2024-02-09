@@ -41,7 +41,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### .NET Core, C4R Views and Interactive Hot Reload
+### .NET Core, C4R Views and Interactive Hot Reloading
 
 Pondering .NET Core, publishing views the cloud, and some hot tips for hot reloading for interactive Revit API testing and debugging:
 
@@ -57,7 +57,7 @@ Pondering .NET Core, publishing views the cloud, and some hot tips for hot reloa
 Happy New Year of the Dragon!
 
 <center>
-<img src="img/2024_dragon_year.jpg" alt="Year of the Dragon" title="Year of the Dragon" width="400"/> <!-- Pixel Height: 852 Pixel Width: 1,304Pixel Height: 500 Pixel Width: 670 -->
+<img src="img/2024_dragon_year.jpg" alt="Year of the Dragon" title="Year of the Dragon" width="400"/> <!-- Pixel Height: 500 Pixel Width: 670 -->
 </center>
 
 ####<a name="1"></a> APS Parameters API Revit Import
