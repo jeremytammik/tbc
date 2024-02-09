@@ -38,6 +38,19 @@ Importing cloud-based APS parameters in desktop project, pondering .NET Core, pu
 
 linkedin:
 
+RIP John Walker, importing cloud-based APS parameters in desktop project, .NET Core recording, programmatically publishing views the cloud, and hot tips for hot reloading for interactive #RevitAPI testing and debugging
+
+https://autode.sk/publishviews
+
+- APS parameters API Revit import
+- .NET Core migration webinar recording
+- C4R publish view to cloud API
+- Revit polyglot notebook
+- Hot reloading in Visual Studio With Dynamo and Revit
+- Assigning invisible graphics linestyle
+- ChatGPT system prompt
+- RIP John Walker...
+
 #BIM #DynamoBIM #AutodeskAPS #Revit #API #IFC #SDK #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
