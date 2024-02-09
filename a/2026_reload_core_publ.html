@@ -109,7 +109,7 @@ collaborate_publish_settings3_rvt_views_to_cloud.png
 to <a href="https://forums.autodesk.com/t5/revit-ideas/make-the-quot-publish-settings-quot-tool-functions-available-in/idc-p/12538103">make the "Publish settings" tool functions available in the API</a>:</p>
 <blockquote>
 <p>I am editing/creating the viewset with the <code>PrintManager</code>, <code>ViewSheetSet</code>, and <code>ViewSheetSetting</code> classes, and then I move on to publishing with the code you showed.
-The detail is that you must put AD`SK as the vendorId, which is not elegant:</p>
+The detail is that you must put <code>ADSK</code> as the vendorId, which is not elegant:</p>
 </blockquote>
 <pre><code>
 public static void PublishedViews(Document d)
@@ -167,7 +167,7 @@ I also wanted to experiment with some open-source libraries and the variable sha
 It’s somewhat related actually, and you could probably use my project as an IDE I guess.
 However, it has no debug.</p>
 <p>Every code cell is compiled into a small assembly and is loaded in runtime, similar to RevitAddinManager.
-The C# script is rewritten to full C# class by Roslyn and the notebook and Revit exchange data about variables to support referenceing between code cells.</p>
+The C# script is rewritten to full C# class by Roslyn and the notebook and Revit exchange data about variables to support referencing between code cells.</p>
 <p>Taking a step back and trying to explain this from a less experienced user perspective, here is what I came up with:</p>
 <blockquote>
 <p>This project aims to create documents or notebooks containing live Revit C#-scripts, visualizations, and narrative text.

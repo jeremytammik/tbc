@@ -125,7 +125,7 @@ Now, a solution to programmatically access and manipulate this data has been sha
 to [make the "Publish settings" tool functions available in the API](https://forums.autodesk.com/t5/revit-ideas/make-the-quot-publish-settings-quot-tool-functions-available-in/idc-p/12538103):
 
 > I am editing/creating the viewset with the `PrintManager`, `ViewSheetSet`, and `ViewSheetSetting` classes, and then I move on to publishing with the code you showed.
-The detail is that you must put AD`SK as the vendorId, which is not elegant:
+The detail is that you must put `ADSK` as the vendorId, which is not elegant:
 
 <pre><code>
 public static void PublishedViews(Document d)
@@ -193,7 +193,7 @@ It’s somewhat related actually, and you could probably use my project as an ID
 However, it has no debug.
 
 Every code cell is compiled into a small assembly and is loaded in runtime, similar to RevitAddinManager.
-The C# script is rewritten to full C# class by Roslyn and the notebook and Revit exchange data about variables to support referenceing between code cells.
+The C# script is rewritten to full C# class by Roslyn and the notebook and Revit exchange data about variables to support referencing between code cells.
 
 Taking a step back and trying to explain this from a less experienced user perspective, here is what I came up with:
 
