@@ -26,7 +26,15 @@ twitter:
 
  the #RevitAPI @AutodeskRevit #BIM @DynamoBIM
 
-&ndash; ...
+Importing cloud-based APS parameters in desktop project, pondering .NET Core, publishing views the cloud, and hot tips for hot reloading for interactive Revit API testing and debugging
+&ndash; APS parameters API Revit import
+&ndash; .NET Core migration webinar recording
+&ndash; C4R publish view to cloud API
+&ndash; Revit polyglot notebook
+&ndash; Hot reloading in Visual Studio With Dynamo and Revit
+&ndash; Assigning invisible graphics linestyle
+&ndash; ChatGPT system prompt
+&ndash; RIP John Walker...
 
 linkedin:
 
@@ -43,7 +51,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### .NET Core, C4R Views and Interactive Hot Reloading
 
-Pondering .NET Core, publishing views the cloud, and some hot tips for hot reloading for interactive Revit API testing and debugging:
+Importing cloud-based APS parameters in desktop project, pondering .NET Core, publishing views the cloud, and hot tips for hot reloading for interactive Revit API testing and debugging:
 
 - [APS parameters API Revit import](#1)
 - [.NET Core migration webinar recording](#2)
@@ -127,8 +135,7 @@ to [make the "Publish settings" tool functions available in the API](https://for
 > I am editing/creating the viewset with the `PrintManager`, `ViewSheetSet`, and `ViewSheetSetting` classes, and then I move on to publishing with the code you showed.
 The detail is that you must put `ADSK` as the vendorId, which is not elegant:
 
-<pre><code>
-public static void PublishedViews(Document d)
+<pre><code class="language-cs">public static void PublishedViews(Document d)
 {
   ViewSheetSet existingViewSet = new FilteredElementCollector(d)
     .OfClass(typeof(ViewSheetSet))
@@ -156,8 +163,7 @@ public static void PublishedViews(Document d)
   viewSheetSetIds.Add(existingViewSet.Id.IntegerValue);
   entity.Set(field, viewSheetSetIds);
   d.ProjectInformation.SetEntity(entity);
-}
-</code></pre>
+}</code></pre>
 
 Many thanks to Charles and Peter for sharing this!
 
@@ -234,40 +240,32 @@ I found that I can achieve this by editing the titleblock family manually and as
 
 I'm creating a Document object from a titleblock family template and retrieving its first ViewSheet object as follows:
 
-<pre><code>
-Document = Application.uiApplication.Application.NewFamilyDocument(TITLEBLOCK_FAMILY_TEMPLATE);
+<pre><code class="language-cs">Document = Application.uiApplication.Application.NewFamilyDocument(TITLEBLOCK_FAMILY_TEMPLATE);
 ViewSheet = new FilteredElementCollector(tbFamilyDoc)
   .OfClass(typeof(ViewSheet))
-  .Cast<ViewSheet>()
-  .First();
-</code></pre>
+  .Cast&lt;ViewSheet&gt;()
+  .First();</code></pre>
 
 I tried to set the `LineStyle` property of the relevant lines like this, but lack the `GraphicsStyle` object that I can't manage to obtain:
 
-<pre><code>
-var lines = new FilteredElementCollector(Document, ViewSheet.Id)
+<pre><code class="language-cs">var lines = new FilteredElementCollector(Document, ViewSheet.Id)
   .WhereElementIsNotElementType()
   .OfClass(typeof(CurveElement))
-  .Cast<CurveElement>()
+  .Cast&lt;CurveElement&gt;()
   .ToList()
-  .ForEach(line => line.LineStyle = graphicsStyleInvisibleLines)
-</code></pre>
+  .ForEach(line =&gt; line.LineStyle = graphicsStyleInvisibleLines)</code></pre>
 
 I think this object is supposed to be retrieved using the method `GetGraphicsStyle` of the class `Category`.
 I used RevitLookup to view the data of the corresponding category, which appears to also be called `<Invisible lines>` and to have the `Id` -2000064.
 The `BuiltInCategory` enumeration contains the value `OST_InvisibleLines` that has an integer value equal to the ID above, but when I run the following, it returns null:
 
-<pre><code>
-Category invisibleLinesCat = Document.Settings.Categories.get_Item(BuiltInCategory.OST_InvisibleLines);
-</code></pre>
+<pre><code class="language-cs">Category invisibleLinesCat = Document.Settings.Categories.get_Item(BuiltInCategory.OST_InvisibleLines);</code></pre>
 
 RevitLookup also showed me that the parent category has the name `Internal Object Styles` and has the ID -2000059.
 I found again a `BuiltInCategory` value with a matching name and integer value `OST_IOS`.
 I tried fetching this parent category to then navigate to the desired subcategory with the line below, but it also returns null.
 
-<pre><code>
-Category internalCat = Document.Settings.Categories.get_Item(BuiltInCategory.OST_IOS);
-</code></pre>
+<pre><code class="language-cs">Category internalCat = Document.Settings.Categories.get_Item(BuiltInCategory.OST_IOS);</code></pre>
 
 How can I obtain a reference to this category or to its GraphicsStyle object?
 
@@ -275,25 +273,23 @@ How can I obtain a reference to this category or to its GraphicsStyle object?
 You should be able to query those line styles the same way you query for the line.
 The following worked for me:
 
-<pre><code>
-var graphicsStyles = new FilteredElementCollector(Document)
+<pre><code class="language-cs">var graphicsStyles = new FilteredElementCollector(Document)
   .WhereElementIsNotElementType()
   .OfClass(typeof(GraphicsStyle))
-  .Cast<GraphicsStyle>()
+  .Cast&lt;GraphicsStyle&gt;()
   .ToList();
 
-var lineStyle = graphicsStyles.FirstOrDefault(x => x.Name == "<Invisible lines>");
+var lineStyle = graphicsStyles.FirstOrDefault(x =&gt; x.Name == "&lt;Invisible lines&gt;");
 
 if (lineStyle != null)
 {
   using (var t = new Transaction(Document, "update line type"))
   {
     t.Start();
-    lines.ForEach(line => line.LineStyle = lineStyle);
+    lines.ForEach(line =&gt; line.LineStyle = lineStyle);
     t.Commit();
   }
-}
-</code></pre>
+}</code></pre>
 
 Many thanks to Evan for the helpful answer!
 
