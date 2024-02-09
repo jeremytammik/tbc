@@ -24,7 +24,7 @@
 
 twitter:
 
- the #RevitAPI @AutodeskRevit #BIM @DynamoBIM
+RIP John Walker, importing cloud-based APS parameters in desktop project, .NET Core recording, programmatically publishing views the cloud, and hot tips for hot reloading for interactive #RevitAPI testing and debugging @AutodeskRevit #BIM @DynamoBIM https://autode.sk/publishviews
 
 Importing cloud-based APS parameters in desktop project, pondering .NET Core, publishing views the cloud, and hot tips for hot reloading for interactive Revit API testing and debugging
 &ndash; APS parameters API Revit import
