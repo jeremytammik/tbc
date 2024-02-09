@@ -1,12 +1,11 @@
-<head>
+<p><head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<link rel="stylesheet" type="text/css" href="bc.css">
+<link rel="stylesheet" type="text/css" href="bc.css"></p>
 <!-- https://highlightjs.org/#usage -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+<p><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css"></p>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script>hljs.highlightAll();</script>
-</head>
-
+<p></head></p>
 <!---
 
 - .net core migration webinar recording
@@ -41,74 +40,60 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### .NET Core, C4R Views and Interactive Hot Reload
-
-Pondering .NET Core, publishing views the cloud, and some hot tips for hot reloading for interactive Revit API testing and debugging:
-
-- [APS parameters API Revit import](#1)
-- [.NET Core migration webinar recording](#2)
-- [C4R publish view to cloud API](#3)
-- [Revit polyglot notebook](#4)
-- [Hot reloading in Visual Studio With Dynamo and Revit](#5)
-- [Assigning invisible graphics linestyle](#6)
-- [ChatGPT system prompt](#7)
-- [RIP John Walker](#8)
-
-Happy New Year of the Dragon!
-
-<center>
+<h3>.NET Core, C4R Views and Interactive Hot Reload</h3>
+<p>Pondering .NET Core, publishing views the cloud, and some hot tips for hot reloading for interactive Revit API testing and debugging:</p>
+<ul>
+<li><a href="#1">APS parameters API Revit import</a></li>
+<li><a href="#2">.NET Core migration webinar recording</a></li>
+<li><a href="#3">C4R publish view to cloud API</a></li>
+<li><a href="#4">Revit polyglot notebook</a></li>
+<li><a href="#5">Hot reloading in Visual Studio With Dynamo and Revit</a></li>
+<li><a href="#6">Assigning invisible graphics linestyle</a></li>
+<li><a href="#7">ChatGPT system prompt</a></li>
+<li><a href="#8">RIP John Walker</a></li>
+</ul>
+<p>Happy New Year of the Dragon!</p>
+<p><center>
 <img src="img/2024_dragon_year.jpg" alt="Year of the Dragon" title="Year of the Dragon" width="400"/> <!-- Pixel Height: 852 Pixel Width: 1,304Pixel Height: 500 Pixel Width: 670 -->
-</center>
-
-####<a name="1"></a> APS Parameters API Revit Import
-
-Let's start out with a quick pointer to George Moturi's blog post on
-the [Revit Parameters import sample add-in with the latest APS Parameters API](https://aps.autodesk.com/blog/revit-parameters-import-sample-latest-aps-parameters-api),
+</center></p>
+<h4><a name="1"></a> APS Parameters API Revit Import</h4>
+<p>Let's start out with a quick pointer to George Moturi's blog post on
+the <a href="https://aps.autodesk.com/blog/revit-parameters-import-sample-latest-aps-parameters-api">Revit Parameters import sample add-in with the latest APS Parameters API</a>,
 showcasing the collaboration between the Autodesk Platform Services APS Parameters API and Revit desktop,
 with the live sample hosted in
-the [Revit parameters import GitHub repository](https://github.com/autodesk-platform-services/revit-parameters-export-addin).
-Many thanks to George for implementing and documenting this exciting new functionality.
-
-####<a name="2"></a> .NET Core Migration Webinar Recording
-
-The question on using .NET Core with the Revit API came up repeatedly, both in
-the [discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) and
-here in the blog, e.g.:
-
-- [.NET 5 and Core](https://thebuildingcoder.typepad.com/blog/2021/01/face-triangulation-lod-net-5-and-core.html#2)
-- [.NET Core](https://thebuildingcoder.typepad.com/blog/2023/08/15-years-polygon-areas-and-net-core.html#3)
-- [.NET Core Preview and Open Source Add-In Projects](https://thebuildingcoder.typepad.com/blog/2023/11/net-core-preview-and-open-source-add-in-projects.html)
-
-Up until today, the Revit API system requirements still require the pre-Core .NET framework 4.8.
-
-Roman [Nice3point](https://github.com/Nice3point) Karpovich
-of [atomatiq](https://www.linkedin.com/company/atomatiq/), aka Роман Карпович, presented
-a [solution using IPC to connect components using different .NET frameworks](https://thebuildingcoder.typepad.com/blog/2023/10/dll-paradise-and-a-fall.html).
-
-The development team is thinking about upgrading the Revit API to .NET Core and held
-the [.NET Core webinar](https://thebuildingcoder.typepad.com/blog/2023/12/parameters-and-net-core-webinar.html#2) on
-January 30, 2024, to discuss the current state of things and migration issues.
-
-The [.NET Core migration webinar recording](https://feedback.autodesk.com/project/article/item.html?cap=cb0fd5af18bb49b791dfa3f5efc47a72&arttypeid={16363613-34f6-4dfa-9b97-3857dbbe9ade}&)
+the <a href="https://github.com/autodesk-platform-services/revit-parameters-export-addin">Revit parameters import GitHub repository</a>.
+Many thanks to George for implementing and documenting this exciting new functionality.</p>
+<h4><a name="2"></a> .NET Core Migration Webinar Recording</h4>
+<p>The question on using .NET Core with the Revit API came up repeatedly, both in
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">discussion forum</a> and
+here in the blog, e.g.:</p>
+<ul>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2021/01/face-triangulation-lod-net-5-and-core.html#2">.NET 5 and Core</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2023/08/15-years-polygon-areas-and-net-core.html#3">.NET Core</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2023/11/net-core-preview-and-open-source-add-in-projects.html">.NET Core Preview and Open Source Add-In Projects</a></li>
+</ul>
+<p>Up until today, the Revit API system requirements still require the pre-Core .NET framework 4.8.</p>
+<p>Roman <a href="https://github.com/Nice3point">Nice3point</a> Karpovich
+of <a href="https://www.linkedin.com/company/atomatiq/">atomatiq</a>, aka Роман Карпович, presented
+a <a href="https://thebuildingcoder.typepad.com/blog/2023/10/dll-paradise-and-a-fall.html">solution using IPC to connect components using different .NET frameworks</a>.</p>
+<p>The development team is thinking about upgrading the Revit API to .NET Core and held
+the <a href="https://thebuildingcoder.typepad.com/blog/2023/12/parameters-and-net-core-webinar.html#2">.NET Core webinar</a> on
+January 30, 2024, to discuss the current state of things and migration issues.</p>
+<p>The <a href="https://feedback.autodesk.com/project/article/item.html?cap=cb0fd5af18bb49b791dfa3f5efc47a72&amp;arttypeid={16363613-34f6-4dfa-9b97-3857dbbe9ade}&amp;">.NET Core migration webinar recording</a>
 has now been posted to the feedback portal.
-Note that an ADN or feedback portal membership is required to access that link.
-
-####<a name="3"></a> C4R Publish View to Cloud API
-
-The cloud collaboration for Revit tool C4R enables an end user
-[to export multiple 3D views for view and data API](https://adndevblog.typepad.com/cloud_and_mobile/2015/09/how-to-export-multiple-3d-views-for-view-and-data-api.html) in
+Note that an ADN or feedback portal membership is required to access that link.</p>
+<h4><a name="3"></a> C4R Publish View to Cloud API</h4>
+<p>The cloud collaboration for Revit tool C4R enables an end user
+<a href="https://adndevblog.typepad.com/cloud_and_mobile/2015/09/how-to-export-multiple-3d-views-for-view-and-data-api.html">to export multiple 3D views for view and data API</a> in
 the UI, cf. also the official Revit online help on how
-to [publish cloud Models](https://help.autodesk.com/view/RVT/2024/ENU/?guid=GUID-A2444193-FCE8-4219-A590-62CA2B8B5C5D).
-
-However, I am not aware of any official support to select them programmatically through the API, even though we did look at the issue
-of [selecting RVT 3D views for Forge translation](https://thebuildingcoder.typepad.com/blog/2016/07/selecting-views-for-forge-translation.html)
-and [selecting rooms and views to publish to the cloud](https://thebuildingcoder.typepad.com/blog/2017/09/revit-20181-nuget-packages-rooms-and-views-in-forge.html#2) years ago.
-
-The question was also raised in
-the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
-on [how to add views to a publishing set](https://forums.autodesk.com/t5/revit-api-forum/how-to-add-views-to-a-publishing-set/m-p/12396874),
-noting that the required information is stored in extensible storage data on the `ProjectInfo` singleton:
-
+to <a href="https://help.autodesk.com/view/RVT/2024/ENU/?guid=GUID-A2444193-FCE8-4219-A590-62CA2B8B5C5D">publish cloud Models</a>.</p>
+<p>However, I am not aware of any official support to select them programmatically through the API, even though we did look at the issue
+of <a href="https://thebuildingcoder.typepad.com/blog/2016/07/selecting-views-for-forge-translation.html">selecting RVT 3D views for Forge translation</a>
+and <a href="https://thebuildingcoder.typepad.com/blog/2017/09/revit-20181-nuget-packages-rooms-and-views-in-forge.html#2">selecting rooms and views to publish to the cloud</a> years ago.</p>
+<p>The question was also raised in
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/how-to-add-views-to-a-publishing-set/m-p/12396874">how to add views to a publishing set</a>,
+noting that the required information is stored in extensible storage data on the <code>ProjectInfo</code> singleton:</p>
 <!--
 views_for_a360.png
 c4r_views_for_a360.png
@@ -117,16 +102,15 @@ collaborate_publish_settings2.png
 collaborate_publish_settings3_rvt_views_to_cloud.png
 -->
 
-<center>
+<p><center>
 <img src="img/c4a_views_projectinfo.png" alt="ProjectInfo C4R publish views data" title="ProjectInfo C4R publish views data" width="800"/> <!-- Pixel Height: 852 Pixel Width: 1,304 -->
-</center>
-
-Now, a solution to programmatically access and manipulate this data has been shared by Peter Hirn and Charles Ciro in the Revit Idea Station wishlist item
-to [make the "Publish settings" tool functions available in the API](https://forums.autodesk.com/t5/revit-ideas/make-the-quot-publish-settings-quot-tool-functions-available-in/idc-p/12538103):
-
-> I am editing/creating the viewset with the `PrintManager`, `ViewSheetSet`, and `ViewSheetSetting` classes, and then I move on to publishing with the code you showed.
-The detail is that you must put AD`SK as the vendorId, which is not elegant:
-
+</center></p>
+<p>Now, a solution to programmatically access and manipulate this data has been shared by Peter Hirn and Charles Ciro in the Revit Idea Station wishlist item
+to <a href="https://forums.autodesk.com/t5/revit-ideas/make-the-quot-publish-settings-quot-tool-functions-available-in/idc-p/12538103">make the "Publish settings" tool functions available in the API</a>:</p>
+<blockquote>
+<p>I am editing/creating the viewset with the <code>PrintManager</code>, <code>ViewSheetSet</code>, and <code>ViewSheetSetting</code> classes, and then I move on to publishing with the code you showed.
+The detail is that you must put AD`SK as the vendorId, which is not elegant:</p>
+</blockquote>
 <pre><code>
 public static void PublishedViews(Document d)
 {
@@ -159,81 +143,60 @@ public static void PublishedViews(Document d)
 }
 </code></pre>
 
-Many thanks to Charles and Peter for sharing this!
-
-####<a name="4"></a> Revit Polyglot Notebook
-
-Joel Waldheim Saury, BIM Developer at [Sweco](https://www.sweco.se/), shared
-his interactive .NET BIM [Revit Polyglot Notebook project](https://github.com/jowsy/bim-net-interactive), saying:
-
-Thanks for a great blog!
-I’ve read it for many years and I’ve been at Autodesk University a couple of times!
-
-Reading your latest post
-about [valid Revit API context](https://thebuildingcoder.typepad.com/blog/2024/01/valid-revit-api-context-llm-and-ltg.html#2) inspired
-me to share a personal project I’ve been working on that touches this topic.
-
-I have been experimenting
-with [VS Code Polyglot Notebook](https://duckduckgo.com/?q=VS+Code+Polyglot+Notebook) extensions,
-how to run live Revit C# scripts, and tried to implement a NET interactive kernel embedded in Revit.
-
-Here is the result:
-
-- [Revit Polyglot Notebook project](https://github.com/jowsy/bim-net-interactive)
-
-The background is that I’ve been using ChatGPT to write some Revit API code for me and just wanted a fast way to test it in Revit.
-I also wanted to experiment with some open-source libraries and the variable sharing capabilities in .NET Interactive enables you to send values between Revit and for example a Python kernel running in Jupyter Notebook!
-
-So this tool was born.
-
-Hope you find it interesting!
-
-I also looked at the [hot-reload trick mentioned below](#5); it looks really useful.
+<p>Many thanks to Charles and Peter for sharing this!</p>
+<h4><a name="4"></a> Revit Polyglot Notebook</h4>
+<p>Joel Waldheim Saury, BIM Developer at <a href="https://www.sweco.se/">Sweco</a>, shared
+his interactive .NET BIM <a href="https://github.com/jowsy/bim-net-interactive">Revit Polyglot Notebook project</a>, saying:</p>
+<p>Thanks for a great blog!
+I’ve read it for many years and I’ve been at Autodesk University a couple of times!</p>
+<p>Reading your latest post
+about <a href="https://thebuildingcoder.typepad.com/blog/2024/01/valid-revit-api-context-llm-and-ltg.html#2">valid Revit API context</a> inspired
+me to share a personal project I’ve been working on that touches this topic.</p>
+<p>I have been experimenting
+with <a href="https://duckduckgo.com/?q=VS+Code+Polyglot+Notebook">VS Code Polyglot Notebook</a> extensions,
+how to run live Revit C# scripts, and tried to implement a NET interactive kernel embedded in Revit.</p>
+<p>Here is the result:</p>
+<ul>
+<li><a href="https://github.com/jowsy/bim-net-interactive">Revit Polyglot Notebook project</a></li>
+</ul>
+<p>The background is that I’ve been using ChatGPT to write some Revit API code for me and just wanted a fast way to test it in Revit.
+I also wanted to experiment with some open-source libraries and the variable sharing capabilities in .NET Interactive enables you to send values between Revit and for example a Python kernel running in Jupyter Notebook!</p>
+<p>So this tool was born.</p>
+<p>Hope you find it interesting!</p>
+<p>I also looked at the <a href="#5">hot-reload trick mentioned below</a>; it looks really useful.
 It’s somewhat related actually, and you could probably use my project as an IDE I guess.
-However, it has no debug.
-
-Every code cell is compiled into a small assembly and is loaded in runtime, similar to RevitAddinManager.
-The C# script is rewritten to full C# class by Roslyn and the notebook and Revit exchange data about variables to support referenceing between code cells.
-
-Taking a step back and trying to explain this from a less experienced user perspective, here is what I came up with:
-
-> This project aims to create documents or notebooks containing live Revit C#-scripts, visualizations, and narrative text.
+However, it has no debug.</p>
+<p>Every code cell is compiled into a small assembly and is loaded in runtime, similar to RevitAddinManager.
+The C# script is rewritten to full C# class by Roslyn and the notebook and Revit exchange data about variables to support referenceing between code cells.</p>
+<p>Taking a step back and trying to explain this from a less experienced user perspective, here is what I came up with:</p>
+<blockquote>
+<p>This project aims to create documents or notebooks containing live Revit C#-scripts, visualizations, and narrative text.
 A simple way to document and demonstrate automations or simply experiment with code.
 This allows for cell-to-cell execution of Revit API code in any order where results can be shared by reference between "code cells" in a notebook.
-The solution consists of an extension to VS Code Polyglot Notebooks and an addin to Autodesk Revit that acts as a data environment where variables are stored in memory during an interactive session.
-
-The most difficult part is probably the inter-process communication between the notebook (.NET 8) and Revit; I have handed that over to NET Interactive.
-
-Many thanks to Joel for sharing this exciting approach!
-
-####<a name="5"></a> Hot Reloading in Visual Studio With Dynamo and Revit
-
-John Pierson demonstrates another interactive feature in his three-minute video
-[don't show the Revit Python users this C# Visual Studio trick](https://youtu.be/Xcjlh3D7ieU):
-
-> Taking a look at the hot reload feature in Visual Studio 2022 and how it works with Dynamo and Revit to instantaneously update a live RVT model
-
-<center>
+The solution consists of an extension to VS Code Polyglot Notebooks and an addin to Autodesk Revit that acts as a data environment where variables are stored in memory during an interactive session.</p>
+</blockquote>
+<p>The most difficult part is probably the inter-process communication between the notebook (.NET 8) and Revit; I have handed that over to NET Interactive.</p>
+<p>Many thanks to Joel for sharing this exciting approach!</p>
+<h4><a name="5"></a> Hot Reloading in Visual Studio With Dynamo and Revit</h4>
+<p>John Pierson demonstrates another interactive feature in his three-minute video
+<a href="https://youtu.be/Xcjlh3D7ieU">don't show the Revit Python users this C# Visual Studio trick</a>:</p>
+<blockquote>
+<p>Taking a look at the hot reload feature in Visual Studio 2022 and how it works with Dynamo and Revit to instantaneously update a live RVT model</p>
+</blockquote>
+<p><center></p>
 <iframe width="480" height="270" src="https://www.youtube.com/embed/Xcjlh3D7ieU?si=w8TFFRObf0-OQe6T" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-</center>
-
-####<a name="6"></a> Assigning Invisible Graphics Linestyle
-
-Back to a 'normal' non-interactive Revit API question,
-[Evan Geer](https://evangeer.github.io/) explains
-[how to assign category / graphics style `<Invisible lines>` to edges of titleblock via API](https://stackoverflow.com/questions/77942445/how-to-assign-category-graphics-style-invisible-lines-to-edges-of-titleblo):
-
-**Question:**
-I'm defining a titleblock family programmatically and I'm trying to make the edges of the sheet included in the titleblock family templates invisible. I want the edges to stay invisible when the sheet is exported to DWG format.
-
-I found that I can achieve this by editing the titleblock family manually and assigning the category `<Invisible lines>` to the edges of the sheet, but I can't manage to do this programmatically.
-
-<center>
+<p></center></p>
+<h4><a name="6"></a> Assigning Invisible Graphics Linestyle</h4>
+<p>Back to a 'normal' non-interactive Revit API question,
+<a href="https://evangeer.github.io/">Evan Geer</a> explains
+<a href="https://stackoverflow.com/questions/77942445/how-to-assign-category-graphics-style-invisible-lines-to-edges-of-titleblo">how to assign category / graphics style <code>&lt;Invisible lines&gt;</code> to edges of titleblock via API</a>:</p>
+<p><strong>Question:</strong>
+I'm defining a titleblock family programmatically and I'm trying to make the edges of the sheet included in the titleblock family templates invisible. I want the edges to stay invisible when the sheet is exported to DWG format.</p>
+<p>I found that I can achieve this by editing the titleblock family manually and assigning the category <code>&lt;Invisible lines&gt;</code> to the edges of the sheet, but I can't manage to do this programmatically.</p>
+<p><center>
 <img src="img/line_properties.png" alt="Line properties" title="Line properties" width="334"/> <!-- Pixel Height: 364 Pixel Width: 334 -->
-</center>
-
-I'm creating a Document object from a titleblock family template and retrieving its first ViewSheet object as follows:
-
+</center></p>
+<p>I'm creating a Document object from a titleblock family template and retrieving its first ViewSheet object as follows:</p>
 <pre><code>
 Document = Application.uiApplication.Application.NewFamilyDocument(TITLEBLOCK_FAMILY_TEMPLATE);
 ViewSheet = new FilteredElementCollector(tbFamilyDoc)
@@ -242,8 +205,7 @@ ViewSheet = new FilteredElementCollector(tbFamilyDoc)
   .First();
 </code></pre>
 
-I tried to set the `LineStyle` property of the relevant lines like this, but lack the `GraphicsStyle` object that I can't manage to obtain:
-
+<p>I tried to set the <code>LineStyle</code> property of the relevant lines like this, but lack the <code>GraphicsStyle</code> object that I can't manage to obtain:</p>
 <pre><code>
 var lines = new FilteredElementCollector(Document, ViewSheet.Id)
   .WhereElementIsNotElementType()
@@ -253,28 +215,24 @@ var lines = new FilteredElementCollector(Document, ViewSheet.Id)
   .ForEach(line => line.LineStyle = graphicsStyleInvisibleLines)
 </code></pre>
 
-I think this object is supposed to be retrieved using the method `GetGraphicsStyle` of the class `Category`.
-I used RevitLookup to view the data of the corresponding category, which appears to also be called `<Invisible lines>` and to have the `Id` -2000064.
-The `BuiltInCategory` enumeration contains the value `OST_InvisibleLines` that has an integer value equal to the ID above, but when I run the following, it returns null:
-
+<p>I think this object is supposed to be retrieved using the method <code>GetGraphicsStyle</code> of the class <code>Category</code>.
+I used RevitLookup to view the data of the corresponding category, which appears to also be called <code>&lt;Invisible lines&gt;</code> and to have the <code>Id</code> -2000064.
+The <code>BuiltInCategory</code> enumeration contains the value <code>OST_InvisibleLines</code> that has an integer value equal to the ID above, but when I run the following, it returns null:</p>
 <pre><code>
 Category invisibleLinesCat = Document.Settings.Categories.get_Item(BuiltInCategory.OST_InvisibleLines);
 </code></pre>
 
-RevitLookup also showed me that the parent category has the name `Internal Object Styles` and has the ID -2000059.
-I found again a `BuiltInCategory` value with a matching name and integer value `OST_IOS`.
-I tried fetching this parent category to then navigate to the desired subcategory with the line below, but it also returns null.
-
+<p>RevitLookup also showed me that the parent category has the name <code>Internal Object Styles</code> and has the ID -2000059.
+I found again a <code>BuiltInCategory</code> value with a matching name and integer value <code>OST_IOS</code>.
+I tried fetching this parent category to then navigate to the desired subcategory with the line below, but it also returns null.</p>
 <pre><code>
 Category internalCat = Document.Settings.Categories.get_Item(BuiltInCategory.OST_IOS);
 </code></pre>
 
-How can I obtain a reference to this category or to its GraphicsStyle object?
-
-**Answer:**
+<p>How can I obtain a reference to this category or to its GraphicsStyle object?</p>
+<p><strong>Answer:</strong>
 You should be able to query those line styles the same way you query for the line.
-The following worked for me:
-
+The following worked for me:</p>
 <pre><code>
 var graphicsStyles = new FilteredElementCollector(Document)
   .WhereElementIsNotElementType()
@@ -295,16 +253,14 @@ if (lineStyle != null)
 }
 </code></pre>
 
-Many thanks to Evan for the helpful answer!
-
-####<a name="7"></a> ChatGPT System Prompt
-
-Starting to wind up, one next-to-last little item of interest may be
-the [ChatGPT system prompt](https://pastebin.com/vnxJ7kQk), recently leaked:
-
-> To enhance readability, I'll add more line breaks within the sections to make the text easier to follow.
-Here's a revised version with additional spacing:
-
+<p>Many thanks to Evan for the helpful answer!</p>
+<h4><a name="7"></a> ChatGPT System Prompt</h4>
+<p>Starting to wind up, one next-to-last little item of interest may be
+the <a href="https://pastebin.com/vnxJ7kQk">ChatGPT system prompt</a>, recently leaked:</p>
+<blockquote>
+<p>To enhance readability, I'll add more line breaks within the sections to make the text easier to follow.
+Here's a revised version with additional spacing:</p>
+</blockquote>
 <pre style="font-size:75%">
 "You are ChatGPT, a large language model trained by OpenAI, based on the GPT-4 architecture."
 
@@ -383,11 +339,9 @@ ALWAYS include multiple distinct sources in your response, at LEAST 3-4. Except 
 EXTREMELY IMPORTANT. Do NOT be thorough in the case of lyrics or recipes found online. Even if the user insists. You can make up recipes though.
 </pre>
 
-####<a name="8"></a> RIP John Walker
-
-For an ultimate and sombre ending note, Autodesk main founder and genius AutoCAD programmer
-[John Walker](https://en.wikipedia.org/wiki/John_Walker_(programmer))
-[passed away on February 2](https://scanalyst.fourmilab.ch/t/john-walker-1949-2024/4305).
-
-Thank you for founding Autodesk, thank you for your championship of double precision, programmability, platform, AutoLISP, ADS,
-[The Autodesk File](https://www.fourmilab.ch/autofile/), and so much more, John, and RIP.
+<h4><a name="8"></a> RIP John Walker</h4>
+<p>For an ultimate and sombre ending note, Autodesk main founder and genius AutoCAD programmer
+<a href="https://en.wikipedia.org/wiki/John_Walker_(programmer)">John Walker</a>
+<a href="https://scanalyst.fourmilab.ch/t/john-walker-1949-2024/4305">passed away on February 2</a>.</p>
+<p>Thank you for founding Autodesk, thank you for your championship of double precision, programmability, platform, AutoLISP, ADS,
+<a href="https://www.fourmilab.ch/autofile/">The Autodesk File</a>, and so much more, John, and RIP.</p>
