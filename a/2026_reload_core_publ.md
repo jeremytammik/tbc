@@ -401,7 +401,7 @@ For an ultimate and sombre ending note, Autodesk main founder and genius AutoCAD
 Thank you for founding Autodesk, thank you for your championship of double precision, programmability, platform, AutoLISP, ADS,
 [The Autodesk File](https://www.fourmilab.ch/autofile/), and so much more, John, and RIP.
 
-More notes o=n John:
+Notes by other colleagues:
 
 - [Billy Hinners](https://www.linkedin.com/posts/billyhinners_john-walker-1949-2024-activity-7161443988665786368-QdNw?utm_source=share&utm_medium=member_desktop)
 - [Kean Walmsley](https://www.keanw.com/2024/02/john-walker-leaves-us.html)
