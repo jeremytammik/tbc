@@ -32,6 +32,10 @@
   https://en.wikipedia.org/wiki/Base_rate_fallacy#False_positive_paradox
   courtesy of Cory Doctorow in Little Brother
 
+- The period from February 2023 to January 2024 reached 1.52C of warming compared with pre-industrial levels, i.e., we have achieved
+  the [world's first year-long breach of the key 1.5C warming limit](https://www.bbc.com/news/science-environment-68110310)
+  [2023 confirmed as world's hottest year on record](https://www.bbc.com/news/science-environment-67861954)
+
 twitter:
 
  #RevitAPI @AutodeskRevit #BIM @DynamoBIM
