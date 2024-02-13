@@ -64,13 +64,55 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 </center>
 
 
-####<a name="2"></a>
-
-####<a name="3"></a>
-
 <pre><code class="language-cs">
 </code></pre>
 
 Many thanks to ??? for sharing this!
 
-####<a name="4"></a>
+
+
+
+####<a name="2"></a> Refresh Point Elevation Prefix
+
+refresh point elevation prefix
+https://autodesk.slack.com/archives/C0SR6NAP8/p1706517751186399
+
+####<a name="3"></a> UIDocument.UpdateAllOpenViews Method
+
+UIDocument.UpdateAllOpenViews Method
+https://www.revitapidocs.com/2024/5cc3231e-ee7e-e1fc-2bd6-d164da617954.htm
+https://autodesk.slack.com/archives/C0SR6NAP8/p1706517751186399
+
+####<a name="4"></a> Excel -- RVT data exchange options
+
+Excel -- RVT data exchange options
+https://autodesk.slack.com/archives/C0SR6NAP8/p1706289884274909
+
+####<a name="5"></a> Defining The Start View Using Revit API
+
+Defining the start view using Revit API
+https://forums.autodesk.com/t5/revit-api-forum/defining-the-start-view-using-revit-api/m-p/12506862#M76426
+
+####<a name="6"></a> People are really bad at understanding just how big LLM's actually are.
+
+People are really bad at understanding just how big LLM's actually are.
+I think this is partly why they belittle them as 'just' next-word predictors.
+https://x.com/jam3scampbell/status/1748200331215835561?s=20
+Searle's Chinese Room: Slow Motion Intelligence
+http://lironshapira.blogspot.com/2011/02/searles-chinese-room-intelligence-in.html?m=1
+
+####<a name="7"></a> Base Rate Fallacy
+
+Base rate fallacy (redirect from False positive paradox)
+https://en.wikipedia.org/wiki/Base_rate_fallacy#False_positive_paradox
+courtesy of Cory Doctorow in Little Brother
+
+####<a name="8"></a> Last Year Was Hot
+
+The period from February 2023 to January 2024 reached 1.52C of warming compared with pre-industrial levels, i.e., we have achieved
+the [world's first year-long breach of the key 1.5C warming limit](https://www.bbc.com/news/science-environment-68110310)
+[2023 confirmed as world's hottest year on record](https://www.bbc.com/news/science-environment-67861954)
+
+Global warming is a joke.
+
+Even the Antarctic ice sheets are cracking up.
