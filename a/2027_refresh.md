@@ -83,12 +83,12 @@ UIDocument.UpdateAllOpenViews Method
 https://www.revitapidocs.com/2024/5cc3231e-ee7e-e1fc-2bd6-d164da617954.htm
 https://autodesk.slack.com/archives/C0SR6NAP8/p1706517751186399
 
-####<a name="4"></a> Excel -- RVT data exchange options
+####<a name="4"></a> Excel Data Exchange Options
 
 Excel -- RVT data exchange options
 https://autodesk.slack.com/archives/C0SR6NAP8/p1706289884274909
 
-####<a name="5"></a> Defining The Start View Using Revit API
+####<a name="5"></a> Defining the Start View
 
 Defining the start view using Revit API
 https://forums.autodesk.com/t5/revit-api-forum/defining-the-start-view-using-revit-api/m-p/12506862#M76426
@@ -116,3 +116,19 @@ the [world's first year-long breach of the key 1.5C warming limit](https://www.b
 Global warming is a joke.
 
 Even the Antarctic ice sheets are cracking up.
+
+John Burn-Murdoch of the Financial Times
+Is the west talking itself into decline?
+
+####<a name="8"></a> Last Year Was Hot
+
+To put that into perspective, [xkcd](https://xkcd.com) published
+[A TIMELINE OF EARTH'S AVERAGE TEMPERATURE SINCE THE LAST ICE AGE GLACIATION](https://xkcd.com/1732/) to
+demonstrate
+
+> when people say "the climate has changed before", these are the kinds of changes they're talking about.
+
+<center>
+<img src="img/" alt="" title="Year of the Drago" width="700"/> <!-- Pixel Height: 29,913 Pixel Width: 1,480 -->
+</center>
+
