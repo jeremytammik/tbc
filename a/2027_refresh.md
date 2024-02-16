@@ -9,7 +9,7 @@
 
 <!---
 
-- refresh point elevation prefix
+- refresh spot elevation prefix
   https://autodesk.slack.com/archives/C0SR6NAP8/p1706517751186399
 
 - UIDocument.UpdateAllOpenViews Method
@@ -64,18 +64,59 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 </center>
 
 
+
+
+
+
+
+####<a name="2"></a> Refresh Spot Elevation Prefix
+
+**Question:** How can I make Revit refresh spot elevation prefix automatically?
+My code adds a plus-minus `&#177;` sign to the spot elevation tag "prefix" in batches.
+However, nothing changes in the view unless you refresh each tag.
+I call both `RefreshActiveView` and `Regenerate` to no avail.
+
+**Answer:** Try calling `UpdateAllOpenViews`.
+That forces a redraw, which I think is one step higher than a refresh
+Refresh triggers a redraw only if a change is detected and it seems in this case it's failing to detect the change
+
+**Response:** I tried `UpdateAllOpenViews` but failed.
+However, I found a way to update the tag by changing the view scale manually.
+Is there any method to do the similar thing through API?
+
+**Answer:** You can change a view's scale from the `Scale` property, but I'm not sure that will help here.
+I don't know of any other API call that would force the view to redraw, sorry.
+
+Later: Try to get the UiView of the active view, close it and then re-open it with the `UiDoc.ActiveView` property.
+It's pretty extreme, but if nothing else works...
+
+**Response:** I found a solution: just select all the tags as the selected annotation elements; after this operation, all the tags will update.
+Here is a code snippet:
+
 <pre><code class="language-cs">
+ts. Start ():
+foreach (SpotDimension item in spotdimensionList)
+{
+  Parameter para = item. get Parameter (BuiltInParameter. SPOT_ _ELEV_DISPLAY_ELEVAT...
+  if (para.AsInteger () == 3)
+    MixResetter (item, spotdimensionTypeCollector):
+  else
+    DefaultResetter (item, spotdimensionIypeCollector):
+  doc.Regenerate();
+  uidoc.Selection.SetElementIds(new List&lt;ElementId&gt; ( item. id )):
+}
+//doc.ActiveView. Scale = 100;
+ts. Commit():
+//uidoc.UpdateAl10penViews () :
 </code></pre>
 
-Many thanks to ??? for sharing this!
+<center>
+<img src="img/" alt="" title="Year of the Drago" width="100"/> <!-- Pixel Height: 358 Pixel Width: 602 -->
+</center>
 
+The highlighted code is the final solution used to resolve the issue.
 
-
-
-####<a name="2"></a> Refresh Point Elevation Prefix
-
-refresh point elevation prefix
-https://autodesk.slack.com/archives/C0SR6NAP8/p1706517751186399
+Many thanks to Shen Wang for sharing this!
 
 ####<a name="3"></a> UIDocument.UpdateAllOpenViews Method
 
