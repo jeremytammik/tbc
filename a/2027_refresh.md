@@ -148,8 +148,46 @@ By the way, for the sake of completeness, I implemented a multi-project cloud-ba
 
 ####<a name="5"></a> Defining the Start View
 
-Defining the start view using Revit API
-https://forums.autodesk.com/t5/revit-api-forum/defining-the-start-view-using-revit-api/m-p/12506862#M76426
+Adrian Crisan of [Studio A International, LLC](http://www.studio-a-int.com) shared a solution using
+the [StartingViewSettings class](https://www.revitapidocs.com/2024/aaa6f49c-faeb-851e-45e9-d3d5799c1753.htm)
+for [defining the start view using Revit API](https://forums.autodesk.com/t5/revit-api-forum/defining-the-start-view-using-revit-api/m-p/12506862):
+
+**Question:** Is it possible to define the start view using the API?
+Similar to the UI functionality
+for [specify the starting view for a model](https://help.autodesk.com/view/RVT/2024/ENU/?guid=GUID-622E667E-FB0B-47E1-8F66-E237A70771BD).
+At the moment, I can only find a way to access the parameter and find out if a view is defined as the start view.
+Thanks  :-)
+
+**Answer:** Use this method to set your starting view:
+
+<pre><code class="language-cs">void SetStartingView ()
+{
+// Code provided courtesy of:
+// Studio A International, LLC
+// http://www.studio-a-int.com
+// The below code set the Starting View to a specific view that exists in Active Project
+FilteredElementCollector feCollector = new FilteredElementCollector(activeDoc);
+myView = feCollector.OfClass(typeof(Autodesk.Revit.DB.View)).Cast&lt;Autodesk.Revit.DB.View&gt;().Where&lt;Autodesk.Revit.DB.View&gt;(v =&gt; ViewType.ThreeD == v.ViewType && v.IsTemplate == false && v.Name == "my3DStartingView").ToList().FirstOrDefault();
+FilteredElementCollector svsCollector = new FilteredElementCollector(activeDoc);
+Autodesk.Revit.DB.StartingViewSettings svs = svsCollector.OfClass(typeof(StartingViewSettings))
+.Cast&lt;Autodesk.Revit.DB.StartingViewSettings&gt;().ToList().FirstOrDefault();
+if (myView is object)
+{
+ElementId myViewId = new ElementId(Convert.ToInt32((myView.Id.ToString())));
+if (svs.IsAcceptableStartingView(myViewId))
+{
+using (Transaction t = new Transaction(activeDoc, "Set Starting View"))
+{
+t.Start("Set Starting View");
+svs.ViewId = myViewId;
+t.Commit();
+}
+}
+}
+}
+</code></pre>
+
+**Response:** It works perfectly! Thanks a lot!
 
 ####<a name="6"></a> People are really bad at understanding just how big LLM's actually are.
 
