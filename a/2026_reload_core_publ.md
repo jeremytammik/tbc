@@ -403,6 +403,7 @@ Thank you for founding Autodesk, thank you for your championship of double preci
 
 Notes by other colleagues:
 
+- [Arkady Gilman](https://www.linkedin.com/posts/arkadygilman_the-autodesk-file-activity-7163181497032654850-Vsmp?utm_source=share&utm_medium=member_desktop)
 - [Billy Hinners](https://www.linkedin.com/posts/billyhinners_john-walker-1949-2024-activity-7161443988665786368-QdNw?utm_source=share&utm_medium=member_desktop)
 - [Kean Walmsley](https://www.keanw.com/2024/02/john-walker-leaves-us.html)
 

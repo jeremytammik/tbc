@@ -216,7 +216,8 @@ Even the Antarctic ice sheets are cracking up.
 John Burn-Murdoch of the Financial Times
 Is the west talking itself into decline?
 
-####<a name="8"></a> Last Year Was Hot
+####<a name="8"></a> Previous Climate Changes Negligeable
+
 
 To put that into perspective, [xkcd](https://xkcd.com) published
 [A TIMELINE OF EARTH'S AVERAGE TEMPERATURE SINCE THE LAST ICE AGE GLACIATION](https://xkcd.com/1732/) to
