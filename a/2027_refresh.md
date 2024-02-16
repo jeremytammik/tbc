@@ -11,10 +11,8 @@
 
 - refresh spot elevation prefix
   https://autodesk.slack.com/archives/C0SR6NAP8/p1706517751186399
-
-- UIDocument.UpdateAllOpenViews Method
+  UIDocument.UpdateAllOpenViews Method
   https://www.revitapidocs.com/2024/5cc3231e-ee7e-e1fc-2bd6-d164da617954.htm
-  https://autodesk.slack.com/archives/C0SR6NAP8/p1706517751186399
 
 - Excel -- RVT data exchange options
   https://autodesk.slack.com/archives/C0SR6NAP8/p1706289884274909
@@ -69,16 +67,26 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 
 
-####<a name="2"></a> Refresh Spot Elevation Prefix
+####<a name="2"></a> UpdateAllOpenViews Doesn't Refresh Spot Elevation Prefix
 
 **Question:** How can I make Revit refresh spot elevation prefix automatically?
 My code adds a plus-minus `&#177;` sign to the spot elevation tag "prefix" in batches.
 However, nothing changes in the view unless you refresh each tag.
 I call both `RefreshActiveView` and `Regenerate` to no avail.
 
-**Answer:** Try calling `UpdateAllOpenViews`.
-That forces a redraw, which I think is one step higher than a refresh
-Refresh triggers a redraw only if a change is detected and it seems in this case it's failing to detect the change
+**Answer:** Try calling
+the [`UIDocument` `UpdateAllOpenViews` method](https://www.revitapidocs.com/2024/5cc3231e-ee7e-e1fc-2bd6-d164da617954.htm).
+That forces a redraw, which I think is one step higher than a refresh.
+Refresh triggers a redraw only if a change is detected and it seems in this case it's failing to detect the change.
+`UpdateAllOpenViews` was introduced in Revit 2028 to force
+a [view update for DirectContext3D](https://thebuildingcoder.typepad.com/blog/2017/04/whats-new-in-the-revit-2018-api.html#3.26.15).
+It sounds really powerful:
+
+> Updates all open views in this document after elements have been changed, deleted, selected or de-selected. Graphics in the views are fully redrawn regardless of which elements have changed. This function should only rarely be needed, but might be required when working with graphics drawn from outside of Revit's transactions and elements, for example, when using DirectContext3D.
+
+> This function is potentially expensive as many views may be updated at once, including regeneration of view's geometry and redisplay of graphics. Thus for most situations it is recommended that API applications rely on the Revit application framework to update views more deliberately.
+
+Well worth taking a look at!
 
 **Response:** I tried `UpdateAllOpenViews` but failed.
 However, I found a way to update the tag by changing the view scale manually.
@@ -116,18 +124,27 @@ ts. Commit():
 
 The highlighted code is the final solution used to resolve the issue.
 
-Many thanks to Shen Wang for sharing this!
-
-####<a name="3"></a> UIDocument.UpdateAllOpenViews Method
-
-UIDocument.UpdateAllOpenViews Method
-https://www.revitapidocs.com/2024/5cc3231e-ee7e-e1fc-2bd6-d164da617954.htm
-https://autodesk.slack.com/archives/C0SR6NAP8/p1706517751186399
+Many thanks to Shen Wang and Dimitar Venkov for sharing this!
 
 ####<a name="4"></a> Excel Data Exchange Options
 
-Excel -- RVT data exchange options
-https://autodesk.slack.com/archives/C0SR6NAP8/p1706289884274909
+Many add-ins exchange Revit data with Microsoft Excel spreadsheets.
+The SDK has two samples which do import/export from Excel spreadsheets, FireRating and ArchSample.
+They rely on a very old DLL which isn't playing nicely with .NET Core.
+If the Revit to Excel workflow is high value, it might be worth while modernising.
+If it is low value, export to CSV or some other easily supported document type may do the trick.
+
+The [3rd most downloaded add-in in the AppStore](https://apps.autodesk.com/RVT/en/Detail/Index?id=6290726048826015851&appLang=en&os=Win64) is
+an Import/Export Excel tool
+using [EPPlus](https://github.com/EPPlusSoftware/EPPlus),
+and that exchange with Excel is an important part of many other popular add-ins.
+
+Here is a modern way
+to [Open a spreadsheet document for read-only access](https://learn.microsoft.com/en-us/office/open-xml/spreadsheet/how-to-open-a-spreadsheet-document-for-read-only-access?tabs=cs-0%2Ccs-1%2Ccs-2%2Ccs).
+
+You can also use a COM library that works so long as you have Excel installed on your computer.
+
+By the way, for the sake of completeness, I implemented a multi-project cloud-based NoSql version of the FireRating SDK sample using the Revit Element `UniqueId` and MongoDB instead of element id and Excel in [FireRatingCloud](https://github.com/jeremytammik/FireRatingCloud).
 
 ####<a name="5"></a> Defining the Start View
 
