@@ -119,7 +119,7 @@ ts. Commit():
 </code></pre>
 
 <center>
-<img src="img/" alt="" title="Year of the Drago" width="100"/> <!-- Pixel Height: 358 Pixel Width: 602 -->
+<img src="img/select_to_refresh.png" alt="Select to refresh graphics" title="Select to refresh graphics" width="100"/> <!-- Pixel Height: 358 Pixel Width: 602 -->
 </center>
 
 The highlighted code is the final solution used to resolve the issue.
@@ -162,28 +162,38 @@ Thanks  :-)
 
 <pre><code class="language-cs">void SetStartingView ()
 {
-// Code provided courtesy of:
-// Studio A International, LLC
-// http://www.studio-a-int.com
-// The below code set the Starting View to a specific view that exists in Active Project
-FilteredElementCollector feCollector = new FilteredElementCollector(activeDoc);
-myView = feCollector.OfClass(typeof(Autodesk.Revit.DB.View)).Cast&lt;Autodesk.Revit.DB.View&gt;().Where&lt;Autodesk.Revit.DB.View&gt;(v =&gt; ViewType.ThreeD == v.ViewType && v.IsTemplate == false && v.Name == "my3DStartingView").ToList().FirstOrDefault();
-FilteredElementCollector svsCollector = new FilteredElementCollector(activeDoc);
-Autodesk.Revit.DB.StartingViewSettings svs = svsCollector.OfClass(typeof(StartingViewSettings))
-.Cast&lt;Autodesk.Revit.DB.StartingViewSettings&gt;().ToList().FirstOrDefault();
-if (myView is object)
-{
-ElementId myViewId = new ElementId(Convert.ToInt32((myView.Id.ToString())));
-if (svs.IsAcceptableStartingView(myViewId))
-{
-using (Transaction t = new Transaction(activeDoc, "Set Starting View"))
-{
-t.Start("Set Starting View");
-svs.ViewId = myViewId;
-t.Commit();
-}
-}
-}
+  // Code provided courtesy of:
+  // Studio A International, LLC
+  // http://www.studio-a-int.com
+  // The below code set the Starting View to a specific view that exists in Active Project
+  FilteredElementCollector feCollector = new FilteredElementCollector(activeDoc);
+  myView = feCollector
+    .OfClass(typeof(Autodesk.Revit.DB.View)).Cast&lt;Autodesk.Revit.DB.View&gt;()
+    .Where&lt;Autodesk.Revit.DB.View&gt;(v
+      =&gt; ViewType.ThreeD == v.ViewType
+        && v.IsTemplate == false
+        && v.Name == "my3DStartingView")
+    .ToList()
+    .FirstOrDefault();
+  FilteredElementCollector svsCollector = new FilteredElementCollector(activeDoc);
+  Autodesk.Revit.DB.StartingViewSettings svs = svsCollector
+    .OfClass(typeof(StartingViewSettings))
+    .Cast&lt;Autodesk.Revit.DB.StartingViewSettings&gt;()
+    .ToList()
+    .FirstOrDefault();
+  if (myView is object)
+  {
+  ElementId myViewId = new ElementId(Convert.ToInt32((myView.Id.ToString())));
+  if (svs.IsAcceptableStartingView(myViewId))
+  {
+  using (Transaction t = new Transaction(activeDoc, "Set Starting View"))
+  {
+  t.Start("Set Starting View");
+  svs.ViewId = myViewId;
+  t.Commit();
+  }
+  }
+  }
 }
 </code></pre>
 
@@ -226,6 +236,19 @@ demonstrate
 > when people say "the climate has changed before", these are the kinds of changes they're talking about.
 
 <center>
-<img src="img/" alt="" title="Year of the Drago" width="700"/> <!-- Pixel Height: 29,913 Pixel Width: 1,480 -->
+<img src="img/xkcd_earth_temperature_timeline.png" alt="Earth average temperature timeline" title="Earth average temperature timeline" width="600"/> <!-- Pixel Height: 29,913 Pixel Width: 1,480 -->
+</center>
+
+####<a name="9"></a> PV Panel Price Trend
+
+Are you thinking about installing PV?
+Now is a good time for buying PV panels...
+[price trend below 13 cents per Watt](https://www.pvxchange.com/Price-Index),
+lowest price ever.
+Will the trend continue?
+How fast can it turn around?
+
+<center>
+<img src="img/2024_pv_panel_price_trend.png" alt="PV panel price trend" title="PV panel price trend" width="600"/> <!-- Pixel Height: 1,556 Pixel Width: 1,676 -->
 </center>
 
