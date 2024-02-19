@@ -55,7 +55,14 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Refresh Graphics
 
-
+####<a name="2"></a> UpdateAllOpenViews Doesn't Refresh Spot Elevation Prefix
+####<a name="3"></a> Excel Data Exchange Options
+####<a name="4"></a> Defining the Start View
+####<a name="5"></a> How Big is a LLM
+####<a name="6"></a> Base Rate Fallacy
+####<a name="7"></a> Last Year Was Hot
+####<a name="8"></a> Previous Climate Changes Negligeable
+####<a name="9"></a> PV Panel Price Trend
 
 <center>
 <img src="img/" alt="" title="Year of the Drago" width="100"/> <!-- Pixel Height: 500 Pixel Width: 670 -->
@@ -67,17 +74,12 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 
 
-####<a name="2"></a> UpdateAllOpenViews Doesn't Refresh Spot Elevation Prefix
+####<a name="1"></a> UpdateAllOpenViews
 
-**Question:** How can I make Revit refresh spot elevation prefix automatically?
-My code adds a plus-minus `&#177;` sign to the spot elevation tag "prefix" in batches.
-However, nothing changes in the view unless you refresh each tag.
-I call both `RefreshActiveView` and `Regenerate` to no avail.
-
-**Answer:** Try calling
+In an internal discussion on refreshing spot elevation graphics after modifying its prefix, Dimitar Venkov pointed out
 the [`UIDocument` `UpdateAllOpenViews` method](https://www.revitapidocs.com/2024/5cc3231e-ee7e-e1fc-2bd6-d164da617954.htm).
-That forces a redraw, which I think is one step higher than a refresh.
-Refresh triggers a redraw only if a change is detected and it seems in this case it's failing to detect the change.
+It forces a redraw, which may be one step higher than a refresh.
+Refresh triggers a redraw only if a change is detected and may failing to detect some changes.
 `UpdateAllOpenViews` was introduced in Revit 2028 to force
 a [view update for DirectContext3D](https://thebuildingcoder.typepad.com/blog/2017/04/whats-new-in-the-revit-2018-api.html#3.26.15).
 It sounds really powerful:
@@ -88,17 +90,32 @@ It sounds really powerful:
 
 Well worth taking a look at!
 
+####<a name="2"></a> Refreshing Spot Elevation Prefix
+
+Unfortunately, there is no silver bullet for all graphics refresh cases.
+For this issue, a different solution was required:
+
+**Question:** How can I make Revit refresh spot elevation prefix automatically?
+My code adds a plus-minus `&#177;` sign to the spot elevation tag "prefix" in batches.
+However, nothing changes in the view unless you refresh each tag.
+I call both `RefreshActiveView` and `Regenerate` to no avail.
+
+**Answer:** Try calling [`UpdateAllOpenViews`](#1).
+
 **Response:** I tried `UpdateAllOpenViews` but failed.
 However, I found a way to update the tag by changing the view scale manually.
 Is there any method to do the similar thing through API?
 
-**Answer:** You can change a view's scale from the `Scale` property, but I'm not sure that will help here.
+**Answer:** You can change the view scale with the `Scale` property, but I'm not sure that will help here.
 I don't know of any other API call that would force the view to redraw, sorry.
 
-Later: Try to get the UiView of the active view, close it and then re-open it with the `UiDoc.ActiveView` property.
+Maybe you can retrieve
+the [UIView](https://www.revitapidocs.com/2024/2a070256-00f0-5cab-1412-bee5bbfcfc5e.htm) of
+the active view, close it and then re-open it with the `uidoc.ActiveView` property.
 It's pretty extreme, but if nothing else works...
 
-**Response:** I found a solution: just select all the tags as the selected annotation elements; after this operation, all the tags will update.
+**Response:** I found a solution: just select all the tags as the selected annotation elements;
+after this operation, all the tags will update.
 Here is a code snippet:
 
 <pre><code class="language-cs">
@@ -124,7 +141,7 @@ ts. Commit():
 
 The highlighted code is the final solution used to resolve the issue.
 
-Many thanks to Shen Wang and Dimitar Venkov for sharing this!
+Many thanks to Shen Wang for sharing this!
 
 ####<a name="3"></a> Excel Data Exchange Options
 
@@ -166,8 +183,9 @@ Thanks  :-)
   // Studio A International, LLC
   // http://www.studio-a-int.com
   // The below code set the Starting View to a specific view that exists in Active Project
+
   FilteredElementCollector feCollector = new FilteredElementCollector(activeDoc);
-  myView = feCollector
+  var myView = feCollector
     .OfClass(typeof(Autodesk.Revit.DB.View)).Cast&lt;Autodesk.Revit.DB.View&gt;()
     .Where&lt;Autodesk.Revit.DB.View&gt;(v
       =&gt; ViewType.ThreeD == v.ViewType
@@ -175,24 +193,26 @@ Thanks  :-)
         && v.Name == "my3DStartingView")
     .ToList()
     .FirstOrDefault();
+
   FilteredElementCollector svsCollector = new FilteredElementCollector(activeDoc);
   Autodesk.Revit.DB.StartingViewSettings svs = svsCollector
     .OfClass(typeof(StartingViewSettings))
     .Cast&lt;Autodesk.Revit.DB.StartingViewSettings&gt;()
     .ToList()
     .FirstOrDefault();
+
   if (myView is object)
   {
-  ElementId myViewId = new ElementId(Convert.ToInt32((myView.Id.ToString())));
-  if (svs.IsAcceptableStartingView(myViewId))
-  {
-  using (Transaction t = new Transaction(activeDoc, "Set Starting View"))
-  {
-  t.Start("Set Starting View");
-  svs.ViewId = myViewId;
-  t.Commit();
-  }
-  }
+    ElementId myViewId = new ElementId(Convert.ToInt32((myView.Id.ToString())));
+    if (svs.IsAcceptableStartingView(myViewId))
+    {
+      using (Transaction t = new Transaction(activeDoc))
+      {
+        t.Start("Set Starting View");
+        svs.ViewId = myViewId;
+        t.Commit();
+      }
+    }
   }
 }
 </code></pre>
@@ -203,26 +223,31 @@ Thanks  :-)
 
 People are really bad at understanding just how big LLM's actually are.
 I think this is partly why they belittle them as 'just' next-word predictors.
-https://x.com/jam3scampbell/status/1748200331215835561?s=20
-Searle's Chinese Room: Slow Motion Intelligence
-http://lironshapira.blogspot.com/2011/02/searles-chinese-room-intelligence-in.html?m=1
+Check out the explanation
+by [@jam3scampbell](https://x.com/jam3scampbell/status/1748200331215835561?s=20),
+leading to
+the [Searle Chinese Room Slow Motion Intelligence](http://lironshapira.blogspot.com/2011/02/searles-chinese-room-intelligence-in.html) thought
+experiment.
 
 ####<a name="6"></a> Base Rate Fallacy
 
-Base rate fallacy (redirect from False positive paradox)
-https://en.wikipedia.org/wiki/Base_rate_fallacy#False_positive_paradox
-courtesy of Cory Doctorow in Little Brother
+Reading [Little Brother](https://en.wikipedia.org/wiki/Little_Brother_(Doctorow_novel))
+by [Cory Doctorow](https://en.wikipedia.org/wiki/Cory_Doctorow) led me to check out
+the [base rate fallacy or false positive paradox](https://en.wikipedia.org/wiki/Base_rate_fallacy#False_positive_paradox) that
+we have been seeing more and more of &ndash; and suffering the consequences of &ndash; in real life in recent years.
 
 ####<a name="7"></a> Last Year Was Hot
 
-The period from February 2023 to January 2024 reached 1.52C of warming compared with pre-industrial levels, i.e., we have achieved
-the [world's first year-long breach of the key 1.5C warming limit](https://www.bbc.com/news/science-environment-68110310)
-[2023 confirmed as world's hottest year on record](https://www.bbc.com/news/science-environment-67861954)
+Talking about suffering the consequences, the period from February 2023 to January 2024 reached 1.52C of warming compared with pre-industrial levels
+So, we have already achieved
+the [world's first year-long breach of the key 1.5C warming limit](https://www.bbc.com/news/science-environment-68110310).
+The calendar year was one month earlier,
+and [2023 was confirmed as world's hottest year on record](https://www.bbc.com/news/science-environment-67861954).
 
 ####<a name="8"></a> Previous Climate Changes Negligeable
 
 To put that into perspective, [xkcd](https://xkcd.com) published
-[A TIMELINE OF EARTH'S AVERAGE TEMPERATURE SINCE THE LAST ICE AGE GLACIATION](https://xkcd.com/1732/) to
+[a timeline of earth's average temperature since the last ice age glaciation](https://xkcd.com/1732/) to
 demonstrate
 
 > when people say "the climate has changed before", these are the kinds of changes they're talking about.
