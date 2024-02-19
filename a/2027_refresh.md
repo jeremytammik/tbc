@@ -38,7 +38,16 @@ twitter:
 
  #RevitAPI @AutodeskRevit #BIM @DynamoBIM
 
-&ndash; ...
+Refreshing graphics, exchanging data, setting the start view, and random titbits related to AI, politics and climate
+&ndash; UpdateAllOpenViews
+&ndash; Refreshing spot elevation prefix
+&ndash; Excel data exchange options
+&ndash; Defining the start view
+&ndash; How big is a LLM
+&ndash; Base rate fallacy
+&ndash; Last year was hot
+&ndash; Previous climate changes negligeable
+&ndash; PV panel price trend...
 
 linkedin:
 
@@ -53,7 +62,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Refresh Graphics
+### Refresh Graphics, Start View and Excel
 
 Refreshing graphics, exchanging data, setting the start view, and random titbits related to AI, politics and climate:
 
@@ -113,21 +122,20 @@ It's pretty extreme, but if nothing else works...
 after this operation, all the tags will update.
 Here is a code snippet:
 
-<pre><code class="language-cs">
-ts. Start ():
+<pre><code class="language-cs">ts.Start();
 foreach (SpotDimension item in spotdimensionList)
 {
-  Parameter para = item. get Parameter (BuiltInParameter. SPOT_ _ELEV_DISPLAY_ELEVAT...
-  if (para.AsInteger () == 3)
-    MixResetter (item, spotdimensionTypeCollector):
+  Parameter para = item.get_Parameter(BuiltInParameter.SPOT_ELEV_DISPLAY_ELEVAT...
+  if (para.AsInteger() == 3)
+    MixResetter (item, spotdimensionTypeCollector);
   else
-    DefaultResetter (item, spotdimensionIypeCollector):
+    DefaultResetter (item, spotdimensionIypeCollector);
   doc.Regenerate();
-  uidoc.Selection.SetElementIds(new List&lt;ElementId&gt; ( item. id )):
+  uidoc.Selection.SetElementIds(new List&lt;ElementId&gt; ( item. id ));
 }
-//doc.ActiveView. Scale = 100;
-ts. Commit():
-//uidoc.UpdateAl10penViews () :
+//doc.ActiveView.Scale = 100;
+ts.Commit();
+//uidoc.UpdateAl10penViews();
 </code></pre>
 
 <center>
