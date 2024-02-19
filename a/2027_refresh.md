@@ -126,7 +126,7 @@ The highlighted code is the final solution used to resolve the issue.
 
 Many thanks to Shen Wang and Dimitar Venkov for sharing this!
 
-####<a name="4"></a> Excel Data Exchange Options
+####<a name="3"></a> Excel Data Exchange Options
 
 Many add-ins exchange Revit data with Microsoft Excel spreadsheets.
 The SDK has two samples which do import/export from Excel spreadsheets, FireRating and ArchSample.
@@ -146,7 +146,7 @@ You can also use a COM library that works so long as you have Excel installed on
 
 By the way, for the sake of completeness, I implemented a multi-project cloud-based NoSql version of the FireRating SDK sample using the Revit Element `UniqueId` and MongoDB instead of element id and Excel in [FireRatingCloud](https://github.com/jeremytammik/FireRatingCloud).
 
-####<a name="5"></a> Defining the Start View
+####<a name="4"></a> Defining the Start View
 
 Adrian Crisan of [Studio A International, LLC](http://www.studio-a-int.com) shared a solution using
 the [StartingViewSettings class](https://www.revitapidocs.com/2024/aaa6f49c-faeb-851e-45e9-d3d5799c1753.htm)
@@ -199,7 +199,7 @@ Thanks  :-)
 
 **Response:** It works perfectly! Thanks a lot!
 
-####<a name="6"></a> People are really bad at understanding just how big LLM's actually are.
+####<a name="5"></a> How Big is a LLM
 
 People are really bad at understanding just how big LLM's actually are.
 I think this is partly why they belittle them as 'just' next-word predictors.
@@ -207,27 +207,19 @@ https://x.com/jam3scampbell/status/1748200331215835561?s=20
 Searle's Chinese Room: Slow Motion Intelligence
 http://lironshapira.blogspot.com/2011/02/searles-chinese-room-intelligence-in.html?m=1
 
-####<a name="7"></a> Base Rate Fallacy
+####<a name="6"></a> Base Rate Fallacy
 
 Base rate fallacy (redirect from False positive paradox)
 https://en.wikipedia.org/wiki/Base_rate_fallacy#False_positive_paradox
 courtesy of Cory Doctorow in Little Brother
 
-####<a name="8"></a> Last Year Was Hot
+####<a name="7"></a> Last Year Was Hot
 
 The period from February 2023 to January 2024 reached 1.52C of warming compared with pre-industrial levels, i.e., we have achieved
 the [world's first year-long breach of the key 1.5C warming limit](https://www.bbc.com/news/science-environment-68110310)
 [2023 confirmed as world's hottest year on record](https://www.bbc.com/news/science-environment-67861954)
 
-Global warming is a joke.
-
-Even the Antarctic ice sheets are cracking up.
-
-John Burn-Murdoch of the Financial Times
-Is the west talking itself into decline?
-
 ####<a name="8"></a> Previous Climate Changes Negligeable
-
 
 To put that into perspective, [xkcd](https://xkcd.com) published
 [A TIMELINE OF EARTH'S AVERAGE TEMPERATURE SINCE THE LAST ICE AGE GLACIATION](https://xkcd.com/1732/) to
@@ -237,14 +229,17 @@ demonstrate
 
 <center>
 <img src="img/xkcd_earth_temperature_timeline.png" alt="Earth average temperature timeline" title="Earth average temperature timeline" width="600"/> <!-- Pixel Height: 29,913 Pixel Width: 1,480 -->
+<p style="font-size: 80%; font-style:italic">Global warming is a joke
+&ndash; Even the Antarctic ice sheets are cracking up</p>
 </center>
 
 ####<a name="9"></a> PV Panel Price Trend
 
 Are you thinking about installing PV?
-Now is a good time for buying PV panels...
-[price trend below 13 cents per Watt](https://www.pvxchange.com/Price-Index),
-lowest price ever.
+I am.
+Now is a good time for buying PV panels, cf.
+the [price trending down below 13 cents per Watt](https://www.pvxchange.com/Price-Index),
+the lowest price ever.
 Will the trend continue?
 How fast can it turn around?
 
