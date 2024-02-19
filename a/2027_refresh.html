@@ -53,6 +53,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 -->
 
 <h3>Refresh Graphics</h3>
+<p>Refreshing graphics, exchanging data, setting the start view, and random titbits related to AI, politics and climate:</p>
 <ul>
 <li><a href="#1">UpdateAllOpenViews</a></li>
 <li><a href="#2">Refreshing spot elevation prefix</a></li>
@@ -78,10 +79,12 @@ It sounds really powerful:</p>
 </blockquote>
 <p>Well worth taking a look at!</p>
 <h4><a name="2"></a> Refreshing Spot Elevation Prefix</h4>
-<p>Unfortunately, there is no silver bullet for all graphics refresh cases.
-For this issue, a different solution was required:</p>
+<p>Unfortunately, there is no silver bullet for all graphics refresh cases,
+and the <a href="https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.33">need to regenerate</a> comes
+in many different flavours.
+For this issue, a different and simpler solution was required:</p>
 <p><strong>Question:</strong> How can I make Revit refresh spot elevation prefix automatically?
-My code adds a plus-minus <code>&amp;#177;</code> sign to the spot elevation tag "prefix" in batches.
+My code adds a plus-minus <code>&#177;</code> sign to the spot elevation tag "prefix" in batches.
 However, nothing changes in the view unless you refresh each tag.
 I call both <code>RefreshActiveView</code> and <code>Regenerate</code> to no avail.</p>
 <p><strong>Answer:</strong> Try calling <a href="#1"><code>UpdateAllOpenViews</code></a>.</p>
@@ -123,7 +126,7 @@ ts. Commit():
 <p>Many add-ins exchange Revit data with Microsoft Excel spreadsheets.
 The SDK has two samples which do import/export from Excel spreadsheets, FireRating and ArchSample.
 They rely on a very old DLL which isn't playing nicely with .NET Core.
-If the Revit to Excel workflow is high value, it might be worth while modernising.
+If the Revit to Excel workflow is high value, it might be worthwhile modernising.
 If it is low value, export to CSV or some other easily supported document type may do the trick.</p>
 <p>The <a href="https://apps.autodesk.com/RVT/en/Detail/Index?id=6290726048826015851&amp;appLang=en&amp;os=Win64">3rd most downloaded add-in in the AppStore</a> is
 an Import/Export Excel tool
@@ -208,7 +211,7 @@ and <a href="https://www.bbc.com/news/science-environment-67861954">2023 was con
 <a href="https://xkcd.com/1732/">a timeline of earth's average temperature since the last ice age glaciation</a> to
 demonstrate</p>
 <blockquote>
-<p>when people say "the climate has changed before", these are the kinds of changes they're talking about.</p>
+<p>when people say, "the climate has changed before", these are the kinds of changes they're talking about.</p>
 </blockquote>
 <p><center>
 <img src="img/xkcd_earth_temperature_timeline.png" alt="Earth average temperature timeline" title="Earth average temperature timeline" width="600"/> <!-- Pixel Height: 29,913 Pixel Width: 1,480 --></p>

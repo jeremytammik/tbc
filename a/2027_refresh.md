@@ -55,6 +55,8 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Refresh Graphics
 
+Refreshing graphics, exchanging data, setting the start view, and random titbits related to AI, politics and climate:
+
 - [UpdateAllOpenViews](#1)
 - [Refreshing spot elevation prefix](#2)
 - [Excel data exchange options](#3)
@@ -83,11 +85,13 @@ Well worth taking a look at!
 
 ####<a name="2"></a> Refreshing Spot Elevation Prefix
 
-Unfortunately, there is no silver bullet for all graphics refresh cases.
-For this issue, a different solution was required:
+Unfortunately, there is no silver bullet for all graphics refresh cases,
+and the [need to regenerate](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.33) comes
+in many different flavours.
+For this issue, a different and simpler solution was required:
 
 **Question:** How can I make Revit refresh spot elevation prefix automatically?
-My code adds a plus-minus `&#177;` sign to the spot elevation tag "prefix" in batches.
+My code adds a plus-minus <code>&#177;</code> sign to the spot elevation tag "prefix" in batches.
 However, nothing changes in the view unless you refresh each tag.
 I call both `RefreshActiveView` and `Regenerate` to no avail.
 
@@ -139,7 +143,7 @@ Many thanks to Shen Wang for sharing this!
 Many add-ins exchange Revit data with Microsoft Excel spreadsheets.
 The SDK has two samples which do import/export from Excel spreadsheets, FireRating and ArchSample.
 They rely on a very old DLL which isn't playing nicely with .NET Core.
-If the Revit to Excel workflow is high value, it might be worth while modernising.
+If the Revit to Excel workflow is high value, it might be worthwhile modernising.
 If it is low value, export to CSV or some other easily supported document type may do the trick.
 
 The [3rd most downloaded add-in in the AppStore](https://apps.autodesk.com/RVT/en/Detail/Index?id=6290726048826015851&appLang=en&os=Win64) is
@@ -241,7 +245,7 @@ To put that into perspective, [xkcd](https://xkcd.com) published
 [a timeline of earth's average temperature since the last ice age glaciation](https://xkcd.com/1732/) to
 demonstrate
 
-> when people say "the climate has changed before", these are the kinds of changes they're talking about.
+> when people say, "the climate has changed before", these are the kinds of changes they're talking about.
 
 <center>
 <img src="img/xkcd_earth_temperature_timeline.png" alt="Earth average temperature timeline" title="Earth average temperature timeline" width="600"/> <!-- Pixel Height: 29,913 Pixel Width: 1,480 -->
