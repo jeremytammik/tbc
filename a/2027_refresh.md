@@ -55,24 +55,15 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Refresh Graphics
 
-####<a name="2"></a> UpdateAllOpenViews Doesn't Refresh Spot Elevation Prefix
-####<a name="3"></a> Excel Data Exchange Options
-####<a name="4"></a> Defining the Start View
-####<a name="5"></a> How Big is a LLM
-####<a name="6"></a> Base Rate Fallacy
-####<a name="7"></a> Last Year Was Hot
-####<a name="8"></a> Previous Climate Changes Negligeable
-####<a name="9"></a> PV Panel Price Trend
-
-<center>
-<img src="img/" alt="" title="Year of the Drago" width="100"/> <!-- Pixel Height: 500 Pixel Width: 670 -->
-</center>
-
-
-
-
-
-
+- [UpdateAllOpenViews](#1)
+- [Refreshing spot elevation prefix](#2)
+- [Excel data exchange options](#3)
+- [Defining the start view](#4)
+- [How big is a LLM](#5)
+- [Base rate fallacy](#6)
+- [Last year was hot](#7)
+- [Previous climate changes negligeable](#8)
+- [PV panel price trend](#9)
 
 ####<a name="1"></a> UpdateAllOpenViews
 
