@@ -96,7 +96,7 @@ In an internal discussion on refreshing spot elevation graphics after modifying 
 the [`UIDocument` `UpdateAllOpenViews` method](https://www.revitapidocs.com/2024/5cc3231e-ee7e-e1fc-2bd6-d164da617954.htm).
 It forces a redraw, which may be one step higher than a refresh.
 Refresh triggers a redraw only if a change is detected and may failing to detect some changes.
-`UpdateAllOpenViews` was introduced in Revit 2028 to force
+`UpdateAllOpenViews` was introduced in Revit 2018 to force
 a [view update for DirectContext3D](https://thebuildingcoder.typepad.com/blog/2017/04/whats-new-in-the-revit-2018-api.html#3.26.15).
 It sounds really powerful:
 
