@@ -110,23 +110,21 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ####<a name="2"></a> BIM Interactive Notebooks
 
-BIM Interactive Notebooks
-Chuong Ho
-https://chuongmep.com/
-https://www.linkedin.com/posts/chuongmep_opensource-ai-dataanalysis-activity-7164531381107183616-TYNP?utm_source=share&utm_medium=member_desktop
-I'm thrilled to share an open-source project that I believe holds immense potential.
+Hot on the foot of
+Joel Waldheim Saury's [interactive .NET Revit BIM Polyglot Notebook](https://thebuildingcoder.typepad.com/blog/2024/02/net-core-c4r-views-and-interactive-hot-reload.html#4),
+[Chuong Ho](https://chuongmep.com/) shares
+his [BIM Interactive Notebooks](https://www.linkedin.com/posts/chuongmep_opensource-ai-dataanalysis-activity-7164531381107183616-TYNP?utm_source=share&utm_medium=member_desktop):
+
+> I'm thrilled to share an open-source project that I believe holds immense potential.
 It enables you to integrate and analyze Revit model data in various ways using Jupyter Notebook use mutiple progaming language under Interactive .NET.
 The project has been brought to fruition, and it's truly gratifying to see its development, as it opens up significant opportunities with AI and data analysis.
-Check out the GitHub repository to explore more:
-https://lnkd.in/gWSsWppG
-/Users/jta/a/doc/revit/tbc/git/a/img/ch_jupyter.gif
+Explore further in the
 
-####<a name="2"></a> NotebookLM
+- [BIM Interactive Notebooks GitHub repository](https://github.com/jowsy/bim-net-interactive)
 
-NotebookLM
-https://notebooklm.google/
-> NotebookLM gives you a personalized AI, grounded in the information you trust.
-NotebookLM is only available in the U.S. for users 18 and up
+<center>
+<img src="img/ch_jupyter.gif" alt="BIM interactive notebooks" title="BIM interactive notebooks" width="748"/> <!-- Pixel Height: 656 Pixel Width: 748 -->
+</center>
 
 ####<a name="2"></a> TemporaryGraphicsManager in Action
 
@@ -153,12 +151,15 @@ https://forums.autodesk.com/t5/revit-api-forum/finding-user-line-styles/m-p/1256
 The curious case of JavaScript
 https://www.linkedin.com/pulse/curious-case-javascript-sandip-jadhav-ebobf
 
-####<a name="2"></a> LLM Tokenisation
+####<a name="2"></a> NotebookLM
 
-LLM tokenisation 2:13:35 video
-Let's build the GPT Tokenizer
-https://youtu.be/zduSFxRajkE
-<iframe width="560" height="315" src="https://www.youtube.com/embed/zduSFxRajkE?si=H0TaI7Ro1ZOpmv0i" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+Unrelated to BIM, Google introduced
+the [NotebookLM experiment](https://notebooklm.google/) touting
+an interface that lets you shift effortlessly from reading to asking questions to writing with built-in AI support that can
+also transform your set of notes into an outline, blog post, business plan, and more.
+
+> NotebookLM gives you a personalized AI, grounded in the information you trust.
+NotebookLM is only available in the U.S. for users 18 and up.
 
 ####<a name="2"></a> World Model on Million-Length Video and Language with RingAttention
 
@@ -169,6 +170,13 @@ https://largeworldmodel.github.io/
 ####<a name="2"></a> Airline Chatbot Invented a Refund Policy
 
 ... and [Air Canada must honor refund policy invented by airline’s chatbot](https://arstechnica.com/tech-policy/2024/02/air-canada-must-honor-refund-policy-invented-by-airlines-chatbot/).
+
+####<a name="2"></a> LLM Tokenisation
+
+LLM tokenisation 2:13:35 video
+Let's build the GPT Tokenizer
+https://youtu.be/zduSFxRajkE
+<iframe width="560" height="315" src="https://www.youtube.com/embed/zduSFxRajkE?si=H0TaI7Ro1ZOpmv0i" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 
 ####<a name="2"></a> Diátaxis Systematic Technical Documentation
 
