@@ -9,61 +9,69 @@
 
 <!---
 
-- refresh spot elevation prefix
-  https://autodesk.slack.com/archives/C0SR6NAP8/p1706517751186399
-  UIDocument.UpdateAllOpenViews Method
-  https://www.revitapidocs.com/2024/5cc3231e-ee7e-e1fc-2bd6-d164da617954.htm
+- BIM Interactive Notebooks
+  Chuong Ho
+  https://chuongmep.com/
+  https://www.linkedin.com/posts/chuongmep_opensource-ai-dataanalysis-activity-7164531381107183616-TYNP?utm_source=share&utm_medium=member_desktop
+  I'm thrilled to share an open-source project that I believe holds immense potential.
+  It enables you to integrate and analyze Revit model data in various ways using Jupyter Notebook use mutiple progaming language under Interactive .NET.
+  The project has been brought to fruition, and it's truly gratifying to see its development, as it opens up significant opportunities with AI and data analysis.
+  Check out the GitHub repository to explore more:
+  https://lnkd.in/gWSsWppG
+  /Users/jta/a/doc/revit/tbc/git/a/img/ch_jupyter.gif
 
-- Excel -- RVT data exchange options
-  https://autodesk.slack.com/archives/C0SR6NAP8/p1706289884274909
+- NotebookLM
+  https://notebooklm.google/
+  > NotebookLM gives you a personalized AI, grounded in the information you trust.
+  NotebookLM is only available in the U.S. for users 18 and up
 
-- Defining the start view using Revit API
-  https://forums.autodesk.com/t5/revit-api-forum/defining-the-start-view-using-revit-api/m-p/12506862#M76426
+- TemporaryGraphicsManager in Action
+  https://forums.autodesk.com/t5/revit-api-forum/temporarygraphicsmanager-in-action/td-p/12566892
+  W7k Revit API Experiments - TemporaryGraphicsManager
+  https://youtu.be/Q7aKEocvRtk
+  LinkedIn BIM Experts -- https://www.linkedin.com/feed/update/urn:li:activity:7164217836867895296?utm_source=share&utm_medium=member_desktop
+  Julian Wandzilak
+  Today, I would like to share a recent discovery I made while working with Revit API. As many of you know, creating new graphical elements within Revit can be quite challenging and limited. However, I stumbled upon a little-known class called TemporaryGraphicsManager.
+  The TemporaryGraphicsManager allows us to add temporary graphical elements directly to the model or drawing space. These graphics are not subject to undo actions and are not permanently saved anywhere. While they won’t clutter up your project, they provide a powerful way to enhance your user experience.
+  Surprisingly, I haven’t seen this class widely used in other plugins or extensions. So, when I first encountered it, I knew I had to put it to the test.
+  In the initial part of my video, I demonstrate how to align title lines to previously saved points. With a simple click, you can create temporary graphics that will guide your design process and allow you to snap your title lines to them!
+  In the second part of the video, I collect points and save them to an external file for future reference. The TemporaryGraphicsManager conveniently marks their locations, eliminating the need to remember which points I’ve already saved.
+  Is this the easiest method of controlling title lines? Perhaps not. In an upcoming update to my Drafter tool (to which I added recently 30 days of trial), I’ll introduce further automations in this area. But one thing is certain: I’ll continue to leverage the power of TemporaryGraphicsManage.
 
-- People are really bad at understanding just how big LLM's actually are.
-  I think this is partly why they belittle them as 'just' next-word predictors.
-  https://x.com/jam3scampbell/status/1748200331215835561?s=20
-  Searle's Chinese Room: Slow Motion Intelligence
-  http://lironshapira.blogspot.com/2011/02/searles-chinese-room-intelligence-in.html?m=1
+- classify line styles built-in versus user defined
+  https://forums.autodesk.com/t5/revit-api-forum/finding-user-line-styles/m-p/12566994#M76897
 
-- Base rate fallacy (redirect from False positive paradox)
-  https://en.wikipedia.org/wiki/Base_rate_fallacy#False_positive_paradox
-  courtesy of Cory Doctorow in Little Brother
+- The curious case of JavaScript
+  https://www.linkedin.com/pulse/curious-case-javascript-sandip-jadhav-ebobf
 
-- The period from February 2023 to January 2024 reached 1.52C of warming compared with pre-industrial levels, i.e., we have achieved
-  the [world's first year-long breach of the key 1.5C warming limit](https://www.bbc.com/news/science-environment-68110310)
-  [2023 confirmed as world's hottest year on record](https://www.bbc.com/news/science-environment-67861954)
+- LLM tokenisation 2:13:35 video
+  Let's build the GPT Tokenizer
+  https://youtu.be/zduSFxRajkE
+  <iframe width="560" height="315" src="https://www.youtube.com/embed/zduSFxRajkE?si=H0TaI7Ro1ZOpmv0i" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+
+- World Model on Million-Length Video and Language with RingAttention
+  https://largeworldmodel.github.io/
+  > The ability to correctly answer questions about an hour-long video is pretty impressive
+
+- Air Canada must honor refund policy invented by airline’s chatbot
+  https://arstechnica.com/tech-policy/2024/02/air-canada-must-honor-refund-policy-invented-by-airlines-chatbot/
+
+- https://diataxis.fr/
+  Diátaxis
+  A systematic approach to technical documentation authoring.
+
+- amara's law -- ubunbtu
+
+- John Burn-Murdoch of the Financial Times
+  Is the west talking itself into decline?
 
 twitter:
 
-Exchanging data with Excel, setting the start view, random titbits related to AI, politics, climate, UpdateAllOpenViews and refreshing graphics with the #RevitAPI @AutodeskRevit #BIM @DynamoBIM https://autode.sk/refreshgraphics
+ with the #RevitAPI @AutodeskRevit #BIM @DynamoBIM
 
-Refreshing graphics, exchanging data, setting the start view, and random titbits related to AI, politics and climate
-&ndash; UpdateAllOpenViews
-&ndash; Refreshing spot elevation prefix
-&ndash; Excel data exchange options
-&ndash; Defining the start view
-&ndash; How big is a LLM
-&ndash; Base rate fallacy
-&ndash; Last year was hot
-&ndash; Previous climate changes negligeable
-&ndash; PV panel price trend...
+&ndash; ...
 
 linkedin:
-
-Exchanging data with Excel, setting the start view, random titbits related to AI, politics, climate, UpdateAllOpenViews and refreshing graphics with the #RevitAPI
-
-https://autode.sk/refreshgraphics
-
-- UpdateAllOpenViews
-- Refreshing spot elevation prefix
-- Excel data exchange options
-- Defining the start view
-- How big is a LLM
-- Base rate fallacy
-- Last year was hot
-- Previous climate changes negligeable
-- PV panel price trend...
 
 #BIM #DynamoBIM #AutodeskAPS #Revit #API #IFC #SDK #Autodesk #AEC #adsk
 
@@ -76,216 +84,142 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Refresh Graphics, Start View and Excel
+### Interactive BIM Notebook and Temporary Graphics
 
-Refreshing graphics, exchanging data, setting the start view, and random titbits related to AI, politics and climate:
 
-- [UpdateAllOpenViews](#1)
-- [Refreshing spot elevation prefix](#2)
-- [Excel data exchange options](#3)
-- [Defining the start view](#4)
-- [How big is a LLM](#5)
-- [Base rate fallacy](#6)
-- [Last year was hot](#7)
-- [Previous climate changes negligeable](#8)
-- [PV panel price trend](#9)
 
-####<a name="1"></a> UpdateAllOpenViews
 
-In an internal discussion on refreshing spot elevation graphics after modifying its prefix, Dimitar Venkov pointed out
-the [`UIDocument` `UpdateAllOpenViews` method](https://www.revitapidocs.com/2024/5cc3231e-ee7e-e1fc-2bd6-d164da617954.htm).
-It forces a redraw, which may be one step higher than a refresh.
-Refresh triggers a redraw only if a change is detected and may failing to detect some changes.
-`UpdateAllOpenViews` was introduced in Revit 2018 to force
-a [view update for DirectContext3D](https://thebuildingcoder.typepad.com/blog/2017/04/whats-new-in-the-revit-2018-api.html#3.26.15).
-It sounds really powerful:
 
-> Updates all open views in this document after elements have been changed, deleted, selected or de-selected. Graphics in the views are fully redrawn regardless of which elements have changed. This function should only rarely be needed, but might be required when working with graphics drawn from outside of Revit's transactions and elements, for example, when using DirectContext3D.
+####<a name="2"></a>
 
-> This function is potentially expensive as many views may be updated at once, including regeneration of view's geometry and redisplay of graphics. Thus for most situations it is recommended that API applications rely on the Revit application framework to update views more deliberately.
+**Question:**
 
-Well worth taking a look at!
+**Answer:**
 
-####<a name="2"></a> Refreshing Spot Elevation Prefix
-
-Unfortunately, there is no silver bullet for all graphics refresh cases,
-and the [need to regenerate](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.33) comes
-in many different flavours.
-For this issue, a different and simpler solution was required:
-
-**Question:** How can I make Revit refresh spot elevation prefix automatically?
-My code adds a plus-minus <code>&#177;</code> sign to the spot elevation tag "prefix" in batches.
-However, nothing changes in the view unless you refresh each tag.
-I call both `RefreshActiveView` and `Regenerate` to no avail.
-
-**Answer:** Try calling [`UpdateAllOpenViews`](#1).
-
-**Response:** I tried `UpdateAllOpenViews` but failed.
-However, I found a way to update the tag by changing the view scale manually.
-Is there any method to do the similar thing through API?
-
-**Answer:** You can change the view scale with the `Scale` property, but I'm not sure that will help here.
-I don't know of any other API call that would force the view to redraw, sorry.
-
-Maybe you can retrieve
-the [UIView](https://www.revitapidocs.com/2024/2a070256-00f0-5cab-1412-bee5bbfcfc5e.htm) of
-the active view, close it and then re-open it with the `uidoc.ActiveView` property.
-It's pretty extreme, but if nothing else works...
-
-**Response:** I found a solution: just select all the tags as the selected annotation elements;
-after this operation, all the tags will update.
-Here is a code snippet:
+**Response:**
 
 <pre><code class="language-cs">ts.Start();
-foreach (SpotDimension item in spotdimensionList)
-{
-  Parameter para = item.get_Parameter(BuiltInParameter.SPOT_ELEV_DISPLAY_ELEVAT...
-  if (para.AsInteger() == 3)
-    MixResetter (item, spotdimensionTypeCollector);
-  else
-    DefaultResetter (item, spotdimensionIypeCollector);
-  doc.Regenerate();
-  uidoc.Selection.SetElementIds(new List&lt;ElementId&gt; ( item. id ));
-}
-//doc.ActiveView.Scale = 100;
-ts.Commit();
-//uidoc.UpdateAl10penViews();
+
 </code></pre>
 
 <center>
-<img src="img/select_to_refresh.png" alt="Select to refresh graphics" title="Select to refresh graphics" width="100"/> <!-- Pixel Height: 358 Pixel Width: 602 -->
+<img src="img/.png" alt="" title="" width="100"/> <!-- Pixel Height: 358 Pixel Width: 602 -->
 </center>
 
-The highlighted code is the final solution used to resolve the issue.
 
-Many thanks to Shen Wang for sharing this!
 
-####<a name="3"></a> Excel Data Exchange Options
+####<a name="2"></a> BIM Interactive Notebooks
 
-Many add-ins exchange Revit data with Microsoft Excel spreadsheets.
-The SDK has two samples which do import/export from Excel spreadsheets, FireRating and ArchSample.
-They rely on a very old DLL which isn't playing nicely with .NET Core.
-If the Revit to Excel workflow is high value, it might be worthwhile modernising.
-If it is low value, export to CSV or some other easily supported document type may do the trick.
+BIM Interactive Notebooks
+Chuong Ho
+https://chuongmep.com/
+https://www.linkedin.com/posts/chuongmep_opensource-ai-dataanalysis-activity-7164531381107183616-TYNP?utm_source=share&utm_medium=member_desktop
+I'm thrilled to share an open-source project that I believe holds immense potential.
+It enables you to integrate and analyze Revit model data in various ways using Jupyter Notebook use mutiple progaming language under Interactive .NET.
+The project has been brought to fruition, and it's truly gratifying to see its development, as it opens up significant opportunities with AI and data analysis.
+Check out the GitHub repository to explore more:
+https://lnkd.in/gWSsWppG
+/Users/jta/a/doc/revit/tbc/git/a/img/ch_jupyter.gif
 
-The [3rd most downloaded add-in in the AppStore](https://apps.autodesk.com/RVT/en/Detail/Index?id=6290726048826015851&appLang=en&os=Win64) is
-an Import/Export Excel tool
-using [EPPlus](https://github.com/EPPlusSoftware/EPPlus),
-and that exchange with Excel is an important part of many other popular add-ins.
+####<a name="2"></a> NotebookLM
 
-Here is a modern way
-to [Open a spreadsheet document for read-only access](https://learn.microsoft.com/en-us/office/open-xml/spreadsheet/how-to-open-a-spreadsheet-document-for-read-only-access?tabs=cs-0%2Ccs-1%2Ccs-2%2Ccs).
+NotebookLM
+https://notebooklm.google/
+> NotebookLM gives you a personalized AI, grounded in the information you trust.
+NotebookLM is only available in the U.S. for users 18 and up
 
-You can also use a COM library that works so long as you have Excel installed on your computer.
+####<a name="2"></a> TemporaryGraphicsManager in Action
 
-By the way, for the sake of completeness, I implemented a multi-project cloud-based NoSql version of the FireRating SDK sample using the Revit Element `UniqueId` and MongoDB instead of element id and Excel in [FireRatingCloud](https://github.com/jeremytammik/FireRatingCloud).
+TemporaryGraphicsManager in Action
+https://forums.autodesk.com/t5/revit-api-forum/temporarygraphicsmanager-in-action/td-p/12566892
+W7k Revit API Experiments - TemporaryGraphicsManager
+https://youtu.be/Q7aKEocvRtk
+LinkedIn BIM Experts -- https://www.linkedin.com/feed/update/urn:li:activity:7164217836867895296?utm_source=share&utm_medium=member_desktop
+Julian Wandzilak
+Today, I would like to share a recent discovery I made while working with Revit API. As many of you know, creating new graphical elements within Revit can be quite challenging and limited. However, I stumbled upon a little-known class called TemporaryGraphicsManager.
+The TemporaryGraphicsManager allows us to add temporary graphical elements directly to the model or drawing space. These graphics are not subject to undo actions and are not permanently saved anywhere. While they won’t clutter up your project, they provide a powerful way to enhance your user experience.
+Surprisingly, I haven’t seen this class widely used in other plugins or extensions. So, when I first encountered it, I knew I had to put it to the test.
+In the initial part of my video, I demonstrate how to align title lines to previously saved points. With a simple click, you can create temporary graphics that will guide your design process and allow you to snap your title lines to them!
+In the second part of the video, I collect points and save them to an external file for future reference. The TemporaryGraphicsManager conveniently marks their locations, eliminating the need to remember which points I’ve already saved.
+Is this the easiest method of controlling title lines? Perhaps not. In an upcoming update to my Drafter tool (to which I added recently 30 days of trial), I’ll introduce further automations in this area. But one thing is certain: I’ll continue to leverage the power of TemporaryGraphicsManage.
 
-####<a name="4"></a> Defining the Start View
+####<a name="2"></a> Classify Line Styles Built-In vs User
 
-Adrian Crisan of [Studio A International, LLC](http://www.studio-a-int.com) shared a solution using
-the [StartingViewSettings class](https://www.revitapidocs.com/2024/aaa6f49c-faeb-851e-45e9-d3d5799c1753.htm)
-for [defining the start view using Revit API](https://forums.autodesk.com/t5/revit-api-forum/defining-the-start-view-using-revit-api/m-p/12506862):
+classify line styles built-in versus user defined
+https://forums.autodesk.com/t5/revit-api-forum/finding-user-line-styles/m-p/12566994#M76897
 
-**Question:** Is it possible to define the start view using the API?
-Similar to the UI functionality
-for [specify the starting view for a model](https://help.autodesk.com/view/RVT/2024/ENU/?guid=GUID-622E667E-FB0B-47E1-8F66-E237A70771BD).
-At the moment, I can only find a way to access the parameter and find out if a view is defined as the start view.
-Thanks  :-)
+####<a name="2"></a> The Curious Case of JavaScript
 
-**Answer:** Use this method to set your starting view:
+The curious case of JavaScript
+https://www.linkedin.com/pulse/curious-case-javascript-sandip-jadhav-ebobf
 
-<pre><code class="language-cs">void SetStartingView ()
-{
-  // Code provided courtesy of:
-  // Studio A International, LLC
-  // http://www.studio-a-int.com
-  // The below code set the Starting View to a specific view that exists in Active Project
+####<a name="2"></a> LLM Tokenisation
 
-  FilteredElementCollector feCollector = new FilteredElementCollector(activeDoc);
-  var myView = feCollector
-    .OfClass(typeof(Autodesk.Revit.DB.View)).Cast&lt;Autodesk.Revit.DB.View&gt;()
-    .Where&lt;Autodesk.Revit.DB.View&gt;(v
-      =&gt; ViewType.ThreeD == v.ViewType
-        && v.IsTemplate == false
-        && v.Name == "my3DStartingView")
-    .ToList()
-    .FirstOrDefault();
+LLM tokenisation 2:13:35 video
+Let's build the GPT Tokenizer
+https://youtu.be/zduSFxRajkE
+<iframe width="560" height="315" src="https://www.youtube.com/embed/zduSFxRajkE?si=H0TaI7Ro1ZOpmv0i" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 
-  FilteredElementCollector svsCollector = new FilteredElementCollector(activeDoc);
-  Autodesk.Revit.DB.StartingViewSettings svs = svsCollector
-    .OfClass(typeof(StartingViewSettings))
-    .Cast&lt;Autodesk.Revit.DB.StartingViewSettings&gt;()
-    .ToList()
-    .FirstOrDefault();
+####<a name="2"></a> World Model on Million-Length Video and Language with RingAttention
 
-  if (myView is object)
-  {
-    ElementId myViewId = new ElementId(Convert.ToInt32((myView.Id.ToString())));
-    if (svs.IsAcceptableStartingView(myViewId))
-    {
-      using (Transaction t = new Transaction(activeDoc))
-      {
-        t.Start("Set Starting View");
-        svs.ViewId = myViewId;
-        t.Commit();
-      }
-    }
-  }
-}
-</code></pre>
+World Model on Million-Length Video and Language with RingAttention
+https://largeworldmodel.github.io/
+> The ability to correctly answer questions about an hour-long video is pretty impressive
 
-**Response:** It works perfectly! Thanks a lot!
+####<a name="2"></a> Airline Chatbot Invented a Refund Policy
 
-####<a name="5"></a> How Big is a LLM
+... and [Air Canada must honor refund policy invented by airline’s chatbot](https://arstechnica.com/tech-policy/2024/02/air-canada-must-honor-refund-policy-invented-by-airlines-chatbot/).
 
-People are really bad at understanding just how big LLM's actually are.
-I think this is partly why they belittle them as 'just' next-word predictors.
-Check out the explanation
-by [@jam3scampbell](https://x.com/jam3scampbell/status/1748200331215835561?s=20),
-leading to
-the [Searle Chinese Room Slow Motion Intelligence](http://lironshapira.blogspot.com/2011/02/searles-chinese-room-intelligence-in.html) thought
-experiment.
+####<a name="2"></a> Diátaxis Systematic Technical Documentation
 
-####<a name="6"></a> Base Rate Fallacy
+A colleague pointed out [Diátaxis](https://diataxis.fr/):
 
-Reading [Little Brother](https://en.wikipedia.org/wiki/Little_Brother_(Doctorow_novel))
-by [Cory Doctorow](https://en.wikipedia.org/wiki/Cory_Doctorow) led me to check out
-the [base rate fallacy or false positive paradox](https://en.wikipedia.org/wiki/Base_rate_fallacy#False_positive_paradox) that
-we have been seeing more and more of &ndash; and suffering the consequences of &ndash; in real life in recent years.
+> A systematic approach to technical documentation authoring.
 
-####<a name="7"></a> Last Year Was Hot
+It applies to my work as well, and our entire team's.
 
-Talking about suffering the consequences, the period from February 2023 to January 2024 reached 1.52C of warming compared with pre-industrial levels
-So, we have already achieved
-the [world's first year-long breach of the key 1.5C warming limit](https://www.bbc.com/news/science-environment-68110310).
-The calendar year was one month earlier,
-and [2023 was confirmed as world's hottest year on record](https://www.bbc.com/news/science-environment-67861954).
+####<a name="2"></a> Amara's Law
 
-####<a name="8"></a> Previous Climate Changes Negligeable
-
-To put that into perspective, [xkcd](https://xkcd.com) published
-[a timeline of earth's average temperature since the last ice age glaciation](https://xkcd.com/1732/) to
-demonstrate
-
-> when people say, "the climate has changed before", these are the kinds of changes they're talking about.
+Roy Amara formulated [Amara's law](https://en.wikipedia.org/wiki/Roy_Amara#Amara's_law) in the 1960s:
 
 <center>
-<img src="img/xkcd_earth_temperature_timeline.png" alt="Earth average temperature timeline" title="Earth average temperature timeline" width="600"/> <!-- Pixel Height: 29,913 Pixel Width: 1,480 -->
-<p style="font-size: 80%; font-style:italic">Global warming is a joke
-&ndash; Even the Antarctic ice sheets are cracking up</p>
+<p style="font-style:italic"></p>We tend to overestimate the effects of a technology in the short run and underestimate them in the long run.
 </center>
 
-####<a name="9"></a> PV Panel Price Trend
+<!--
 
-Are you thinking about installing PV?
-I am.
-Now is a good time for buying PV panels, cf.
-the [price trending down below 13 cents per Watt](https://www.pvxchange.com/Price-Index),
-the lowest price ever.
-Will the trend continue?
-How fast can it turn around?
+«Wir neigen daeu, die Auswirkungen einer Technologie kursfristig zu überschätzen und langfristig Zu unterschätsen.»
+Diesen Satz formulierte in den Sechzigerjahren der Computerspezialist Roy Amara. Seine Beobachtung galt dabei nicht den technologischen Entwicklungen, sondern dem menschlichen Verhalten: Wir sind neugierig, aber ungeduldig. Wir lassen uns leicht von Neuem begeistern, aber sind schnell enttäuscht, wenn es nicht so gut funktioniert wie gedacht.
+Natürlich stösst alles Neue immer auch auf Gegenwind, der Mensch liebt Beständigkeit und fürchtet Veränderung. Aber gerade bei Technologien, so Amaras Beobachtung, versprechen wir uns zu schnell zu viel und haben zu wenig Verständnis dafür, dass eine Innovation sich entwickeln muss. Langsam.
+Ein aktuelles Beispiel? KI. Anfangs herrschte eine Mischung aus Euphorie und Untergangsstimmung. Die einen knieten vor KI wie vor einer Marienerscheinung, die anderen tanzten den Apocalypso.
+Inzwischen hat sich vieles relativiert, die Begeisterung, aber auch die Befürchtungen wurden ein bisschen runtergerechnet. Amara würde sagen: Wir neiggen dazu, die Auswirkungen einer Technologie kurzfristig zu überschätzen und langfristig zu unterschätzen.
+Diesen Satz, der als «Amara's Law» oder «Amaras Gesetz» bekannt wurde, kann man auf fast alle Bereiche anwenden. Zum Beispiel auf unser Gesundheitsverhalten: Wir neigen dazu, Verhaltensänderungen - eine neue Trainingsmethode, Meditation, Keto-Diät - anfangs zu überschätzen und begeistert als Allheilmittel zu betrachten, den langfristigen Nutzen aber zu unterschätzen. Der Punkt ist: Die meisten bleiben nicht lange genug bei einem Verhalten, um seinen wahren Nutzen und Ertrag zu erkennen.
+Oder nehmen wir Menschen: Wir lernen eine Person kennen. Sie gefällt uns. Wir verlieben uns. Sehen sie durch eine rosarote Brille. Dann fangen wir an, Fehler zu erkennen. Was uns anfangs noch begeisterte, irritiert. Wenn wir die Phase aber durchstehen, wenn wir merken, dass die andere Person nicht perfekt ist (wir aber auch nicht), dann wendet sich das Blatt. Wenn wir uns selbst und das Gegenüber in der Unperfektion lieben lernen, entsteht eine tiefere Verbindung. Kurz: Wir neigen dazu, Menschen kurzfristig zu überschätzen und langfristig zu unterschätzen.
+-->
 
-<center>
-<img src="img/2024_pv_panel_price_trend.png" alt="PV panel price trend" title="PV panel price trend" width="600"/> <!-- Pixel Height: 1,556 Pixel Width: 1,676 -->
-</center>
+His observation was not about technology, but human behavior: we are curious and impatient.
+We get excited about new things and are quickly disappointed when they don't immediately perform as expected.
+Especially from technologies, we expect too much too quickly and have little patience with the need for an innovation to develop with time.
+AI is a good example: the initial mixture of euphoria and panic has rapidly faded.
+Another example, our health behavior: we often initially overestimate behavioral changes &ndash; a new training method, meditation, keto diet &ndash; and enthusiastically view them as a panacea, underestimating long-term benefits.
+Often, people don't stick with a behavior long enough to see its true benefits and returns.
+Or, other people: we get to know a person, like her, fall in love.
+Reality sets in, initially exciting aspects irritate.
+Get through that phase and realise that the other person is not perfect (but neither are we), and the tide turns.
+So, again, we tend to overestimate people in the short term and underestimate them in the long term.
+
+####<a name="2"></a> Talking About Progress and Doom
+
+John Burn-Murdoch of the Financial Times presented recently asked,
+[Is the west talking itself into decline?](https://duckduckgo.com/?q=Is+the+west+talking+itself+into+decline%3F)
+
+A recent [scientific paper](https://docs.iza.org/dp16674.pdf) used textual analysis of 173,031 works printed in England between 1500 and 1900 and found significant correlation between vocabulary and culture.
+
+> Extending the same analysis to the present, a striking picture emerges:
+over the past 60 years, the west has begun to shift away from the culture of progress, and towards one of caution, worry and risk-aversion, with economic growth slowing over the same period.
+The frequency of terms related to progress, improvement and the future has dropped by about 25 per cent since the 1960s, while those related to threats, risks and worries have become several times more common.
+
+So: don't worry, be happy!
+
+Take a risk and innovate!
 
