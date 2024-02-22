@@ -67,7 +67,7 @@
 
 twitter:
 
- with the #RevitAPI @AutodeskRevit #BIM @DynamoBIM
+Amara's law, progress versus risk, AI-based utilities, BIM interactive notebooks, classifying line styles, and TemporaryGraphicsManager in action  with the #RevitAPI @AutodeskRevit #BIM @DynamoBIM https://autode.sk/bimnotebook
 
 Interactivity and AI keeps growing
 &ndash; BIM interactive notebooks
