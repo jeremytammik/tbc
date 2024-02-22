@@ -69,7 +69,19 @@ twitter:
 
  with the #RevitAPI @AutodeskRevit #BIM @DynamoBIM
 
-&ndash; ...
+Interactivity and AI keeps growing
+&ndash; BIM interactive notebooks
+&ndash; TemporaryGraphicsManager in action
+&ndash; Classify line styles built-in vs user
+&ndash; The curious case of JavaScript
+&ndash; Magika AI-based file type classification
+&ndash; NotebookLM
+&ndash; World model on million-length video and language with RingAttention
+&ndash; Airline chatbot invented a refund policy
+&ndash; LLM tokenisation
+&ndash; Diátaxis systematic technical documentation
+&ndash; Amara's law
+&ndash; Talking about progress versus risk...
 
 linkedin:
 
@@ -84,7 +96,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Interactive BIM Notebook and Temporary Graphics
+### Interactive BIM Notebook, Temporary Graphics and AI
 
 The amount of news items related to interactivity and AI keeps growing:
 
@@ -113,7 +125,7 @@ It enables you to integrate and analyze Revit model data in various ways using J
 The project has been brought to fruition, and it's truly gratifying to see its development, as it opens up significant opportunities with AI and data analysis.
 Explore further in the
 
-- [BIM Interactive Notebooks GitHub repository](https://github.com/jowsy/bim-net-interactive)
+> - [BIM Interactive Notebooks GitHub repository](https://github.com/jowsy/bim-net-interactive)
 
 <center>
 <img src="img/ch_jupyter.gif" alt="BIM interactive notebooks" title="BIM interactive notebooks" width="748"/> <!-- Pixel Height: 656 Pixel Width: 748 -->
