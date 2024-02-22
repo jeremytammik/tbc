@@ -92,11 +92,6 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ####<a name="2"></a>
 
-**Question:**
-
-**Answer:**
-
-**Response:**
 
 <pre><code class="language-cs">ts.Start();
 
@@ -143,12 +138,13 @@ Is this the easiest method of controlling title lines? Perhaps not. In an upcomi
 
 ####<a name="2"></a> Classify Line Styles Built-In vs User
 
-An interesting example of many different possible approaches to classify line styles in built-in versus user defined was finally solved
+An interesting example of several completely different possible approaches to
+classify line styles in built-in versus user defined was finally solved
 by Frank [@Fair59](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/2083518) Aarssen in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [finding user line styles](https://forums.autodesk.com/t5/revit-api-forum/finding-user-line-styles/m-p/12566994):
 
-
+**Question:**
 I’m writing an addon that changes all the line styles of Detail Lines, Model Lines and the boarders of Filled Regions to a certain line style. But I'm having issues with distinguishing user built line styles from system / inbuilt ones.
 
 To get all the lines styles and including the user and system ones, I use a FilteredElementCollector to find class GraphicsStyle:
@@ -198,29 +194,11 @@ MyStyle
 
 Seems a little inconsistent to me... Is there any good way to pick out the 'system' line styles so that I can only find ones the user has created?
 
-Cheers!
- Solved by FAIR59. Go to Solution.
- Solved by Kevin.Bell. Go to Solution.
-Tags (0)
-Add tags
-Report
-4 REPLIES
-Sort:
-MESSAGE 2 OF 5
-jeremy_tammik
-  Autodesk jeremy_tammik  in reply to: Kevin.Bell
-‎2024-02-15 10:15 PM
+
+**Answer:**
 One possible approach that might work is to look at their element ids. These objects are elements, stored in the BIM db, hence equipped with element ids, aren't they? The element ids are assigned one by one as things get added to the database. Hence, higher element ids are added later. They are also incremented consecutively as work progresses. While this behaviour is undocumented and not officially supported or guaranteed in any way whatsoever, it has been working like that forever, afaik. Therefore, if you determine the highest element id in your project right now, you know that everything with a higher id has been added later. Therefore, you know that all line styles with an id higher than the highest one when you started initial work on your BIM are user generated in one way or another, and all lower ones are built-in. Does this help?
 
-Jeremy Tammik,  Developer Advocacy and Support, The Building Coder, Autodesk Developer Network, ADN Open
-Tags (0)
-Add tags
-Report
-MESSAGE 3 OF 5
-Kevin.Bell
-  Advisor Kevin.Bell  in reply to: Kevin.Bell
-‎2024-02-16 11:16 AM
-
+**Response:**
 Thanks for your response.
 
 I think I've found another way which better does what I'm doing for. After reading more I found that I can collect all CurveElements from the project with this:
@@ -229,66 +207,66 @@ I think I've found another way which better does what I'm doing for. After readi
 
 Iterate through them and use the method GetLineStyleIds() to get the GraphicsStyles... luckly these appear to be named correctly with <> denoting 'System' line styles.
 
-Thanks.
+**Answer:**
+A category has the property `BuiltInCategory`.
+The graphicalStyleCategory of a user-defined line has a built-in category value of `Invalid`:
 
-Tags (0)
-Add tags
-Report
-MESSAGE 4 OF 5
-FAIR59
-  Advisor FAIR59  in reply to: Kevin.Bell
-‎2024-02-17 03:33 PM
-
-A category has the property BuiltInCategory. The graphicalStyleCategory of a user-defined line has a value of BuiltIncategory.Invalid
-            StringBuilder sb = new StringBuilder();
-            Category LinesCat = Category.GetCategory(doc,BuiltInCategory.OST_Lines);
-            IEnumerable<GraphicsStyle> getgs = new FilteredElementCollector(doc).OfClass(typeof(GraphicsStyle)).Cast<GraphicsStyle>();
-            foreach(GraphicsStyle gs in getgs)
-            {
-              Category cat = gs.GraphicsStyleCategory;
-              if(cat==null || cat.Parent==null) continue;
-              if(cat.Parent.Id.IntegerValue != LinesCat.Id.IntegerValue) continue;
-              if(cat.BuiltInCategory == BuiltInCategory.INVALID)
-              {
-                sb.AppendLine(string.Format("User defined Line: {0}",cat.Name));
-              } else
-              {
-                sb.AppendLine(string.Format("System defined Line {0} / {1}",cat.BuiltInCategory, cat.Name));
-              }
-            }
-            TaskDialog.Show("debug",sb.ToString());
-
-Tags (0)
-Add tags
-Report
-MESSAGE 5 OF 5
-Kevin.Bell
-  Advisor Kevin.Bell  in reply to: Kevin.Bell
-‎2024-02-20 11:42 AM
-Excellent, I can check for that too. Thanks.
+<pre>
+  StringBuilder sb = new StringBuilder();
+  Category LinesCat = Category.GetCategory(doc,
+    BuiltInCategory.OST_Lines);
+  IEnumerable&lt;GraphicsStyle&gt; getgs
+    = new FilteredElementCollector(doc)
+      .OfClass(typeof(GraphicsStyle))
+      .Cast&lt;GraphicsStyle>();
+  foreach(GraphicsStyle gs in getgs)
+  {
+    Category cat = gs.GraphicsStyleCategory;
+    if(cat==null || cat.Parent==null)
+      continue;
+    if(cat.Parent.Id.IntegerValue != LinesCat.Id.IntegerValue)
+      continue;
+    if(cat.BuiltInCategory == BuiltInCategory.INVALID)
+    {
+      sb.AppendLine(string.Format(
+        "User defined Line: {0}",cat.Name));
+    }
+    else
+    {
+      sb.AppendLine(string.Format(
+        "System defined Line {0} / {1}",
+        cat.BuiltInCategory, cat.Name));
+    }
+  }
+  TaskDialog.Show("debug",sb.ToString());
+</pre>
 
 ####<a name="2"></a> The Curious Case of JavaScript
 
-The curious case of JavaScript
-https://www.linkedin.com/pulse/curious-case-javascript-sandip-jadhav-ebobf
+For an interesting overview of the evolution and power of JavaScript, Sandip Jadhav describes his personal exploration
+in [The curious case of JavaScript](https://www.linkedin.com/pulse/curious-case-javascript-sandip-jadhav-ebobf).
 
 ####<a name="2"></a> Magika AI-Based File Type Classification
 
-Open-sourced approach to file detection from Google - curious if we struggle with this within our own storage solutions.
-Blog post: https://opensource.googleblog.com/2024/02/magika-ai-powered-fast-and-efficient-file-type-identification.html
-Repo: https://github.com/google/magika/
+Unrelated to BIM, determining the type of data contained in a computer file can be surprisingly tricky.
+One important utility to address that need was provided in 1973 by
+the [Unix `file` command](https://en.wikipedia.org/wiki/File_(command)).
+50 years later, Google now open-sourced [Magika](https://google.github.io/magika/),
+an AI-based approach to this task with higher performance:
 
-https://google.github.io/magika/
+- [Magika blog post](https://opensource.googleblog.com/2024/02/magika-ai-powered-fast-and-efficient-file-type-identification.html)
+- [Magika GitHub repository](Repo: )https://github.com/google/magika/)
 
-Successor of the `file` command standard program of Unix and Unix-like operating systems for recognizing the type of data contained in a computer file.
-
+<center>
+<img src="img/magika_performance.png" alt="Magika performance" title="Magika performance" width="600"/> <!-- Pixel Height: 720 Pixel Width: 1,328 -->
+</center>
 
 ####<a name="2"></a> NotebookLM
 
-Unrelated to BIM, Google introduced
+Google also introduced
 the [NotebookLM experiment](https://notebooklm.google/) touting
-an interface that lets you shift effortlessly from reading to asking questions to writing with built-in AI support that can
-also transform your set of notes into an outline, blog post, business plan, and more.
+an interface that lets you easily shift between reading a text, asking questions about it and writing with built-in AI support that can
+also transform your set of notes into an outline, blog post, business plan, and more:
 
 > NotebookLM gives you a personalized AI, grounded in the information you trust.
 NotebookLM is only available in the U.S. for users 18 and up.
