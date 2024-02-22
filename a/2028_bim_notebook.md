@@ -76,7 +76,7 @@ Interactivity and AI keeps growing
 &ndash; The curious case of JavaScript
 &ndash; Magika AI-based file type classification
 &ndash; NotebookLM
-&ndash; World model on million-length video and language with RingAttention
+&ndash; AI understands videos better
 &ndash; Airline chatbot invented a refund policy
 &ndash; LLM tokenisation
 &ndash; Diátaxis systematic technical documentation
@@ -106,7 +106,7 @@ The amount of news items related to interactivity and AI keeps growing:
 - [The curious case of JavaScript](#5)
 - [Magika AI-based file type classification](#6)
 - [NotebookLM](#7)
-- [World model on million-length video and language with RingAttention](#8)
+- [AI understands videos better](#8)
 - [Airline chatbot invented a refund policy](#9)
 - [LLM tokenisation](#10)
 - [Diátaxis systematic technical documentation](#11)
@@ -306,7 +306,7 @@ also transform your set of notes into an outline, blog post, business plan, and 
 > NotebookLM gives you a personalized AI, grounded in the information you trust.
 NotebookLM is only available in the U.S. for users 18 and up.
 
-####<a name="8"></a> World Model on Million-Length Video and Language with RingAttention
+####<a name="8"></a> AI understands videos better
 
 On the topic of AI, the research
 on a [world model on million-length video and language with RingAttention](https://largeworldmodel.github.io/) now
