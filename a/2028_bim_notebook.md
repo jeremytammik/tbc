@@ -274,11 +274,11 @@ in [The curious case of JavaScript](https://www.linkedin.com/pulse/curious-case-
 Unrelated to BIM, determining the type of data contained in a computer file can be surprisingly tricky.
 One important utility to address that need was provided in 1973 by
 the [Unix `file` command](https://en.wikipedia.org/wiki/File_(command)).
-50 years later, Google now open-sourced [Magika](https://google.github.io/magika/),
+50 years later, Google just open-sourced [Magika](https://google.github.io/magika/),
 an AI-based approach to this task with higher performance:
 
 - [Magika blog post](https://opensource.googleblog.com/2024/02/magika-ai-powered-fast-and-efficient-file-type-identification.html)
-- [Magika GitHub repository](Repo: )https://github.com/google/magika/)
+- [Magika GitHub repository](https://github.com/google/magika/)
 
 <center>
 <img src="img/magika_performance.png" alt="Magika performance" title="Magika performance" width="600"/> <!-- Pixel Height: 720 Pixel Width: 1,328 -->
@@ -313,6 +313,8 @@ on [LLM tokenisation &ndash; let's build the GPT tokenizer](https://youtu.be/zdu
 <center>
 <iframe width="560" height="315" src="https://www.youtube.com/embed/zduSFxRajkE?si=H0TaI7Ro1ZOpmv0i" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 </center>
+
+That might help better understand some of the occasional AI weirdness.
 
 ####<a name="11"></a> Diátaxis Systematic Technical Documentation
 
