@@ -109,7 +109,7 @@ Joel Waldheim Saury's [interactive .NET Revit BIM Polyglot Notebook](https://the
 his [BIM Interactive Notebooks](https://www.linkedin.com/posts/chuongmep_opensource-ai-dataanalysis-activity-7164531381107183616-TYNP?utm_source=share&utm_medium=member_desktop):
 
 > I'm thrilled to share an open-source project that I believe holds immense potential.
-It enables you to integrate and analyze Revit model data in various ways using Jupyter Notebook use mutiple progaming language under Interactive .NET.
+It enables you to integrate and analyze Revit model data in various ways using Jupyter Notebook with multiple programming languages under Interactive .NET.
 The project has been brought to fruition, and it's truly gratifying to see its development, as it opens up significant opportunities with AI and data analysis.
 Explore further in the
 
@@ -136,7 +136,7 @@ The TemporaryGraphicsManager allows us to add temporary graphical elements direc
 Surprisingly, I haven’t seen this class widely used in other plugins or extensions. So, when I first encountered it, I knew I had to put it to the test.
 In the initial part of my video, I demonstrate how to align title lines to previously saved points. With a simple click, you can create temporary graphics that will guide your design process and allow you to snap your title lines to them!
 In the second part of the video, I collect points and save them to an external file for future reference. The TemporaryGraphicsManager conveniently marks their locations, eliminating the need to remember which points I’ve already saved.
-Is this the easiest method of controlling title lines? Perhaps not. In an upcoming update to my Drafter tool (to which I added recently 30 days of trial), I’ll introduce further automations in this area. But one thing is certain: I’ll continue to leverage the power of TemporaryGraphicsManage.
+Is this the easiest method of controlling title lines? Perhaps not. In an upcoming update to my Drafter tool (to which I added recently 30 days of trial), I’ll introduce further automations in this area. But one thing is certain: I’ll continue to leverage the power of TemporaryGraphicsManager.
 
 Thank you for the heads-up, Julian!
 
@@ -333,12 +333,12 @@ Roy Amara formulated [Amara's law](https://en.wikipedia.org/wiki/Roy_Amara#Amara
 <p style="font-style:italic"></p>We tend to overestimate the effects of a technology in the short run and underestimate them in the long run.
 </center>
 
-His observation was not only about technology, but human behavior in general: we are curious and impatient.
+His observation was not only about technology, but human behaviour in general: we are curious and impatient.
 We get excited about new things and are quickly disappointed when they don't immediately perform as expected.
 Especially from technologies, we expect too much too quickly and have little patience with the need for innovation to develop with time.
 AI is a good example: the initial mixture of euphoria and panic has rapidly faded.
-Another example, our health behavior: we often initially overestimate behavioral changes &ndash; a new training method, meditation, or diet &ndash; and enthusiastically view them as a panacea, underestimating long-term benefits.
-Often, people don't stick with a behavior long enough to see its true benefits and returns.
+Another example, our health behaviour: we often initially overestimate behavioural changes &ndash; a new training method, meditation, or diet &ndash; and enthusiastically view them as a panacea, underestimating long-term benefits.
+Often, people don't stick with a behaviour long enough to see its true benefits and returns.
 Or, other people ([Sartre's hell](https://duckduckgo.com/?q=sartre+hell)): we get to know a person, like her, fall in love.
 Reality sets in, initially exciting aspects irritate.
 Get through that phase and realise that the other person is not perfect (but neither are we), and the tide turns.
