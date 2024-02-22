@@ -342,7 +342,7 @@ Finally, for a fundamental aspect of our human nature that applies to almost eve
 Roy Amara formulated [Amara's law](https://en.wikipedia.org/wiki/Roy_Amara#Amara's_law) in the 1960s:
 
 <center>
-<p style="font-style:italic"></p>We tend to overestimate the effects of a technology in the short run and underestimate them in the long run.
+<p style="font-style:italic;padding-right:10%;padding-left:10%">We tend to overestimate the effects of a technology in the short run and underestimate them in the long run.</p>
 </center>
 
 His observation was not only about technology, but human behaviour in general: we are curious and impatient.
@@ -359,7 +359,7 @@ So, again, we tend to overestimate people in the short term and underestimate th
 ####<a name="13"></a> Talking About Progress versus Risk
 
 Continuing to wax philosophical, with an eye to the interesting times we are living in and actively creating today, every day,
-John Burn-Murdoch of the Financial Times presented recently asked,
+John Burn-Murdoch of the Financial Times recently asked,
 [is the west talking itself into decline?](https://duckduckgo.com/?q=Is+the+west+talking+itself+into+decline%3F)
 
 A recent [scientific paper](https://docs.iza.org/dp16674.pdf) used textual analysis of 173,031 works printed in England between 1500 and 1900 and found significant correlation between vocabulary and culture.
