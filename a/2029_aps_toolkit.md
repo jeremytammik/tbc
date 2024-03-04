@@ -9,9 +9,21 @@
 
 <!-- https://prismjs.com -->
 <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
 </head>
 
 <!---
+
+- How to know if Revit API is in Context
+  https://forums.autodesk.com/t5/revit-api-forum/how-to-know-if-revit-api-is-in-context/td-p/12574320
+  finally cracked!
+
+- Detecting Revit User Input State in Real-Time via Revit API
+  https://forums.autodesk.com/t5/revit-api-forum/detecting-revit-user-input-state-in-real-time-via-revit-api/td-p/12610444
+
+- Easy Revit API
+  https://easyrevitapi.com/
 
 - https://www.linkedin.com/posts/chuongmep_ai-bim-aps-activity-7167851379355533313-hs3r?utm_source=share&utm_medium=member_desktop
   Chuong HoChuong Ho
@@ -21,9 +33,6 @@
   This toolkit is open-source, ensuring accessibility to all engineers, BIM developers, and data scientists. I am actively working on refining it further. Please feel free to provide any feedback in the comments below this post, and I will consider all suggestions.
   Open Source: https://lnkd.in/ghkv_BhM
   #AI #BIM #APS #Automation #LLM #DataAnalysis #OpenSource
-
-- Easy Revit API
-  https://easyrevitapi.com/
 
 - The killer app of Gemini Pro 1.5 is video
   https://simonwillison.net/2024/Feb/21/gemini-pro-video/
@@ -56,10 +65,6 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 </center>
 
 -->
-
-<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
-
 
 ### APS Toolkit
 
@@ -135,3 +140,50 @@ Many thanks to Chuong Ho for this!
 **Response:**
 
 
+####<a name="2"></a> Determining Whether in Revit API Context
+
+How to know if Revit API is in Context
+https://forums.autodesk.com/t5/revit-api-forum/how-to-know-if-revit-api-is-in-context/td-p/12574320
+finally cracked!
+
+####<a name="3"></a> Real-time Revit User Input State Detection
+
+Detecting Revit User Input State in Real-Time via Revit API
+https://forums.autodesk.com/t5/revit-api-forum/detecting-revit-user-input-state-in-real-time-via-revit-api/td-p/12610444
+
+####<a name="4"></a> Easy Revit API
+
+Easy Revit API
+https://easyrevitapi.com/
+
+####<a name="5"></a> https://www.linkedin.com/posts/chuongmep_ai-bim-aps-activity-7167851379355533313-hs3r?utm_source=share&utm_medium=member_desktop
+
+https://www.linkedin.com/posts/chuongmep_ai-bim-aps-activity-7167851379355533313-hs3r?utm_source=share&utm_medium=member_desktop
+Chuong HoChuong Ho
+Computational Design Researcher | Autodesk Expert Elite | ConsultantComputational Design Researcher | Autodesk Expert Elite | Consultant
+https://chuongmep.com/
+I am excited to announce a significant development in data interaction and retrieval processes using Autodesk Platform Services from Autodesk. Today, I am officially releasing the first version of a toolkit designed to facilitate data access, aiming to support AI processes, Data Analysts, LLM, and explore the boundaries where APS may fall short in providing for end-users.
+This toolkit is open-source, ensuring accessibility to all engineers, BIM developers, and data scientists. I am actively working on refining it further. Please feel free to provide any feedback in the comments below this post, and I will consider all suggestions.
+Open Source: https://lnkd.in/ghkv_BhM
+#AI #BIM #APS #Automation #LLM #DataAnalysis #OpenSource
+
+####<a name="6"></a> Gemini Understands Video and Image Input
+
+The killer app of Gemini Pro 1.5 is video
+https://simonwillison.net/2024/Feb/21/gemini-pro-video/
+
+####<a name="7"></a> Generative AI and the Transformer
+
+Generative AI exists because of the transformer
+https://ig.ft.com/generative-ai/
+a beginner's guide to understanding LLM
+
+####<a name="8"></a> White House Wants to Dump C and C++
+
+White House urges developers to dump C and C++
+https://www.infoworld.com/article/3713203/white-house-urges-developers-to-dump-c-and-c.amp.html
+
+####<a name="9"></a> Ultra Processed Food is Toxic
+
+The harsh reality of ultra processed food - with Chris Van Tulleken
+https://youtu.be/5QOTBreQaIk
