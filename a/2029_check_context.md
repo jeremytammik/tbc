@@ -34,6 +34,15 @@
   Open Source: https://lnkd.in/ghkv_BhM
   #AI #BIM #APS #Automation #LLM #DataAnalysis #OpenSource
 
+- DA4R: referencing UI is OK, just make sure you don't call it
+  https://forums.autodesk.com/t5/revit-api-forum/revit-design-automation-api-using-the-reference-to-revitapiui/m-p/12563120
+
+- Using argument "adskDebug" to troubleshot failure job of Design Automation
+  https://aps.autodesk.com/blog/using-argument-adskdebug-troubleshot-failure-job-design-automation
+  by Zhong Wu
+  just add the following argument when you post your DA workitem:
+    "adskDebug": { "uploadJobFolder": true }
+
 - The killer app of Gemini Pro 1.5 is video
   https://simonwillison.net/2024/Feb/21/gemini-pro-video/
 
@@ -66,7 +75,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### APS Toolkit
+### API Context, APS Toolkit and DA4R Debugging
 
 
 
