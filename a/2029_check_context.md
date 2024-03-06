@@ -181,18 +181,29 @@ Open Source: https://lnkd.in/ghkv_BhM
 The killer app of Gemini Pro 1.5 is video
 https://simonwillison.net/2024/Feb/21/gemini-pro-video/
 
+####<a name="6"></a> LLM is not Self-Aware
+
+... even
+though [Anthropic’s Claude 3 causes stir by seeming to realize when it was being tested](https://arstechnica.com/information-technology/2024/03/claude-3-seems-to-detect-when-it-is-being-tested-sparking-ai-buzz-online/)
+
+
 ####<a name="7"></a> Generative AI and the Transformer
 
 Generative AI exists because of the transformer
 https://ig.ft.com/generative-ai/
 a beginner's guide to understanding LLM
 
-####<a name="8"></a> White House Wants to Dump C and C++
+####<a name="8"></a> Design to Reduce Junk Data
+
+Design Patterns that Encourage Junk Data
+https://css-irl.info/design-patterns-that-encourage-junk-data/
+
+####<a name="9"></a> White House Wants to Dump C and C++
 
 White House urges developers to dump C and C++
 https://www.infoworld.com/article/3713203/white-house-urges-developers-to-dump-c-and-c.amp.html
 
-####<a name="9"></a> Ultra Processed Food is Toxic
+####<a name="10"></a> Ultra Processed Food is Toxic
 
 The harsh reality of ultra processed food - with Chris Van Tulleken
 https://youtu.be/5QOTBreQaIk
