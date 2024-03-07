@@ -178,8 +178,13 @@ Open Source: https://lnkd.in/ghkv_BhM
 
 ####<a name="6"></a> Gemini Understands Video and Image Input
 
-The killer app of Gemini Pro 1.5 is video
-https://simonwillison.net/2024/Feb/21/gemini-pro-video/
+An impressive example of use of LLM with video input support is presented stating
+that [the killer app of Gemini Pro 1.5 is video](https://simonwillison.net/2024/Feb/21/gemini-pro-video.
+
+I tested using Gemini myself for
+a [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) question
+on [2024 dark theme colouring addins](https://forums.autodesk.com/t5/revit-api-forum/2024-dark-theme-colouring-addins/m-p/12614689) with
+acceptable and useful results, afaict.
 
 ####<a name="6"></a> LLM is not Self-Aware
 
