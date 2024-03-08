@@ -75,27 +75,72 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 -->
 
 <h3>API Context, APS Toolkit and DA4R Debugging</h3>
-<h4><a name="2"></a> APS Toolkit</h4>
+<p>We'll close this week with an interesting solution to check for a valid Revit API context and a whole bunch of short pointers to other topics of interest, mostly AI related:</p>
+<ul>
+<li><a href="#2">Determining Revit API context</a></li>
+<li><a href="#3">Detect Revit user input state</a></li>
+<li><a href="#4">Easy Revit API</a></li>
+<li><a href="#5">APS toolkit</a></li>
+<li><a href="#6">Gemini with image and video input</a></li>
+<li><a href="#7">LLM is not self-aware</a></li>
+<li><a href="#8">Generative AI transformer</a></li>
+<li><a href="#9">Design to reduce junk data</a></li>
+<li><a href="#10">C and C++ are risky</a></li>
+<li><a href="#11">Ultra processed food is toxic</a></li>
+</ul>
+<h4><a name="2"></a> Determining Revit API Context</h4>
+<p>Luiz Henrique <a href="https://ricaun.com/">@ricaun</a> Cassettari finally cracked the
+question <a href="https://forums.autodesk.com/t5/revit-api-forum/how-to-know-if-revit-api-is-in-context/td-p/12574320">how to know if Revit API is in context</a>:</p>
+<blockquote>
+<p>Revit API throws exceptions if your code is trying to execute Revit API methods in a modeless context, e.g., a WPF modeless view; that's the reason you need to use <code>ExternalEvent</code> to execute Revit API code in context.</p>
+<p>Sometimes you need to know whether code is running in context or if not, to just execute the Revit API code right away or send it to ExternalEvent to be executed.</p>
+<p>If you have access to <code>UIApplication</code> or <code>UIControllerApplication</code>, and if you try to subscribe to an event outside Revit API context, you are gonna have this exception: Invalid call to Revit API! Revit is currently not within an API context.</p>
+<p>Meaning: you can use that to know if your code is in context or not.</p>
+</blockquote>
+<p><center>
+<img src="img/ricaun_in_context.png" alt="In Revit API context check" title="In Revit API context check" width="740"/> <!-- Pixel Height: 303 Pixel Width: 740 -->
+</center></p>
+<ul>
+<li><a href="https://ricaun.com/revit-api-context/">Code sample and video</a></li>
+<li>14-minute video on <a href="https://youtu.be/gyo6xGN5DDU">Tasks and InContext in Revit API</a></li>
+</ul>
+<p>I'm using this technique using my open-source library to manage the creation of an external event if it is not in context and enable it to run Revit API asynchronously in <a href="https://github.com/ricaun-io/ricaun.Revit.UI.Tasks">ricaun.Revit.UI.Tasks</a>.</p>
+<p>Many thanks to ricaun for sharing this long-sought-after solution!</p>
+<h4><a name="3"></a> Detect Revit User Input State</h4>
+<p>In a related vein, we also discussed the question
+of <a href="https://forums.autodesk.com/t5/revit-api-forum/detecting-revit-user-input-state-in-real-time-via-revit-api/td-p/12610444">detecting Revit user input state in real-time via Revit API</a>.</p>
+<h4><a name="4"></a> Easy Revit API</h4>
+<p>Big welcome to a new member in the Revit programming blogosphere,
+<a href="https://easyrevitapi.com/">Easy Revit API</a>.
+Welcome, Mohamed-Youssef.
+Best of luck and much success with your blog and other projects!</p>
+<h4><a name="5"></a> APS Toolkit</h4>
 <p>In the last post,
 I mentioned <a href="https://chuongmep.com/">Chuong Ho</a>'s
 <a href="https://thebuildingcoder.typepad.com/blog/2024/02/interactive-bim-notebook-temporary-graphics-and-ai.html#2">BIM interactive notebooks</a>.</p>
 <p>Now you can see how he put them to use in his newest project,
 the <a href="https://github.com/chuongmep/aps-toolkit">APS Toolkit</a>:</p>
-<p>APS Toolkit (Former is Forge) is powerful for you to explore <code>Autodesk Platform Services</code>(APS). It's built on top of <a href="https://www.nuget.org/packages/Autodesk.Forge/">Autodesk.Forge</a> and <a href="https://www.nuget.org/packages/Newtonsoft.Json/">Newtonsoft.Json</a>. Forge Toolkit includes some features allow you to read, download and write data from <code>Autodesk Platform Services</code> and export to CSV, Excel, JSON, XML, etc.</p>
-<p><img alt="APSToolkit" src="docs/APSToolkit.png" /></p>
-<h2>⚡ Features</h2>
+<blockquote>
+<p>I am excited to announce a significant development in data interaction and retrieval processes using Autodesk Platform Services from Autodesk. Today, I am officially releasing the first version of a toolkit designed to facilitate data access, aiming to support AI processes, Data Analysts, LLM, and explore the boundaries where APS may fall short in providing for end-users.
+This toolkit is open-source, ensuring accessibility to all engineers, BIM developers, and data scientists. I am actively working on refining it further. Please feel free to provide any feedback in the comments below this post, and I will consider all suggestions.</p>
+</blockquote>
+<p><a href="https://github.com/chuongmep/aps-toolkit">APS Toolkit</a> empowers you to explore the Autodesk Platform Services APS.
+It's built on top of <a href="https://www.nuget.org/packages/Autodesk.Forge/">Autodesk.Forge</a>
+and <a href="https://www.nuget.org/packages/Newtonsoft.Json/">Newtonsoft.Json</a>.
+The toolkit includes features enabling you to read, download and write data from APS and export to CSV, Excel, JSON, XML, etc.</p>
+<p>Features:</p>
 <ul>
-<li>[x] Read/Download SVF Model</li>
-<li>[x] Read/Query Properties Database SQLite</li>
-<li>[x] Read/Download Properties Without Viewer</li>
-<li>[x] Read Geometry Data</li>
-<li>[x] Read Metadata</li>
-<li>[x] Read Fragments</li>
-<li>[x] Read MeshPacks</li>
-<li>[x] Read Images</li>
-<li>[x] Export Data to CSV</li>
-<li>[x] Export Data to Excel</li>
-<li>[x] Export Data to Parquet</li>
+<li>Read/Download SVF Model</li>
+<li>Read/Query Properties Database SQLite</li>
+<li>Read/Download Properties Without Viewer</li>
+<li>Read Geometry Data</li>
+<li>Read Metadata</li>
+<li>Read Fragments</li>
+<li>Read MeshPacks</li>
+<li>Read Images</li>
+<li>Export Data to CSV</li>
+<li>Export Data to Excel</li>
+<li>Export Data to Parquet</li>
 </ul>
 <p>Sample usage to export Revit Data To Excel using .NET C&#35;:</p>
 <pre><code class="language-csharp">using APSToolkit;
@@ -119,45 +164,27 @@ df = prop_reader.get_data_by_category("Ducts")
 df.save_to_excel("result.xlsx")
 </code></pre>
 
-<p><center>
-<img src="img/" alt="" title="" width="100"/> <!-- Pixel Height: 656 Pixel Width: 748 -->
-</center></p>
-<p>Many thanks to Chuong Ho for this!</p>
-<pre>
-</pre>
-
-<p><strong>Question:</strong></p>
-<p><strong>Answer:</strong></p>
-<p><strong>Response:</strong></p>
-<h4><a name="2"></a> Determining Whether in Revit API Context</h4>
-<p>How to know if Revit API is in Context
-https://forums.autodesk.com/t5/revit-api-forum/how-to-know-if-revit-api-is-in-context/td-p/12574320
-finally cracked!</p>
-<h4><a name="3"></a> Real-time Revit User Input State Detection</h4>
-<p>Detecting Revit User Input State in Real-Time via Revit API
-https://forums.autodesk.com/t5/revit-api-forum/detecting-revit-user-input-state-in-real-time-via-revit-api/td-p/12610444</p>
-<h4><a name="4"></a> Easy Revit API</h4>
-<p>Easy Revit API
-https://easyrevitapi.com/</p>
-<h4><a name="5"></a> https://www.linkedin.com/posts/chuongmep_ai-bim-aps-activity-7167851379355533313-hs3r?utm_source=share&amp;utm_medium=member_desktop</h4>
-<p>https://www.linkedin.com/posts/chuongmep_ai-bim-aps-activity-7167851379355533313-hs3r?utm_source=share&amp;utm_medium=member_desktop
-Chuong HoChuong Ho
-Computational Design Researcher | Autodesk Expert Elite | ConsultantComputational Design Researcher | Autodesk Expert Elite | Consultant
-https://chuongmep.com/
-I am excited to announce a significant development in data interaction and retrieval processes using Autodesk Platform Services from Autodesk. Today, I am officially releasing the first version of a toolkit designed to facilitate data access, aiming to support AI processes, Data Analysts, LLM, and explore the boundaries where APS may fall short in providing for end-users.
-This toolkit is open-source, ensuring accessibility to all engineers, BIM developers, and data scientists. I am actively working on refining it further. Please feel free to provide any feedback in the comments below this post, and I will consider all suggestions.
-Open Source: https://lnkd.in/ghkv_BhM</p>
-<h1>AI #BIM #APS #Automation #LLM #DataAnalysis #OpenSource</h1>
-<h4><a name="6"></a> Gemini Understands Video and Image Input</h4>
-<p>The killer app of Gemini Pro 1.5 is video
-https://simonwillison.net/2024/Feb/21/gemini-pro-video/</p>
-<h4><a name="7"></a> Generative AI and the Transformer</h4>
-<p>Generative AI exists because of the transformer
-https://ig.ft.com/generative-ai/
-a beginner's guide to understanding LLM</p>
-<h4><a name="8"></a> White House Wants to Dump C and C++</h4>
-<p>White House urges developers to dump C and C++
-https://www.infoworld.com/article/3713203/white-house-urges-developers-to-dump-c-and-c.amp.html</p>
-<h4><a name="9"></a> Ultra Processed Food is Toxic</h4>
-<p>The harsh reality of ultra processed food - with Chris Van Tulleken
-https://youtu.be/5QOTBreQaIk</p>
+<p>Many thanks to Chuong Ho for creating and sharing this powerful toolkit!</p>
+<h4><a name="6"></a> Gemini with Image and Video Input</h4>
+<p>An impressive example of use of LLM with video input support is presented stating
+that [the killer app of Gemini Pro 1.5 is video](https://simonwillison.net/2024/Feb/21/gemini-pro-video.</p>
+<p>I tested using Gemini myself for
+a <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> question
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/2024-dark-theme-colouring-addins/m-p/12614689">2024 dark theme colouring addins</a> with
+acceptable and useful results, afaict.</p>
+<h4><a name="7"></a> LLM is not Self-Aware</h4>
+<p>... Even
+though <a href="https://arstechnica.com/information-technology/2024/03/claude-3-seems-to-detect-when-it-is-being-tested-sparking-ai-buzz-online/">Anthropic’s Claude 3 causes stir by seeming to realize when it was being tested</a></p>
+<h4><a name="8"></a> Generative AI transformer</h4>
+<p>A nice beginner's guide to understanding LLM explains
+why <a href="https://ig.ft.com/generative-ai/">generative AI exists because of the transformer</a>.</p>
+<h4><a name="9"></a> Design to Reduce Junk Data</h4>
+<p>Design Patterns that Encourage Junk Data
+https://css-irl.info/design-patterns-that-encourage-junk-data/</p>
+<h4><a name="10"></a> C and C++ are Risky</h4>
+<p>70 percent of all security vulnerabilities are caused by memory safety issues, and many of thiose are automatically eliminated by working in a memory-safe programming language.
+Therefore,
+the <a href="https://www.infoworld.com/article/3713203/white-house-urges-developers-to-dump-c-and-c.amp.html">White House urges developers to dump C and C++</a>.</p>
+<h4><a name="11"></a> Ultra Processed Food is Toxic</h4>
+<p>Talking about things we ought to dump, I seldom watch long videos, but this one had me mesmerised:
+<a href="https://youtu.be/5QOTBreQaIk">The harsh reality of ultra processed food with Chris Van Tulleken</a>.</p>

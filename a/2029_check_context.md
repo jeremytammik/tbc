@@ -77,19 +77,20 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### API Context, APS Toolkit and DA4R Debugging
 
+We'll close this week with an interesting solution to check for a valid Revit API context and a whole bunch of short pointers to other topics of interest, mostly AI related:
 
+- [Determining Revit API context](#2)
+- [Detect Revit user input state](#3)
+- [Easy Revit API](#4)
+- [APS toolkit](#5)
+- [Gemini with image and video input](#6)
+- [LLM is not self-aware](#7)
+- [Generative AI transformer](#8)
+- [Design to reduce junk data](#9)
+- [C and C++ are risky](#10)
+- [Ultra processed food is toxic](#11)
 
-<pre>
-</pre>
-
-**Question:**
-
-**Answer:**
-
-**Response:**
-
-
-####<a name="2"></a> Determining Whether in Revit API Context
+####<a name="2"></a> Determining Revit API Context
 
 Luiz Henrique [@ricaun](https://ricaun.com/) Cassettari finally cracked the
 question [how to know if Revit API is in context](https://forums.autodesk.com/t5/revit-api-forum/how-to-know-if-revit-api-is-in-context/td-p/12574320):
@@ -113,7 +114,7 @@ I'm using this technique using my open-source library to manage the creation of 
 
 Many thanks to ricaun for sharing this long-sought-after solution!
 
-####<a name="3"></a> Real-time Revit User Input State Detection
+####<a name="3"></a> Detect Revit User Input State
 
 In a related vein, we also discussed the question
 of [detecting Revit user input state in real-time via Revit API](https://forums.autodesk.com/t5/revit-api-forum/detecting-revit-user-input-state-in-real-time-via-revit-api/td-p/12610444).
@@ -126,13 +127,6 @@ Welcome, Mohamed-Youssef.
 Best of luck and much success with your blog and other projects!
 
 ####<a name="5"></a> APS Toolkit
-
-Open Source: https://lnkd.in/ghkv_BhM
-#AI #BIM #APS #Automation #LLM #DataAnalysis #OpenSource
-
-
-
-####<a name="2"></a>
 
 In the last post,
 I mentioned [Chuong Ho](https://chuongmep.com/)'s
@@ -189,7 +183,7 @@ df.save_to_excel("result.xlsx")
 
 Many thanks to Chuong Ho for creating and sharing this powerful toolkit!
 
-####<a name="6"></a> Gemini Understands Video and Image Input
+####<a name="6"></a> Gemini with Image and Video Input
 
 An impressive example of use of LLM with video input support is presented stating
 that [the killer app of Gemini Pro 1.5 is video](https://simonwillison.net/2024/Feb/21/gemini-pro-video.
@@ -204,7 +198,7 @@ acceptable and useful results, afaict.
 ... Even
 though [Anthropic’s Claude 3 causes stir by seeming to realize when it was being tested](https://arstechnica.com/information-technology/2024/03/claude-3-seems-to-detect-when-it-is-being-tested-sparking-ai-buzz-online/)
 
-####<a name="8"></a> Generative AI and the Transformer
+####<a name="8"></a> Generative AI transformer
 
 A nice beginner's guide to understanding LLM explains
 why [generative AI exists because of the transformer](https://ig.ft.com/generative-ai/).
