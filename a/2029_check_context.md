@@ -107,10 +107,10 @@ question [how to know if Revit API is in context](https://forums.autodesk.com/t5
 <img src="img/ricaun_in_context.png" alt="In Revit API context check" title="In Revit API context check" width="740"/> <!-- Pixel Height: 303 Pixel Width: 740 -->
 </center>
 
-- [Code sample and video](https://ricaun.com/revit-api-context/)
+> - [Code sample and video](https://ricaun.com/revit-api-context/)
 - 14-minute video on [Tasks and InContext in Revit API](https://youtu.be/gyo6xGN5DDU)
 
-I'm using this technique using my open-source library to manage the creation of an external event if it is not in context and enable it to run Revit API asynchronously in [ricaun.Revit.UI.Tasks](https://github.com/ricaun-io/ricaun.Revit.UI.Tasks).
+> I'm using this technique using my open-source library to manage the creation of an external event if it is not in context and enable it to run Revit API asynchronously in [ricaun.Revit.UI.Tasks](https://github.com/ricaun-io/ricaun.Revit.UI.Tasks).
 
 Many thanks to ricaun for sharing this long-sought-after solution!
 
@@ -205,8 +205,8 @@ why [generative AI exists because of the transformer](https://ig.ft.com/generati
 
 ####<a name="9"></a> Design to Reduce Junk Data
 
-Design Patterns that Encourage Junk Data
-https://css-irl.info/design-patterns-that-encourage-junk-data/
+We are generating huge and ever-growing amounts of data, much of which is useless and never looked at again, so it is well worth
+pondering &ndash; and avoiding &mdash; [design patterns that encourage junk data](https://css-irl.info/design-patterns-that-encourage-junk-data/).
 
 ####<a name="10"></a> C and C++ are Risky
 
@@ -216,7 +216,6 @@ the [White House urges developers to dump C and C++](https://www.infoworld.com/a
 
 ####<a name="11"></a> Ultra Processed Food is Toxic
 
-Talking about things we ought to dump, I seldom watch long videos, but this one had me mesmerised:
-[The harsh reality of ultra processed food with Chris Van Tulleken](https://youtu.be/5QOTBreQaIk).
-
+Talking about things we ought to dump, I seldom watch long videos, but this hour-long one had me mesmerised all the way through:
+[the harsh reality of ultra processed food with Chris Van Tulleken](https://youtu.be/5QOTBreQaIk).
 
