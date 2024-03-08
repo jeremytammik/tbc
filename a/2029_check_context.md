@@ -88,7 +88,7 @@ We'll close this week with an interesting solution to check for a valid Revit AP
 - [Generative AI transformer](#8)
 - [Design to reduce junk data](#9)
 - [C and C++ are risky](#10)
-- [Ultra processed food is toxic](#11)
+- [Ultra-processed food is toxic](#11)
 
 ####<a name="2"></a> Determining Revit API Context
 
@@ -110,7 +110,7 @@ question [how to know if Revit API is in context](https://forums.autodesk.com/t5
 > - [Code sample and video](https://ricaun.com/revit-api-context/)
 - 14-minute video on [Tasks and InContext in Revit API](https://youtu.be/gyo6xGN5DDU)
 
-> I'm using this technique using my open-source library to manage the creation of an external event if it is not in context and enable it to run Revit API asynchronously in [ricaun.Revit.UI.Tasks](https://github.com/ricaun-io/ricaun.Revit.UI.Tasks).
+> I'm using this technique using my open source library to manage the creation of an external event if it is not in context and enable it to run Revit API asynchronously in [ricaun.Revit.UI.Tasks](https://github.com/ricaun-io/ricaun.Revit.UI.Tasks).
 
 Many thanks to ricaun for sharing this long-sought-after solution!
 
@@ -136,7 +136,7 @@ Now you can see how he put them to use in his newest project,
 the [APS Toolkit](https://github.com/chuongmep/aps-toolkit):
 
 > I am excited to announce a significant development in data interaction and retrieval processes using Autodesk Platform Services from Autodesk. Today, I am officially releasing the first version of a toolkit designed to facilitate data access, aiming to support AI processes, Data Analysts, LLM, and explore the boundaries where APS may fall short in providing for end-users.
-This toolkit is open-source, ensuring accessibility to all engineers, BIM developers, and data scientists. I am actively working on refining it further. Please feel free to provide any feedback in the comments below this post, and I will consider all suggestions.
+This toolkit is open source, ensuring accessibility to all engineers, BIM developers, and data scientists. I am actively working on refining it further. Please feel free to provide any feedback in the comments below this post, and I will consider all suggestions.
 
 [APS Toolkit](https://github.com/chuongmep/aps-toolkit) empowers you to explore the Autodesk Platform Services APS.
 It's built on top of [Autodesk.Forge](https://www.nuget.org/packages/Autodesk.Forge/)
@@ -196,7 +196,7 @@ acceptable and useful results, afaict.
 ####<a name="7"></a> LLM is not Self-Aware
 
 ... Even
-though [Anthropic’s Claude 3 causes stir by seeming to realize when it was being tested](https://arstechnica.com/information-technology/2024/03/claude-3-seems-to-detect-when-it-is-being-tested-sparking-ai-buzz-online/)
+though [Anthropic’s Claude 3 causes stir by seeming to realize when it was being tested](https://arstechnica.com/information-technology/2024/03/claude-3-seems-to-detect-when-it-is-being-tested-sparking-ai-buzz-online/).
 
 ####<a name="8"></a> Generative AI transformer
 
@@ -210,11 +210,11 @@ pondering &ndash; and avoiding &mdash; [design patterns that encourage junk data
 
 ####<a name="10"></a> C and C++ are Risky
 
-70 percent of all security vulnerabilities are caused by memory safety issues, and many of thiose are automatically eliminated by working in a memory-safe programming language.
+70 percent of all security vulnerabilities are caused by memory safety issues, and many of those are automatically eliminated by working in a memory-safe programming language.
 Therefore,
 the [White House urges developers to dump C and C++](https://www.infoworld.com/article/3713203/white-house-urges-developers-to-dump-c-and-c.amp.html).
 
-####<a name="11"></a> Ultra Processed Food is Toxic
+####<a name="11"></a> Ultra-Processed Food is Toxic
 
 Talking about things we ought to dump, I seldom watch long videos, but this hour-long one had me mesmerised all the way through:
 [the harsh reality of ultra processed food with Chris Van Tulleken](https://youtu.be/5QOTBreQaIk).
