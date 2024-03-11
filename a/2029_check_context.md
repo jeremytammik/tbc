@@ -60,7 +60,17 @@ twitter:
 
  the #RevitAPI @AutodeskRevit #BIM @DynamoBIM
 
-&ndash; ...
+We present a long-awaited solution to check for a valid Revit API context and a whole bunch of short pointers to other mostly AI-related topics of interest
+&ndash; Determining Revit API context
+&ndash; Detect Revit user input state
+&ndash; Easy Revit API4)
+&ndash; APS toolkit
+&ndash; Gemini with image and video input
+&ndash; LLM is not self-aware
+&ndash; Generative AI transformer
+&ndash; Design to reduce junk data
+&ndash; C and C++ are risky
+&ndash; Ultra-processed food is toxic...
 
 linkedin:
 
@@ -77,7 +87,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### API Context, APS Toolkit and DA4R Debugging
 
-We'll close this week with an interesting solution to check for a valid Revit API context and a whole bunch of short pointers to other topics of interest, mostly AI related:
+We present a long-awaited solution to check for a valid Revit API context and a whole bunch of short pointers to other topics of interest, mostly AI related:
 
 - [Determining Revit API context](#2)
 - [Detect Revit user input state](#3)
