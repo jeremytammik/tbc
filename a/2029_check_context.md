@@ -59,13 +59,12 @@
 
 twitter:
 
-
- the #RevitAPI @AutodeskRevit #BIM @DynamoBIM https://autode.sk/rvtapicontext
+Check for a valid Revit API context, APS debugging toolkit, AI and other news with the #RevitAPI @AutodeskRevit #BIM @DynamoBIM https://autode.sk/rvtapicontext
 
 We present a long-awaited solution to check for a valid Revit API context and a whole bunch of short pointers to other mostly AI-related topics of interest
 &ndash; Determining Revit API context
 &ndash; Detect Revit user input state
-&ndash; Easy Revit API4)
+&ndash; Easy Revit API
 &ndash; APS toolkit
 &ndash; Gemini with image and video input
 &ndash; LLM is not self-aware
