@@ -75,6 +75,21 @@ We present a long-awaited solution to check for a valid Revit API context and a 
 
 linkedin:
 
+Check for a valid Revit API context, APS debugging toolkit, AI and other news with the #RevitAPI
+
+https://autode.sk/rvtapicontext
+
+- Determining Revit API context
+- Detect Revit user input state
+- Easy Revit API
+- APS toolkit
+- Gemini with image and video input
+- LLM is not self-aware
+- Generative AI transformer
+- Design to reduce junk data
+- C and C++ are risky
+- Ultra-processed food is toxic...
+
 #BIM #DynamoBIM #AutodeskAPS #Revit #API #IFC #SDK #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
