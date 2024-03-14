@@ -59,7 +59,8 @@
 
 twitter:
 
- the #RevitAPI @AutodeskRevit #BIM @DynamoBIM
+
+ the #RevitAPI @AutodeskRevit #BIM @DynamoBIM https://autode.sk/rvtapicontext
 
 We present a long-awaited solution to check for a valid Revit API context and a whole bunch of short pointers to other mostly AI-related topics of interest
 &ndash; Determining Revit API context
