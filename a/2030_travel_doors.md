@@ -50,7 +50,16 @@ twitter:
 
  with the #RevitAPI @AutodeskRevit #BIM @DynamoBIM
 
-&ndash; ...
+
+New exciting Revit API solutions and furious pace of LLM development
+&ndash; Bowerbird C&#35; scripting for Revit
+&ndash; Doors traversed by path of travel
+&ndash; Camera mapping between APS and Revit
+&ndash; Claude 3 can see
+&ndash; Devin, an AI software engineer
+&ndash; Meta imagine generates images
+&ndash; An LLM for decompiling binary code
+&ndash; Simple climate change overview...
 
 linkedin:
 
@@ -65,7 +74,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Script on the Fly, Camera Settings and PoT Doors Traversed
+### Camera Settings, Doors Traversed, Script on the Fly
 
 New exciting Revit API solutions and continued furious pace of LLM development:
 
