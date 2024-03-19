@@ -209,7 +209,7 @@ Ever so many thanks to Eason for his very careful research and documentation.
 
 ####<a name="5"></a> Claude 3 can See
 
-Claude 3 is now available, an LLM AI model, now vision-enabled and scoring high several intelligence tests:
+Claude 3 LLM AI model was released, now vision-enabled and with scores in several intelligence tests:
 
 - [Claude 3 announcement](https://www.anthropic.com/news/claude-3-family)
 - [Claude 3 entry point](https://claude.ai/)
@@ -225,16 +225,18 @@ a fully autonomous AI software engineer.
 [Meta Imagine](https://imagine.meta.com/) generates images,
 cf., [Meta launches web-based AI image generator trained on your Instagram pics](https://uk.pcmag.com/ai/150034/meta-launches-web-based-ai-image-generator-ai-updates-across-its-apps).
 
-I briefly tested it to create an image of the real-world scene in front of me and was unable to tweak the prompt to generate a satisfactory result.
-My impression was that it very quickly ignored important aspects of my prompt, e.g., specific colour requests, etc., even when I repeated them, so I gave up unsatisfied.
+I briefly tested it myself, trying to approximate an image of the real-world scene in front of me, and was unable to tweak the prompt to generate a satisfactory result.
+My impression was that it very quickly ignored important aspects of my prompt, e.g., specific colour requests, etc., even when I repeated them, so I quickly gave up, unsatisfied.
 
 ####<a name="8"></a> An LLM for Decompiling Binary Code
 
-[LLM4Decompile: Decompiling Binary Code with Large Language Models](https://arxiv.org/abs/2403.05286)
-[LLM4Decompile GitHub repo](https://github.com/albertan017/LLM4Decompile)
+Yet another use of LLM,
+[LLM4Decompile: decompiling binary code with large language models](https://arxiv.org/abs/2403.05286),
+with its [LLM4Decompile GitHub repo](https://github.com/albertan017/LLM4Decompile).
 
 ####<a name="9"></a> Simple Climate Change Overview
 
+On another ever-present and looming topic of our days,
 BBC shares a nice and simple comprehensive article
 explaining [What is climate change? A really simple guide](https://www.bbc.com/news/science-environment-24021772).
 
