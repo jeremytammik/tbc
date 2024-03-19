@@ -108,10 +108,10 @@ the [PathOfTravelDoors GitHub repo](https://github.com/jeremytammik/PathOfTravel
 
 They were picked up again in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
-on [Doors traversed on path of travel lines](https://forums.autodesk.com/t5/revit-api-forum/doors-traversed-on-path-of-travel-lines/td-p/12616109).
+on [doors traversed on path of travel lines](https://forums.autodesk.com/t5/revit-api-forum/doors-traversed-on-path-of-travel-lines/td-p/12616109).
 
 **Question:** I want to list all the doors that are crossed by a path of travel line.
-I tried to code that, but it seems that the `ReferenceIntersector` finds more doors that are not on the path of travel, but the introduced ray is reaching them.
+I tried to code that, but it seems that the `ReferenceIntersector` finds more doors that are not on the path of travel, because the introduced ray is reaching them.
 
 I looked at the Revit SDK sample PathOfTravel, but that does not help.
 
@@ -120,7 +120,7 @@ the [FindNearest method](https://www.revitapidocs.com/2024/866e1f2b-c79a-4d9f-1d
 to ensure that I only get a maximum of one single intersected door.
 
 <center>
-<img src="img/aps_viewer_camera_perspective.png" alt="Path of travel doors" title="Path of travel doors" width="600"/> <!-- Pixel Height: 622 Pixel Width: 1,152 -->
+<img src="img/path_of_travel_doors.png" alt="Path of travel doors" title="Path of travel doors" width="600"/> <!-- Pixel Height: 622 Pixel Width: 1,152 -->
 </center>
 
 **Answer:** Hmm. Maybe, this task can be addressed simpler.
