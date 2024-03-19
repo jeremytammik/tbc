@@ -65,7 +65,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Path of Travel Doors Traversed
+### Script on the Fly, Camera Settings and PoT Doors Traversed
 
 
 ####<a name="2"></a> Bowerbird C&#35; Scripting for Revit
@@ -91,7 +91,7 @@ Thanks in advance!
 
 Many thanks to Christopher for creating and sharing this helpful tool!
 
-####<a name="2"></a> Doors traversed on path of travel lines
+####<a name="3"></a> Doors traversed on path of travel lines
 
 Doors traversed on path of travel lines
 https://forums.autodesk.com/t5/revit-api-forum/doors-traversed-on-path-of-travel-lines/td-p/12616109
@@ -107,7 +107,7 @@ https://forums.autodesk.com/t5/revit-api-forum/doors-traversed-on-path-of-travel
 </ul>
 
 
-####<a name="2"></a> Camera Mapping between APS Viewer and Revit
+####<a name="4"></a> Camera Mapping between APS Viewer and Revit
 
 In 2019, Eason Kang shared a very helpful explanation on how
 to [map Forge viewer camera back to Revit](https://aps.autodesk.com/blog/map-forge-viewer-camera-back-revit).
@@ -136,42 +136,40 @@ Cf. https://forge.zendesk.com/agent/tickets/14155
 
 Ever so many thanks to Eason for his very careful research and documentation.
 
-####<a name="2"></a> We’re excited to introduce Claude 3, our next generation of vision-enabled AI models - now available on claude.ai.
+####<a name="5"></a> Claude 3 can See
 
-We’re excited to introduce Claude 3, our next generation of vision-enabled AI models - now available on claude.ai.
-https://www.anthropic.com/news/claude-3-family
-https://claude.ai/
+Claude 3 is now available, an LLM AI model, now vision-enabled and scoring high several intelligence tests:
 
-####<a name="2"></a> Introducing Devin, the first AI software engineer
+- [Claude 3 announcement](https://www.anthropic.com/news/claude-3-family)
+- [Claude 3 entry point](https://claude.ai/)
 
-Introducing Devin, the first AI software engineer
-https://www.cognition-labs.com/blog
-March 12th, 2024 | Written by Scott Wu
-Meet Devin, the world’s first fully autonomous AI software engineer.
+####<a name="6"></a> Devin, an AI software engineer
 
-####<a name="2"></a> generates image, but badly, inattentive, does not follow the detailed prompt: https://imagine.meta.com/
+Another announcment
+introduces [Devin, the first AI software engineer](https://www.cognition-labs.com/blog),
+a fully autonomous AI software engineer.
 
-generates image, but badly, inattentive, does not follow the detailed prompt: https://imagine.meta.com/
-Meta Launches Web-Based AI Image Generator Trained on Your Instagram Pics
-https://uk.pcmag.com/ai/150034/meta-launches-web-based-ai-image-generator-ai-updates-across-its-apps
-I very briefly tested Meta Imagine to create an image purely based on a text prompt and was unable to tweak the prompt to generate a satisfactory result.
-My impression was that it very quickly ignored important aspects of my prompt, e.g., specific colour requests etc.
+####<a name="7"></a> Meta Imagine Generates Images
 
-####<a name="2"></a> Decompiling Binary Code with LLM
+[Meta Imagine](https://imagine.meta.com/) generates images,
+cf., [Meta launches web-based AI image generator trained on your Instagram pics](https://uk.pcmag.com/ai/150034/meta-launches-web-based-ai-image-generator-ai-updates-across-its-apps).
+
+I briefly tested it to create an image of the real-world scene in front of me and was unable to tweak the prompt to generate a satisfactory result.
+My impression was that it very quickly ignored important aspects of my prompt, e.g., specific colour requests, etc., even when I repeated them, so I gave up unsatisfied.
+
+####<a name="8"></a> An LLM for Decompiling Binary Code
 
 [LLM4Decompile: Decompiling Binary Code with Large Language Models](https://arxiv.org/abs/2403.05286)
 [LLM4Decompile GitHub repo](https://github.com/albertan017/LLM4Decompile)
 
-####<a name="2"></a> What is climate change? A really simple guide
+####<a name="9"></a> A Simple Top-Level Overview of Climate Change
 
-What is climate change? A really simple guide
-https://www.bbc.com/news/science-environment-24021772
-
+BBC shares a very basic and comprehensive article
+explaining [What is climate change? A really simple guide](https://www.bbc.com/news/science-environment-24021772).
 
 
 <pre><code class="language-csharp">
 </code></pre>
-
 
 <pre><code class="language-python">
 </code></pre>
