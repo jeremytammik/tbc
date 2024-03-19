@@ -57,7 +57,7 @@ New exciting Revit API solutions and furious pace of LLM development
 &ndash; Camera mapping between APS and Revit
 &ndash; Claude 3 can see
 &ndash; Devin, an AI software engineer
-&ndash; Meta Imagine generates images
+&ndash; Meta Ixmagine generates images
 &ndash; An LLM for decompiling binary code
 &ndash; Simple climate change overview...
 
