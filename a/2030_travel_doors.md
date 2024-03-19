@@ -106,6 +106,36 @@ https://forums.autodesk.com/t5/revit-api-forum/doors-traversed-on-path-of-travel
 <li><a href="https://thebuildingcoder.typepad.com/blog/2024/02/interactive-bim-notebook-temporary-graphics-and-ai.html">Interactive BIM Notebook, Temporary Graphics and AI</a></li>
 </ul>
 
+
+####<a name="2"></a> Camera Mapping between APS Viewer and Revit
+
+In 2019, Eason Kang shared a very helpful explanation on how
+to [map Forge viewer camera back to Revit](https://aps.autodesk.com/blog/map-forge-viewer-camera-back-revit).
+
+However, some aspects changed, and some were left uncovered back then, as discussed in
+the new [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160)
+on [Revit 3D view camera settings](https://forums.autodesk.com/t5/revit-api-forum/revit-3d-view-camera-settings/m-p/12629132).
+
+So, Eason took another deep dive into the topic, researched, tested, organized all the material and published it in two blog posts:
+
+- [From APS viewer to Revit](https://aps.autodesk.com/blog/camera-mapping-between-aps-viewer-and-revit-part-i-restore-viewer-camera-revit)
+- [From Revit to APS viewer](https://aps.autodesk.com/blog/camera-mapping-between-aps-viewer-and-revit-part-ii-restore-revit-camera-viewer)
+
+The associated sample code lives in the
+
+- [aps-viewer-revit-camera-sync GitHub repo](https://github.com/yiskang/aps-viewer-revit-camera-sync)
+
+<!--
+If you’re interested, here are the old discussions with another customer about doing something similar.
+Cf. https://forge.zendesk.com/agent/tickets/14155
+-->
+
+<center>
+<img src="img/aps_viewer_camera_perspective.png" alt="APS perspective view camera" title="APS perspective view camera" width="600"/> <!-- Pixel Height: 576 Pixel Width: 1,024 -->
+</center>
+
+Ever so many thanks to Eason for his very careful research and documentation.
+
 ####<a name="2"></a> We’re excited to introduce Claude 3, our next generation of vision-enabled AI models - now available on claude.ai.
 
 We’re excited to introduce Claude 3, our next generation of vision-enabled AI models - now available on claude.ai.
@@ -127,20 +157,16 @@ https://uk.pcmag.com/ai/150034/meta-launches-web-based-ai-image-generator-ai-upd
 I very briefly tested Meta Imagine to create an image purely based on a text prompt and was unable to tweak the prompt to generate a satisfactory result.
 My impression was that it very quickly ignored important aspects of my prompt, e.g., specific colour requests etc.
 
+####<a name="2"></a> Decompiling Binary Code with LLM
+
+[LLM4Decompile: Decompiling Binary Code with Large Language Models](https://arxiv.org/abs/2403.05286)
+[LLM4Decompile GitHub repo](https://github.com/albertan017/LLM4Decompile)
+
 ####<a name="2"></a> What is climate change? A really simple guide
 
 What is climate change? A really simple guide
 https://www.bbc.com/news/science-environment-24021772
 
-
-####<a name="2"></a>
-
-<center>
-<img src="img/.png" alt="" title="" width="100"/> <!-- Pixel Height: 303 Pixel Width: 740 -->
-</center>
-
-
-Many thanks to  for
 
 
 <pre><code class="language-csharp">
