@@ -91,10 +91,68 @@ Thanks in advance!
 
 Many thanks to Christopher for creating and sharing this helpful tool!
 
-####<a name="3"></a> Doors traversed on path of travel lines
+####<a name="3"></a> Doors Traversed by Path of Travel
 
-Doors traversed on path of travel lines
-https://forums.autodesk.com/t5/revit-api-forum/doors-traversed-on-path-of-travel-lines/td-p/12616109
+I took a look onca at determining the doors traversed by path of travel and shared some thoughts on that in
+the [PathOfTravelDoors GitHub repo](https://github.com/jeremytammik/PathOfTravelDoors).
+
+They were picked up again in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on [Doors traversed on path of travel lines](https://forums.autodesk.com/t5/revit-api-forum/doors-traversed-on-path-of-travel-lines/td-p/12616109).
+
+**Question:** I want to list all the doors that are crossed by a path of travel line.
+I tried to code that, but it seems that the `ReferenceIntersector` finds more doors that are not on the path of travel, but the introduced ray is reaching them.
+
+I looked at the Revit SDK sample PathOfTravel, but that does not help.
+
+The [ReferenceIntersector documentation](https://www.revitapidocs.com/2024/c4fb6c89-ca34-7c56-b730-98755d11fedf.htm) is illuminating, and
+the [FindNearest method](https://www.revitapidocs.com/2024/866e1f2b-c79a-4d9f-1db1-9e386dd42941.htm) ought
+to ensure that I only get a maximum of one single intersected door.
+
+<center>
+<img src="img/aps_viewer_camera_perspective.png" alt="Path of travel doors" title="Path of travel doors" width="600"/> <!-- Pixel Height: 622 Pixel Width: 1,152 -->
+</center>
+
+**Answer:** Hmm. Maybe, this task can be addressed simpler.
+How about this suggestion to approach it without using the reference intersector at all:
+
+- Retrieve the path of travel curve tessellation
+- For each line segment, determine whether it intersects a door
+
+Afaict, that should solve the problem right there. What do you think?
+
+**Response:** Just cracked it an hour ago!
+I tackled it by this trick ( so far good, not sure if it can be a universal solution):
+For each curve in the path of travel line I did once from the start point following the curve's direction, and once from the endpoint with the reversed direction.
+Then, I accepted the points that appeared in both.
+
+I thought of another approach as you mentioned: generating an imaginary line at each door location and checking whether the path of travel line segments intersected it or not.
+However, this method required finding the two points of each door, possibly by examining the geometry of a wall for its opening.
+While it seemed plausible, I decided against pursuing it initially due to its complexity.
+
+Later: Unfortunately, the described technique fails to yield the intended results across certain models, resulting in a null output from the `ReferenceIntersector`.
+
+As a workaround for these specific models, an alternative approach was employed:
+
+- Extract the start and end points of each line from the door geometry instance
+- Construct an imaginary line corresponding to the door location (the bounding box includes door swing, so not proper for my case)
+- Examin the intersection of this imaginary line with the curves of the path of travel lines
+
+**Answer:**
+Glad to hear that you found an approach that works reliably for all door instances.
+
+I cannot say why for sure the reference intersector fails in some cases.
+One thing to consider, though, is that a content creator has complete freedom in the family creation.
+So, some content creators might choose to represent doors in a completely unconventional manner.
+They might define the door geometry so that no solids or faces exist for the reference intersector to detect, which would lead to such failures.
+This infinite flexibility provided for Revit family definitions can make it hard to ensure that an approach always covers all cases.
+This makes unit testing on a large collection of possible BIM variations all the more important.
+
+The approach you describe is very generic: every door opening is described by one single line from start to end point, and that line must be crossed to pass through the door.
+That sounds pretty fool-proof to me.
+
+<!--
+
 % bl 1740 1744 1781 1836 1871 1917 2028
 <ul>
 <li><a href="https://thebuildingcoder.typepad.com/blog/2019/04/whats-new-in-the-revit-2020-api.html">What's New in the Revit 2020 API</a></li>
@@ -105,6 +163,8 @@ https://forums.autodesk.com/t5/revit-api-forum/doors-traversed-on-path-of-travel
 <li><a href="https://thebuildingcoder.typepad.com/blog/2021/09/view-sheet-from-view-and-select-all-on-level.html">View Sheet from View and Select All on Level</a></li>
 <li><a href="https://thebuildingcoder.typepad.com/blog/2024/02/interactive-bim-notebook-temporary-graphics-and-ai.html">Interactive BIM Notebook, Temporary Graphics and AI</a></li>
 </ul>
+
+-->
 
 
 ####<a name="4"></a> Camera Mapping between APS Viewer and Revit
