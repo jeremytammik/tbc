@@ -67,7 +67,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Script on the Fly, Camera Settings and PoT Doors Traversed
 
-Exciting Revit API solutions and continued furious pace of LLM development:
+New exciting Revit API solutions and continued furious pace of LLM development:
 
 - [Bowerbird C&#35; scripting for Revit](#2)
 - [Doors traversed by path of travel](#3)
@@ -146,7 +146,7 @@ As a workaround for these specific models, an alternative approach was employed:
 
 - Extract the start and end points of each line from the door geometry instance
 - Construct an imaginary line corresponding to the door location (the bounding box includes door swing, so not proper for my case)
-- Examin the intersection of this imaginary line with the curves of the path of travel lines
+- Examine the intersection of this imaginary line with the curves of the path of travel lines
 
 **Answer:**
 Glad to hear that you found an approach that works reliably for all door instances.
@@ -215,7 +215,7 @@ Claude 3 is now available, an LLM AI model, now vision-enabled and scoring high 
 
 ####<a name="6"></a> Devin, an AI Software Engineer
 
-Another announcment
+Another announcement
 introduces [Devin, the first AI software engineer](https://www.cognition-labs.com/blog),
 a fully autonomous AI software engineer.
 
