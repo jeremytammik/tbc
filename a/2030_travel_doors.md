@@ -81,11 +81,10 @@ New exciting Revit API solutions and continued furious pace of LLM development:
 ####<a name="2"></a> Bowerbird C&#35; Scripting for Revit
 
 [Christopher Diggins](https://github.com/cdiggins) published
-[Bowerbird](https://github.com/ara3d/bowerbird).
-It accelerates and simplifies C# tool and plug-in development by dynamically compiling C# source files:
-He would appreciate comments on it in
-the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160)
-thread [Feedback Requested &ndash; Bowerbird](https://forums.autodesk.com/t5/revit-api-forum/feedback-requested-bowerbird-c-scripting-for-revit/td-p/12643568),
+[Bowerbird](https://github.com/ara3d/bowerbird) for
+quick and easy C&#35; tool and plug-in development by dynamically compiling C# source files,
+and a [request for feedback on it](https://forums.autodesk.com/t5/revit-api-forum/feedback-requested-bowerbird-c-scripting-for-revit/td-p/12643568)
+in the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160),
 saying:
 
 > I've released a new open-source project for Revit C# developers called Bowerbird.
@@ -96,14 +95,15 @@ without having to go through the process of creating and deploying a plug-in, an
 by [pyRevit](https://github.com/eirannejad/pyRevit) by [Ehsan Iran-Nejad](https://github.com/eirannejad)
 and [Revit.ScriptCS](https://github.com/sridharbaldava/Revit.ScriptCS) by [Sridhar Baldava](https://github.com/sridharbaldava).
 
-> I'd greatly appreciate any feedback or contributions at https://github.com/ara3d/bowerbird/
+> I'd greatly appreciate any feedback or contributions in
+the [Bowerbird GitHub project](https://github.com/ara3d/bowerbird/).
 Thanks in advance!
 
 Many thanks to Christopher for creating and sharing this helpful tool!
 
 ####<a name="3"></a> Doors Traversed by Path of Travel
 
-I took a look onca at determining the doors traversed by path of travel and shared some thoughts on that in
+A while ago, I took a look at determining the doors traversed by a path of travel and shared some thoughts on that in
 the [PathOfTravelDoors GitHub repo](https://github.com/jeremytammik/PathOfTravelDoors).
 
 They were picked up again in
