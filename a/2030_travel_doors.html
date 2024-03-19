@@ -1,0 +1,203 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css"></p>
+<!-- https://highlightjs.org/#usage
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+-->
+
+<!-- https://prismjs.com -->
+<p><link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css" rel="stylesheet" /></p>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+<style> code[class*=language-], pre[class*=language-] { font-size : 90%; } </style>
+<p></head></p>
+<!---
+
+- Feedback Requested - Bowerbird: C# Scripting for Revit
+  https://forums.autodesk.com/t5/revit-api-forum/feedback-requested-bowerbird-c-scripting-for-revit/td-p/12643568
+
+- Doors traversed on path of travel lines
+  https://forums.autodesk.com/t5/revit-api-forum/doors-traversed-on-path-of-travel-lines/td-p/12616109
+  % bl 1740 1744 1781 1836 1871 1917 2028
+  <ul>
+  <li><a href="https://thebuildingcoder.typepad.com/blog/2019/04/whats-new-in-the-revit-2020-api.html">What's New in the Revit 2020 API</a></li>
+  <li><a href="https://thebuildingcoder.typepad.com/blog/2019/04/new-revit-2020-sdk-samples.html">New Revit 2020 SDK Samples</a></li>
+  <li><a href="https://thebuildingcoder.typepad.com/blog/2019/09/whats-new-in-the-revit-20201-api.html">What's New in the Revit 2020.1 API</a></li>
+  <li><a href="https://thebuildingcoder.typepad.com/blog/2020/04/whats-new-in-the-revit-2021-api.html">What's New in the Revit 2021 API</a></li>
+  <li><a href="https://thebuildingcoder.typepad.com/blog/2020/10/firerevit-deprecated-api-and-elbow-centre-point.html">FireRevit, Deprecated API and Elbow Centre Point</a></li>
+  <li><a href="https://thebuildingcoder.typepad.com/blog/2021/09/view-sheet-from-view-and-select-all-on-level.html">View Sheet from View and Select All on Level</a></li>
+  <li><a href="https://thebuildingcoder.typepad.com/blog/2024/02/interactive-bim-notebook-temporary-graphics-and-ai.html">Interactive BIM Notebook, Temporary Graphics and AI</a></li>
+  </ul>
+
+- We’re excited to introduce Claude 3, our next generation of vision-enabled AI models - now available on claude.ai.
+  https://www.anthropic.com/news/claude-3-family
+  https://claude.ai/
+
+- Introducing Devin, the first AI software engineer
+  https://www.cognition-labs.com/blog
+  March 12th, 2024 | Written by Scott Wu
+  Meet Devin, the world’s first fully autonomous AI software engineer.
+
+- generates image, but badly, inattentive, does not follow the detailed prompt: https://imagine.meta.com/
+
+- What is climate change? A really simple guide
+  https://www.bbc.com/news/science-environment-24021772
+
+twitter:
+
+ with the #RevitAPI @AutodeskRevit #BIM @DynamoBIM
+
+&ndash; ...
+
+linkedin:
+
+#BIM #DynamoBIM #AutodeskAPS #Revit #API #IFC #SDK #Autodesk #AEC #adsk
+
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+
+<center>
+<img src="img/" alt="" title="" width="600"/>
+<p style="font-size: 80%; font-style:italic"></p>
+</center>
+
+-->
+
+<h3>Script on the Fly, Camera Settings and PoT Doors Traversed</h3>
+<p>Exciting Revit API solutions and continued furious pace of LLM development:</p>
+<ul>
+<li><a href="#2">Bowerbird C&#35; scripting for Revit</a></li>
+<li><a href="#3">Doors traversed by path of travel</a></li>
+<li><a href="#4">Camera mapping between APS and Revit</a></li>
+<li><a href="#5">Claude 3 can see</a></li>
+<li><a href="#6">Devin, an AI software engineer</a></li>
+<li><a href="#7">Meta imagine generates images</a></li>
+<li><a href="#8">An LLM for decompiling binary code</a></li>
+<li><a href="#9">Simple climate change overview</a></li>
+</ul>
+<h4><a name="2"></a> Bowerbird C&#35; Scripting for Revit</h4>
+<p><a href="https://github.com/cdiggins">Christopher Diggins</a> published
+<a href="https://github.com/ara3d/bowerbird">Bowerbird</a>.
+It accelerates and simplifies C# tool and plug-in development by dynamically compiling C# source files:
+He would appreciate comments on it in
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a>
+thread <a href="https://forums.autodesk.com/t5/revit-api-forum/feedback-requested-bowerbird-c-scripting-for-revit/td-p/12643568">Feedback Requested &ndash; Bowerbird</a>,
+saying:</p>
+<blockquote>
+<p>I've released a new open-source project for Revit C# developers called Bowerbird.
+It uses the Roslyn C# compiler to allow users to create and edit new commands directly from C# source files,
+without having to go through the process of creating and deploying a plug-in, and re-launching Revit.</p>
+<p>It is inspired
+by <a href="https://github.com/eirannejad/pyRevit">pyRevit</a> by <a href="https://github.com/eirannejad">Ehsan Iran-Nejad</a>
+and <a href="https://github.com/sridharbaldava/Revit.ScriptCS">Revit.ScriptCS</a> by <a href="https://github.com/sridharbaldava">Sridhar Baldava</a>.</p>
+<p>I'd greatly appreciate any feedback or contributions at https://github.com/ara3d/bowerbird/
+Thanks in advance!</p>
+</blockquote>
+<p>Many thanks to Christopher for creating and sharing this helpful tool!</p>
+<h4><a name="3"></a> Doors Traversed by Path of Travel</h4>
+<p>I took a look onca at determining the doors traversed by path of travel and shared some thoughts on that in
+the <a href="https://github.com/jeremytammik/PathOfTravelDoors">PathOfTravelDoors GitHub repo</a>.</p>
+<p>They were picked up again in
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/doors-traversed-on-path-of-travel-lines/td-p/12616109">Doors traversed on path of travel lines</a>.</p>
+<p><strong>Question:</strong> I want to list all the doors that are crossed by a path of travel line.
+I tried to code that, but it seems that the <code>ReferenceIntersector</code> finds more doors that are not on the path of travel, but the introduced ray is reaching them.</p>
+<p>I looked at the Revit SDK sample PathOfTravel, but that does not help.</p>
+<p>The <a href="https://www.revitapidocs.com/2024/c4fb6c89-ca34-7c56-b730-98755d11fedf.htm">ReferenceIntersector documentation</a> is illuminating, and
+the <a href="https://www.revitapidocs.com/2024/866e1f2b-c79a-4d9f-1db1-9e386dd42941.htm">FindNearest method</a> ought
+to ensure that I only get a maximum of one single intersected door.</p>
+<p><center>
+<img src="img/aps_viewer_camera_perspective.png" alt="Path of travel doors" title="Path of travel doors" width="600"/> <!-- Pixel Height: 622 Pixel Width: 1,152 -->
+</center></p>
+<p><strong>Answer:</strong> Hmm. Maybe, this task can be addressed simpler.
+How about this suggestion to approach it without using the reference intersector at all:</p>
+<ul>
+<li>Retrieve the path of travel curve tessellation</li>
+<li>For each line segment, determine whether it intersects a door</li>
+</ul>
+<p>Afaict, that should solve the problem right there. What do you think?</p>
+<p><strong>Response:</strong> Just cracked it an hour ago!
+I tackled it by this trick ( so far good, not sure if it can be a universal solution):
+For each curve in the path of travel line I did once from the start point following the curve's direction, and once from the endpoint with the reversed direction.
+Then, I accepted the points that appeared in both.</p>
+<p>I thought of another approach as you mentioned: generating an imaginary line at each door location and checking whether the path of travel line segments intersected it or not.
+However, this method required finding the two points of each door, possibly by examining the geometry of a wall for its opening.
+While it seemed plausible, I decided against pursuing it initially due to its complexity.</p>
+<p>Later: Unfortunately, the described technique fails to yield the intended results across certain models, resulting in a null output from the <code>ReferenceIntersector</code>.</p>
+<p>As a workaround for these specific models, an alternative approach was employed:</p>
+<ul>
+<li>Extract the start and end points of each line from the door geometry instance</li>
+<li>Construct an imaginary line corresponding to the door location (the bounding box includes door swing, so not proper for my case)</li>
+<li>Examin the intersection of this imaginary line with the curves of the path of travel lines</li>
+</ul>
+<p><strong>Answer:</strong>
+Glad to hear that you found an approach that works reliably for all door instances.</p>
+<p>I cannot say why for sure the reference intersector fails in some cases.
+One thing to consider, though, is that a content creator has complete freedom in the family creation.
+So, some content creators might choose to represent doors in a completely unconventional manner.
+They might define the door geometry so that no solids or faces exist for the reference intersector to detect, which would lead to such failures.
+This infinite flexibility provided for Revit family definitions can make it hard to ensure that an approach always covers all cases.
+This makes unit testing on a large collection of possible BIM variations all the more important.</p>
+<p>The approach you describe is very generic: every door opening is described by one single line from start to end point, and that line must be crossed to pass through the door.
+That sounds pretty fool-proof to me.</p>
+<!--
+
+% bl 1740 1744 1781 1836 1871 1917 2028
+<ul>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2019/04/whats-new-in-the-revit-2020-api.html">What's New in the Revit 2020 API</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2019/04/new-revit-2020-sdk-samples.html">New Revit 2020 SDK Samples</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2019/09/whats-new-in-the-revit-20201-api.html">What's New in the Revit 2020.1 API</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2020/04/whats-new-in-the-revit-2021-api.html">What's New in the Revit 2021 API</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2020/10/firerevit-deprecated-api-and-elbow-centre-point.html">FireRevit, Deprecated API and Elbow Centre Point</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2021/09/view-sheet-from-view-and-select-all-on-level.html">View Sheet from View and Select All on Level</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2024/02/interactive-bim-notebook-temporary-graphics-and-ai.html">Interactive BIM Notebook, Temporary Graphics and AI</a></li>
+</ul>
+
+-->
+
+<h4><a name="4"></a> Camera Mapping Between APS and Revit</h4>
+<p>In 2019, Eason Kang shared a very helpful explanation on how
+to <a href="https://aps.autodesk.com/blog/map-forge-viewer-camera-back-revit">map Forge viewer camera back to Revit</a>.</p>
+<p>However, some aspects changed, and some were left uncovered back then, as discussed in
+the new <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a>
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/revit-3d-view-camera-settings/m-p/12629132">Revit 3D view camera settings</a>.</p>
+<p>So, Eason took another deep dive into the topic, researched, tested, organized all the material and published it in two blog posts:</p>
+<ul>
+<li><a href="https://aps.autodesk.com/blog/camera-mapping-between-aps-viewer-and-revit-part-i-restore-viewer-camera-revit">From APS viewer to Revit</a></li>
+<li><a href="https://aps.autodesk.com/blog/camera-mapping-between-aps-viewer-and-revit-part-ii-restore-revit-camera-viewer">From Revit to APS viewer</a></li>
+</ul>
+<p>The associated sample code lives in the</p>
+<ul>
+<li><a href="https://github.com/yiskang/aps-viewer-revit-camera-sync">aps-viewer-revit-camera-sync GitHub repo</a></li>
+</ul>
+<!--
+If you’re interested, here are the old discussions with another customer about doing something similar.
+Cf. https://forge.zendesk.com/agent/tickets/14155
+-->
+
+<p><center>
+<img src="img/aps_viewer_camera_perspective.png" alt="APS perspective view camera" title="APS perspective view camera" width="600"/> <!-- Pixel Height: 576 Pixel Width: 1,024 -->
+</center></p>
+<p>Ever so many thanks to Eason for his very careful research and documentation.</p>
+<h4><a name="5"></a> Claude 3 can See</h4>
+<p>Claude 3 is now available, an LLM AI model, now vision-enabled and scoring high several intelligence tests:</p>
+<ul>
+<li><a href="https://www.anthropic.com/news/claude-3-family">Claude 3 announcement</a></li>
+<li><a href="https://claude.ai/">Claude 3 entry point</a></li>
+</ul>
+<h4><a name="6"></a> Devin, an AI Software Engineer</h4>
+<p>Another announcment
+introduces <a href="https://www.cognition-labs.com/blog">Devin, the first AI software engineer</a>,
+a fully autonomous AI software engineer.</p>
+<h4><a name="7"></a> Meta Imagine Generates Images</h4>
+<p><a href="https://imagine.meta.com/">Meta Imagine</a> generates images,
+cf., <a href="https://uk.pcmag.com/ai/150034/meta-launches-web-based-ai-image-generator-ai-updates-across-its-apps">Meta launches web-based AI image generator trained on your Instagram pics</a>.</p>
+<p>I briefly tested it to create an image of the real-world scene in front of me and was unable to tweak the prompt to generate a satisfactory result.
+My impression was that it very quickly ignored important aspects of my prompt, e.g., specific colour requests, etc., even when I repeated them, so I gave up unsatisfied.</p>
+<h4><a name="8"></a> An LLM for Decompiling Binary Code</h4>
+<p><a href="https://arxiv.org/abs/2403.05286">LLM4Decompile: Decompiling Binary Code with Large Language Models</a>
+<a href="https://github.com/albertan017/LLM4Decompile">LLM4Decompile GitHub repo</a></p>
+<h4><a name="9"></a> Simple Climate Change Overview</h4>
+<p>BBC shares a nice and simple comprehensive article
+explaining <a href="https://www.bbc.com/news/science-environment-24021772">What is climate change? A really simple guide</a>.</p>

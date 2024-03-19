@@ -67,6 +67,16 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Script on the Fly, Camera Settings and PoT Doors Traversed
 
+Exciting Revit API solutions and continued furious pace of LLM development:
+
+- [Bowerbird C&#35; scripting for Revit](#2)
+- [Doors traversed by path of travel](#3)
+- [Camera mapping between APS and Revit](#4)
+- [Claude 3 can see](#5)
+- [Devin, an AI software engineer](#6)
+- [Meta imagine generates images](#7)
+- [An LLM for decompiling binary code](#8)
+- [Simple climate change overview](#9)
 
 ####<a name="2"></a> Bowerbird C&#35; Scripting for Revit
 
@@ -167,7 +177,7 @@ That sounds pretty fool-proof to me.
 -->
 
 
-####<a name="4"></a> Camera Mapping between APS Viewer and Revit
+####<a name="4"></a> Camera Mapping Between APS and Revit
 
 In 2019, Eason Kang shared a very helpful explanation on how
 to [map Forge viewer camera back to Revit](https://aps.autodesk.com/blog/map-forge-viewer-camera-back-revit).
@@ -203,7 +213,7 @@ Claude 3 is now available, an LLM AI model, now vision-enabled and scoring high 
 - [Claude 3 announcement](https://www.anthropic.com/news/claude-3-family)
 - [Claude 3 entry point](https://claude.ai/)
 
-####<a name="6"></a> Devin, an AI software engineer
+####<a name="6"></a> Devin, an AI Software Engineer
 
 Another announcment
 introduces [Devin, the first AI software engineer](https://www.cognition-labs.com/blog),
@@ -222,17 +232,8 @@ My impression was that it very quickly ignored important aspects of my prompt, e
 [LLM4Decompile: Decompiling Binary Code with Large Language Models](https://arxiv.org/abs/2403.05286)
 [LLM4Decompile GitHub repo](https://github.com/albertan017/LLM4Decompile)
 
-####<a name="9"></a> A Simple Top-Level Overview of Climate Change
+####<a name="9"></a> Simple Climate Change Overview
 
-BBC shares a very basic and comprehensive article
+BBC shares a nice and simple comprehensive article
 explaining [What is climate change? A really simple guide](https://www.bbc.com/news/science-environment-24021772).
-
-
-<pre><code class="language-csharp">
-</code></pre>
-
-<pre><code class="language-python">
-</code></pre>
-
-Many thanks to ??? for creating and sharing this powerful toolkit!
 
