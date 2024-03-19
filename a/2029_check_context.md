@@ -101,14 +101,13 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### API Context, APS Toolkit and DA4R Debugging
+### API Context, Input State and DA4R Debugging
 
 We present a long-awaited solution to check for a valid Revit API context and a whole bunch of short pointers to other topics of interest, mostly AI related:
 
 - [Determining Revit API context](#2)
 - [Detect Revit user input state](#3)
 - [Easy Revit API](#4)
-- [APS toolkit](#5)
 - [Gemini with image and video input](#6)
 - [LLM is not self-aware](#7)
 - [Generative AI transformer](#8)
@@ -151,6 +150,8 @@ Big welcome to a new member in the Revit programming blogosphere,
 [Easy Revit API](https://easyrevitapi.com/).
 Welcome, Mohamed-Youssef.
 Best of luck and much success with your blog and other projects!
+
+<!--
 
 ####<a name="5"></a> APS Toolkit
 
@@ -208,6 +209,8 @@ df.save_to_excel("result.xlsx")
 </code></pre>
 
 Many thanks to Chuong Ho for creating and sharing this powerful toolkit!
+
+-->
 
 ####<a name="6"></a> Gemini with Image and Video Input
 

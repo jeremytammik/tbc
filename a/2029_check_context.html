@@ -100,13 +100,12 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-<h3>API Context, APS Toolkit and DA4R Debugging</h3>
+<h3>API Context, Input State and DA4R Debugging</h3>
 <p>We present a long-awaited solution to check for a valid Revit API context and a whole bunch of short pointers to other topics of interest, mostly AI related:</p>
 <ul>
 <li><a href="#2">Determining Revit API context</a></li>
 <li><a href="#3">Detect Revit user input state</a></li>
 <li><a href="#4">Easy Revit API</a></li>
-<li><a href="#5">APS toolkit</a></li>
 <li><a href="#6">Gemini with image and video input</a></li>
 <li><a href="#7">LLM is not self-aware</a></li>
 <li><a href="#8">Generative AI transformer</a></li>
@@ -142,35 +141,41 @@ of <a href="https://forums.autodesk.com/t5/revit-api-forum/detecting-revit-user-
 <a href="https://easyrevitapi.com/">Easy Revit API</a>.
 Welcome, Mohamed-Youssef.
 Best of luck and much success with your blog and other projects!</p>
-<h4><a name="5"></a> APS Toolkit</h4>
-<p>In the last post,
-I mentioned <a href="https://chuongmep.com/">Chuong Ho</a>'s
-<a href="https://thebuildingcoder.typepad.com/blog/2024/02/interactive-bim-notebook-temporary-graphics-and-ai.html#2">BIM interactive notebooks</a>.</p>
-<p>Now you can see how he put them to use in his newest project,
-the <a href="https://github.com/chuongmep/aps-toolkit">APS Toolkit</a>:</p>
-<blockquote>
-<p>I am excited to announce a significant development in data interaction and retrieval processes using Autodesk Platform Services from Autodesk. Today, I am officially releasing the first version of a toolkit designed to facilitate data access, aiming to support AI processes, Data Analysts, LLM, and explore the boundaries where APS may fall short in providing for end-users.
-This toolkit is open source, ensuring accessibility to all engineers, BIM developers, and data scientists. I am actively working on refining it further. Please feel free to provide any feedback in the comments below this post, and I will consider all suggestions.</p>
-</blockquote>
-<p><a href="https://github.com/chuongmep/aps-toolkit">APS Toolkit</a> empowers you to explore the Autodesk Platform Services APS.
-It's built on top of <a href="https://www.nuget.org/packages/Autodesk.Forge/">Autodesk.Forge</a>
-and <a href="https://www.nuget.org/packages/Newtonsoft.Json/">Newtonsoft.Json</a>.
-The toolkit includes features enabling you to read, download and write data from APS and export to CSV, Excel, JSON, XML, etc.</p>
-<p>Features:</p>
-<ul>
-<li>Read/Download SVF Model</li>
-<li>Read/Query Properties Database SQLite</li>
-<li>Read/Download Properties Without Viewer</li>
-<li>Read Geometry Data</li>
-<li>Read Metadata</li>
-<li>Read Fragments</li>
-<li>Read MeshPacks</li>
-<li>Read Images</li>
-<li>Export Data to CSV</li>
-<li>Export Data to Excel</li>
-<li>Export Data to Parquet</li>
-</ul>
-<p>Sample usage to export Revit Data To Excel using .NET C&#35;:</p>
+<!--
+
+####<a name="5"></a> APS Toolkit
+
+In the last post,
+I mentioned [Chuong Ho](https://chuongmep.com/)'s
+[BIM interactive notebooks](https://thebuildingcoder.typepad.com/blog/2024/02/interactive-bim-notebook-temporary-graphics-and-ai.html#2).
+
+Now you can see how he put them to use in his newest project,
+the [APS Toolkit](https://github.com/chuongmep/aps-toolkit):
+
+> I am excited to announce a significant development in data interaction and retrieval processes using Autodesk Platform Services from Autodesk. Today, I am officially releasing the first version of a toolkit designed to facilitate data access, aiming to support AI processes, Data Analysts, LLM, and explore the boundaries where APS may fall short in providing for end-users.
+This toolkit is open source, ensuring accessibility to all engineers, BIM developers, and data scientists. I am actively working on refining it further. Please feel free to provide any feedback in the comments below this post, and I will consider all suggestions.
+
+[APS Toolkit](https://github.com/chuongmep/aps-toolkit) empowers you to explore the Autodesk Platform Services APS.
+It's built on top of [Autodesk.Forge](https://www.nuget.org/packages/Autodesk.Forge/)
+and [Newtonsoft.Json](https://www.nuget.org/packages/Newtonsoft.Json/).
+The toolkit includes features enabling you to read, download and write data from APS and export to CSV, Excel, JSON, XML, etc.
+
+Features:
+
+- Read/Download SVF Model
+- Read/Query Properties Database SQLite
+- Read/Download Properties Without Viewer
+- Read Geometry Data
+- Read Metadata
+- Read Fragments
+- Read MeshPacks
+- Read Images
+- Export Data to CSV
+- Export Data to Excel
+- Export Data to Parquet
+
+Sample usage to export Revit Data To Excel using .NET C&#35;:
+
 <pre><code class="language-csharp">using APSToolkit;
 using Autodesk.Forge;
 using APSToolkit.Database;
@@ -181,7 +186,8 @@ var RevitPropDbReader = new PropDbReaderRevit(urn, token);
 RevitPropDbReader.ExportAllDataToExcel("result.xlsx");
 </code></pre>
 
-<p>Sample usage to export Revit Data To Excel using Python:</p>
+Sample usage to export Revit Data To Excel using Python:
+
 <pre><code class="language-python">from aps_toolkit import Auth
 from aps_toolkit import PropDbReaderRevit
 auth = Auth()
@@ -192,7 +198,10 @@ df = prop_reader.get_data_by_category("Ducts")
 df.save_to_excel("result.xlsx")
 </code></pre>
 
-<p>Many thanks to Chuong Ho for creating and sharing this powerful toolkit!</p>
+Many thanks to Chuong Ho for creating and sharing this powerful toolkit!
+
+-->
+
 <h4><a name="6"></a> Gemini with Image and Video Input</h4>
 <p>An impressive example of use of LLM with video input support is presented stating
 that [the killer app of Gemini Pro 1.5 is video](https://simonwillison.net/2024/Feb/21/gemini-pro-video.</p>
