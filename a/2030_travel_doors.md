@@ -48,8 +48,7 @@
 
 twitter:
 
- with the #RevitAPI @AutodeskRevit #BIM @DynamoBIM https://autode.sk/camerasettings
-
+Bowerbird scriptingd, oors traversed by path of travel, camera mapping between APS and @AutodeskRevit with the #RevitAPI #BIM @DynamoBIM https://autode.sk/camerasettings
 
 New exciting Revit API solutions and furious pace of LLM development
 &ndash; Bowerbird C&#35; scripting for Revit
