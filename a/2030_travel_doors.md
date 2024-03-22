@@ -48,7 +48,7 @@
 
 twitter:
 
- with the #RevitAPI @AutodeskRevit #BIM @DynamoBIM
+ with the #RevitAPI @AutodeskRevit #BIM @DynamoBIM https://autode.sk/camerasettings
 
 
 New exciting Revit API solutions and furious pace of LLM development
