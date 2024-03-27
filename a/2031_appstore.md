@@ -16,6 +16,12 @@
 
 <!---
 
+- PreviewControl border
+  https://forums.autodesk.com/t5/revit-api-forum/previewcontrol-border/td-p/12570113
+  /Users/jta/a/doc/revit/tbc/git/a/img/preview_border_hide.png
+
+- change level of piping elements
+  https://forums.autodesk.com/t5/revit-api-forum/transferring-elements-from-one-level-to-another-while/m-p/12664814#M77745
 
 twitter:
 
@@ -37,16 +43,16 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### AppStore Update
+### Change Pipe Level and Suppress PreviewControl Border
 
 
 
-####<a name="2"></a>
+####<a name="2"></a> Suppressing the PreviewControl Border
 
 
 Many thanks to ?? for creating and sharing this helpful tool!
 
-####<a name="3"></a>
+####<a name="3"></a> Moving Pipes to a Different Level
 
 **Question:**
 
