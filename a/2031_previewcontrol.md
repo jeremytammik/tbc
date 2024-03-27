@@ -83,8 +83,8 @@ I am off for a while and have no access to the code, but don’t feel discourage
 It was really painful to solve this and I wish Autodesk would just remove the borders in an upcoming release.
 It is hard to make software look good if the underlying API takes you back to the nineties ;-).
 
-I cannot share the actual code, unfortunately. Our codebase is really massive and closed ;-).
-While I cannot find the time to provide a full working example, I can post some code for you to fill the gaps. The important snippet (to be called after previewControl.Loaded AND previewControll.IsVisibleChanged) is the following:
+I can post some code for you to fill the gaps.
+The important snippet (to be called after `previewControl.Loaded` AND `previewControl.IsVisibleChanged`) is the following:
 
 <pre><code class="language-csharp">
 // get preview window host
@@ -117,9 +117,13 @@ if (previewControl.Tag is System.Windows.Thickness t)
 }
 </code></pre>
 
-The IsVisibleChanged handler is required for use in tab controls, since Revit seems to re-create the view in case of visibility changes. I misused the tag to save the previous state and avoid shrinking/growing of the control due to the padding-changes at "reentry". If you find a better solution to trigger the redraw, please let me know. This part is pretty hacky, but I had to move on at some point and got stuck with whatever did the job.
+The `IsVisibleChanged` handler is required for use in tab controls, since Revit seems to re-create the view in case of visibility changes.
+I misused the tag to save the previous state and avoid shrinking/growing of the control due to the padding-changes at "reentry".
+If you find a better solution to trigger the redraw, please let me know.
+This part is pretty hacky, but I had to move on at some point and got stuck with whatever did the job.
 
-I also use some WinAPI functions which can be easily imported (google, pinvoke). The HwndHelpers function is just syntactic sugar around EnumChildWindows.
+I also use some WinAPI functions which can be easily imported (google, pinvoke).
+The HwndHelpers function is just syntactic sugar around EnumChildWindows.
 
 <pre><code class="language-csharp">
 public static IList&lt;IntPtr&gt; GetAllChildHandles(IntPtr hwnd)
@@ -146,15 +150,9 @@ public static IList&lt;IntPtr&gt; GetAllChildHandles(IntPtr hwnd)
 }
 </code></pre>
 
-
-rawava1350
-2024-03-26 06:07 AM
-@cwaluga great solution
-
-nice3point
-2024-03-26 06:09 AM
-
-@cwaluga  amazing, i completely forgot about the Child when was writing a similar code.
+**Response:**
+Amazing.
+I completely forgot about the Child when writing similar code.
 Now all borders are gone.
 In addition, I have solved the redrawing problem, for which you used Padding (it was not working correctly).
 
@@ -246,7 +244,6 @@ public static IList&lt;IntPtr&gt; GetChildHandles(IntPtr hwnd)
   {
     gcHandles.Free();
   }
-
   return handles;
 }
 
@@ -264,12 +261,18 @@ User32:
 
 <pre><code class="language-csharp">
 /// &lt;summary&gt;
-///   An application-defined callback function used with the EnumChildWindows function. It receives the child window handles. The WNDENUMPROC type defines a pointer to this callback function. EnumChildProc is a placeholder for the application-defined function name.
+/// An application-defined callback function used with the EnumChildWindows function.
+/// It receives the child window handles. The WNDENUMPROC type defines a pointer to
+/// this callback function. EnumChildProc is a placeholder for the application-defined
+/// function name.
 /// &lt;/summary&gt;
 public delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
 
 /// &lt;summary&gt;
-///   Enumerates the child windows that belong to the specified parent window by passing the handle to each child window, in turn, to an application-defined callback function. EnumChildWindows continues until the last child window is enumerated or the callback function returns FALSE.
+/// Enumerates the child windows that belong to the specified parent window by
+/// passing the handle to each child window, in turn, to an application-defined
+/// callback function. EnumChildWindows continues until the last child window
+/// is enumerated or the callback function returns FALSE.
 /// &lt;/summary&gt;
 /// &lt;param name="hwnd"&gt;The window that you want to get information about.&lt;/param&gt;
 /// &lt;param name="func"&gt;A pointer to an application-defined callback function&lt;/param&gt;
@@ -281,21 +284,20 @@ public static extern bool EnumChildWindows(IntPtr hwnd, EnumWindowsProc func, In
 
 I've also disabled edge rounding for Windows 11.
 The used methods can be found in the WPF UI repository.
-User32: https://github.com/lepoco/wpfui/blob/development/src/Wpf.Ui/Interop/User32.cs
-UnsafeNativeMethods: https://github.com/lepoco/wpfui/blob/development/src/Wpf.Ui/Interop/UnsafeNativeMethods.cs
+
+- [User32](https://github.com/lepoco/wpfui/blob/development/src/Wpf.Ui/Interop/User32.cs)
+- [UnsafeNativeMethods](https://github.com/lepoco/wpfui/blob/development/src/Wpf.Ui/Interop/UnsafeNativeMethods.cs)
 
 So, problem solved; I think it will be useful to share this on the blog.
-However, I would like to ask Revit development team to turn this off by default, as it is easier for users to configure the control themselves than to mess with Win API and native code.
+However, I would like to ask the Revit development team to turn this off by default,
+as it is easier for users to configure the control themselves than to mess with Win API and native code.
 
-cwaluga
-2024-03-26 06:34 AM
-@nice3point: Nice, can you please elaborate on which of these lines can get me rid of the padding-trick?
+The lines to get me rid of the padding-trick are
 
-nice3point
-2024-03-26 06:36 AM
+- UnsafeNativeMethods.RemoveWindowCaption(handle);
 
-UnsafeNativeMethods.RemoveWindowCaption(handle); where handle is hwndHost
-https://github.com/lepoco/wpfui/blob/development/src/Wpf.Ui/Interop/UnsafeNativeMethods.cs#L468
+where handle is `hwndHost`,
+cf. [UnsafeNativeMethods.cs line 468](https://github.com/lepoco/wpfui/blob/development/src/Wpf.Ui/Interop/UnsafeNativeMethods.cs#L468).
 
 Many thanks to Roman for researching and sharing this helpful solution!
 
@@ -310,23 +312,21 @@ to [transferring elements from one level to another while maintaining their posi
 **Question:**
 How to move selected elements to another level while maintaining their position in space?
 
-jeremy_tammik
-  Autodesk jeremy_tammik  in reply to: 2lenin-off
-2024-03-25 01:31 PM
-
-Welcome to the Revit API. Can you achieve what you want manually in the end user interface? If so, that is a good start. If not, it would be good to check that first, determine the optimal workflow and best practices. Here is the standard approach to address a Revit API programming task:
-
-https://thebuildingcoder.typepad.com/blog/2017/01/virtues-of-reproduction-research-mep-settings-onto...
+**Answer:**
+Can you achieve what you want manually in the end user interface?
+If so, that is a good start.
+If not, it would be good to check that first, determine the optimal workflow and best practices, cf.
+the [standard approach to address a Revit API programming task](https://thebuildingcoder.typepad.com/blog/2017/01/virtues-of-reproduction-research-mep-settings-ontology.html#3).
 
 Possibly, some elements cannot simply be moved to an different level, but need to be recreated from scratch based on the new level.
 
+There is an older post showing how to do something similar here:
 
-EvanGeer
-2024-03-25 02:16 PM
+https://forums.autodesk.com/t5/revit-api-forum/change-the-level-of-an-element/td-p/3707640
 
-There is an older post showing how to do something similar here: https://forums.autodesk.com/t5/revit-api-forum/change-the-level-of-an-element/td-p/3707640
-
-Here is an example command that will change the level of the selected elements. Note that you will need to determine which parameter you want to change for different types of elements, and as @jeremy_tammik  noted, you may not be able to change the level of some elements. The example below is changing the level for selected piping elements.
+Here is an example command that will change the level of the selected elements.
+Note that you will need to determine which parameter you want to change for different types of elements, and as noted above, you may not be able to change the level of some elements.
+This example changes the level for selected piping elements:
 
 <pre><code class="language-csharp">
 public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
@@ -365,21 +365,17 @@ public Result Execute(ExternalCommandData commandData, ref string message, Eleme
 }
 </code></pre>
 
-Evan Geer
+In order to select a level interactively, transfer all elements from it to the target level, and list elements that were not transferred in a dialog box,
+you just need some handling for parameters and element type match-up.
+This seems like a perfect match for an abstract factory pattern or something similar.
+You might also save some time using the RevitLookup tools to identify which parameters match to which types.
 
+It's not ideal, but I do not think that there is a universal solution to changing the level of an element.
+As far as I understand, the reason for this is that different elements are hosted by and associated with levels in different ways.
+So, Revit's engine under the hood is doing different things to make that work, and the options we have exposed to us in the API therefore differ by type.
 
-2lenin-off
-2024-03-26 06:18 AM
-Thanks for the answer, although this is not exactly what I wanted. I wanted to select a level (in dialog window) and transfer all elements from it to the transit level. Elements that were not transferred - display in the dialog box
-
-EvanGeer
-2024-03-26 07:42 AM
-
-I believe this approach would work, you would just need some handling for parameter/element type match up. This seems like a perfect match for an abstract factory pattern or something similar. You might also save some time using the Revit Lookup tools to identify which parameters match to which types.
-
-It's not ideal, but I do not think that there is a universal solution to changing the level of an element. As far as I understand, the reason for this is that different elements are hosted by and associated with levels in different ways. So Revit's engine under the hood is doing different things to make that work, and the options we have exposed to us in the API therefore differ by type. @jeremy_tammik is the expert in that regard, but this is what I understand to be the case.
-
-Regarding handling moving everything on a given level, that can be accomplished with some changes to my example. Where I have hard-code the level name var newLevelName = "L2"; you could easily replace that with a UI allowing users to select the destination level. Similarly, you could add a UI to allow the user to select a source level, and supply that id to this block of code:
+Regarding handling moving everything on a given level, that can be accomplished with some changes to my example.
+Where I have hard-code the level name in `newLevelName`, set to "L2"; you could easily replace that with a UI allowing users to select the destination level. Similarly, you could add a UI to allow the user to select a source level, and supply that id to this block of code:
 
 <pre><code class="language-csharp">
   var levelHostedElements = selectedElements
@@ -387,16 +383,4 @@ Regarding handling moving everything on a given level, that can be accomplished 
     .ToList();
 </code></pre>
 
-Do you also need help with selection and UI components?
-Evan Geer
-evangeer.com
-
-
-
-**Question:**
-
-**Answer:**
-
-**Response:**
-
-
+Many thanks to Evan for the nice sample code and thorough explanation!
