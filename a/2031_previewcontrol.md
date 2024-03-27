@@ -61,101 +61,28 @@ raised and solved the question of how to suppress the unwanted
 **Question:**
 Is it possible to disable the PreviewControl border ? This border comes from the Win32 window. Setting User32.WindowStyles by Hwnd handle does not give any results. Except WS_CHILD and similar, no other styles are applied. Is this border added by Revit development team or is it a HwndHost issue ?
 
-
 <center>
 <img src="img/preview_border_hide_1.png" alt="PreviewControl border" title="PreviewControl border" width="400"/> <!-- Pixel Height: 592 Pixel Width: 523 -->
 </center>
 
-<center>
-<img src="img/preview_border_hide_2.png" alt="PreviewControl border" title="PreviewControl border" width="400"/> <!-- Pixel Height: 790 Pixel Width: 466 -->
-</center>
-
-<center>
-<img src="img/preview_border_hide_3.png" alt="PreviewControl border suppressed" title="PreviewControl border suppressed" width="400"/> <!-- Pixel Height: 852 Pixel Width: 525 -->
-</center>
-
-
-
-Speed_CAD
-  Advocate Speed_CAD  in reply to: nice3point
-2024-02-19 07:31 PM
-Hi,
-
+**Answer:**
 The only way I could do it when I used it, was to set the Grid margin to -4, but this only works if the grid is set entirely to the window.
-Mauricio Jorquera
-Tags (0)
-Add tags
-Report
-MESSAGE 3 OF 16
-nice3point
-  Advocate nice3point  in reply to: Speed_CAD
-2024-02-20 01:10 AM
-It's not a solution, negative margin just covers other content
-Tags (0)
-Add tags
-Report
-MESSAGE 4 OF 16
-Speed_CAD
-  Advocate Speed_CAD  in reply to: nice3point
-2024-02-20 01:21 AM
+
+**Response:**
+That is not a solution; the negative margin just covers other content.
+
+**Answer:**
 I don't like the negative margin either, but it was the only way to hide the border. And for it to work, the container (Grid) must cover the entire window.
-Mauricio Jorquera
-Tags (0)
-Add tags
-Report
-MESSAGE 5 OF 16
-nice3point
-  Advocate nice3point  in reply to: nice3point
-2024-02-20 01:23 AM
-@jeremytammikhi Jeremy, can you ask the Revit team where this border comes from?
-Tags (0)
-Add tags
-Report
-MESSAGE 6 OF 16
-jeremy_tammik
-  Autodesk jeremy_tammik  in reply to: nice3point
-2024-02-20 01:34 AM
 
-Sure. Thank you for asking. I passed it on to them internally.
+**Answer B:**
+You can use Spy++ to determine the window structure and use WinAPI to remove the borders and some WPF magic to trigger the repaint.
+It took me hours of experimenting, but it is doable.
+If I recall correctly, there are multiple levels of controls and you have to figure out which ones carry the borders.
 
-Jeremy Tammik,  Developer Advocacy and Support, The Building Coder, Autodesk Developer Network, ADN Open
-Tags (0)
-Add tags
-Report
-MESSAGE 7 OF 16
-cwaluga
-  Advocate cwaluga  in reply to: jeremy_tammik
-2024-03-04 11:08 AM
-You can use Spy++ to determine the window structure and use WinAPI to remove the borders and some WPF magic to trigger the repaint. It took me hours of experimenting, but it is doable. If I recall correctly, there are multiple levels of controls and you have to figure out which ones carry the borders.
+I am off for a while and have no access to the code, but don’t feel discouraged if it doesn’t work the first time.
+It was really painful to solve this and I wish Autodesk would just remove the borders in an upcoming release.
+It is hard to make software look good if the underlying API takes you back to the nineties ;-).
 
-I am off for a while and have no access to the code, but don’t feel discouraged if it doesn’t work the first time. It was really painful to solve this and I wish Autodesk would just remove the borders in an upcoming release. It is hard to make software look good if the underlying API takes you back to the nineties ;-).
-Tags (0)
-Add tags
-Report
-MESSAGE 8 OF 16
-nice3point
-  Advocate nice3point  in reply to: nice3point
-2024-03-04 01:12 PM
-@cwaluga  perfect) can you share your code?
-@jeremy_tammik   any updates from the Revit team?
-Tags (0)
-Add tags
-Report
-MESSAGE 9 OF 16
-jeremy_tammik
-  Autodesk jeremy_tammik  in reply to: nice3point
-2024-03-05 12:04 AM
-Nope, no updates yet. I added @cwaluga 's comments to my query and reprompted. Thank you for those!
-
-Jeremy Tammik,  Developer Advocacy and Support, The Building Coder, Autodesk Developer Network, ADN Open
-Tags (0)
-Add tags
-Report
-MESSAGE 10 OF 16
-cwaluga
-  Advocate cwaluga  in reply to: nice3point
-2024-03-25 04:14 AM
-@nice3point @jeremy_tammik
 I cannot share the actual code, unfortunately. Our codebase is really massive and closed ;-).
 While I cannot find the time to provide a full working example, I can post some code for you to fill the gaps. The important snippet (to be called after previewControl.Loaded AND previewControll.IsVisibleChanged) is the following:
 
@@ -239,20 +166,19 @@ nice3point
 
 @cwaluga  amazing, i completely forgot about the Child when was writing a similar code. Now all borders are gone, in addition, I have solved the redrawing problem, for which you used Padding (it was not working correctly)
 Before:
-nice3point_0-1711460240466.png
-After:
-nice3point_0-1711458548335.png
 
-Tags (0)
-Add tags
-Report
-MESSAGE 13 OF 16
-nice3point
-  Advocate nice3point  in reply to: nice3point
-2024-03-26 06:17 AM
+
+<center>
+<img src="img/preview_border_hide_2.png" alt="PreviewControl border" title="PreviewControl border" width="400"/> <!-- Pixel Height: 790 Pixel Width: 466 -->
+</center>
+
+After:
+
+<center>
+<img src="img/preview_border_hide_3.png" alt="PreviewControl border suppressed" title="PreviewControl border suppressed" width="400"/> <!-- Pixel Height: 852 Pixel Width: 525 -->
+</center>
 
 Solution:
-
 
 public void Initialize()
 {
@@ -358,40 +284,25 @@ public delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
 [DllImport(Libraries.User32)]
 public static extern bool EnumChildWindows(IntPtr hwnd, EnumWindowsProc func, IntPtr lParam);
 
-
-I've also disabled edge rounding for Windows 11 as well.
+I've also disabled edge rounding for Windows 11.
 The used methods can be found in the WPF UI repository.
 User32: https://github.com/lepoco/wpfui/blob/development/src/Wpf.Ui/Interop/User32.cs
 UnsafeNativeMethods: https://github.com/lepoco/wpfui/blob/development/src/Wpf.Ui/Interop/UnsafeNativeMethods.cs
-Tags (0)
-Add tags
-Report
-MESSAGE 14 OF 16
-nice3point
-  Advocate nice3point  in reply to: nice3point
-2024-03-26 06:21 AM
-@jeremy_tammik problem solved, I think it will be useful to share this on the blog. However, I would like to ask Revit development team to turn this off by default, as it is easier for users to configure the control themselves than to mess with Win API and native code
-Tags (0)
-Add tags
-Report
-MESSAGE 15 OF 16
+
+So, problem solved; I think it will be useful to share this on the blog.
+However, I would like to ask Revit development team to turn this off by default, as it is easier for users to configure the control themselves than to mess with Win API and native code.
+
 cwaluga
-  Advocate cwaluga  in reply to: nice3point
 2024-03-26 06:34 AM
 @nice3point: Nice, can you please elaborate on which of these lines can get me rid of the padding-trick?
-Tags (0)
-Add tags
-Report
-MESSAGE 16 OF 16
+
 nice3point
-  Advocate nice3point  in reply to: cwaluga
 2024-03-26 06:36 AM
 
 UnsafeNativeMethods.RemoveWindowCaption(handle); where handle is hwndHost
 https://github.com/lepoco/wpfui/blob/development/src/Wpf.Ui/Interop/UnsafeNativeMethods.cs#L468
 
-
-Many thanks to ?? for creating and sharing this helpful tool!
+Many thanks to Roman for researching and sharing this helpful solution!
 
 ####<a name="3"></a> Changing Level of Piping Elements
 
