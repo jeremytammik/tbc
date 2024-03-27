@@ -86,7 +86,7 @@ It is hard to make software look good if the underlying API takes you back to th
 I cannot share the actual code, unfortunately. Our codebase is really massive and closed ;-).
 While I cannot find the time to provide a full working example, I can post some code for you to fill the gaps. The important snippet (to be called after previewControl.Loaded AND previewControll.IsVisibleChanged) is the following:
 
-
+<pre><code class="language-csharp">
 // get preview window host
 var previewWndHost = previewControl.Content;
 if (previewWndHost is null)
@@ -115,23 +115,23 @@ if (previewControl.Tag is System.Windows.Thickness t)
   p.Bottom = p.Bottom == t.Bottom ? p.Bottom + 1 : t.Bottom;
   previewControl.Padding = p;
 }
-
+</code></pre>
 
 The IsVisibleChanged handler is required for use in tab controls, since Revit seems to re-create the view in case of visibility changes. I misused the tag to save the previous state and avoid shrinking/growing of the control due to the padding-changes at "reentry". If you find a better solution to trigger the redraw, please let me know. This part is pretty hacky, but I had to move on at some point and got stuck with whatever did the job.
 
 I also use some WinAPI functions which can be easily imported (google, pinvoke). The HwndHelpers function is just syntactic sugar around EnumChildWindows.
 
-
-public static IList<IntPtr> GetAllChildHandles(IntPtr hwnd)
+<pre><code class="language-csharp">
+public static IList&lt;IntPtr&gt; GetAllChildHandles(IntPtr hwnd)
 {
-  var childHandles = new List<IntPtr>();
+  var childHandles = new List&lt;IntPtr&gt;();
   var gcChildHandles = GCHandle.Alloc(childHandles);
 
   try
   {
     bool EnumWindow(IntPtr hWnd, IntPtr lParam)
     {
-      (GCHandle.FromIntPtr(lParam).Target as List<IntPtr>)?.Add(hWnd);
+      (GCHandle.FromIntPtr(lParam).Target as List&lt;IntPtr&gt;)?.Add(hWnd);
       return true;
     }
 
@@ -142,31 +142,23 @@ public static IList<IntPtr> GetAllChildHandles(IntPtr hwnd)
   {
     gcChildHandles.Free();
   }
-
   return childHandles;
 }
+</code></pre>
 
 
-
-Tags (0)
-Add tags
-Report
-MESSAGE 11 OF 16
 rawava1350
-  Community Visitor rawava1350  in reply to: nice3point
 2024-03-26 06:07 AM
-@cwalugagreat solution
-Tags (0)
-Add tags
-Report
-MESSAGE 12 OF 16
+@cwaluga great solution
+
 nice3point
-  Advocate nice3point  in reply to: nice3point
 2024-03-26 06:09 AM
 
-@cwaluga  amazing, i completely forgot about the Child when was writing a similar code. Now all borders are gone, in addition, I have solved the redrawing problem, for which you used Padding (it was not working correctly)
-Before:
+@cwaluga  amazing, i completely forgot about the Child when was writing a similar code.
+Now all borders are gone.
+In addition, I have solved the redrawing problem, for which you used Padding (it was not working correctly).
 
+Before:
 
 <center>
 <img src="img/preview_border_hide_2.png" alt="PreviewControl border" title="PreviewControl border" width="400"/> <!-- Pixel Height: 790 Pixel Width: 466 -->
@@ -180,109 +172,112 @@ After:
 
 Solution:
 
+<pre><code class="language-csharp">
 public void Initialize()
 {
-    var previewControl = new PreviewControl(_context, view.Id);
-    previewControl.Loaded += RemovePreviewControlStyles;
+  var previewControl = new PreviewControl(_context, view.Id);
+  previewControl.Loaded += RemovePreviewControlStyles;
 }
 
 private void RemovePreviewControlStyles(object sender, EventArgs args)
 {
-    var control = (PreviewControl)sender;
-    var previewHost = (FrameworkElement)control.Content;
-    var previewType = previewHost.GetType();
-    var hostField = previewType.GetField("m_hwndHost", BindingFlags.NonPublic | BindingFlags.DeclaredOnly | BindingFlags.Instance)!;
-    var handle = (IntPtr)hostField.GetValue(previewHost);
+  var control = (PreviewControl)sender;
+  var previewHost = (FrameworkElement)control.Content;
+  var previewType = previewHost.GetType();
+  var hostField = previewType.GetField("m_hwndHost", BindingFlags.NonPublic | BindingFlags.DeclaredOnly | BindingFlags.Instance)!;
+  var handle = (IntPtr)hostField.GetValue(previewHost);
 
-    var childHandles = UnsafeNativeMethods.GetChildHandles(handle);
+  var childHandles = UnsafeNativeMethods.GetChildHandles(handle);
 
-    UnsafeNativeMethods.RemoveWindowStyles(handle);
-    UnsafeNativeMethods.RemoveWindowCaption(handle);
-    foreach (var childHandle in childHandles)
-    {
-        UnsafeNativeMethods.RemoveWindowStyles(childHandle);
-    }
+  UnsafeNativeMethods.RemoveWindowStyles(handle);
+  UnsafeNativeMethods.RemoveWindowCaption(handle);
+  foreach (var childHandle in childHandles)
+  {
+    UnsafeNativeMethods.RemoveWindowStyles(childHandle);
+  }
 }
-
+</code></pre>
 
 UnsafeNativeMethods:
 
-
-/// <summary>
+<pre><code class="language-csharp">
+/// &lt;summary&gt;
 /// Tries to remove styles from selected window handle.
-/// </summary>
-/// <param name="handle">Window handle.</param>
-/// <returns><see langword="true"/> if invocation of native Windows function succeeds.</returns>
+/// &lt;/summary&gt;
+/// &lt;param name="handle"&gt;Window handle.&lt;/param&gt;
+/// &lt;returns&gt;&lt;see langword="true"/&gt; if invocation of native Windows function succeeds.&lt;/returns&gt;
 public static bool RemoveWindowStyles(IntPtr handle)
 {
-    if (handle == IntPtr.Zero)
-    {
-        return false;
-    }
+  if (handle == IntPtr.Zero)
+  {
+    return false;
+  }
 
-    if (!User32.IsWindow(handle))
-    {
-        return false;
-    }
+  if (!User32.IsWindow(handle))
+  {
+    return false;
+  }
 
-    var cornerResult = ApplyWindowCornerPreference(handle, WindowCornerPreference.DoNotRound);
-    if (!cornerResult) return false;
+  var cornerResult = ApplyWindowCornerPreference(handle, WindowCornerPreference.DoNotRound);
+  if (!cornerResult) return false;
 
-    var windowStyleLong = User32.GetWindowLong(handle, User32.GWL.GWL_EXSTYLE);
-    windowStyleLong &= ~(int)User32.WS_EX.CLIENTEDGE;
+  var windowStyleLong = User32.GetWindowLong(handle, User32.GWL.GWL_EXSTYLE);
+  windowStyleLong &= ~(int)User32.WS_EX.CLIENTEDGE;
 
-    var styleResult = SetWindowLong(handle, User32.GWL.GWL_EXSTYLE, windowStyleLong);
-    return styleResult.ToInt64() > 0x0;
+  var styleResult = SetWindowLong(handle, User32.GWL.GWL_EXSTYLE, windowStyleLong);
+  return styleResult.ToInt64() &gt; 0x0;
 }
 
-/// <summary>
-///     Get the child windows that belong to the specified parent window by passing the handle to each child window.
-/// </summary>
-/// <param name="hwnd">Window handle.</param>
-public static IList<IntPtr> GetChildHandles(IntPtr hwnd)
+/// &lt;summary&gt;
+///   Get the child windows that belong to the specified parent window by passing the handle to each child window.
+/// &lt;/summary&gt;
+/// &lt;param name="hwnd"&gt;Window handle.&lt;/param&gt;
+public static IList&lt;IntPtr&gt; GetChildHandles(IntPtr hwnd)
 {
-    var handles = new List<IntPtr>();
-    var gcHandles = GCHandle.Alloc(handles);
+  var handles = new List&lt;IntPtr&gt;();
+  var gcHandles = GCHandle.Alloc(handles);
 
-    try
-    {
-        var callbackPointer = new User32.EnumWindowsProc(EnumWindowCallback);
-        User32.EnumChildWindows(hwnd, callbackPointer, GCHandle.ToIntPtr(gcHandles));
-    }
-    finally
-    {
-        gcHandles.Free();
-    }
+  try
+  {
+    var callbackPointer = new User32.EnumWindowsProc(EnumWindowCallback);
+    User32.EnumChildWindows(hwnd, callbackPointer, GCHandle.ToIntPtr(gcHandles));
+  }
+  finally
+  {
+    gcHandles.Free();
+  }
 
-    return handles;
+  return handles;
 }
 
 private static bool EnumWindowCallback(IntPtr hwnd, IntPtr lParam)
 {
-    var target = GCHandle.FromIntPtr(lParam).Target as List<IntPtr>;
-    if (target is null) return false;
+  var target = GCHandle.FromIntPtr(lParam).Target as List&lt;IntPtr&gt;;
+  if (target is null) return false;
 
-    target.Add(hwnd);
-    return true;
+  target.Add(hwnd);
+  return true;
 }
-
+</code></pre>
 
 User32:
 
-/// <summary>
-///     An application-defined callback function used with the EnumChildWindows function. It receives the child window handles. The WNDENUMPROC type defines a pointer to this callback function. EnumChildProc is a placeholder for the application-defined function name.
-/// </summary>
+<pre><code class="language-csharp">
+/// &lt;summary&gt;
+///   An application-defined callback function used with the EnumChildWindows function. It receives the child window handles. The WNDENUMPROC type defines a pointer to this callback function. EnumChildProc is a placeholder for the application-defined function name.
+/// &lt;/summary&gt;
 public delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
 
-/// <summary>
-///     Enumerates the child windows that belong to the specified parent window by passing the handle to each child window, in turn, to an application-defined callback function. EnumChildWindows continues until the last child window is enumerated or the callback function returns FALSE.
-/// </summary>
-/// <param name="hwnd">The window that you want to get information about.</param>
-/// <param name="func">A pointer to an application-defined callback function</param>
-/// <param name="lParam">An application-defined value to be passed to the callback function.</param>
-/// <returns></returns>
+/// &lt;summary&gt;
+///   Enumerates the child windows that belong to the specified parent window by passing the handle to each child window, in turn, to an application-defined callback function. EnumChildWindows continues until the last child window is enumerated or the callback function returns FALSE.
+/// &lt;/summary&gt;
+/// &lt;param name="hwnd"&gt;The window that you want to get information about.&lt;/param&gt;
+/// &lt;param name="func"&gt;A pointer to an application-defined callback function&lt;/param&gt;
+/// &lt;param name="lParam"&gt;An application-defined value to be passed to the callback function.&lt;/param&gt;
+/// &lt;returns&gt;&lt;/returns&gt;
 [DllImport(Libraries.User32)]
 public static extern bool EnumChildWindows(IntPtr hwnd, EnumWindowsProc func, IntPtr lParam);
+</code></pre>
 
 I've also disabled edge rounding for Windows 11.
 The used methods can be found in the WPF UI repository.
@@ -306,7 +301,9 @@ Many thanks to Roman for researching and sharing this helpful solution!
 
 ####<a name="3"></a> Changing Level of Piping Elements
 
-:[Evan Geer](https://evangeer.github.io/) shared
+evangeer.com
+
+[Evan Geer](https://evangeer.github.io/) shared
 a nice example for changing the level for selected piping elements in his answer
 to [transferring elements from one level to another while maintaining their position in space](https://forums.autodesk.com/t5/revit-api-forum/transferring-elements-from-one-level-to-another-while/m-p/12664814)
 
@@ -323,74 +320,59 @@ https://thebuildingcoder.typepad.com/blog/2017/01/virtues-of-reproduction-resear
 
 Possibly, some elements cannot simply be moved to an different level, but need to be recreated from scratch based on the new level.
 
-Jeremy Tammik,  Developer Advocacy and Support, The Building Coder, Autodesk Developer Network, ADN Open
-Tags (0)
-Add tags
-Report
-MESSAGE 3 OF 5
+
 EvanGeer
-  Participant EvanGeer  in reply to: 2lenin-off
 2024-03-25 02:16 PM
 
 There is an older post showing how to do something similar here: https://forums.autodesk.com/t5/revit-api-forum/change-the-level-of-an-element/td-p/3707640
 
 Here is an example command that will change the level of the selected elements. Note that you will need to determine which parameter you want to change for different types of elements, and as @jeremy_tammik  noted, you may not be able to change the level of some elements. The example below is changing the level for selected piping elements.
 
-
-
+<pre><code class="language-csharp">
 public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
 {
-    var doc = commandData.Application.ActiveUIDocument.Document;
-    var selectedIds = commandData.Application.ActiveUIDocument.Selection.GetElementIds();
+  var doc = commandData.Application.ActiveUIDocument.Document;
+  var selectedIds = commandData.Application.ActiveUIDocument.Selection.GetElementIds();
 
-    var selectedElements = selectedIds.Select(x => doc.GetElement(x)).ToList();
+  var selectedElements = selectedIds.Select(x =&gt; doc.GetElement(x)).ToList();
 
-    var newLevelName = "L2";
-    var newLevel = new FilteredElementCollector(doc)
-        .OfClass(typeof(Level))
-        .FirstOrDefault(x => x.Name == newLevelName) as Level;
+  var newLevelName = "L2";
+  var newLevel = new FilteredElementCollector(doc)
+    .OfClass(typeof(Level))
+    .FirstOrDefault(x =&gt; x.Name == newLevelName) as Level;
 
-    var levelHostedElements = selectedElements
-        .Where(x => x.LevelId != null && x.LevelId != ElementId.InvalidElementId)
-        .ToList();
+  var levelHostedElements = selectedElements
+    .Where(x =&gt; x.LevelId != null && x.LevelId != ElementId.InvalidElementId)
+    .ToList();
 
-    using (var t = new Transaction(doc, "update level"))
+  using (var t = new Transaction(doc, "update level"))
+  {
+    t.Start();
+    foreach (var element in levelHostedElements)
     {
-        t.Start();
-        foreach (var element in levelHostedElements)
-        {
-            // NOTE: you will need to select the correct parameter for the element type you are targeting
-            var levelParameter = element.get_Parameter(BuiltInParameter.RBS_START_LEVEL_PARAM);
-            if (levelParameter?.HasValue == true /*&& offsetParameter?.HasValue == true*/)
-            {
-                var oldLevel = doc.GetElement(levelParameter.AsElementId()) as Level;
+      // NOTE: you will need to select the correct parameter for the element type you are targeting
+      var levelParameter = element.get_Parameter(BuiltInParameter.RBS_START_LEVEL_PARAM);
+      if (levelParameter?.HasValue == true /*&& offsetParameter?.HasValue == true*/)
+      {
+        var oldLevel = doc.GetElement(levelParameter.AsElementId()) as Level;
 
-                levelParameter.Set(newLevel.Id);
-            }
-        }
-        t.Commit();
+        levelParameter.Set(newLevel.Id);
+      }
     }
-    return Result.Succeeded;
+    t.Commit();
+  }
+  return Result.Succeeded;
 }
-
-
+</code></pre>
 
 Evan Geer
-evangeer.com
-Tags (0)
-Add tags
-Report
-MESSAGE 4 OF 5
+
+
 2lenin-off
-  Observer 2lenin-off  in reply to: EvanGeer
 2024-03-26 06:18 AM
 Thanks for the answer, although this is not exactly what I wanted. I wanted to select a level (in dialog window) and transfer all elements from it to the transit level. Elements that were not transferred - display in the dialog box
-Tags (0)
-Add tags
-Report
-MESSAGE 5 OF 5
+
 EvanGeer
-  Participant EvanGeer  in reply to: 2lenin-off
 2024-03-26 07:42 AM
 
 I believe this approach would work, you would just need some handling for parameter/element type match up. This seems like a perfect match for an abstract factory pattern or something similar. You might also save some time using the Revit Lookup tools to identify which parameters match to which types.
@@ -399,10 +381,11 @@ It's not ideal, but I do not think that there is a universal solution to changin
 
 Regarding handling moving everything on a given level, that can be accomplished with some changes to my example. Where I have hard-code the level name var newLevelName = "L2"; you could easily replace that with a UI allowing users to select the destination level. Similarly, you could add a UI to allow the user to select a source level, and supply that id to this block of code:
 
-    var levelHostedElements = selectedElements
-        .Where(x => x.LevelId == sourceLevel.Id)
-        .ToList();
-
+<pre><code class="language-csharp">
+  var levelHostedElements = selectedElements
+    .Where(x =&gt; x.LevelId == sourceLevel.Id)
+    .ToList();
+</code></pre>
 
 Do you also need help with selection and UI components?
 Evan Geer
