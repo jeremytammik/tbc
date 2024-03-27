@@ -45,12 +45,14 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Change Pipe Level and Suppress PreviewControl Border
 
-
+- [Suppressing the `PreviewControl` border](#2)
+- [Changing the level of piping elements](#3)
 
 ####<a name="2"></a> Suppressing the PreviewControl Border
 
-
-[PreviewControl border](https://forums.autodesk.com/t5/revit-api-forum/previewcontrol-border/td-p/12570113)
+Roman [@Nice3point](https://t.me/nice3point) Karpovich, aka Роман Карпович,
+raised and solved the question of how to suppress the unwanted
+[PreviewControl border](https://forums.autodesk.com/t5/revit-api-forum/previewcontrol-border/td-p/12570113):
 
 **Question:**
 Is it possible to disable the PreviewControl border ? This border comes from the Win32 window. Setting User32.WindowStyles by Hwnd handle does not give any results. Except WS_CHILD and similar, no other styles are applied. Is this border added by Revit development team or is it a HwndHost issue ?
@@ -385,13 +387,13 @@ UnsafeNativeMethods.RemoveWindowCaption(handle); where handle is hwndHost
 https://github.com/lepoco/wpfui/blob/development/src/Wpf.Ui/Interop/UnsafeNativeMethods.cs#L468
 
 
-
 Many thanks to ?? for creating and sharing this helpful tool!
 
 ####<a name="3"></a> Changing Level of Piping Elements
 
-
-[Transferring elements from one level to another while maintaining their position in space](https://forums.autodesk.com/t5/revit-api-forum/transferring-elements-from-one-level-to-another-while/m-p/12664814)
+:[Evan Geer](https://evangeer.github.io/) shared
+a nice example for changing the level for selected piping elements in his answer
+to [transferring elements from one level to another while maintaining their position in space](https://forums.autodesk.com/t5/revit-api-forum/transferring-elements-from-one-level-to-another-while/m-p/12664814)
 
 **Question:**
 How to move selected elements to another level while maintaining their position in space?
