@@ -20,6 +20,10 @@
   https://forums.autodesk.com/t5/revit-api-forum/previewcontrol-border/td-p/12570113
   /Users/jta/a/doc/revit/tbc/git/a/img/preview_border_hide.png
 
+- spy on the preview control
+  PreviewControl border
+  https://forums.autodesk.com/t5/revit-api-forum/previewcontrol-border/m-p/12612782#M77175
+
 - change level of piping elements
   https://forums.autodesk.com/t5/revit-api-forum/transferring-elements-from-one-level-to-another-while/m-p/12664814#M77745
 
