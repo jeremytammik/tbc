@@ -57,7 +57,15 @@ Many thanks to ?? for creating and sharing this helpful tool!
 **Question:**
 
 <center>
-<img src="img/.png" alt="" title="" width="100"/> <!-- Pixel Height: 622 Pixel Width: 1,152 -->
+<img src="img/preview_border_hide_1.png" alt="PreviewControl border" title="PreviewControl border" width="400"/> <!-- Pixel Height: 592 Pixel Width: 523 -->
+</center>
+
+<center>
+<img src="img/preview_border_hide_2.png" alt="PreviewControl border" title="PreviewControl border" width="400"/> <!-- Pixel Height: 790 Pixel Width: 466 -->
+</center>
+
+<center>
+<img src="img/preview_border_hide_3.png" alt="PreviewControl border suppressed" title="PreviewControl border suppressed" width="400"/> <!-- Pixel Height: 852 Pixel Width: 525 -->
 </center>
 
 
