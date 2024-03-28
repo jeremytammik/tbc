@@ -49,10 +49,10 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Change Pipe Level and Suppress PreviewControl Border
 
-- [Suppressing the `PreviewControl` border](#2)
+- [Spying to suppress the `PreviewControl` border](#2)
 - [Changing the level of piping elements](#3)
 
-####<a name="2"></a> Suppressing the PreviewControl Border
+####<a name="2"></a> Spying to Suppress the PreviewControl Border
 
 Roman [@Nice3point](https://t.me/nice3point) Karpovich, aka Роман Карпович,
 raised and solved the question of how to suppress the unwanted
