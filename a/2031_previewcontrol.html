@@ -1,6 +1,6 @@
-<head>
+<p><head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<link rel="stylesheet" type="text/css" href="bc.css">
+<link rel="stylesheet" type="text/css" href="bc.css"></p>
 <!-- https://highlightjs.org/#usage
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
@@ -8,12 +8,11 @@
 -->
 
 <!-- https://prismjs.com -->
-<link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css" rel="stylesheet" />
+<p><link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css" rel="stylesheet" /></p>
 <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
 <style> code[class*=language-], pre[class*=language-] { font-size : 90%; } </style>
-</head>
-
+<p></head></p>
 <!---
 
 - PreviewControl border
@@ -47,48 +46,37 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Change Pipe Level and Suppress PreviewControl Border
-
-Picking up two illuminating conversations from
-the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160):
-
-- [Spying to suppress the `PreviewControl` border](#2)
-- [Changing the level of piping elements](#3)
-
-####<a name="2"></a> Spying to Suppress the PreviewControl Border
-
-Roman [@Nice3point](https://t.me/nice3point) Karpovich, aka Роман Карпович,
+<h3>Change Pipe Level and Suppress PreviewControl Border</h3>
+<p>Picking up two illuminating conversations from
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a>:</p>
+<ul>
+<li><a href="#2">Spying to suppress the <code>PreviewControl</code> border</a></li>
+<li><a href="#3">Changing the level of piping elements</a></li>
+</ul>
+<h4><a name="2"></a> Spying to Suppress the PreviewControl Border</h4>
+<p>Roman <a href="https://t.me/nice3point">@Nice3point</a> Karpovich, aka Роман Карпович,
 raised and solved the question of how to suppress the unwanted
-[PreviewControl border](https://forums.autodesk.com/t5/revit-api-forum/previewcontrol-border/td-p/12570113):
-
-**Question:**
-Is it possible to disable the PreviewControl border ? This border comes from the Win32 window. Setting User32.WindowStyles by Hwnd handle does not give any results. Except WS_CHILD and similar, no other styles are applied. Is this border added by Revit development team or is it a HwndHost issue ?
-
-<center>
+<a href="https://forums.autodesk.com/t5/revit-api-forum/previewcontrol-border/td-p/12570113">PreviewControl border</a>:</p>
+<p><strong>Question:</strong>
+Is it possible to disable the PreviewControl border ? This border comes from the Win32 window. Setting User32.WindowStyles by Hwnd handle does not give any results. Except WS_CHILD and similar, no other styles are applied. Is this border added by Revit development team or is it a HwndHost issue ?</p>
+<p><center>
 <img src="img/preview_border_hide_1.png" alt="PreviewControl border" title="PreviewControl border" width="300"/> <!-- Pixel Height: 592 Pixel Width: 523 -->
-</center>
-
-**Answer:**
-The only way I could do it when I used it, was to set the Grid margin to -4, but this only works if the grid is set entirely to the window.
-
-**Response:**
-That is not a solution; the negative margin just covers other content.
-
-**Answer:**
-I don't like the negative margin either, but it was the only way to hide the border. And for it to work, the container (Grid) must cover the entire window.
-
-**Answer B:**
+</center></p>
+<p><strong>Answer:</strong>
+The only way I could do it when I used it, was to set the Grid margin to -4, but this only works if the grid is set entirely to the window.</p>
+<p><strong>Response:</strong>
+That is not a solution; the negative margin just covers other content.</p>
+<p><strong>Answer:</strong>
+I don't like the negative margin either, but it was the only way to hide the border. And for it to work, the container (Grid) must cover the entire window.</p>
+<p><strong>Answer B:</strong>
 You can use Spy++ to determine the window structure and use WinAPI to remove the borders and some WPF magic to trigger the repaint.
 It took me hours of experimenting, but it is doable.
-If I recall correctly, there are multiple levels of controls and you have to figure out which ones carry the borders.
-
-I am off for a while and have no access to the code, but don’t feel discouraged if it doesn’t work the first time.
+If I recall correctly, there are multiple levels of controls and you have to figure out which ones carry the borders.</p>
+<p>I am off for a while and have no access to the code, but don’t feel discouraged if it doesn’t work the first time.
 It was really painful to solve this and I wish Autodesk would just remove the borders in an upcoming release.
-It is hard to make software look good if the underlying API takes you back to the nineties ;-).
-
-I can post some code for you to fill the gaps.
-The important snippet (to be called after `previewControl.Loaded` AND `previewControl.IsVisibleChanged`) is the following:
-
+It is hard to make software look good if the underlying API takes you back to the nineties ;-).</p>
+<p>I can post some code for you to fill the gaps.
+The important snippet (to be called after <code>previewControl.Loaded</code> AND <code>previewControl.IsVisibleChanged</code>) is the following:</p>
 <pre><code class="language-csharp">
 // get preview window host
 var previewWndHost = previewControl.Content;
@@ -120,14 +108,12 @@ if (previewControl.Tag is System.Windows.Thickness t)
 }
 </code></pre>
 
-The `IsVisibleChanged` handler is required for use in tab controls, since Revit seems to re-create the view in case of visibility changes.
+<p>The <code>IsVisibleChanged</code> handler is required for use in tab controls, since Revit seems to re-create the view in case of visibility changes.
 I misused the tag to save the previous state and avoid shrinking/growing of the control due to the padding-changes at "reentry".
 If you find a better solution to trigger the redraw, please let me know.
-This part is pretty hacky, but I had to move on at some point and got stuck with whatever did the job.
-
-I also use some WinAPI functions which can be easily imported (google, pinvoke).
-The HwndHelpers function is just syntactic sugar around EnumChildWindows.
-
+This part is pretty hacky, but I had to move on at some point and got stuck with whatever did the job.</p>
+<p>I also use some WinAPI functions which can be easily imported (google, pinvoke).
+The HwndHelpers function is just syntactic sugar around EnumChildWindows.</p>
 <pre><code class="language-csharp">
 public static IList&lt;IntPtr&gt; GetAllChildHandles(IntPtr hwnd)
 {
@@ -153,26 +139,20 @@ public static IList&lt;IntPtr&gt; GetAllChildHandles(IntPtr hwnd)
 }
 </code></pre>
 
-**Response:**
+<p><strong>Response:</strong>
 Amazing.
 I completely forgot about the Child when writing similar code.
 Now all borders are gone.
-In addition, I have solved the redrawing problem, for which you used Padding (it was not working correctly).
-
-Before:
-
-<center>
+In addition, I have solved the redrawing problem, for which you used Padding (it was not working correctly).</p>
+<p>Before:</p>
+<p><center>
 <img src="img/preview_border_hide_2.png" alt="PreviewControl border" title="PreviewControl border" width="200"/> <!-- Pixel Height: 790 Pixel Width: 466 -->
-</center>
-
-After:
-
-<center>
+</center></p>
+<p>After:</p>
+<p><center>
 <img src="img/preview_border_hide_3.png" alt="PreviewControl border suppressed" title="PreviewControl border suppressed" width="200"/> <!-- Pixel Height: 852 Pixel Width: 525 -->
-</center>
-
-Solution:
-
+</center></p>
+<p>Solution:</p>
 <pre><code class="language-csharp">
 public void Initialize()
 {
@@ -199,8 +179,7 @@ private void RemovePreviewControlStyles(object sender, EventArgs args)
 }
 </code></pre>
 
-UnsafeNativeMethods:
-
+<p>UnsafeNativeMethods:</p>
 <pre><code class="language-csharp">
 /// &lt;summary&gt;
 /// Tries to remove styles from selected window handle.
@@ -260,8 +239,7 @@ private static bool EnumWindowCallback(IntPtr hwnd, IntPtr lParam)
 }
 </code></pre>
 
-User32:
-
+<p>User32:</p>
 <pre><code class="language-csharp">
 /// &lt;summary&gt;
 /// An application-defined callback function used with the EnumChildWindows function.
@@ -285,52 +263,40 @@ public delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
 public static extern bool EnumChildWindows(IntPtr hwnd, EnumWindowsProc func, IntPtr lParam);
 </code></pre>
 
-I've also disabled edge rounding for Windows 11.
-The methods used can be found in the WPF UI repository:
-
-- [User32](https://github.com/lepoco/wpfui/blob/development/src/Wpf.Ui/Interop/User32.cs)
-- [UnsafeNativeMethods](https://github.com/lepoco/wpfui/blob/development/src/Wpf.Ui/Interop/UnsafeNativeMethods.cs)
-
-So, problem solved; I think it will be useful to share this on the blog.
+<p>I've also disabled edge rounding for Windows 11.
+The methods used can be found in the WPF UI repository:</p>
+<ul>
+<li><a href="https://github.com/lepoco/wpfui/blob/development/src/Wpf.Ui/Interop/User32.cs">User32</a></li>
+<li><a href="https://github.com/lepoco/wpfui/blob/development/src/Wpf.Ui/Interop/UnsafeNativeMethods.cs">UnsafeNativeMethods</a></li>
+</ul>
+<p>So, problem solved; I think it will be useful to share this on the blog.
 However, I would like to ask the Revit development team to turn this off by default,
-as it is easier for users to configure the control themselves than to mess with Win API and native code.
-
-The lines to get me rid of the padding-trick are
-
-- UnsafeNativeMethods.RemoveWindowCaption(handle);
-
-where handle is `hwndHost`,
-cf. [UnsafeNativeMethods.cs line 468](https://github.com/lepoco/wpfui/blob/development/src/Wpf.Ui/Interop/UnsafeNativeMethods.cs#L468).
-
-Many thanks to Roman for researching and sharing this helpful solution!
-
-####<a name="3"></a> Changing Level of Piping Elements
-
-evangeer.com
-
-[Evan Geer](https://evangeer.com/)) shared
+as it is easier for users to configure the control themselves than to mess with Win API and native code.</p>
+<p>The lines to get me rid of the padding-trick are</p>
+<ul>
+<li>UnsafeNativeMethods.RemoveWindowCaption(handle);</li>
+</ul>
+<p>where handle is <code>hwndHost</code>,
+cf. <a href="https://github.com/lepoco/wpfui/blob/development/src/Wpf.Ui/Interop/UnsafeNativeMethods.cs#L468">UnsafeNativeMethods.cs line 468</a>.</p>
+<p>Many thanks to Roman for researching and sharing this helpful solution!</p>
+<h4><a name="3"></a> Changing Level of Piping Elements</h4>
+<p>evangeer.com</p>
+<p><a href="https://evangeer.com/">Evan Geer</a>) shared
 a nice example for changing the level for selected piping elements in his answer
-to [transferring elements from one level to another while maintaining their position in space](https://forums.autodesk.com/t5/revit-api-forum/transferring-elements-from-one-level-to-another-while/m-p/12664814)
-
-**Question:**
-How to move selected elements to another level while maintaining their position in space?
-
-**Answer:**
+to <a href="https://forums.autodesk.com/t5/revit-api-forum/transferring-elements-from-one-level-to-another-while/m-p/12664814">transferring elements from one level to another while maintaining their position in space</a></p>
+<p><strong>Question:</strong>
+How to move selected elements to another level while maintaining their position in space?</p>
+<p><strong>Answer:</strong>
 Can you achieve what you want manually in the end user interface?
 If so, that is a good start.
 If not, it would be good to check that first, determine the optimal workflow and best practices, cf.
-the [standard approach to address a Revit API programming task](https://thebuildingcoder.typepad.com/blog/2017/01/virtues-of-reproduction-research-mep-settings-ontology.html#3).
-
-Possibly, some elements cannot simply be moved to an different level, but need to be recreated from scratch based on the new level.
-
-There is an older post showing how to do something similar here:
-
-https://forums.autodesk.com/t5/revit-api-forum/change-the-level-of-an-element/td-p/3707640
-
-Here is an example command that will change the level of the selected elements.
+the <a href="https://thebuildingcoder.typepad.com/blog/2017/01/virtues-of-reproduction-research-mep-settings-ontology.html#3">standard approach to address a Revit API programming task</a>.</p>
+<p>Possibly, some elements cannot simply be moved to an different level, but need to be recreated from scratch based on the new level.</p>
+<p>There is an older post showing how to do something similar here:</p>
+<p>https://forums.autodesk.com/t5/revit-api-forum/change-the-level-of-an-element/td-p/3707640</p>
+<p>Here is an example command that will change the level of the selected elements.
 Note that you will need to determine which parameter you want to change for different types of elements, and as noted above, you may not be able to change the level of some elements.
-This example changes the level for selected piping elements:
-
+This example changes the level for selected piping elements:</p>
 <pre><code class="language-csharp">
 public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
 {
@@ -368,22 +334,19 @@ public Result Execute(ExternalCommandData commandData, ref string message, Eleme
 }
 </code></pre>
 
-In order to select a level interactively, transfer all elements from it to the target level, and list elements that were not transferred in a dialog box,
+<p>In order to select a level interactively, transfer all elements from it to the target level, and list elements that were not transferred in a dialog box,
 you just need some handling for parameters and element type match-up.
 This seems like a perfect match for an abstract factory pattern or something similar.
-You might also save some time using the RevitLookup tools to identify which parameters match to which types.
-
-It's not ideal, but I do not think that there is a universal solution to changing the level of an element.
+You might also save some time using the RevitLookup tools to identify which parameters match to which types.</p>
+<p>It's not ideal, but I do not think that there is a universal solution to changing the level of an element.
 As far as I understand, the reason for this is that different elements are hosted by and associated with levels in different ways.
-So, Revit's engine under the hood is doing different things to make that work, and the options we have exposed to us in the API therefore differ by type.
-
-Regarding handling moving everything on a given level, that can be accomplished with some changes to my example.
-Where I have hard-code the level name in `newLevelName`, set to "L2"; you could easily replace that with a UI allowing users to select the destination level. Similarly, you could add a UI to allow the user to select a source level, and supply that id to this block of code:
-
+So, Revit's engine under the hood is doing different things to make that work, and the options we have exposed to us in the API therefore differ by type.</p>
+<p>Regarding handling moving everything on a given level, that can be accomplished with some changes to my example.
+Where I have hard-code the level name in <code>newLevelName</code>, set to "L2"; you could easily replace that with a UI allowing users to select the destination level. Similarly, you could add a UI to allow the user to select a source level, and supply that id to this block of code:</p>
 <pre><code class="language-csharp">
   var levelHostedElements = selectedElements
     .Where(x =&gt; x.LevelId == sourceLevel.Id)
     .ToList();
 </code></pre>
 
-Many thanks to Evan for the nice sample code and thorough explanation!
+<p>Many thanks to Evan for the nice sample code and thorough explanation!</p>
