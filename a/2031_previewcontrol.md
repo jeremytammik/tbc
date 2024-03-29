@@ -33,8 +33,9 @@ twitter:
 
 &ndash; ...
 
-linkedin:
+Picking up two illuminating conversations from the Revit API discussion forum, we look at spying to suppress the <code>PreviewControl</code> border and changing the level of piping elements...
 
+linkedin:
 
 #BIM #DynamoBIM #AutodeskAPS #Revit #API #IFC #SDK #Autodesk #AEC #adsk
 
@@ -47,7 +48,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Change Pipe Level and Suppress PreviewControl Border
+### Change Pipe Level and PreviewControl Border
 
 Picking up two illuminating conversations from
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160):
@@ -305,8 +306,6 @@ cf. [UnsafeNativeMethods.cs line 468](https://github.com/lepoco/wpfui/blob/devel
 Many thanks to Roman for researching and sharing this helpful solution!
 
 ####<a name="3"></a> Changing Level of Piping Elements
-
-evangeer.com
 
 [Evan Geer](https://evangeer.com/)) shared
 a nice example for changing the level for selected piping elements in his answer
