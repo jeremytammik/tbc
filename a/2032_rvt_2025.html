@@ -107,7 +107,7 @@ the <a href="https://github.com/jeremytammik/RevitLookup/issues/210">RevitLookup
 The main point is made
 by Roman <a href="https://t.me/nice3point">@Nice3point</a> Karpovich, aka Роман Карпович:</p>
 <blockquote>
-<p>You can support different versions like this. <code>&amp;lt;</code> its a <code>&lt;</code> symbol in XML:</p>
+<p>You can support different versions like this; <code>&amp;lt;</code> represents a <code>&lt;</code> symbol in XML:</p>
 </blockquote>
 <pre><code class="language-xml">&lt;PackageReference Include="Microsoft.Extensions.Hosting" Version="8.*" Condition="$(RevitVersion) == '2025'"/&gt;
 &lt;PackageReference Include="Microsoft.Extensions.Hosting" Version="7.*" Condition="$(RevitVersion) != '' And $(RevitVersion) &lt; '2025'"/&gt;
@@ -161,7 +161,7 @@ a <a href="https://forums.autodesk.com/t5/revit-api-forum/revit-developer-starte
 <p>For full details, please refer to the <a href="https://github.com/jeremytammik/RevitLookup/discussions/209">Revit developer starter discussion page</a>.</p>
 <p>Thanks for this as well, Roman!</p>
 <h4><a name="6"></a> Revit 2025 Macros with Visual Studio 2022</h4>
-<p>In case you rpefer working with macros instead of a full-fledged add-in,
+<p>In case you prefer working with macros instead of a full-fledged add-in,
 Luiz Henrique <a href="https://ricaun.com/">@ricaun</a> Cassettari shared a solution enabling the use of Visual Studio 2022 for Macros in Revit 2025 in
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/revit-2025-macro-manager-and-visual-studio-2022/td-p/12687232">Revit 2025 Macro Manager and Visual Studio 2022</a>.</p>
