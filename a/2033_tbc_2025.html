@@ -59,7 +59,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 <li>Parallels Desktop 19.3.0</li>
 <li>Visual Studio 2022 17.9.5</li>
 </ul>
-<p>Next, I recompiled The Building Coder samples for Revit 2024 and eliminated all remaining deprecated API useage to ensure zero errors and zero warnings, creating a final
+<p>Next, I recompiled The Building Coder samples for Revit 2024 and eliminated all remaining deprecated API usage to ensure zero errors and zero warnings, creating a final
 <a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2024.0.153.1">release 2024.0.153.1</a> for that.</p>
 <h4><a name="3"></a> .NET Upgrade Assistant</h4>
 <p>I used the <a href="https://learn.microsoft.com/en-us/dotnet/core/porting/upgrade-assistant-overview">.NET Upgrade Assistant</a> to move from the .NET Framework 4.8 to .NET Core 8:</p>
@@ -94,15 +94,15 @@ produced <a href="doc/tbc_samples_2025_migr_01.txt">12 errors and 2 warnings</a>
 <li>Error CS0104 <code>TaskDialog</code> is an ambiguous reference between <em>System.Windows.Forms.TaskDialog</em> and <em>Autodesk.Revit.UI.TaskDialog</em></li>
 <li>Warning CS8073 The result of the expression is always <code>true</code> since a value of type <code>Guid</code> is never equal to <code>null</code>  in CmdFamilyParamGuid.cs</li>
 </ul>
-<p>The remaining three errors are due to the removal of document-level macros in Revit 2025 and are equally easily eliminated by commenting out the code section causing them:</p>
+<p>The remaining three errors in the module CmdDeleteMacros.cs are due to the removal of document-level macros in Revit 2025 and are equally easily eliminated by commenting out the code section causing them:</p>
 <ul>
-<li>Error CS1503 Argument 1: cannot convert from 'Autodesk.Revit.UI.UIDocument' to 'Autodesk.Revit.UI.UIApplication' BuildingCoder Y:\a\src\rvt\the_building_coder_samples\BuildingCoder\CmdDeleteMacros.cs  43  Active</li>
-<li>Error CS1503 Argument 1: cannot convert from 'Autodesk.Revit.DB.Document' to 'Autodesk.Revit.ApplicationServices.Application'  BuildingCoder Y:\a\src\rvt\the_building_coder_samples\BuildingCoder\CmdDeleteMacros.cs  74  Active</li>
-<li>Error CS1061 <code>MacroModule</code> does not contain a definition for <code>RemoveMacro</code> and no accessible extension method <code>RemoveMacro</code> accepting a first argument of type <code>MacroModule</code> could be found in CmdDeleteMacros.cs</li>
+<li>Error CS1503 Argument 1: cannot convert from 'Autodesk.Revit.UI.UIDocument' to 'Autodesk.Revit.UI.UIApplication'</li>
+<li>Error CS1503 Argument 1: cannot convert from 'Autodesk.Revit.DB.Document' to 'Autodesk.Revit.ApplicationServices.Application'</li>
+<li>Error CS1061 <code>MacroModule</code> does not contain a definition for <code>RemoveMacro</code></li>
 </ul>
 <p>After removing the <code>TaskDialog</code> ambiguity, comparison of Parameter.GUID property with null and support for document-level macros, The Building Coder samples compile for Revit 2025 with zero errors and zero warnings.</p>
 <h4><a name="6"></a> Conclusion</h4>
 <p>Next, I updated BcSamples.txt with the new binary output path <em>/bin/Debug/net8.0-windows</em>.</p>
-<p>I have not tested the result yet, since I am stil in the process of installing the Revit SDK samples and setting up the RvtSamples external application that I use to load both the SDK and The Building Coder samples.</p>
+<p>I have not tested the result yet, since I am still in the process of installing the Revit SDK samples and setting up the RvtSamples external application that I use to load both the SDK and The Building Coder samples.</p>
 <p>Good luck, have fun and much success with your own migrations!</p>
 <p>Stay tuned for further news.</p>
