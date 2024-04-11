@@ -1,0 +1,27 @@
+/Users/jta/a/doc/revit/tbc/git/a/doc/2025_revt_sdk_sample_comparison.txt
+
+cleanup obj and bin:
+  /Users/jta/a/src/rvt/RevitSdkSamples %
+  find . -name obj -type d -exec rm -r {} +
+  find . -name bin -type d -exec rm -r {} +
+
+list all folders:
+  /Users/jta/a/src/rvt/RevitSdkSamples/SDK % find . -type d | grep -v \.git | sort > /Users/jta/a/lib/revit/jeremy/2025_dir_revitsdksamples2024.txt
+  /Users/jta/a/lib/revit/2025 % find . -type d | grep -v \.git | sort > /Users/jta/a/lib/revit/jeremy/2025_dir_list.txt
+  /Users/jta/a/lib/revit/jeremy % diff 2025_dir_revitsdksamples2024.txt 2025_dir_list.txt > 2025_dir_diff.txt
+
+folders only in 2024:
+  /Users/jta/a/lib/revit/jeremy % grep "^<" 2025_dir_diff.txt | sed 's/^< //' > 2025_dir_2024_only.txt
+  manually edited
+  2025_dir_rm_2024_only.sh
+
+list all files:
+  /Users/jta/a/src/rvt/RevitSdkSamples/SDK % find . | grep -v \.git | sort > /Users/jta/a/lib/revit/jeremy/2025_file_revitsdksamples2024.txt
+  /Users/jta/a/lib/revit/2025 % find . | grep -v \.git | sort > /Users/jta/a/lib/revit/jeremy/2025_file_list.txt
+  /Users/jta/a/lib/revit/jeremy % diff 2025_file_revitsdksamples2024.txt 2025_file_list.txt > 2025_file_diff.txt
+
+delete 2024 files not present in 2025:
+  /Users/jta/a/lib/revit/jeremy % grep "^<" 2025_file_diff.txt | sed 's/^< //' > 2025_file_2024_only.txt
+  manually edited
+  2025_file_rm_2024_only.sh
+
