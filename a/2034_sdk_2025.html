@@ -69,8 +69,8 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 </ul>
 <h4><a name="2"></a> RevitLookup HotFix 2025.0.1</h4>
 <p><a href="https://github.com/jeremytammik/RevitLookup/releases/tag/2025.0.1">RevitLookup HotFix 2025.0.1</a> has been released to handle
-the <a href="https://github.com/jeremytammik/RevitLookup/issues/214">fixed search bar crashing Revit (issue 214)</a>.
-This version includes further improvements:</p>
+the <a href="https://github.com/jeremytammik/RevitLookup/issues/214">fixed search bar crashing Revit (issue 214)</a>.</p>
+<p>This version includes further improvements:</p>
 <ul>
 <li>Ref parameter type support</li>
 <li>Add BasePoint.GetSurveyPoint support by @SergeyNefyodov in #212</li>
@@ -93,7 +93,14 @@ This version includes further improvements:</p>
 </blockquote>
 <h4><a name="4"></a> Comparison with Previous SDK</h4>
 <p>I downloaded the new SDK and compared the directory structure and individual files with the Revit 2024 version, noting the following changes:</p>
-<p>Removed:</p>
+<p>Four new SDK samples:</p>
+<ul>
+<li>ContextMenu &ndash; create a customised add-in context menu, <a href="#7">cf. below</a></li>
+<li>DisallowEndWrapping &ndash; allow or disallow end wrapping at certain wall locations</li>
+<li>EditSketch &ndash; edit curves in sketches and add dimensions to the sketch using <code>SketchEditScope</code></li>
+<li>NewMacro &ndash; generate, build end execute a Macro by <code>MacroManager</code></li>
+</ul>
+<p>Folders Removed:</p>
 <ul>
 <li>REX SDK</li>
 <li>Samples/AnalyticalSupportData_Info</li>
@@ -109,10 +116,10 @@ This version includes further improvements:</p>
 <li>Macro Samples/MacroSamples_MEP</li>
 <li>Macro Samples/MacroSamples_RFA</li>
 <li>Macro Samples/MacroSamples_RVT</li>
-<li>Samples/ContextMenu &ndash; create a customised add-in context menu</li>
-<li>Samples/DisallowEndWrapping &ndash; allow or disallow end wrapping at certain wall locations</li>
-<li>Samples/EditSketch &ndash; edit curves in sketches and add dimensions to the sketch using <code>SketchEditScope</code></li>
-<li>Samples/NewMacro &ndash; generate, build end execute a Macro by <code>MacroManager</code></li>
+<li>Samples/ContextMenu</li>
+<li>Samples/DisallowEndWrapping</li>
+<li>Samples/EditSketch</li>
+<li>Samples/NewMacro</li>
 </ul>
 <p>Here are my exact comparison steps and details:</p>
 <ul>
@@ -121,26 +128,31 @@ This version includes further improvements:</p>
 <li><a href="doc/2025_file_diff.txt">File differences</a></li>
 </ul>
 <h4><a name="5"></a> Integration into RevitSdkSamples</h4>
-<p>Before making any changes to my local installation of the</p>
-<p>In order to preserve the <a href="https://github.com/jeremytammik/RevitSdkSamples">RevitSdkSamples</a> Git history from the previous version to the Revit 2025 SDK as much as possible, I integrated the new SDK into RevitSdkSamples in two steps, based on the differences detected in the steps described above:</p>
+<p>Before making any changes to my local installation of the SDK samples, I prefer to integrate it into
+the <a href="https://github.com/jeremytammik/RevitSdkSamples">RevitSdkSamples GitHub repository</a> to track and share my modifications.</p>
+<p>In order to preserve as much as possible of the Git history from the previous version to the new SDK release, instead of just deleting and overwriting everything, I integrated the new SDK into RevitSdkSamples in two steps, based on the differences detected in the steps described above:</p>
 <ul>
 <li>Delete from RevitSdkSamples all obsolete files that no longer occur in the Revit 2025 SDK</li>
 <li>Copy the Revit 2025 SDK into RevitSdkSamples, overwriting existing files</li>
 </ul>
-<p>The result is captured in <a href="https://github.com/jeremytammik/RevitSdkSamples/releases/tag/2025.0.0">RevitSdkSamples release 2025.0.0</a>.</p>
+<p>The result is captured
+in <a href="https://github.com/jeremytammik/RevitSdkSamples/releases/tag/2025.0.0">RevitSdkSamples release 2025.0.0</a>.</p>
 <h4><a name="6"></a> Compiling the Revit 2025 SDK Samples</h4>
 <p>My first attempt to rebuild the solution <a href="doc/sdk_samples_2025_01.txt">skipped all 201 solutions</a>.</p>
 <p>I searched for an explanation and looked
 at <a href="https://stackoverflow.com/questions/1319772/how-to-determine-why-visual-studio-might-be-skipping-projects-when-building-a-so">how to determine why Visual Studio might be skipping projects when building a solution</a>.</p>
 <p>I ended up selecting the build target <code>x64</code> in the Configuration Manager to match the targets listed for each one of the individual solutions.</p>
-<p><center>
-<img src="img/sdk_2025_vs_config_mgr.png" alt="Configuration Manager build target" title="Configuration Manager build target" width="100"/> <!-- Pixel Height: 678 Pixel Width: 848 --></p>
+<!--
+<center>
+<img src="img/sdk_2025_vs_config_mgr.png" alt="Configuration Manager build target" title="Configuration Manager build target" width="300"/>
 <p style="font-size: 80%; font-style:italic">Configuration Manager build target</p>
-<p></center></p>
+</center>
+-->
+
 <p>With that setting in place, it reported 'Rebuild started at 9:09 AM...' and did not skip the projects, but it did not seem to do anything else either except endlessly consume more and more memory until
 I <a href="doc/sdk_samples_2025_02.txt">canceled the build after more than 15 minutes</a>:</p>
 <p><center>
-<img src="img/sdk_2025_vs_memory.png" alt="Visual Studio memory consumption growing" title="Visual Studio memory consumption growing" width="100"/> <!-- Pixel Height: 678 Pixel Width: 848 --></p>
+<img src="img/sdk_2025_vs_memory.png" alt="Visual Studio memory consumption growing" title="Visual Studio memory consumption growing" width="600"/> <!-- Pixel Height: 678 Pixel Width: 848 --></p>
 <p style="font-size: 80%; font-style:italic">Visual Studio memory consumption growing</p>
 <p></center></p>
 <p>Next, I removed the <code>.vs</code> folder and changed the build output verbosity to detailed in Visual Studio &gt; Tools &gt; Options &gt; Projects and Solutions &gt; Build and Run.</p>
@@ -186,27 +198,29 @@ Copy always means just what it says, and there’s never a good reason for that.
 There is another option to "Copy if newer" instead of “Copy always”.</p>
 </blockquote>
 <p>In the newer SDK-style projects, go to the <code>.csproj</code> file and look for</p>
-<pre><code class="language-xml">
-&lt;CopyToOutputDirectory&gt;Always&lt;/CopyToOutputDirectory&gt;
+<pre><code class="language-xml">&lt;CopyToOutputDirectory&gt;Always&lt;/CopyToOutputDirectory&gt;
 </code></pre>
 
 <p>Change that to</p>
-<pre><code class="language-xml">
-&lt;CopyToOutputDirectory&gt;PreserveNewest&lt;/CopyToOutputDirectory&gt;
+<pre><code class="language-xml">&lt;CopyToOutputDirectory&gt;PreserveNewest&lt;/CopyToOutputDirectory&gt;
 </code></pre>
 
 <p>I found and fixed that setting in six project: CloudAPISample, DockableDialogs, FreeFormElement, GetSetDefaultTypes, InCanvasControlAPI and SinePlotter.</p>
 <p>Recompiling again from scratch resulted in <a href="doc/sdk_samples_2025_06.txt">181 succeeded, 20 failed, 23 errors, 5 warnings, in 1 hour and 26 minutes</a>.</p>
-<p>Definitely not something I want to repeat on a daily basis.</p>
+<p>Definitely not something I want to repeat on a daily basis.
+Maybe my virtual machine running Windows in Parallels on a Mac is solwing things down?</p>
+<p>My current SDK installation is captured
+in <a href="https://github.com/jeremytammik/RevitSdkSamples/releases/tag/2025.0.1">RevitSdkSamples release 2025.0.1</a>.</p>
 <h4><a name="7"></a> Custom Add-In Context Menu</h4>
 <p>As hinted at by the new <code>ContextMenu</code> SDK sample mentioned above, the Revit API 2025 enables an add-in to create a custom right-click context menu:</p>
 <blockquote>
 <p>This sample demonstrates how to create customized context menu for Add-In and how to create different types of menu items: <code>CommandMenuItem</code>, <code>SeparatorItem</code>, <code>SubMenuItem</code>.</p>
 </blockquote>
-<p>Ricaun shares his take on that functionality in
+<p><a href="https://ricaun.com/">Ricaun</a>, aka Luiz Henrique Cassettari, shares his take on that functionality in
 his <a href="https://gist.github.com/ricaun/ffb897b9ba5b152992cfe20ca6bcfa16">ContextMenuExtension gist</a> and
 a nine-minute video
 on <a href="https://youtu.be/1hqGWeYjUcU">Revit API 2025 RegisterContextMenu</a>:</p>
 <p><center></p>
 <iframe width="480" height="270" src="https://www.youtube.com/embed/1hqGWeYjUcU?si=92qAe9HEPDd4Kr_X" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 <p></center></p>
+<p>Thank you very much, Luiz!</p>
