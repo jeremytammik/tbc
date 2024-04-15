@@ -150,7 +150,7 @@ at <a href="https://stackoverflow.com/questions/1319772/how-to-determine-why-vis
 -->
 
 <p>With that setting in place, it reported 'Rebuild started at 9:09 AM...' and did not skip the projects, but it did not seem to do anything else either except endlessly consume more and more memory until
-I <a href="doc/sdk_samples_2025_02.txt">canceled the build after more than 15 minutes</a>:</p>
+I <a href="doc/sdk_samples_2025_02.txt">cancelled the build after more than 15 minutes</a>:</p>
 <p><center>
 <img src="img/sdk_2025_vs_memory.png" alt="Visual Studio memory consumption growing" title="Visual Studio memory consumption growing" width="600"/> <!-- Pixel Height: 678 Pixel Width: 848 --></p>
 <p style="font-size: 80%; font-style:italic">Visual Studio memory consumption growing</p>
@@ -172,7 +172,7 @@ with <a href="doc/sdk_samples_2025_04.txt">177 succeeded, 24 failed, 0 skipped, 
 <li>Error CS0246 The type or namespace names <code>GetLinkPathForOpen</code> and <code>LocalLinkSharedCoordinatesSaved</code> could not be found</li>
 </ul>
 <p>I fixed those by commenting out the two offending lines, since the methods referred to are not defined anywhere.</p>
-<p>The remaining errors and warnings have to do with external referces, such as:</p>
+<p>The remaining errors and warnings have to do with external references, such as:</p>
 <ul>
 <li>Error NU1100  Unable to resolve 'System.Data.DataSetExtensions (&gt;= 4.5.0)' for 'net8.0-windows7.0' in Selections</li>
 <li>Error BC30002 Type 'MsExcel.Application' is not defined in <code>ArchSample</code> and <code>FireRating</code></li>
@@ -205,10 +205,10 @@ There is another option to "Copy if newer" instead of “Copy always”.</p>
 <pre><code class="language-xml">&lt;CopyToOutputDirectory&gt;PreserveNewest&lt;/CopyToOutputDirectory&gt;
 </code></pre>
 
-<p>I found and fixed that setting in six project: CloudAPISample, DockableDialogs, FreeFormElement, GetSetDefaultTypes, InCanvasControlAPI and SinePlotter.</p>
+<p>I found and fixed that setting in six projects: CloudAPISample, DockableDialogs, FreeFormElement, GetSetDefaultTypes, InCanvasControlAPI and SinePlotter.</p>
 <p>Recompiling again from scratch resulted in <a href="doc/sdk_samples_2025_06.txt">181 succeeded, 20 failed, 23 errors, 5 warnings, in 1 hour and 26 minutes</a>.</p>
 <p>Definitely not something I want to repeat on a daily basis.
-Maybe my virtual machine running Windows in Parallels on a Mac is solwing things down?</p>
+Maybe my virtual machine running Windows in Parallels on a Mac is slowing things down?</p>
 <p>My current SDK installation is captured
 in <a href="https://github.com/jeremytammik/RevitSdkSamples/releases/tag/2025.0.1">RevitSdkSamples release 2025.0.1</a>.</p>
 <h4><a name="7"></a> Custom Add-In Context Menu</h4>
