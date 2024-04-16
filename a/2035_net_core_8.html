@@ -35,7 +35,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 -->
 
 <h3>Migrating .NET 4.8 to .NET Core 8</h3>
-<p>The Revit 2025 SDK help file RevitAPI.chm includes a section on Migrating From .NET 4.8 to .NET 8.
+<p>The Revit 2025 SDK help file <em>RevitAPI.chm</em> includes a section on <em>Migrating From .NET 4.8 to .NET 8</em>.
 I printed it out in PDF format in <a href="doc/migrating_to_net_core_8.pdf">migrating_to_net_core_8.pdf</a>.
 Better still, though, the CHM file contains native HTML formatted text.
 For your convenience and to facilitate web searches, here it is:</p>
@@ -64,7 +64,7 @@ For your convenience and to facilitate web searches, here it is:</p>
     <div class="pageBody">
       <div id="TopicContent" class="topicContent">
         <table class="titleTable"><tr>
-          <td class="titleColumn"><h1>Migrating From .NET 4.8 to .NET 8</h1></td></tr></table>
+          <td class="titleColumn"><h1>Migrating from .NET 4.8 to .NET 8</h1></td></tr></table>
           <p>Revit 2025 is built on .NET 8. In this release, the Revit API is .NET 8 only, and Revit add-ins need to be recompiled for .NET 8.</p><p>The move from .NET 4.8 is to .NET 8 is a relatively large jump. .NET 8 comes from the .NET Core lineage, which has significant differences from .NET 4.8.</p><br /><strong><u>Upgrade Process</u></strong><p>There are many Microsoft documents and tools to help application developers migrate from .NET 4.8 to .NET Core/5/6/7/8. Following is a list of some helpful documents:</p><ul><li>Overview of porting from .NET Framework to .NET document:
       <a href="https://learn.microsoft.com/en-us/dotnet/core/porting/" target="_blank" rel="noopener noreferrer">https://learn.microsoft.com/en-us/dotnet/core/porting/</a></li><li>.NET Upgrade Assistant can help with the project migration:
       <a href="https://learn.microsoft.com/en-us/dotnet/core/porting/upgrade-assistant-overview" target="_blank" rel="noopener noreferrer">https://learn.microsoft.com/en-us/dotnet/core/porting/upgrade-assistant-overview</a></li><li><a href="https://docs.microsoft.com/en-us/dotnet/standard/analyzers/portability-analyzer" target="_blank" rel="noopener noreferrer">The .NET Portability Analyzer - .NET</a> on C# projects to roughly evaluate how much work is required to make the migration as well as dependencies between the assemblies.
@@ -81,7 +81,7 @@ For your convenience and to facilitate web searches, here it is:</p>
 
             <span class="literal"><em>
               &lt;CLRSupport&gt;true&lt;/CLRSupport&gt;
-            </em></span> with 
+            </em></span> with
             <span class="literal"><em>
               &lt;CLRSupport&gt;NetCore&lt;/CLRSupport&gt;.
             </em></span>
@@ -155,7 +155,7 @@ For your convenience and to facilitate web searches, here it is:</p>
         &gt;false&lt;/GenerateDependencyFile&gt;
 
       </em></span></li></ul><p><p /></p><strong><u>Assembly Properties</u></strong><br /><p>After updating your application to .NET 8, you may see build errors for your assembly properties. Many assembly properties are now auto-generated and <a href="https://learn.microsoft.com/en-us/dotnet/architecture/modernize-desktop/example-migration#assemblyinfo-considerations" target="_blank" rel="noopener noreferrer">can be removed from AssemblyInfo.cs</a>.</p><p><p /></p><strong><u>Double Numbers To String</u></strong><br /><br /><p>If you have unit tests or integration tests that compare doubles as strings, they may fail when you upgrade to .NET 8. This is because the number of decimal places printed by <em>ToString()</em> for doubles is <a href="https://devblogs.microsoft.com/dotnet/floating-point-parsing-and-formatting-improvements-in-net-core-3-0/" target="_blank" rel="noopener noreferrer">different in .NET 4.8 and .NET 8</a>. You can call <em>ToString("G15")</em> when converting doubles to strings to use the old .NET 4.8 formatting.</p><p><p /></p><strong><u>String.Compare</u></strong><p>
-    String.Compare behavior has changed, see <a href="https://learn.microsoft.com/en-us/dotnet/core/extensions/globalization-icu" target="_blank" rel="noopener noreferrer">.NET globalization and ICU</a> and <a href="https://learn.microsoft.com/en-us/dotnet/core/extensions/globalization-icu#use-nls-instead-of-icu" target="_blank" rel="noopener noreferrer">Use Globalization and ICU</a>.
+    String.Compare behavior has changed, see <a href="https://learn.microsoft.com/en-us/dotnet/core/extensions/globalization-icu" target="_blank" rel="noopener noreferrer">.NET globalization and ICU</a> and <a href="https://learn.microsoft.com/en-us/dotnet/core/extensions/globalization-icu#use-nls-instead-of-icu" target="_blank" rel="noopener noreferrer">Use Globalization and ICU</a>.
   </p><p><p /></p><strong><u>
     Windows Dialogs May Change Appearance
   </u></strong><p>
@@ -164,7 +164,7 @@ For your convenience and to facilitate web searches, here it is:</p>
     If your application is having trouble starting new processes, this may be because
 
     <a href="https://github.com/dotnet/core/issues/4109" target="_blank" rel="noopener noreferrer">System.Diagnostics.Process.Start(url) has a behavior change</a>. The <a href="https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.processstartinfo.useshellexecute?view=net-7.0" target="_blank" rel="noopener noreferrer">ProcessStartInfo.UseShellExecute Property</a> defaults to <span class="literal"><em>true </em></span>in
-    .NET 4.8 and <span class="literal"><em>false</em></span> in .NET 8.  Set <span class="literal"><em>UseShellExecute=true</em></span> to workaround this change.<p /></p><br /><strong><u>Encoding.Default Behaves Differently in .NET 8</u></strong><p>If your application is having problems getting the text encoding used by Windows, it may be because <span class="literal"><em>Encoding.Default</em></span> behaves differently in .NET 8. In .NET 4.8 <span class="literal"><em>Encoding.Default</em></span> would get the system's active code page, but in .NET Core/5/6/7/8
+    .NET 4.8 and <span class="literal"><em>false</em></span> in .NET 8.  Set <span class="literal"><em>UseShellExecute=true</em></span> to workaround this change.<p /></p><br /><strong><u>Encoding.Default Behaves Differently in .NET 8</u></strong><p>If your application is having problems getting the text encoding used by Windows, it may be because <span class="literal"><em>Encoding.Default</em></span> behaves differently in .NET 8. In .NET 4.8 <span class="literal"><em>Encoding.Default</em></span> would get the system's active code page, but in .NET Core/5/6/7/8
     <a href="https://learn.microsoft.com/en-us/dotnet/api/system.text.encoding.default?view=net-7.0" target="_blank" rel="noopener noreferrer">Encoding.Default is always UTF8</a>.
   </p><br /><strong><u>Items Order Differently in Sorted Lists</u></strong><p>If you see different orderings of items in sorted lists after updating to .NET 8, this may be because
     <a href="https://github.com/microsoft/dotnet/blob/main/Documentation/compatibility/list_sort-algorithm-changed.md" target="_blank" rel="noopener noreferrer">List&lt;T&gt;.Sort() behaves differently</a> in .NET 8 than .NET 4.8. The change fixes a .NET 4.8 bug which affected <span class="literal"><em>Sort()</em></span> of items of equal value.<p /></p><br /><br /><strong><u>System.ServiceModel</u></strong><br /><p>
