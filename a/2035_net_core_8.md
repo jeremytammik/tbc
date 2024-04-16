@@ -85,7 +85,7 @@ For your convenience and to facilitate web searches, here it is:
 
             <span class="literal"><em>
               &lt;CLRSupport&gt;true&lt;/CLRSupport&gt;
-            </em></span> with 
+            </em></span> with
             <span class="literal"><em>
               &lt;CLRSupport&gt;NetCore&lt;/CLRSupport&gt;.
             </em></span>
@@ -159,7 +159,7 @@ For your convenience and to facilitate web searches, here it is:
         &gt;false&lt;/GenerateDependencyFile&gt;
 
       </em></span></li></ul><p><p /></p><strong><u>Assembly Properties</u></strong><br /><p>After updating your application to .NET 8, you may see build errors for your assembly properties. Many assembly properties are now auto-generated and <a href="https://learn.microsoft.com/en-us/dotnet/architecture/modernize-desktop/example-migration#assemblyinfo-considerations" target="_blank" rel="noopener noreferrer">can be removed from AssemblyInfo.cs</a>.</p><p><p /></p><strong><u>Double Numbers To String</u></strong><br /><br /><p>If you have unit tests or integration tests that compare doubles as strings, they may fail when you upgrade to .NET 8. This is because the number of decimal places printed by <em>ToString()</em> for doubles is <a href="https://devblogs.microsoft.com/dotnet/floating-point-parsing-and-formatting-improvements-in-net-core-3-0/" target="_blank" rel="noopener noreferrer">different in .NET 4.8 and .NET 8</a>. You can call <em>ToString("G15")</em> when converting doubles to strings to use the old .NET 4.8 formatting.</p><p><p /></p><strong><u>String.Compare</u></strong><p>
-    String.Compare behavior has changed, see <a href="https://learn.microsoft.com/en-us/dotnet/core/extensions/globalization-icu" target="_blank" rel="noopener noreferrer">.NET globalization and ICU</a> and <a href="https://learn.microsoft.com/en-us/dotnet/core/extensions/globalization-icu#use-nls-instead-of-icu" target="_blank" rel="noopener noreferrer">Use Globalization and ICU</a>.
+    String.Compare behavior has changed, see <a href="https://learn.microsoft.com/en-us/dotnet/core/extensions/globalization-icu" target="_blank" rel="noopener noreferrer">.NET globalization and ICU</a> and <a href="https://learn.microsoft.com/en-us/dotnet/core/extensions/globalization-icu#use-nls-instead-of-icu" target="_blank" rel="noopener noreferrer">Use Globalization and ICU</a>.
   </p><p><p /></p><strong><u>
     Windows Dialogs May Change Appearance
   </u></strong><p>
@@ -168,7 +168,7 @@ For your convenience and to facilitate web searches, here it is:
     If your application is having trouble starting new processes, this may be because
 
     <a href="https://github.com/dotnet/core/issues/4109" target="_blank" rel="noopener noreferrer">System.Diagnostics.Process.Start(url) has a behavior change</a>. The <a href="https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.processstartinfo.useshellexecute?view=net-7.0" target="_blank" rel="noopener noreferrer">ProcessStartInfo.UseShellExecute Property</a> defaults to <span class="literal"><em>true </em></span>in
-    .NET 4.8 and <span class="literal"><em>false</em></span> in .NET 8.  Set <span class="literal"><em>UseShellExecute=true</em></span> to workaround this change.<p /></p><br /><strong><u>Encoding.Default Behaves Differently in .NET 8</u></strong><p>If your application is having problems getting the text encoding used by Windows, it may be because <span class="literal"><em>Encoding.Default</em></span> behaves differently in .NET 8. In .NET 4.8 <span class="literal"><em>Encoding.Default</em></span> would get the system's active code page, but in .NET Core/5/6/7/8
+    .NET 4.8 and <span class="literal"><em>false</em></span> in .NET 8.  Set <span class="literal"><em>UseShellExecute=true</em></span> to workaround this change.<p /></p><br /><strong><u>Encoding.Default Behaves Differently in .NET 8</u></strong><p>If your application is having problems getting the text encoding used by Windows, it may be because <span class="literal"><em>Encoding.Default</em></span> behaves differently in .NET 8. In .NET 4.8 <span class="literal"><em>Encoding.Default</em></span> would get the system's active code page, but in .NET Core/5/6/7/8
     <a href="https://learn.microsoft.com/en-us/dotnet/api/system.text.encoding.default?view=net-7.0" target="_blank" rel="noopener noreferrer">Encoding.Default is always UTF8</a>.
   </p><br /><strong><u>Items Order Differently in Sorted Lists</u></strong><p>If you see different orderings of items in sorted lists after updating to .NET 8, this may be because
     <a href="https://github.com/microsoft/dotnet/blob/main/Documentation/compatibility/list_sort-algorithm-changed.md" target="_blank" rel="noopener noreferrer">List&lt;T&gt;.Sort() behaves differently</a> in .NET 8 than .NET 4.8. The change fixes a .NET 4.8 bug which affected <span class="literal"><em>Sort()</em></span> of items of equal value.<p /></p><br /><br /><strong><u>System.ServiceModel</u></strong><br /><p>
