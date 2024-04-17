@@ -16,6 +16,9 @@
 
 <!---
 
+- OpenCascade for Boolean operations
+  https://forums.autodesk.com/t5/revit-api-forum/boolean-operation-fail/m-p/12713966#M78244
+
 
 twitter:
  the #RevitAPI @AutodeskRevit #BIM @DynamoBIM
@@ -37,9 +40,33 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Migrating .NET 4.8 to .NET Core 8
 
-The Revit 2025 SDK help file *RevitAPI.chm* includes a section on *Migrating From .NET 4.8 to .NET 8*.
-I printed it out in PDF format in [migrating_to_net_core_8.pdf](doc/migrating_to_net_core_8.pdf).
-Better still, though, the CHM file contains native HTML formatted text.
+The Revit 2025 API is based on .NET Core 8, a significant upgrade from the previous .NET 4.8 framework underlying the Revit 2024 API and previous:
+
+
+####<a name="2"></a> Public .NET Core Migration Webinar Recording
+
+The development team held a webinar in January on the topic of the *Autodesk Desktop API .NET Core Migration &ndash; Embracing Modern .NET*.
+
+The one-and-a-quarter-hour [Autodesk desktop API .NET Core 8.0 migration webinar recording](https://youtu.be/RyHx5-CqKZM) has
+now been published for public access:
+
+<center>
+  <iframe width="560" height="315" src="https://www.youtube.com/embed/RyHx5-CqKZM?si=06RnsnnwMor_M8G2" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+</center>
+
+In addition, here is the [presentation slide deck PDF](doc/migrating_to_net_core_8_webinar_recording.pdf).
+
+My colleague Madhukar Moogala also shared the recording together with the AutoCAD migration guide in his article
+on [Autodesk Desktop API Update: .NET Core Migration](https://adndevblog.typepad.com/autocad/2024/04/autodesk-desktop-api-update-net-core-migration.html).
+
+####<a name="3"></a> Public .NET Core Migration Webinar Recording
+
+For Revit 2025, the guide on *Migrating From .NET 4.8 to .NET 8* is included as a section in the Revit 2025 API help file *RevitAPI.chm*, provided in
+the Revit 2025 SDK that is available from the [Revit developer centre](https://aps.autodesk.com/developer/overview/revit).
+
+I printed it out in PDF format, available in [migrating_to_net_core_8.pdf](doc/migrating_to_net_core_8.pdf).
+
+Better still, though, the `CHM` file contains native `HTML` formatted text.
 For your convenience and to facilitate web searches, here it is:
 
 <!--
