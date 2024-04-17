@@ -70,7 +70,7 @@ the Revit 2025 SDK that is available from the [Revit developer centre](https://a
 
 I printed it out in PDF format, available in [migrating_to_net_core_8.pdf](doc/migrating_to_net_core_8.pdf).
 
-Better still, though, the `CHM` file contains native `HTML` formatted text.
+Better still, though, the `CHM` file contains native [`HTML` formatted text](doc/migrating_to_net_core_8.html).
 For your convenience and to facilitate web searches, here it is:
 
 <!--
