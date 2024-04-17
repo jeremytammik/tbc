@@ -54,7 +54,7 @@ now been published for public access:
   <iframe width="560" height="315" src="https://www.youtube.com/embed/RyHx5-CqKZM?si=06RnsnnwMor_M8G2" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 </center>
 
-In addition, here is the [presentation slide deck PDF](doc/migrating_to_net_core_8_webinar_recording.pdf).
+In addition, here is the [presentation slide deck PDF](doc/migrating_to_net_core_8_webinar.pdf).
 
 My colleague Madhukar Moogala also shared the recording together with the AutoCAD migration guide in his article
 on [Autodesk Desktop API Update: .NET Core Migration](https://adndevblog.typepad.com/autocad/2024/04/autodesk-desktop-api-update-net-core-migration.html).
