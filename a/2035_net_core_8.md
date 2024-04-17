@@ -43,7 +43,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 The Revit 2025 API is based on .NET Core 8, a significant upgrade from the previous .NET 4.8 framework underlying the Revit 2024 API and previous:
 
 
-####<a name="2"></a> Public .NET Core Migration Webinar Recording
+####<a name="2"></a> .NET Core Migration Webinar Recording
 
 The development team held a webinar in January on the topic of the *Autodesk Desktop API .NET Core Migration &ndash; Embracing Modern .NET*.
 
@@ -56,12 +56,12 @@ now been published for public access:
 
 In addition, here is the [presentation slide deck PDF](doc/migrating_to_net_core_8_webinar.pdf).
 
-My colleague Madhukar Moogala also shared the recording together with the AutoCAD migration guide in his article
-on [Autodesk Desktop API Update: .NET Core Migration](https://adndevblog.typepad.com/autocad/2024/04/autodesk-desktop-api-update-net-core-migration.html).
+My colleague Madhukar Moogala also shared the recording together with AutoCAD API migration guides in his article
+on [Autodesk desktop API update .NET Core migration](https://adndevblog.typepad.com/autocad/2024/04/autodesk-desktop-api-update-net-core-migration.html).
 
-####<a name="3"></a> Public .NET Core Migration Webinar Recording
+####<a name="3"></a> Revit API .NET Core Migration Guide
 
-For Revit 2025, the guide on *Migrating From .NET 4.8 to .NET 8* is included as a section in the Revit 2025 API help file *RevitAPI.chm*, provided in
+For Revit 2025, the guide on *Migrating from .NET 4.8 to .NET 8* is included as a section in the Revit 2025 API help file *RevitAPI.chm*, provided in
 the Revit 2025 SDK that is available from the [Revit developer centre](https://aps.autodesk.com/developer/overview/revit).
 
 I printed it out in PDF format, available in [migrating_to_net_core_8.pdf](doc/migrating_to_net_core_8.pdf).
