@@ -16,12 +16,9 @@
 
 <!---
 
-- OpenCascade for Boolean operations
-  https://forums.autodesk.com/t5/revit-api-forum/boolean-operation-fail/m-p/12713966#M78244
-
-
 twitter:
- the #RevitAPI @AutodeskRevit #BIM @DynamoBIM
+
+The Revit 2025 API is based on .NET 8, so we discuss upgrading from the .NET 4.8 framework, .NET 8 migration webinar recording and the Revit API .NET 8 migration guide for the #RevitAPI @AutodeskRevit #BIM @DynamoBIM https://autode.sk/dotnet8migration
 
 The Revit 2025 API is based on .NET Core 8, upgrading from the previous .NET 4.8 framework
 &ndash; .NET Core migration webinar recording
@@ -91,7 +88,6 @@ For your convenience and to facilitate web searches, here it is:
   <meta name="Description" content="Revit 2025 is built on .NET 8. In this release, the Revit API is .NET 8 only, and Revit add-ins need to be recompiled for .NET 8." />
   <link rel="stylesheet" type="text/css" href="../styles/branding-Help1.css" /></head>
 -->
-
 
   <body onload="SetDefaultLanguage('cs');">
     <input type="hidden" id="userDataCache" class="userDataStyle" />
