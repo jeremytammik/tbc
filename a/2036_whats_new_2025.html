@@ -265,10 +265,11 @@ in the <a href="http://help.autodesk.com/view/RVT/2025/ENU">Revit 2025 online he
 <p><a name="4.1.1"></a><h2 class="new">1.1. CefSharp upgrade</h2></p>
 <p>Revit and Autodesk add-ins use the CEFsharp library internally for several features. Some third-party add-ins do so as well.  Occasionally, when different versions of the library are used, it leads to instability issues for Revit. In order to avoid version conflicts, we are clarifying what CEFsharp version is being used, and loading it prior to all add-in initializations.</p>
 <ul>
-<li>In this version, Revit uses CEFsharp version  v119.4.30</li>
+<li>In this version, Revit uses CEFsharp version v119.4.30</li>
 </ul>
 <p><a name="4.1.2"></a><h2 class="new">1.2. Revit now on .NET 8</h2></p>
-<p>The Revit API for Revit 2025 is built on .NET 8.  This upgrade keeps Revit up to date with the latest .NET features, performance improvements, and security fixes.</p>
+<p>The Revit API for Revit 2025 is built on .NET 8.
+This upgrade keeps Revit up to date with the latest .NET features, performance improvements, and security fixes.</p>
 <p>Addins for Revit 2025 will need to be rebuilt on .NET 8.</p>
 <p><a name="4.1.3"></a><h2 class="new">1.3. Add-ins and macro changes</h2></p>
 <p><a name="4.1.3.1"></a><h2 class="new">1.3.1. MacroManager API</h2></p>
@@ -500,13 +501,11 @@ in the <a href="http://help.autodesk.com/view/RVT/2025/ENU">Revit 2025 online he
 <li>Autodesk.Revit.DB.Mechanical.OccupancyUnit &ndash; Removed enum value OccupancyUnit.UseDefaultValues</li>
 <li>Autodesk.Revit.DB.BaseLoadOn &ndash; Removed enum value BaseLoadOn.kUseDefaultLoad</li>
 </ul>
-<p><a name="4.1.16.4"></a><h2 class="new">1.16.4. Enums</h2></p>
 <p><center></p>
 <div style="border-style:solid; border-width:2px 0px 2px 0px">
 <a name="4.2"></a><h1 class="new" style="font-weight: bold">2. API Additions</h1>
 </div>
 <p></center></p>
-<p><a name="4.2.1"></a><h2 class="new">2.1. Element Iteration API additions</h2></p>
 <p><a name="4.2.1"></a><h2 class="new">2.1. Add-ins and macros additions</h2></p>
 <p><a name="4.2.1.1"></a><h2 class="new">2.1.1. MacroManager API</h2></p>
 <p>The new property:</p>
@@ -1013,4 +1012,3 @@ in the <a href="http://help.autodesk.com/view/RVT/2025/ENU">Revit 2025 online he
 <li>DocumentReloadingLatest &ndash; Subscribe to the DocumentReloadingLatestEventArgs event to be notified when Revit is just about to reload latest changes from a central model.</li>
 <li>DocumentReloadedLatest &ndash; Subscribe to the DocumentReloadedLatestEventArgs event to be notified immediately after Revit has finished reloading a document with central model.</li>
 </ul>
-<p><a name="4.2.29.1"></a><h2 class="new">2.29.1. SunStudyTimeInterval</h2></p>
