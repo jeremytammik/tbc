@@ -1,0 +1,1011 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css"></p>
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js" type="text/javascript"></script>
+
+<style>
+  ul.toc { list-style-type: none; }
+  h1.new { font-size: 150%; }
+  h2.new { font-size: 150%; }
+  h3.new { font-size: 120%; }
+  h4.new { font-size: 120%; }
+</style>
+
+<p></head></p>
+<!---
+
+twitter:
+
+What's New in the Revit 2025 API? Exciting new functionality, migration information, overview of changes and additions, table of contents, full details of all new aspects of the @AutodeskRevit #BIM #RevitAPI @DynamoBIM @AutodeskAPS https://autode.sk/rvt2025apinews
+
+The Revit 2025 API contains significant enhancements for add-in developers
+&ndash; Information sources
+&ndash; What's new in previous versions
+&ndash; Detailed table of contents
+&ndash; API Changes
+&ndash; API Additions...
+
+linkedin:
+
+#BIM #DynamoBIM #AutodeskAPS #Revit #API #IFC #SDK #Autodesk #AEC #adsk
+
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+
+<center>
+<img src="img/" alt="" title="" width="600"/>
+<p style="font-size: 80%; font-style:italic"></p>
+</center>
+
+-->
+
+<h3>What's New in the Revit 2025 API</h3>
+<p>The Revit 2025 API contains significant changes and enhancements for add-in developers:</p>
+<ul>
+<li><a href="#1">Information sources</a></li>
+<li><a href="#2">What's new in previous versions</a></li>
+<li><a href="#4">Detailed table of contents</a></li>
+</ul>
+<p>Top level table of contents:</p>
+<ul class="toc">
+<li>1. <a href="#4.1">API changes</a></li>
+<ul class="toc">
+<li>1.1. <a href="#4.1.1">CefSharp upgrade</a></li>
+<li>1.2. <a href="#4.1.2">Revit now on .NET 8</a></li>
+<li>1.3. <a href="#4.1.3">Add-ins and macro changes</a></li>
+<li>1.4. <a href="#4.1.4">Array API changes</a></li>
+<li>1.5. <a href="#4.1.5">BRepBuilder API changes</a></li>
+<li>1.6. <a href="#4.1.6">Dimension API changes</a></li>
+<li>1.7. <a href="#4.1.7">Extensible Storage(Schema) API changes</a></li>
+<li>1.8. <a href="#4.1.8">Electrical API changes</a></li>
+<li>1.9. <a href="#4.1.9">Link Visibility/Graphic Override API changes</a></li>
+<li>1.10. <a href="#4.1.10"> MEP changes</a></li>
+<li>1.11. <a href="#4.1.11"> Reinforcement API changes</a></li>
+<li>1.12. <a href="#4.1.12"> Slab API changes</a></li>
+<li>1.13. <a href="#4.1.13"> Structure API changes</a></li>
+<li>1.14. <a href="#4.1.14"> Task Dialog API changes</a></li>
+<li>1.15. <a href="#4.1.15"> Toposolid API changes</a></li>
+<li>1.16. <a href="#4.1.16"> Obsolete API removal</a></li>
+</ul>
+<li>2. <a href="#4.2">API additions</a></li>
+<ul class="toc">
+<li>2.1. <a href="#4.2.1">Add-ins and macros additions</a></li>
+<li>2.2. <a href="#4.2.2">Analysis API additions</a></li>
+<li>2.3. <a href="#4.2.3">Annotations API additions</a></li>
+<li>2.4. <a href="#4.2.4">Array API additions</a></li>
+<li>2.5. <a href="#4.2.5">MEP Fabrication API additions</a></li>
+<li>2.6. <a href="#4.2.6">DirectShape API additions</a></li>
+<li>2.7. <a href="#4.2.7">Dimension API additions</a></li>
+<li>2.8. <a href="#4.2.8">Electrical API additions</a></li>
+<li>2.9. <a href="#4.2.9">Energy Analysis API additions</a></li>
+<li>2.10. <a href="#4.2.10"> IFC API additions</a></li>
+<li>2.11. <a href="#4.2.11"> Import Export API additions</a></li>
+<li>2.12. <a href="#4.2.12"> PDF Export API additions</a></li>
+<li>2.13. <a href="#4.2.13"> Reinforcement API additions</a></li>
+<li>2.14. <a href="#4.2.14"> Selection API additions</a></li>
+<li>2.15. <a href="#4.2.15"> Sketched Element API additions</a></li>
+<li>2.16. <a href="#4.2.16"> Structure API additions</a></li>
+<li>2.17. <a href="#4.2.17"> Tag/Keynotes API additions</a></li>
+<li>2.18. <a href="#4.2.18"> Toposolid API additions</a></li>
+<li>2.19. <a href="#4.2.19"> UI API additions</a></li>
+<li>2.20. <a href="#4.2.20"> View API additions</a></li>
+<li>2.21. <a href="#4.2.21"> Link Visibility/Graphic Override API additions</a></li>
+<li>2.22. <a href="#4.2.22"> RevitServer Enterprise / Revit Cloud Worksharing API additions</a></li>
+</ul>
+</ul>
+
+<h4><a name="1"></a>Information Sources</h4>
+<p>The information below is based on the contents of the <em>Revit Platform API Changes and Additions.docx</em> document included with
+the Revit 2025 SDK, the software developers kit available from
+the <a href="https://www.autodesk.com/developer-network/platform-technologies/revit">Revit Developer Centre</a>.</p>
+<p>It is also provided in the section on <em>What's New</em> in the Revit 2025 API help file <code>RevitAPI.chm</code> included with the SDK:</p>
+<p><center>
+<img src="img/revit_2025_api_chm.png" alt="Revit 2025 API help on What's New" title="Revit 2025 API help on What's New" width="600"/> <!-- Pixel Height: 1,294 Pixel Width: 1,098 -->
+</center></p>
+<p>For convenient, easy, and effective web searching, this blog post provides a cleaned-up online HTML version of that information with numbering and table of contents added, as well as the following PDF printout of the original document included in the SDK with table of contents and page numbers added:</p>
+<ul>
+<li><a href="zip/Revit_Platform_API_Changes_and_Additions_2025_01.pdf">Revit_Platform_API_Changes_and_Additions_2025.pdf</a></li>
+</ul>
+<p>The <em>What's New</em> section and the <em>Changes and Additions</em> document provide important information, both for discovering and exploring the newly added API functionality and for later reference.</p>
+<p>If you encounter any issues migrating your existing add-ins between different versions, this is one of the first places to look.</p>
+<p>For detailed information on all other aspects of the Revit API, please refer to the rest of the API documentation and samples provided in the SDK.</p>
+<p>The most important things to install and always keep at hand are:</p>
+<ul>
+<li>The Revit API help file <code>RevitAPI.chm</code></li>
+<li>The Visual Studio solution containing all the SDK samples, <code>Samples\SDKSamples.sln</code></li>
+</ul>
+<p>You will regularly need both for research on how to solve specific Revit API programming tasks.</p>
+<p>More in-depth official explanations and background information is provided by the
+online <a href="http://help.autodesk.com/view/RVT/2025/ENU/?guid=Revit_API_Revit_API_Developers_Guide_html">Revit API Developers Guide</a> included
+in the <a href="http://help.autodesk.com/view/RVT/2025/ENU">Revit 2025 online help</a>.</p>
+<h4><a name="2"></a>What's New in Previous Versions</h4>
+<p>Here are links to previous discussions of <em>What's New in the Revit API</em>:</p>
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/02/whats-new-in-the-revit-2010-api.html">What's New in the Revit 2010 API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/02/whats-new-in-the-revit-2011-api.html">What's New in the Revit 2011 API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/02/whats-new-in-the-revit-2012-api.html">What's New in the Revit 2012 API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/03/whats-new-in-the-revit-2013-api.html">What's New in the Revit 2013 API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2013/04/whats-new-in-the-revit-2014-api.html">What's New in the Revit 2014 API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2014/04/whats-new-in-the-revit-2015-api.html">What's New in the Revit 2015 API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2015/04/whats-new-in-the-revit-2016-api.html">What's New in the Revit 2016 API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2016/04/whats-new-in-the-revit-2017-api.html">What's New in the Revit 2017 API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2016/11/whats-new-in-the-revit-20171-api.html">What's New in the Revit 2017.1 API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2017/04/whats-new-in-the-revit-2018-api.html">What's New in the Revit 2018 API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2017/08/revit-20181-and-the-visual-materials-api.html">Revit 2018.1 and the Visual Materials API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2017/09/revit-201811-fixes-cropbox-setting.html">Revit 2018.1.1 and 2018.1 API Docs Online</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2017/11/modifying-material-visual-appearance.html">Revit 2018.1 Visual Materials API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2017/12/whats-new-in-the-revit-20182-api.html">What's New in the Revit 2018.2 API</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2018/04/whats-new-in-the-revit-2019-api.html">What's New in the Revit 2019 API</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2019/04/whats-new-in-the-revit-2020-api.html">What's New in the Revit 2020 API</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2019/09/whats-new-in-the-revit-20201-api.html">What's New in the Revit 2020.1 API</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2020/04/whats-new-in-the-revit-2021-api.html">What's New in the Revit 2021 API</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2020/08/revit-20211-sdk-and-whats-new.html">What's New in the Revit 2021.1 API</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2021/04/whats-new-in-the-revit-2022-api.html">What's New in the Revit 2022 API</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2021/11/whats-new-in-the-revit-20221-api.html">What's New in the Revit 2022.1 API</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2022/04/whats-new-in-the-revit-2023-api.html">What's New in the Revit 2023 API</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2023/04/whats-new-in-the-revit-2024-api.html">What's New in the Revit 2024 API</a></li>
+</ul>
+<h4><a name="4"></a>Detailed Table of Contents</h4>
+<!-- <h1>Major changes and renovations to the Revit API -->
+
+<ul class="toc">
+<li>1. <a href="#4.1">API changes</a></li>
+<ul class="toc">
+<li>1.1. <a href="#4.1.1">CefSharp upgrade</a></li>
+<li>1.2. <a href="#4.1.2">Revit now on .NET 8</a></li>
+<li>1.3. <a href="#4.1.3">Add-ins and macro changes</a></li>
+<ul class="toc">
+<li>1.3.1. <a href="#4.1.3.1">MacroManager API</a></li>
+</ul>
+<li>1.4. <a href="#4.1.4">Array API changes</a></li>
+<li>1.5. <a href="#4.1.5">BRepBuilder API changes</a></li>
+<li>1.6. <a href="#4.1.6">Dimension API changes</a></li>
+<li>1.7. <a href="#4.1.7">Extensible Storage(Schema) API changes</a></li>
+<li>1.8. <a href="#4.1.8">Electrical API changes</a></li>
+<ul class="toc">
+<li>1.8.1. <a href="#4.1.8.1">Distribution system</a></li>
+<li>1.8.2. <a href="#4.1.8.2">Parameter Naming</a></li>
+</ul>
+<li>1.9. <a href="#4.1.9">Link Visibility/Graphic Override API changes</a></li>
+<li>1.10. <a href="#4.1.10"> MEP changes</a></li>
+<ul class="toc">
+<li>1.10.1. <a href="#4.1.10.1"> Duct Settings</a></li>
+</ul>
+<li>1.11. <a href="#4.1.11"> Reinforcement API changes</a></li>
+<ul class="toc">
+<li>1.11.1. <a href="#4.1.11.1"> Rebar</a></li>
+</ul>
+<li>1.12. <a href="#4.1.12"> Slab API changes</a></li>
+<li>1.13. <a href="#4.1.13"> Structure API changes</a></li>
+<ul class="toc">
+<li>1.13.1. <a href="#4.1.13.1"> Bending details in view</a></li>
+<li>1.13.2. <a href="#4.1.13.2"> Analytical Surface</a></li>
+</ul>
+<li>1.14. <a href="#4.1.14"> Task Dialog API changes</a></li>
+<li>1.15. <a href="#4.1.15"> Toposolid API changes</a></li>
+<li>1.16. <a href="#4.1.16"> Obsolete API removal</a></li>
+<ul class="toc">
+<li>1.16.1. <a href="#4.1.16.1"> Classes</a></li>
+<li>1.16.2. <a href="#4.1.16.2"> Properties</a></li>
+<li>1.16.3. <a href="#4.1.16.3"> Methods</a></li>
+<li>1.16.4. <a href="#4.1.16.4"> Enums</a></li>
+</ul>
+</ul>
+<li>2. <a href="#4.2">API additions</a></li>
+<ul class="toc">
+<li>2.1. <a href="#4.2.1">Add-ins and macros additions</a></li>
+<ul class="toc">
+<li>2.1.1. <a href="#4.2.1.1">MacroManager API</a></li>
+</ul>
+<li>2.2. <a href="#4.2.2">Analysis API additions</a></li>
+<ul class="toc">
+<li>2.2.1. <a href="#4.2.2.1">MEP Analytical networks</a></li>
+<li>2.2.2. <a href="#4.2.2.2">MEP Duct/Pipe Pressure Loss calculation</a></li>
+<li>2.2.3. <a href="#4.2.2.3">MEP Space Engineering Parameters</a></li>
+</ul>
+<li>2.3. <a href="#4.2.3">Annotations API additions</a></li>
+<li>2.4. <a href="#4.2.4">Array API additions</a></li>
+<ul class="toc">
+<li>2.4.1. <a href="#4.2.4.1">Linear Array</a></li>
+</ul>
+<li>2.5. <a href="#4.2.5">MEP Fabrication API additions</a></li>
+<li>2.6. <a href="#4.2.6">DirectShape API additions</a></li>
+<li>2.7. <a href="#4.2.7">Dimension API additions</a></li>
+<li>2.8. <a href="#4.2.8">Electrical API additions</a></li>
+<li>2.9. <a href="#4.2.9">Energy Analysis API additions</a></li>
+<ul class="toc">
+<li>2.9.1. <a href="#4.2.9.1">gbXML export options</a></li>
+</ul>
+<li>2.10. <a href="#4.2.10"> IFC API additions</a></li>
+<ul class="toc">
+<li>2.10.1. <a href="#4.2.10.1"> IFC Hybrid Import</a></li>
+<li>2.10.2. <a href="#4.2.10.2"> IFC Category Mapping</a></li>
+</ul>
+<li>2.11. <a href="#4.2.11"> Import Export API additions</a></li>
+<li>2.12. <a href="#4.2.12"> PDF Export API additions</a></li>
+<li>2.13. <a href="#4.2.13"> Reinforcement API additions</a></li>
+<ul class="toc">
+<li>2.13.1. <a href="#4.2.13.1"> Rebar</a></li>
+<li>2.13.2. <a href="#4.2.13.2"> Rebar splice type options and rules</a></li>
+</ul>
+<li>2.14. <a href="#4.2.14"> Selection API additions</a></li>
+<ul class="toc">
+<li>2.14.1. <a href="#4.2.14.1"> UI Application</a></li>
+</ul>
+<li>2.15. <a href="#4.2.15"> Sketched Element API additions</a></li>
+<ul class="toc">
+<li>2.15.1. <a href="#4.2.15.1"> Wall APIs</a></li>
+</ul>
+<li>2.16. <a href="#4.2.16"> Structure API additions</a></li>
+<ul class="toc">
+<li>2.16.1. <a href="#4.2.16.1"> Analytical Elements</a></li>
+<li>2.16.2. <a href="#4.2.16.2"> Analytical Surface</a></li>
+<li>2.16.3. <a href="#4.2.16.3"> Bending Details on Drawings</a></li>
+<li>2.16.4. <a href="#4.2.16.4"> Radial Array</a></li>
+</ul>
+<li>2.17. <a href="#4.2.17"> Tag/Keynotes API additions</a></li>
+<li>2.18. <a href="#4.2.18"> Toposolid API additions</a></li>
+<li>2.19. <a href="#4.2.19"> UI API additions</a></li>
+<ul class="toc">
+<li>2.19.1. <a href="#4.2.19.1"> Context Menu</a></li>
+</ul>
+<li>2.20. <a href="#4.2.20"> View API additions</a></li>
+<ul class="toc">
+<li>2.20.1. <a href="#4.2.20.1"> SheetCollection</a></li>
+</ul>
+<li>2.21. <a href="#4.2.21"> Link Visibility/Graphic Override API additions</a></li>
+<li>2.22. <a href="#4.2.22"> RevitServer Enterprise / Revit Cloud Worksharing API additions</a></li>
+</ul>
+</ul>
+
+<p><center></p>
+<div style="border-style:solid; border-width:2px 0px 2px 0px">
+<a name="4.1"></a><h1 class="new" style="font-weight: bold">1. API Changes</h1>
+</div>
+<p></center></p>
+<p><a name="4.1.1"></a><h2 class="new">1.1. CefSharp upgrade</h2></p>
+<p>Revit and Autodesk add-ins use the CEFsharp library internally for several features. Some third-party add-ins do so as well.  Occasionally, when different versions of the library are used, it leads to instability issues for Revit. In order to avoid version conflicts, we are clarifying what CEFsharp version is being used, and loading it prior to all add-in initializations.</p>
+<ul>
+<li>In this version, Revit uses CEFsharp version  v119.4.30</li>
+</ul>
+<p><a name="4.1.2"></a><h2 class="new">1.2. Revit now on .NET 8</h2></p>
+<p>The Revit API for Revit 2025 is built on .NET 8.  This upgrade keeps Revit up-to-date with the latest .NET features, performance improvements, and security fixes.</p>
+<p>Addins for Revit 2025 will need to be rebuilt on .NET 8.</p>
+<p><a name="4.1.3"></a><h2 class="new">1.3. Add-ins and macro changes</h2></p>
+<p><a name="4.1.3.1"></a><h2 class="new">1.3.1. MacroManager API</h2></p>
+<p>Updated Revit macro tool with modernized UI and code editor that also supports modern .NET API. Following methods were changed.</p>
+<ul>
+<li>Deprecated member(s) &rarr; Replacement members(s)</li>
+<li>MacroManager.AddModule(ModuleSettings moduleSettings) &rarr; MacroManager.AddModule(ModuleSettings moduleSettings, IModuleMaker* maker)</li>
+<li>UIMacroManager.AddModule(ModuleSettings moduleSettings, MacroEnvironment environment) &rarr; UIMacroManager.AddModule(ModuleSettings moduleSettings, MacroEnvironment environment, IModuleMaker* maker)</li>
+</ul>
+<p>The following properties were deprecated:</p>
+<ul>
+<li>ModuleSettings.Description</li>
+<li>MacroModule.MacroLevel</li>
+<li>MacroModule.Description</li>
+<li>Macro.Description</li>
+<li>MacroManage.MacroLevel</li>
+</ul>
+<p>The following methods were deprecated:</p>
+<ul>
+<li>MacroModule.AddMacro()</li>
+<li>MacroModule.RemoveMacro()</li>
+<li>MacroManager.GetDocumentMacroSecurityOptions()</li>
+<li>MacroManager.SetDocumentMacroSecurityOptions()</li>
+<li>MacroManager.GetMacroManager()</li>
+<li>MacroManager.IsDocLvlMacro()</li>
+<li>UIMacroManager.EditModule()</li>
+<li>UIMacroManager.EditMacro()</li>
+<li>UIMacroManager.StepInto()</li>
+<li>UIMacroManager.GetMacroManager()</li>
+<li>UIMacroManager.GetUIDocumentMacroSecurityOptions()</li>
+<li>UIMacroManager.SetUIDocumentMacroSecurityOptions()</li>
+</ul>
+<p>The following enums were deprecated:</p>
+<ul>
+<li>Deprecated values of enum Autodesk.Revit.DB.Macro.MacroLanguageType, only C# is supported.<ul>
+<li>MacroLanguageType.VBNet</li>
+<li>MacroLanguageType.Python</li>
+</ul>
+</li>
+<li>Autodesk.Revit.DB.Macros.MacroLevel</li>
+<li>Autodesk.Revit.DB.Macros.DocumentMacroOptions</li>
+<li>UIDocumentMacroOptions</li>
+</ul>
+<p><a name="4.1.4"></a><h2 class="new">1.4. Array API changes</h2></p>
+<p>The valid arrays size differs in project and family documents. The replacement method takes the document as an argument so we get an accurate answer.</p>
+<ul>
+<li>Deprecated member(s) &rarr; Replacement members(s)</li>
+<li>LinearArray.IsValidArraySize() &rarr; LinearArray.IsValidNumberOfMembers()</li>
+<li>RadialArray.IsValidArraySize() &rarr; RadialArray.IsValidNumberOfMembers()</li>
+</ul>
+<p><a name="4.1.5"></a><h2 class="new">1.5. BRepBuilder API changes</h2></p>
+<p>BRepBuilder now accepts HermiteSurface as a permitted support surface type for faces.</p>
+<p>Changed behavior:</p>
+<ul>
+<li>BRepBuilder.IsPermittedSurfaceType() will now return true for HermiteSurface.</li>
+<li>BRepBuilderSurfaceGeometry.Create() can now accept a HermiteSurface and use it to create the corresponding BRepBuilderSurfaceGeometry.</li>
+</ul>
+<p><a name="4.1.6"></a><h2 class="new">1.6. Dimension API changes</h2></p>
+<p>After the introduction of LinearDimension class, when filtering for Dimensions, linear dimensions will return as type LinearDimension (child class) instead of Dimension (parent class).</p>
+<p>Methods affected:</p>
+<ul>
+<li>typeof(), etc. : If using typeof() or .getType().Equals(), to check if a LinearDimension is Dimension, it will not work due to the nature of the derived classes.</li>
+</ul>
+<p><a name="4.1.7"></a><h2 class="new">1.7. Extensible Storage(Schema) API changes</h2></p>
+<p>Fixed two API(s) for the Extensible Storage feature:</p>
+<ul>
+<li>Document.EraseSchemaAndAllEntities() &ndash; Fixed the API to ensure it removes entities from all parts of a Revit model.</li>
+<li>ExtensibleStorageFilter() &ndash; Fixed the API to ensure it filters all elements associated with extensible storage data based on specific Schema IDs.</li>
+</ul>
+<p><a name="4.1.8"></a><h2 class="new">1.8. Electrical API changes</h2></p>
+<p><a name="4.1.8.1"></a><h2 class="new">1.8.1. Distribution system</h2></p>
+<p>The following properties were modified to support high-leg delta and single-phase distribution system.</p>
+<ul>
+<li>Deprecated member(s) &rarr; Replacement members(s)</li>
+<li>AnalyticalPowerSourceData.Voltage &rarr; AnalyticalPowerSourceData.AssignedVoltage</li>
+<li>AnalyticalDistributionNodePropertyData.NumberOfPhases  &rarr; AnalyticalDistributionNodePropertyData.AssignedPhasesNumber &ndash; For analytical power source, bus, transformer, transfer switch, the number of electrical phases is read only in Revit 2025 and assigned through the distribution system. For analytical equipment load, we suggest you use the AnalyticalEquipmentLoadData.PhasesNumber property.</li>
+<li>AnalyticalBusData.Voltage &rarr; AnalyticalBusData.AssignedVoltage</li>
+<li>AnalyticalTransferSwitchData.Voltage &rarr; AnalyticalTransferSwitchData.AssignedVoltage</li>
+</ul>
+<p><a name="4.1.8.2"></a><h2 class="new">1.8.2. Parameter Naming</h2></p>
+<p>Improved naming for the following electrical parameters to remove ambiguity, improve accuracy, and better adhere with industry terminology.</p>
+<ul>
+<li>Parameter/String Attribute: Text(before) &rarr; Text(after)</li>
+<li>RBS_ELEC_PANEL_TOTALESTLOAD_PARAM: Total Estimated Demand &rarr; Total Demand Apparent Power</li>
+<li>RBS_ELEC_PANEL_TOTALLOAD_PARAM: Total Connected &rarr; Total Connected Apparent Power</li>
+<li>RBS_ELEC_APPARENT_LOAD_PHASEA: Apparent Load Phase A &rarr; Apparent Power Phase A</li>
+<li>RBS_ELEC_APPARENT_LOAD_PHASEB: Apparent Load Phase B &rarr; Apparent Power Phase B</li>
+<li>RBS_ELEC_APPARENT_LOAD_PHASEC: Apparent Load Phase C &rarr; Apparent Power Phase C</li>
+<li>RBS_ELEC_DEMAND_LOAD_PHASEA: Demand Load Phase A &rarr; Demand Apparent Power Phase A</li>
+<li>RBS_ELEC_DEMAND_LOAD_PHASEB: Demand Load Phase B &rarr; Demand Apparent Power Phase B</li>
+<li>RBS_ELEC_DEMAND_LOAD_PHASEC: Demand Load Phase C &rarr; Demand Apparent Power Phase C</li>
+<li>RBS_ELEC_APPARENT_LOAD: Apparent Load &rarr; Apparent Power</li>
+<li>RBS_ELEC_APPARENT_LOAD_PHASE1: Apparent Load Phase 1 &rarr; Apparent Power Phase 1</li>
+<li>RBS_ELEC_APPARENT_LOAD_PHASE2: Apparent Load Phase 2 &rarr; Apparent Power Phase 2</li>
+<li>RBS_ELEC_APPARENT_LOAD_PHASE3: Apparent Load Phase 3 &rarr; Apparent Power Phase 3</li>
+<li>RBS_ELEC_TRUE_LOAD: True Load &rarr; True Power</li>
+<li>RBS_ELEC_TRUE_LOAD_PHASE1: True Load Phase 1 &rarr; True Power Phase 1</li>
+<li>RBS_ELEC_TRUE_LOAD_PHASE2: True Load Phase 2 &rarr; True Power Phase 2</li>
+<li>RBS_ELEC_TRUE_LOAD_PHASE3: True Load Phase 3 &rarr; True Power Phase 3</li>
+<li>RBS_ELEC_TRUE_LOAD_PHASEA: True Load Phase A &rarr; True Power Phase A</li>
+<li>RBS_ELEC_TRUE_LOAD_PHASEB: True Load Phase B &rarr; True Power Phase B</li>
+<li>RBS_ELEC_TRUE_LOAD_PHASEC: True Load Phase C &rarr; True Power Phase C</li>
+<li>RBS_ELEC_DEMANDFACTOR_DEMANDLOAD_PARAM: Estimated Demand Load &rarr; Demand Apparent Power</li>
+<li>RBS_ELEC_DEMANDFACTOR_LOAD_PARAM: Connected Load &rarr; Connected Apparent Power</li>
+<li>RBS_ELEC_PANEL_BRANCH_CIRCUIT_APPARENT_LOAD_PHASEA: Branch Circuit Apparent Load Phase A  &rarr; Branch Circuit Apparent Power Phase A</li>
+<li>RBS_ELEC_PANEL_BRANCH_CIRCUIT_APPARENT_LOAD_PHASEB: Branch Circuit Apparent Load Phase B  &rarr; Branch Circuit Apparent Power Phase B</li>
+<li>RBS_ELEC_PANEL_BRANCH_CIRCUIT_APPARENT_LOAD_PHASEC: Branch Circuit Apparent Load Phase C  &rarr; Branch Circuit Apparent Power Phase C</li>
+<li>RBS_ELEC_PANEL_FEED_THRU_LUGS_APPARENT_LOAD_PHASEA: Feed Through Lugs Apparent Load Phase A &rarr; Feed Through Lugs Apparent Power Phase A</li>
+<li>RBS_ELEC_PANEL_FEED_THRU_LUGS_APPARENT_LOAD_PHASEB: Feed Through Lugs Apparent Load Phase B &rarr; Feed Through Lugs Apparent Power Phase B</li>
+<li>RBS_ELEC_PANEL_FEED_THRU_LUGS_APPARENT_LOAD_PHASEC: Feed Through Lugs Apparent Load Phase C &rarr; Feed Through Lugs Apparent Power Phase C</li>
+<li>RBS_ELEC_PANEL_TOTALESTLOAD_OTHER_PARAM: Other Total Estimated Demand  &rarr; Other Total Demand Apparent Power</li>
+<li>RBS_ELEC_LOADSUMMARY_CONNECTED_LOAD_PARAM: Connected Load (VA) &rarr; Connected Apparent Power</li>
+<li>RBS_ELEC_LOADSUMMARY_DEMAND_LOAD_PARAM: Estimated Demand (VA) &rarr; Demand Apparent Power</li>
+<li>RBS_ELEC_PANEL_TOTALESTLOAD_POWER_PARAM: Power Total Estimated Demand &rarr; Power Total Demand Apparent Power</li>
+<li>RBS_ELEC_PANEL_TOTALESTLOAD_LIGHT_PARAM: Lighting Total Estimated Demand &rarr; Lighting Total Demand Apparent Power</li>
+<li>RBS_ELEC_PANEL_TOTALESTLOAD_HVAC_PARAM: HVAC Total Estimated Demand &rarr; HVAC Total Demand Apparent Power</li>
+<li>RBS_ELEC_PANEL_TOTALLOAD_HVAC_PARAM: HVAC Total Connected &rarr; HVAC Total Connected Apparent Power</li>
+<li>RBS_ELEC_PANEL_TOTALLOAD_LIGHT_PARAM: Lighting Total Connected &rarr; Lighting Total Connected Apparent Power</li>
+<li>RBS_ELEC_PANEL_TOTALLOAD_POWER_PARAM: Power Total Connected &rarr; Power Total Connected Apparent Power</li>
+<li>RBS_ELEC_PANEL_TOTALLOAD_OTHER_PARAM: Other Total Connected &rarr; Other Total Connected Apparent Power</li>
+</ul>
+<p><a name="4.1.9"></a><h2 class="new">1.9. Link Visibility/Graphic Override API changes</h2></p>
+<p>The following methods were modified to support custom settings type.</p>
+<ul>
+<li>Revit.DB.RevitLinkGraphicsSettings.LinkVisibilityType</li>
+<li>Revit.DB.View.SetLinkOverrides(ElementId, RevitLinkGraphicsSettings) &ndash; Supports RevitLinkGraphicsSettings of Custom type.</li>
+<li>Revit.DB.View.GetLinkOverrides(ElementId) &ndash; Removed two validators:<ul>
+<li>AreGraphicsOverridesAllowed()</li>
+<li>IsLinkOverridesSupported()</li>
+</ul>
+</li>
+</ul>
+<p><a name="4.1.10"></a><h2 class="new">1.10.  MEP changes</h2></p>
+<p><a name="4.1.10.1"></a><h2 class="new">1.10.1.  Duct Settings</h2></p>
+<p>Two new properties DuctSettings.AirDynamicViscosity and DuctPressureDropData.DynamicViscosity were added to clarify the value used in the duct pressure loss calculation. They replaced the deprecated properties that were kinematic viscosity.</p>
+<ul>
+<li>Deprecated members(s)&rarr; Replacement member(s)</li>
+<li>RbsDuctSettingsElem.AirViscosity &rarr; DuctSettings.AirDynamicViscosity</li>
+<li>DuctPressureDropData.Viscosity &rarr; DuctPressureDropData.DynamicViscosity</li>
+<li>DuctFittingAndAccessoryData.AirViscosity &rarr; DuctSettings.AirDynamicViscosity</li>
+</ul>
+<p><a name="4.1.11"></a><h2 class="new">1.11.  Reinforcement API changes</h2></p>
+<p><a name="4.1.11.1"></a><h2 class="new">1.11.1.  Rebar</h2></p>
+<ul>
+<li>Deprecated member(s) &rarr; Replacement member(s)</li>
+<li>RebarConstraintsManager.SetPreferredConstraintForHandle(RebarConstrainedHandle handle, RebarConstraint constraint) &rarr; RebarConstraintsManager.SetPreferredConstraint(RebarConstraint constraint) &ndash; Use the new replacement method to set RebarConstraint as preferred constraint target that avoids issues where one could apply the RebarConstraint bounded to handle 'A' to another handle 'B'.</li>
+<li>RebarConstraintsManager.GetConstraintCandidatesForHandle(RebarConstrainedHandle handle)
+  &rarr; RebarConstraintsManager.GetConstraintCandidatesForHandle(Structure.RebarConstrainedHandle, ElementId),
+  RebarConstraintsManager.GetConstraintCandidatesForHandle(Structure.RebarConstrainedHandle, Reference)
+  &ndash; For getting the direct neighbors of a rebar host, use Structure.RebarHostData.GetRebarHostDirectNeighbors(Element hostElement);
+  For getting all the rebars in a host, use Structure.RebarHostData.GetRebarsInHost()</li>
+<li>Rebar.DistributionType
+  The enum having values:
+  Uniform 0 &ndash; Represents uniform distribution;
+  VaryingLength 1 &ndash; Represents varying length distribution
+  &rarr; RebarShapeDrivenAccessor.UseRebarConstraintsToProduceVaryingBars</li>
+</ul>
+<p><a name="4.1.12"></a><h2 class="new">1.12.  Slab API changes</h2></p>
+<p>The following methods were added for adding split line on SlabShapeEditor.</p>
+<ul>
+<li>Deprecated member(s) &rarr; Replacement member(s)</li>
+<li>SlabShapeEditor.DrawPoint &rarr; SlabShapeEditor.AddPoint(XYZ point)</li>
+<li>SlabShapeEditor.DrawSplitline &rarr; SlabShapeEditor.AddSplitLine(SlabShapeVertex startVertex, SlabShapeVertex endVertex)</li>
+</ul>
+<p><a name="4.1.13"></a><h2 class="new">1.13.  Structure API changes</h2></p>
+<p><a name="4.1.13.1"></a><h2 class="new">1.13.1.  Bending details in view</h2></p>
+<p>The following parameters were renamed without any changes to their functionality.</p>
+<ul>
+<li>Deprecated member(s) &rarr; Replacement member(s)</li>
+<li>BENDING_DETAIL_SEGMENET_REPESENTATION &rarr; BENDING_DETAIL_SEGMENT_REPRESENTATION</li>
+<li>BENDING_DETAIL_REPESENTATION_FOR_3D_BARS  &rarr; BENDING_DETAIL_REPRESENTATION_FOR_3D_BARS</li>
+</ul>
+<p><a name="4.1.13.2"></a><h2 class="new">1.13.2.  Analytical Surface</h2></p>
+<p>The following new method was added that allows users to verify if contour is valid for this Analytical Surface.</p>
+<ul>
+<li>Deprecated members(s) &rarr; Replacement member(s)</li>
+<li>AnalyticalSurfaceBase.isCurveLoopValid() &rarr; AnalyticalSurfaceBase.IsOuterContourValid()</li>
+</ul>
+<p><a name="4.1.14"></a><h2 class="new">1.14.  Task Dialog API changes</h2></p>
+<p>Support added so that FooterText property can contain a hyperlink of the form "rvthelptopic:[topic]" to launch Revit's contextual for the topic specified. Previously, the only option was to specify "#" as the hyperlink and set the Dialog Id, making it difficult to share dialogs with same Id, but different context and associated Help.</p>
+<p><a name="4.1.15"></a><h2 class="new">1.15.  Toposolid API changes</h2></p>
+<p>The following parameters were renamed without any changes to their functionality.</p>
+<ul>
+<li>Deprecated member(s) &rarr; Replacement member(s)</li>
+<li>SSE_POINT_ElEVATION_BASE_TYPE &rarr; SSE_POINT_ELEVATION_BASE_TYPE</li>
+<li>SSE_POINT_ElEVATION &rarr; SSE_POINT_ELEVATION</li>
+<li>TOPOSOLID_SUBDIVIDE_HEIGNT &rarr; TOPOSOLID_SUBDIVIDE_HEIGHT</li>
+</ul>
+<p><a name="4.1.16"></a><h2 class="new">1.16.  Obsolete API removal</h2></p>
+<p>The following API members and classes which had previously been marked Deprecated have been removed in this release. Consult the API documentation from prior releases for information on the replacements to use:</p>
+<p><a name="4.1.16.1"></a><h2 class="new">1.16.1.  Classes</h2></p>
+<ul>
+<li>DocumentEntryPoint</li>
+</ul>
+<p><a name="4.1.16.2"></a><h2 class="new">1.16.2.  Properties</h2></p>
+<ul>
+<li>ViewSchedule.ImageRowHeight</li>
+<li>UIThemeManager.DefaultTheme</li>
+</ul>
+<p><a name="4.1.16.3"></a><h2 class="new">1.16.3.  Methods</h2></p>
+<ul>
+<li>FamilyManager.AddParameter(ExternalDefinition, BuiltInParameterGroup, bool)</li>
+<li>FamilyManager.AddParameter(string, BuiltInParameterGroup, Category, bool)</li>
+<li>FamilyManager.ReplaceParameter(FamilyParameter, ExternalDefinition, BuiltInParameterGroup, bool)</li>
+<li>FamilyManager.ReplaceParameter(FamilyParameter, string, BuiltInParameterGroup, bool)</li>
+<li>FamilyManager.IsUserAssignableParameterGroup()</li>
+<li>BindingMap.Insert()</li>
+<li>BindingMap.ReInsert()</li>
+<li>FilterNumericLess.Evaluate(int, int)</li>
+<li>FilterNumericLessOrEqual.Evaluate(int, int)</li>
+<li>FilterNumericGreater.Evaluate(int, int)</li>
+<li>FilterNumericGreaterOrEqual.Evaluate(int, int)</li>
+<li>FilterNumericEquals.Evaluate(int, int)</li>
+<li>ParameterFilterRuleFactory.CreateEqualsRule(ElementId, AString, bool)</li>
+<li>ParameterFilterRuleFactory.CreateNotEqualsRule(ElementId, AString, bool)</li>
+<li>ParameterFilterRuleFactory.CreateGreaterRule(ElementId, AString, bool)</li>
+<li>ParameterFilterRuleFactory.CreateGreaterOrEqualRule(ElementId, AString, bool)</li>
+<li>ParameterFilterRuleFactory.CreateLessRule(ElementId, AString, bool)</li>
+<li>ParameterFilterRuleFactory.CreateLessOrEqualRule(ElementId, AString, bool)</li>
+<li>ParameterFilterRuleFactory.CreateContainsRule(ElementId, AString, bool)</li>
+<li>ParameterFilterRuleFactory.CreateNotContainsRule(ElementId, AString, bool)</li>
+<li>ParameterFilterRuleFactory.CreateBeginsWithRule(ElementId, AString, bool)</li>
+<li>ParameterFilterRuleFactory.CreateNotBeginsWithRule(ElementId, AString, bool)</li>
+<li>ParameterFilterRuleFactory.CreateEndsWithRule(ElementId, AString, bool)</li>
+<li>ParameterFilterRuleFactory.CreateNotEndsWithRule(ElementId, AString, bool)</li>
+</ul>
+<p><a name="4.1.16.4"></a><h2 class="new">1.16.4.  Enums</h2></p>
+<ul>
+<li>Autodesk.Revit.DB.Mechanical.OccupancyUnit &ndash; Removed enum value OccupancyUnit.UseDefaultValues</li>
+<li>Autodesk.Revit.DB.BaseLoadOn &ndash; Removed enum value BaseLoadOn.kUseDefaultLoad</li>
+</ul>
+<p><a name="4.1.16.4"></a><h2 class="new">1.16.4. Enums</h2></p>
+<p><center></p>
+<div style="border-style:solid; border-width:2px 0px 2px 0px">
+<a name="4.2"></a><h1 class="new" style="font-weight: bold">2. API Additions</h1>
+</div>
+<p></center></p>
+<p><a name="4.2.1"></a><h2 class="new">2.1. Element Iteration API additions</h2></p>
+<p><a name="4.2.1"></a><h2 class="new">2.1. Add-ins and macros additions</h2></p>
+<p><a name="4.2.1.1"></a><h2 class="new">2.1.1. MacroManager API</h2></p>
+<p>The new property:</p>
+<ul>
+<li>MacroModule.ModuleFolder &ndash; Returns the folder of the module.</li>
+</ul>
+<p>The new interface:</p>
+<ul>
+<li>IModuleMaker</li>
+</ul>
+<p>allows users to create new module project by implementing this interface.</p>
+<p>The new event:</p>
+<ul>
+<li>MacroUpdated</li>
+</ul>
+<p>is raised after the macro modules are updated.</p>
+<p><a name="4.2.2"></a><h2 class="new">2.2. Analysis API additions</h2></p>
+<p><a name="4.2.2.1"></a><h2 class="new">2.2.1. MEP Analytical networks</h2></p>
+<p>The new constructor allows users to traverse both sides of the specified analytical segment. In comparison, the existing constructor MEPNetworkIterator(Document, MEPAnalyticalNode, MEPAnalyticalSegment) only traverses one side of the analytical segment.</p>
+<ul>
+<li>Autodesk.Revit.DB.Analysis.MEPNetworkIterator(Document, MEPAnalyticalSegment)</li>
+</ul>
+<p><a name="4.2.2.2"></a><h2 class="new">2.2.2. MEP Duct/Pipe Pressure Loss calculation</h2></p>
+<p>Users now have access to Duct/Pipe pressure loss characteristic allowing them to correlate the element and understand the calculation logic.</p>
+<p>The new classes:</p>
+<ul>
+<li>Autodesk.Revit.DB.Analysis.CriticalPathCollector &ndash; Provides the calculated flow and pressure drop values of the network critical path, so users can better select their equipment.</li>
+<li>Autodesk.Revit.DB.Analysis.CriticalPathIterator &ndash; Allows users to traverse the analytical segments on the network critical path.</li>
+</ul>
+<p><a name="4.2.2.3"></a><h2 class="new">2.2.3. MEP Space Engineering Parameters</h2></p>
+<p>Users now have access to building operating day and year schedules allowing them to create and edit schedules that describe the usage of buildings (occupancy, power, lighting) for use in energy analysis.</p>
+<p>The new classes:</p>
+<ul>
+<li>Autodesk.Revit.DB.Analysis.BuildingOperatingDaySchedule &ndash; An element that represents the 24 hour operating schedule.</li>
+<li>Autodesk.Revit.DB.Analysis.BuildingOperatingYearSchedule &ndash; An element that represents the 365 day operating schedule.</li>
+</ul>
+<p>The new methods:</p>
+<ul>
+<li>BuildingOperatingDaySchedule.Create(Document, Name) &ndash; Allows creation of a new BuildingOperatingDaySchedule with that name and adds it to the document. It returns the newly created BuildingOperatingDaySchedule element, with all usages set to 0.</li>
+<li>BuildingOperatingDaySchedule.GetValueForHour(Hour)</li>
+<li>BuildingOperatingDaySchedule.SetValueForHour(Hour, Usage)</li>
+<li>BuildingOperatingYearSchedule.Create(Document, DaySchedule, Name) &ndash; Allows creation of a new BuildingOperatingYearSchedule with that name and adds it to the document. It returns the newly created BuildingOperatingDaySchedule element, with all usages set to daySchedule.</li>
+<li>BuildingOperatingDaySchedule.GetScheduleForDay(Day)</li>
+<li>BuildingOperatingDaySchedule.SetValueForHour(Day, DaySchedule)</li>
+</ul>
+<p>The new properties:</p>
+<ul>
+<li>BuildingOperatingDaySchedule.ScheduleName</li>
+<li>BuildingOperatingYearSchedule.ScheduleName</li>
+</ul>
+<p><a name="4.2.3"></a><h2 class="new">2.3. Annotations API additions</h2></p>
+<p>Exposing the new class to fix different behavior of span direction symbol between UI and API.</p>
+<p>The new class:</p>
+<ul>
+<li>Autodesk.Revit.DB.SpanDirectionSymbol</li>
+</ul>
+<p>represents an instance of a Span Direction Symbol in Autodesk Revit.</p>
+<p><a name="4.2.4"></a><h2 class="new">2.4. Array API additions</h2></p>
+<p><a name="4.2.4.1"></a><h2 class="new">2.4.1. Linear Array</h2></p>
+<p>The new methods:</p>
+<ul>
+<li>LinearArray.GetMinimumSize() &ndash; Allows users to get the minimum size of a linear array based on if the document is a family document.</li>
+<li>LinearArray.GetNumberOfMembersIncludingPlaceholders() &ndash; Allows users to get the number of members in a linear array, including placeholders that are still there in families with small array counts.</li>
+<li>LinearArray.IsValidNumberOfMembers() &ndash; Indicates whether the input count is a valid size for an array based on the document.</li>
+</ul>
+<p><a name="4.2.5"></a><h2 class="new">2.5. MEP Fabrication API additions</h2></p>
+<p>The new methods in the FabricationConfiguration class now provides support to check for bad connections between fabrication parts prior to reloading the configuration.</p>
+<ul>
+<li>CheckConnectionsForAllFabricationParts() &ndash; Allows users to check the connections for all fabrication parts in the current project. It will create reviewable warnings for all bad connections found.</li>
+<li>ValidateConnectionsForAllFabricationParts() &ndash; Allows users to validate all fabrication part connections in the current project. Invalid connections found will be added to the connection validation information class. The validation checks for bad alignments or gaps, incompatible connection types, mismatches of size, mismatches of shapes.</li>
+<li>PostReviewableWarningsForBadConnections() &ndash; Reviewable warnings are created for all entries contained in the connection validation information.</li>
+<li>GetUpdatedStraightsFromValidateConnections() &ndash; Allows users to get the set of element identifiers of fabrication part straights that were previously updated. If no straights were updated, it will return an empty set of element identifiers.</li>
+</ul>
+<p><a name="4.2.6"></a><h2 class="new">2.6. DirectShape API additions</h2></p>
+<p>The new method:</p>
+<ul>
+<li>DirectShapeType.SetShape(IList&lt;GeometryObject&gt;, DirectShapeTargetViewType) &ndash; Allows users to set a custom plan view representation of a DirectShapeType.</li>
+</ul>
+<p><a name="4.2.7"></a><h2 class="new">2.7. Dimension API additions</h2></p>
+<p>Users can now create radial, linear and arc length dimensions via the API in a project document.</p>
+<p>The new classes:</p>
+<ul>
+<li>RadialDimension</li>
+<li>ArchLengthDimension</li>
+<li>LinearDimension</li>
+</ul>
+<p>The new methods:</p>
+<ul>
+<li>RadialDimension.Create(Document, View, Reference, XYZ origin, bool isDiameterDimension)</li>
+<li>ArcLengthDimension.Create(Document, View, Arc, Reference, Reference firstRef, Reference secondRef)</li>
+<li>LinearDimension.Create(Document, View, Line, IList&lt;Reference&gt;)</li>
+</ul>
+<p><a name="4.2.8"></a><h2 class="new">2.8. Electrical API additions</h2></p>
+<p>Added functionality for high-leg delta and single-phase distribution system. User can now create and modify high-leg delta distribution system and single-phase load in electrical analytical distribution system, and get the per phase current on each node.</p>
+<p>The new classes:</p>
+<ul>
+<li>Autodesk.Revit.DB.Electrical.ElectricalPerPhaseData &ndash; Represents per phase values including current and load.</li>
+<li>Autodesk.Revit.DB.Electrical.AnalyticalPowerDistributableNodeData &ndash; Represents the data and parameters of a power distributable node.</li>
+<li>Autodesk.Revit.DB.Electrical.AnalyticalTransformerData &ndash; Represents the data and parameters of analytical transformer node.</li>
+</ul>
+<p>The new properties:</p>
+<ul>
+<li>Electrical.DistributionSysType.HighLegPhase &ndash; Represents the high-leg phase in the 3 phase 4 wires delta distribution system.</li>
+<li>AnalyticalPowerSourceData.ApparentPowerRating &ndash; Represents the apparent power rating value of the analytical power source.</li>
+<li>AnalyticalDistributionNodePropertyData.ConnectedPhases &ndash; Represents the electrical connected phases of the electrical analytical node to its upstream node.</li>
+<li>AnalyticalEquipmentLoadData.PhasesNumber &ndash; Represents the number of electrical phases of the analytical equipment load.</li>
+<li>AnalyticalEquipmentLoadData.PowerFactorState &ndash; Represents the PowerFactorState type of the analytical equipment load.</li>
+<li>AreaBasedLoadData.ConnectedPhases &ndash; Represents the electrical connected phases of the area based load to its upstream node.</li>
+<li>AreaBasedLoadData.PhasesNumber &ndash; Allows users to set the number of electrical phases of the area based load.</li>
+<li>AreaBasedLoadData.PowerFactorState &ndash; Represents the power factor state of the area based load.</li>
+<li>AreaBasedLoadType.PowerFactorState &ndash; Represents the power factor state of the area based load type.</li>
+</ul>
+<p>The new enums:</p>
+<ul>
+<li>Autodesk.Revit.DB.Electrical.ElectricalPhaseLine &ndash; Defines the electrical phase.</li>
+<li>Autodesk.Revit.DB.Electrical.ElectricalConnectedPhases &ndash; Defines the electrical connected phases of an electrical analytical node.</li>
+</ul>
+<p><a name="4.2.9"></a><h2 class="new">2.9. Energy Analysis API additions</h2></p>
+<p><a name="4.2.9.1"></a><h2 class="new">2.9.1. gbXML export options</h2></p>
+<p>We now provide support for legacy export of gbXML based on a conceptual energy analytical model from a conceptual mass model from add-ins/add-ons.</p>
+<p>The new methods:</p>
+<ul>
+<li>GetMassIds() &ndash; Allows users to get a list of masses to use as shading surfaces in the exported gbXML.</li>
+<li>GetMassZoneIds() &ndash; Allows users to get a list of mass zones to analyze in the exported gbXML.</li>
+</ul>
+<p>The new constructor:</p>
+<ul>
+<li>GBXMLExportOptions(massZoneIds, massIds) &ndash; Allows users to construct a new instance of the options used to export a mass model to gbXML.</li>
+</ul>
+<p>The new property:</p>
+<ul>
+<li>IsConceptual &ndash; Indicates if the exported gbXML is based on a conceptual energy analytical model from a conceptual mass model.</li>
+</ul>
+<p><a name="4.2.10"></a><h2 class="new">2.10.  IFC API additions</h2></p>
+<p><a name="4.2.10.1"></a><h2 class="new">2.10.1.  IFC Hybrid Import</h2></p>
+<ul>
+<li>IFCHybridImport.UpdateElements() &ndash; The new method allows users to update elements previously imported via a Hybrid IFC Link operation.</li>
+<li>IFCHybridImport.GetIFCStepIdToElementIdMap() &ndash; The new method allows users to retrieve the association between the original IFC STEP identifiers and the created or updated Elements.</li>
+</ul>
+<p><a name="4.2.10.2"></a><h2 class="new">2.10.2.  IFC Category Mapping</h2></p>
+<p>Added functionality that allows user to control the way how Revit categories are mapped to IFC Classes during IFC Export. User can now create, retrieve and modify IFC category mapping templates.</p>
+<p>The new classes:</p>
+<ul>
+<li>Autodesk.Revit.DB.IFCCategoryTemplate &ndash; Represents an element that contains IFC category mapping template stored in a Revit document.</li>
+<li>Autodesk.Revit.DB.ExportIFCCategoryKey &ndash; Represents a Revit category item stored in a template.</li>
+<li>Autodesk.Revit.DB.ExportIFCCategoryInfo &ndash; Represents the mapped IFC information stored in the template.</li>
+</ul>
+<p>The new enums:
+-  CustomSubCategoryId &ndash; Represents pseudo sub-categories that can appear in a mapping template. It has the following values:
+    - None &ndash; Represents the default value for most Revit categories and subcategories.
+    - InteriorWall &ndash; Represents the custom id for interior walls.
+    - ExteriorWall &ndash; Represents the custom id for exterior walls.
+    - FoundationWall &ndash; Represents the custom id for foundation walls.
+    - RetainingWall &ndash; Represents the custom id for retaining walls.
+    - Coreshaft &ndash; Represents the custom id for cores/shafts.
+    - Soffit &ndash; Represents the custom id for soffits.</p>
+<p><a name="4.2.11"></a><h2 class="new">2.11.  Import Export API additions</h2></p>
+<p>The new functionality provides support for importing, linking and exporting files of STEP format.</p>
+<p>The new class:</p>
+<ul>
+<li>STEPImportOptions</li>
+</ul>
+<p>represents the options for STEP formats.</p>
+<p>The new methods, uses the new class STEPImportOptions:</p>
+<ul>
+<li>Document.Import(String, STEPImportOptions, View)</li>
+<li>Document.Link(String, STEPImportOptions, View)</li>
+<li>Document.Export(String, String, STEPExportOptions)</li>
+</ul>
+<p><a name="4.2.12"></a><h2 class="new">2.12.  PDF Export API additions</h2></p>
+<p>Document export for PDF now allows using a separate Revit Worker to create the PDF in the background, leaving the main Revit process free for other work. FileExporting and FileExported events are triggered at the start and end of the export job respectively. There are new API calls for PDFExportOptions, FileExportedEventArgs, and FileExportingEventArgs. Third party Addins may interfere with the PDF generation using this feature if they change the appearance of Elements in a way that is not serialized.</p>
+<p>The new method:</p>
+<ul>
+<li>PDFExportOptions.SetExportInBackground() &ndash; When set to true, Document.Export launches a new process to export the PDF that leaves Revit unblocked. Changes to the document made after the export has started are not accounted for in the PDF.</li>
+</ul>
+<p>The classes FileExportingEventArgs and FileExportedEventArgsBoth have a new member:</p>
+<ul>
+<li>BackgroundOperation &ndash; The value is true if a background process was requested for the background operation that raised the event.</li>
+</ul>
+<p><a name="4.2.13"></a><h2 class="new">2.13.  Reinforcement API additions</h2></p>
+<p><a name="4.2.13.1"></a><h2 class="new">2.13.1.  Rebar</h2></p>
+<p>Users now have the ability to create and modify rebar constraints to surfaces.</p>
+<p>The new enum:</p>
+<ul>
+<li>RebarConstraintsStatus</li>
+</ul>
+<p>represents the status of the constraints.</p>
+<p>The new value for RebarConstraintType enum:</p>
+<ul>
+<li>ToSurface</li>
+</ul>
+<p>represents handle is constrained to a surface.</p>
+<p>The new methods:</p>
+<ul>
+<li>RebarConstraint.CreateConstraintToSurface() &ndash; Allows users to create a constraint of ToSurface type for a given RebarConstrainedHandle.</li>
+<li>RebarConstraint.GetSurfaceForConstraintToSurface() &ndash; Allows users to retrieve the surface for a constraint of ToSurface type.</li>
+<li>RebarConstraint.IsValidSurfaceToConstraintHandleTo() &ndash; Allows users to check if the surface can be used to create a constraint to it for a given RebarConstrainedhandle.</li>
+<li>RebarConstraint.IsToSurface() &ndash; Returns true if the RebarConstraintType of the RebarConstraint is ToSurface, false otherwise.</li>
+<li>RebarConstraint.GetRebarConstrainedHandle() &ndash; Allows users to get the RebarConstrainedHandle for which this constraint is.</li>
+<li>RebarConstraint.FlipSideForClearBarSpacingZeroDistanceConstraint() &ndash; This method in RebarConstriant is applied for bar-on-bar constraint.  It flips the side on which a RebarConstrainedHandle constrained using clear bar distance with zero offset connects to another Rebar target handle.</li>
+<li>RebarConstrainedHandle.IsEqual() &ndash; Returns true if the objects are equal, false otherwise.</li>
+<li>RebarConstraintsManager.SetPreferredConstraintsToSurfaceForHandles() &ndash; For ShapeDriven rebar it will set a preferred 'ToSurface' RebarConstraint for each input handle. The surface that will be used by the constraint is the current surface that is used to compute the position of the handle. This function applies only for shape driven Rebar, and will throw exception for free form rebar.</li>
+<li>RebarConstraintsManager.SetPreferredConstraint() &ndash; Allows users to set the RebarConstraint as preferred constraint for its RebarConstrainedHandle.</li>
+<li>RebarConstraintsManager.GetAutomaticConstraintCandidatesForHandle() &ndash; For shape driven rebar returns all possible automatic RebarConstraints that could be used for a specified RebarConstrainedHandle. For free form rebar it returns an empty list.</li>
+</ul>
+<p><a name="4.2.13.2"></a><h2 class="new">2.13.2.  Rebar splice type options and rules</h2></p>
+<p>Added functionality for splicing the rebar. Users can now splice a rebar, remove the splice (keeping the bars separated), unify into one bar, modify the data related to splice and modify the constraints of the spliced bars seeing as splice chain.</p>
+<p>The new classes:</p>
+<ul>
+<li>Autodesk.Revit.DB.Structure.RebarSpliceTypeUtils &ndash; Utility class for dealing with rebar splice type operations.</li>
+<li>Autodesk.Revit.DB.Structure.RebarSpliceOptions</li>
+<li>Autodesk.Revit.DB.Structure.RebarSpliceGeometry &ndash; This class consists of a vector and a point which will be projected to the nearest rebar curve.</li>
+<li>Autodesk.Revit.DB.Structure.RebarSpliceRules</li>
+<li>Autodesk.Revit.DB.Structure.RebarSplice &ndash; A class that can used to access the data between two connected rebars.</li>
+<li>Autodesk.Revit.DB.Structure.RebarSpliceByRulesResult</li>
+<li>Autodesk.Revit.DB.Structure.RebarSpliceUtils</li>
+</ul>
+<p>The new methods:</p>
+<ul>
+<li>RebarBarType.GetLapLength()</li>
+<li>RebarBarType.SetLapLength()</li>
+<li>RebarBarType.GetAutoCalculatedLapLength()</li>
+<li>RebarBarType.SetAutoCalculatedLapLength()</li>
+<li>RebarBarType.GetStaggerLength)</li>
+<li>RebarBarType.SetStaggerLength()</li>
+<li>RebarBarType.GetAutoCalculatedStaggerLength()</li>
+<li>RebarBarType.SetAutoCalculatedStaggerLength()</li>
+<li>Rebar.GetRebarSplice()</li>
+<li>Rebar.RemoveSplice()</li>
+<li>Rebar.GetLapLength()</li>
+<li>Rebar.GetSpliceStaggerLength()</li>
+<li>RebarConstrainedHandle.GetHandleSurface()</li>
+<li>RebarConstrainedHandle.Move()</li>
+<li>RebarConstrainedHandle.CanSetBehavior()</li>
+<li>RebarConstrainedHandle.GetPossibleHandleBehaviors()</li>
+<li>RebarHostData.GetRebarHostDirectNeighbors() &ndash; Returns the first level of neighbors for the provided host that can host reinforcement, i.e. elements that are joined directly to the provided host element and not the neighbors of the joined elements.</li>
+</ul>
+<p>The new properties:</p>
+<ul>
+<li>RebarSpliceOptions.SpliceTypeId</li>
+<li>RebarSpliceOptions.SplicePosition</li>
+<li>Rebar.CanHaveVaryingLengthBars</li>
+<li>Rebar.HasVariableLengthBars</li>
+<li>RebarShapeDrivenAccessor.UseRebarConstraintsToProduceVaryingBars</li>
+<li>RebarConstrainedHandle.HandleBehavior</li>
+</ul>
+<p>The new enums:</p>
+<ul>
+<li>RebarSplicePosition &ndash; Describes the position of the splice. It has the following values:<ul>
+<li>End1 &ndash; Lap is towards the start of the splice chain.</li>
+<li>Middle &ndash; Lap goes into both directions.</li>
+<li>End2 &ndash; Lap is towards the end of the splice chain.</li>
+</ul>
+</li>
+<li>RebarSpliceShiftOption &ndash; Describes the way bars are shifted in the splice relation. It has the following values:<ul>
+<li>BarPlane &ndash; Represents the bar plane is shifted so that the spliced rebars are not clashing.</li>
+<li>None &ndash; The bars are not shifted at all.</li>
+</ul>
+</li>
+<li>RebarSpliceByRulesRunOutPosition &ndash; Describes the run-out position. It has the following values:<ul>
+<li>Start &ndash; Represents the rest will remain at the start of the bar.</li>
+<li>End &ndash; Represents the rest will remain at the end of the bar</li>
+</ul>
+</li>
+<li>RebarSpliceError &ndash; Represents the states for splicing a Rebar. It has the following values:<ul>
+<li>Success</li>
+<li>Unknown &ndash; Represents there is an unexpected error.</li>
+<li>InvalidRebar &ndash; Represents free form rebars or shape driven rebars that are multiplanar or having shape whose definition is RebarShapeDefinitionByArc or rebars part of a group that cannot be spliced.</li>
+<li>InvalidLineOrLinePlaneNormal &ndash; Represents the line length is zero or the line direction is parallel with the line plane normal.</li>
+<li>LineDoesNotIntersectRebarBoundingBox &ndash; Represents the line doesn't intersect the rebar bounding box.</li>
+<li>SpliceGeometryOnHookOrFillet &ndash; Represents if the splice geometry is on a hook or a fillet, the rebar can't be spliced with it.</li>
+<li>TooSmallSegments &ndash; Represents one of the resulting segments is too small to apply the lap.</li>
+<li>SpliceGeometryDoesNotIntersectAllTheBarsInTheSet &ndash; Represents a plane obtained from splice geometry doesn't intersect all the bars in the set.</li>
+<li>SpliceGeometryAlmostParallelToBarSegment &ndash; Represents the plane formed by splice geometry is almost parallel to bar segment plane.</li>
+</ul>
+</li>
+<li>RebarSpliceByRulesError &ndash; Represents the states for splicing a Rebar by rules. It has the following values:<ul>
+<li>Success</li>
+<li>Unknown &ndash; Represents there is an unexpected error.</li>
+<li>InvalidRebar &ndash; Represents free form rebars or shape driven rebars that are multiplanar or having shape whose definition is RebarShapeDefinitionByArc or rebars part of a group that cannot be spliced.</li>
+<li>TooBigHook &ndash; Represents the hook lengths exceed the maximum length.</li>
+<li>TooSmallRunOut &ndash; Represents the run-out is below minimum length, or the lap can't be applied to it.</li>
+<li>MaximumLengthBiggerThanBarLength &ndash; Represents the maximum length exceeds the bar length.</li>
+<li>TooBigArc &ndash; Represents the arc segment exceeds the maximum length.</li>
+<li>CantSpliceAllTheBarsInSet &ndash; Represents  some bars in the varying set are not intersected by the resulting splice geometries.</li>
+<li>LapLengthBiggerThanMaximumBarLength &ndash; Represents the lap length is greater than the maximum length.</li>
+<li>InvalidCombinationOfMaximumMinimumBarLengthAndLapLength &ndash; Represents the combination of the maximum bar length, minimum bar length and lap length is invalid.</li>
+</ul>
+</li>
+<li>RebarHandleBehavior &ndash; Represents different behaviors that can be applied to a RebarConstrainedHandle. It has the following values:<ul>
+<li>Default &ndash; Represents the default behavior of a RebarConstrainedHandle.</li>
+<li>SpliceMainEndOnEnd1Position</li>
+<li>SpliceMainEndOnMiddlePosition &ndash; Represents the behavior can be set to a StartOfBar or EndOfBar RebarConstrainedHandle of a bar that is part of splice. On the connected bar there is a ToOtherRebar constraint whose target is the current rebar. The RebarConstrainedHandle's plane in the same position as the splice plane for Middle.</li>
+<li>SpliceMainEndOnEnd2Position &ndash; Represents the behavior can be set to a StartOfBar or EndOfBar RebarConstrainedHandle of a bar that is part of splice. On the connected bar there is a ToOtherRebar constraint whose target is the current rebar. The RebarConstrainedHandle's plane in the same position as the splice plane for Middle</li>
+<li>SpliceConnectedEndOnEnd1Position &ndash; Represents  the behavior can be set to a StartOfBar or EndOfBar RebarConstrainedHandle of a bar that is part of splice. On this RebarConstrainedHandle is a ToOtherRebar constraint whose target is the other bar involved in splice. The RebarConstrainedHandle's plane in the same position as the splice plane for End1.</li>
+<li>SpliceConnectedEndOnMiddlePosition &ndash; Represents the behavior can be set to a StartOfBar or EndOfBar RebarConstrainedHandle of a bar that is part of splice. On this RebarConstrainedHandle is a ToOtherRebar constraint whose target is the other bar involved in splice. The RebarConstrainedHandle's plane in the same position as the splice plane for Middle</li>
+<li>SpliceConnectedEndOnEnd2Position &ndash; Represents  the behavior can be set to a StartOfBar or EndOfBar RebarConstrainedHandle of a bar that is part of splice. On this RebarConstrainedHandle is a ToOtherRebar constraint whose target is the other bar involved in splice. RebarConstrainedHandle's plane in the same position as the splice plane for End2</li>
+<li>SpliceRebarPlaneOnSpliceSetExtent &ndash; Represents the behavior can be set to a RebarPlane RebarConstrainedHandle of a bar that is part of splice</li>
+<li>SpliceOutOfPlaneExtentOnSpliceSetExtent &ndash; Represents the behavior can be set to a OutOfPlaneExtent RebarConstrainedHandle of a bar that is part of splice.</li>
+<li>SpliceEdge &ndash; Represents the behavior can be set to an edge segment that is connected to the other rebar of splice.</li>
+</ul>
+</li>
+</ul>
+<p><a name="4.2.14"></a><h2 class="new">2.14.  Selection API additions</h2></p>
+<p><a name="4.2.14.1"></a><h2 class="new">2.14.1.  UI Application</h2></p>
+<p>The new enum:</p>
+<ul>
+<li>ThemeType &ndash; Represents the application frame theme type. It has the following values:<ul>
+<li>CanvasTheme &ndash; Indicates that the ThemeChanged event is triggered by canvas theme change.</li>
+<li>UITheme &ndash; Indicates that the ThemeChanged event is triggered by the global UI theme change.</li>
+</ul>
+</li>
+</ul>
+<p>The new read-only property for ThemeChangedEventArgs:</p>
+<ul>
+<li>ThemeChangedType &ndash; Returns ThemeType enum that indicates the kind of change triggered the current event.</li>
+</ul>
+<p><a name="4.2.15"></a><h2 class="new">2.15.  Sketched Element API additions</h2></p>
+<p><a name="4.2.15.1"></a><h2 class="new">2.15.1.  Wall APIs</h2></p>
+<p>The new methods now allow users to selectively enable or disable end wrapping for a specific wall end when the wall's end wrap is activated in the Wall Type dialog.</p>
+<ul>
+<li>Revit.DB.Wall.GetWrappingLocationAsReferences(int locationIndex) &ndash; Allows users to get an array of references to faces at the location.</li>
+<li>Revit.DB.Wall.GetWrappingLocationAsCurveParameter(int locationIndex) &ndash; Allows users to get the non-normalized (actual) curve parameter of the location.</li>
+<li>Revit.DB.Wall.GetValidWrappingLocationIndices()</li>
+<li>Revit.DB.Wall.AllowWrappingAtLocation(int locationIndex)</li>
+<li>Revit.DB.Wall.DisallowWrappingAtLocation(int locationIndex)</li>
+<li>Revit.DB.Wall.IsWrappingAtLocationAllowed(int locationIndex)</li>
+</ul>
+<p><a name="4.2.16"></a><h2 class="new">2.16.  Structure API additions</h2></p>
+<p><a name="4.2.16.1"></a><h2 class="new">2.16.1.  Analytical Elements</h2></p>
+<p>The new methods:</p>
+<ul>
+<li>AnalyticalElement.IsValidTransform() &ndash; Allows users to check whether the value set for Local Coordinate System is valid for an Analytical Element.</li>
+<li>AnalyticalElement.SetTransform() &ndash; Allows users to set the transform of Analytical Element Local Coordinate System.</li>
+</ul>
+<p><a name="4.2.16.2"></a><h2 class="new">2.16.2.  Analytical Surface</h2></p>
+<p>The new method:</p>
+<ul>
+<li>AnalyticalSurfaceBase.IsOuterContourValid() &ndash; Allows users to verify if contour is valid for this Analytical Surface.</li>
+</ul>
+<p><a name="4.2.16.3"></a><h2 class="new">2.16.3.  Bending Details on Drawings</h2></p>
+<p>Added new functionality for enhancing bending details. These include the ability to create and customize the size of schematic bending detail boxes, set specific tag types for bending details, adjust the position and rotation of tags relative to the bending detail, customize the tag alignment option, and add multiple hosts for the schematic bending detail. This update offers greater flexibility and precision in the representation and annotation of bending details in Revit models.</p>
+<p>The new methods:</p>
+<ul>
+<li>RebarBendingDetail.AddHosts()</li>
+<li>RebarBendingDetail.GetHosts()</li>
+<li>RebarBendingDetail.RemoveHosts()</li>
+<li>RebarBendingDetail.SetTagRelativePosition()</li>
+<li>RebarBendingDetail.SetTagRelativeRotation()</li>
+<li>RebarBendingDetail.GetTagRelativePosition()</li>
+<li>RebarBendingDetail.GetTagRelativeRotation()</li>
+<li>RebarBendingDetail.IsSchematicBendingDetail()</li>
+<li>RebarBendingDetail.IsRealisticBendingDetail()</li>
+<li>RebarBendingDetail.ResetTagRelativePosition()</li>
+<li>RebarBendingDetail.ResetAnnotationPositions()</li>
+</ul>
+<p>The new properties:</p>
+<ul>
+<li>RebarBendingDetailType.SchematicHeight &ndash; Represents  the height of the box where the schematic Bending Detail will be represented.</li>
+<li>RebarBendingDetailType.SchematicWidth &ndash; Represents the width of the box where the schematic Bending Detail will be represented.</li>
+<li>RebarBendingDetailType.TagTypeId &ndash; Represents the Id of the tag type which is used in the Bending Detail representation.</li>
+<li>RebarBendingDetailType.DisplayMode &ndash; Represents the display mode for the bending detail.</li>
+</ul>
+<p>The new enum:</p>
+<ul>
+<li>Autodesk.Revit.DB.Structure.BendingDetailDisplayMode</li>
+</ul>
+<p>represents the mode in which the Bending Detail will be represented.</p>
+<p><a name="4.2.16.4"></a><h2 class="new">2.16.4.  Radial Array</h2></p>
+<p>The new methods:</p>
+<ul>
+<li>RadialArray.GetMinimumSize() &ndash; Allows users to get the minimum size of a radial array based on if the document is a family document.</li>
+<li>RadialArray.GetNumberOfMembersIncludingPlaceholders() &ndash; Allows users to get the number of members in a radial array, including placeholders that are still there in families with small array counts.</li>
+<li>RadialArray.IsValidNumberOfMembers() &ndash; Indicates whether the input count is a valid size for an array based on the document.</li>
+</ul>
+<p><a name="4.2.17"></a><h2 class="new">2.17.  Tag/Keynotes API additions</h2></p>
+<p>We now provide functionality to align multiple text, tags and keynotes with new contextual alignment tools in the ribbon.</p>
+<p>The new class:</p>
+<ul>
+<li>Autodesk.Revit.DB.AnnotationMultipleAlignmentUtils</li>
+</ul>
+<p>allows users to align annotation elements to one another. Currently supports TextNotes, Tags and Keynotes.</p>
+<p>The new methods:</p>
+<ul>
+<li>AnnotationMultipleAlignmentUtils.ElementSupportsMultiAlign() &ndash; allows users to check whether the element type can be aligned using the multiple allignment commands.</li>
+<li>AnnotationMultipleAlignmentUtils.GetAnnotationOutlineWithoutLeaders() &ndash; allows users to get the four corners of the annotations bounding box, not including leaders. Outline calculations include leader/border offsets wherever applicable. (Eg. in the case of TextNotes).</li>
+<li>AnnotationMultipleAlignmentUtils.MoveWithAnchoredLeaders() &ndash; allows users to move the given element to the position specified by the input moveVec, while keeping the leader end points anchored.</li>
+</ul>
+<p><a name="4.2.18"></a><h2 class="new">2.18.  Toposolid API additions</h2></p>
+<p>Added functionality for Toposolid smooth shading.</p>
+<p>The new methods:</p>
+<ul>
+<li>Toposolid.ExcavateBy() &ndash; Allows users to excavate toposolid by a given element.</li>
+<li>Toposolid.RemoveExcavationBy() &ndash; Allows users to remove the excavation between the given element and the toposolid.</li>
+<li>Toposolid.CanBeExcavatedBy() &ndash; Allows users to check if the given element can be used to excavate the toposolid.</li>
+<li>Toposolid.SetSmoothedSurface() &ndash; Allows users to set the smoothed surface setting of toposolid category in the given document.</li>
+<li>Toposolid.IsSmoothedSurfaceEnabled() &ndash; Allows users to check if smoothed surface setting of toposolid category is enabled in the given document.</li>
+<li>Toposolid.GetIntersectingElementData()</li>
+<li>ToposolidType.SetContourSetting() &ndash; Allows users to set the contour setting for the current toposolid type by copying from an existing contour setting object.</li>
+<li>ContourSetting.IsItemEnabled()</li>
+<li>ContourSettingItem.GetContourSettingItemType()</li>
+<li>FaceToposolid.Create()</li>
+<li>FaceToposolid.UpdateToFace() &ndash; Allows users to reset the face toposolid to its defining face.</li>
+<li>FaceToposolid.GetReferencedFaces()</li>
+<li>FaceToposolid.SetReferencedFaces()</li>
+</ul>
+<p>The new classes:</p>
+<ul>
+<li>Autodesk.Revit.DB.IntersectingElementData &ndash; Stores information of an element that intersects with another element.</li>
+<li>Autodesk.Revit.DB.FaceToposolid &ndash; represents a face-based Toposolid within the Autodesk Revit project.</li>
+</ul>
+<p>The new enum:</p>
+<ul>
+<li>Autodesk.Revit.DB.IntersectionType &ndash; It has the following values.<ul>
+<li>Cut</li>
+<li>Excavate</li>
+</ul>
+</li>
+<li>Autodesk.Revit.DB.ContourSettingItemType &ndash; Represents the type of contour setting item. It has the following values:<ul>
+<li>Single</li>
+<li>UnboudedRange</li>
+<li>BoundedRange.</li>
+</ul>
+</li>
+</ul>
+<p>The new properties:</p>
+<ul>
+<li>IntersectingElementData.IntersectionType</li>
+<li>IntersectingElementData.IntersectingElementId</li>
+<li>IntersectingElementData.IntersectedElementId</li>
+<li>IntersectingElementData.IntersectionVolume</li>
+</ul>
+<p><a name="4.2.19"></a><h2 class="new">2.19.  UI API additions</h2></p>
+<p><a name="4.2.19.1"></a><h2 class="new">2.19.1.  Context Menu</h2></p>
+<p>We now provide functionality to create context menu from an add-in.</p>
+<p>The new Interface:</p>
+<ul>
+<li>Revit.UI.IContextMenuCreator &ndash; The interface users need to implement to build context menu.</li>
+</ul>
+<p>The new Constructor:</p>
+<ul>
+<li>Revit.UI.ContextMenu() &ndash; Allows users to create a new instance of Context Menu.</li>
+<li>Revit.UI.CommandMenuItem(name , className, assemblyName ) &ndash; Allows users to create a new instance of command menu item with name, external command class name and external application assembly name.</li>
+<li>Revit.UI.SubMenuItem(name , ContextMenu) &ndash; Allows users to create a new instance of flyout menu with name and sub menu instance.</li>
+<li>Revit.UI.Separator() &ndash; Allows users to create a new instance of separator menu item.</li>
+</ul>
+<p>The new methods:</p>
+<ul>
+<li>ContextMenu.AddItem() &ndash; Allows users to add a specific type of MenuItem object to context menu.</li>
+<li>CommandMenuItem.SetAvailabilityClassName() &ndash; Allows users to set availabilityClassName of CommandMenuItem.</li>
+<li>CommandMenuItem.SetToolTip() &ndash; Allows users to set tooltip of CommandMenuItem.</li>
+<li>IContextMenuCreator.BuildContextMenu() &ndash; Allows users to add menu items to the passed in ContextMenu object.</li>
+<li>UIControlledApplication.RegisterContextMenu() &ndash; Allow user to add new context menu creators with application name.</li>
+</ul>
+<p><a name="4.2.20"></a><h2 class="new">2.20.  View API additions</h2></p>
+<p><a name="4.2.20.1"></a><h2 class="new">2.20.1.  SheetCollection</h2></p>
+<p>The new class:</p>
+<ul>
+<li>Autodesk.Revit.DB.SheetCollection &ndash; Represents a sheet collection in Autodesk Revit.</li>
+</ul>
+<p>The new methods:</p>
+<ul>
+<li>Autodesk.Revit.DB.SheetCollection.Create(document, name) &ndash; Allows users to create a new instance of sheet collection with a specified name and adds it to the document. It returns the newly created sheet collection element.</li>
+<li>Autodesk.Revit.DB.SheetCollection.Create(document) &ndash; Allows users to create a new instance of sheet collection with an auto-generated name and adds it to the document. It returns the newly created sheet collection element.</li>
+</ul>
+<p>The new property:</p>
+<ul>
+<li>Autodesk.Revit.DB.ViewSheet.SheetCollectionId &ndash; Represents the Id of the sheet collection this sheet is associated with.</li>
+</ul>
+<p><a name="4.2.21"></a><h2 class="new">2.21.  Link Visibility/Graphic Override API additions</h2></p>
+<p>The new functionality allows Revit Link Visibility/Graphic Overrides, for the 'Custom' option.</p>
+<p>The new methods in class Autodesk.Revit.DB.RevitLinkGraphicsSettings:</p>
+<ul>
+<li>RevitLinkGraphicsSettings.IsViewRangeSupported(View) &ndash; Allows users to check if the input view supports view range settings for RevitLinkGraphicsSettings graphic overrides.</li>
+<li>RevitLinkGraphicsSettings.GetPhaseId()</li>
+<li>RevitLinkGraphicsSettings.GetPhaseType()</li>
+<li>RevitLinkGraphicsSettings.SetPhase(LinkVisibility, ElementId) &ndash; Allows users to configure phase and phase type of RevitLinkGraphicsSettings. Accepts LinkVisibility and ElementId of the phase from the linked document or ElementId.InvalidElementId.</li>
+<li>RevitLinkGraphicsSettings.GetPhaseFilterId()</li>
+<li>RevitLinkGraphicsSettings.GetPhaseFilterType()</li>
+<li>RevitLinkGraphicsSettings.SetPhaseFilter(LinkVisibility, ElementId) &ndash; Allows users to configure phase filter and phase filter type of RevitLinkGraphicsSettings. Accepts LinkVisibility and ElementId of the phase filter from the linked document or ElementId.InvalidElementId.</li>
+<li>RevitLinkGraphicsSettings.GetViewDetailLevel()</li>
+<li>RevitLinkGraphicsSettings.GetViewDetailLevelType()</li>
+<li>RevitLinkGraphicsSettings.SetViewDetailLevel(LinkVisibility, ViewDetailLevel) &ndash; Allows users to configure detail level and detail level type of RevitLinkGraphicsSettings. Accepts LinkVisibility and ViewDetailLevel types.</li>
+<li>RevitLinkGraphicsSettings.GetDiscipline()</li>
+<li>RevitLinkGraphicsSettings.GetDisciplineType()</li>
+<li>RevitLinkGraphicsSettings.SetDiscipline(LinkVisibility, ViewDiscipline) &ndash; Allows users to configure discipline and discipline type of RevitLinkGraphicsSettings. Accepts LinkVisibility and ViewDiscipline types.</li>
+</ul>
+<p>The new properties in Autodesk.Revit.DB.RevitLinkGraphicsSettings:</p>
+<ul>
+<li>RevitLinkGraphicsSettings.ViewFilterType</li>
+<li>RevitLinkGraphicsSettings.ViewRange</li>
+<li>RevitLinkGraphicsSettings.ColorFill</li>
+<li>RevitLinkGraphicsSettings.ObjectStyles</li>
+<li>RevitLinkGraphicsSettings.NestedLinks</li>
+</ul>
+<p><a name="4.2.22"></a><h2 class="new">2.22.  RevitServer Enterprise / Revit Cloud Worksharing API additions</h2></p>
+<p>The following events have been supported for file-based worksharing since 2021. We now support them in RevitServer Enterprise/Revit Cloud Worksharing.</p>
+<ul>
+<li>DocumentReloadingLatest &ndash; Subscribe to the DocumentReloadingLatestEventArgs event to be notified when Revit is just about to reload latest changes from a central model.</li>
+<li>DocumentReloadedLatest &ndash; Subscribe to the DocumentReloadedLatestEventArgs event to be notified immediately after Revit has finished reloading a document with central model.</li>
+</ul>
+<p><a name="4.2.29.1"></a><h2 class="new">2.29.1. SunStudyTimeInterval</h2></p>
