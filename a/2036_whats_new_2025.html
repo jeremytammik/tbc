@@ -270,7 +270,7 @@ in the <a href="http://help.autodesk.com/view/RVT/2025/ENU">Revit 2025 online he
 This upgrade keeps Revit up to date with the latest .NET features, performance improvements, and security fixes.</p>
 <p>Addins for Revit 2025 will need to be rebuilt on .NET 8.</p>
 <p><a name="4.1.3"></a><h2 class="new">1.3. Add-ins and macro changes</h2></p>
-<p><a name="4.1.3.1"></a><h2 class="new">1.3.1. MacroManager API</h2></p>
+<p><a name="4.1.3.1"></a><h3 class="new">1.3.1. MacroManager API</h3></p>
 <p>Updated Revit macro tool with modernized UI and code editor that also supports modern .NET API. Following methods were changed.</p>
 <ul>
 <li>Deprecated member(s) &rarr; Replacement members(s)</li>
@@ -338,7 +338,7 @@ This upgrade keeps Revit up to date with the latest .NET features, performance i
 <li>ExtensibleStorageFilter() &ndash; Fixed the API to ensure it filters all elements associated with extensible storage data based on specific Schema IDs.</li>
 </ul>
 <p><a name="4.1.8"></a><h2 class="new">1.8. Electrical API changes</h2></p>
-<p><a name="4.1.8.1"></a><h2 class="new">1.8.1. Distribution system</h2></p>
+<p><a name="4.1.8.1"></a><h3 class="new">1.8.1. Distribution system</h3></p>
 <p>The following properties were modified to support high-leg delta and single-phase distribution system.</p>
 <ul>
 <li>Deprecated member(s) &rarr; Replacement members(s)</li>
@@ -347,7 +347,7 @@ This upgrade keeps Revit up to date with the latest .NET features, performance i
 <li>AnalyticalBusData.Voltage &rarr; AnalyticalBusData.AssignedVoltage</li>
 <li>AnalyticalTransferSwitchData.Voltage &rarr; AnalyticalTransferSwitchData.AssignedVoltage</li>
 </ul>
-<p><a name="4.1.8.2"></a><h2 class="new">1.8.2. Parameter Naming</h2></p>
+<p><a name="4.1.8.2"></a><h3 class="new">1.8.2. Parameter Naming</h3></p>
 <p>Improved naming for the following electrical parameters to remove ambiguity, improve accuracy, and better adhere with industry terminology.</p>
 <ul>
 <li>Parameter/String Attribute: Text(before) &rarr; Text(after)</li>
@@ -401,7 +401,7 @@ This upgrade keeps Revit up to date with the latest .NET features, performance i
 </li>
 </ul>
 <p><a name="4.1.10"></a><h2 class="new">1.10.  MEP changes</h2></p>
-<p><a name="4.1.10.1"></a><h2 class="new">1.10.1.  Duct Settings</h2></p>
+<p><a name="4.1.10.1"></a><h3 class="new">1.10.1.  Duct Settings</h3></p>
 <p>Two new properties DuctSettings.AirDynamicViscosity and DuctPressureDropData.DynamicViscosity were added to clarify the value used in the duct pressure loss calculation. They replaced the deprecated properties that were kinematic viscosity.</p>
 <ul>
 <li>Deprecated members(s)&rarr; Replacement member(s)</li>
@@ -410,7 +410,7 @@ This upgrade keeps Revit up to date with the latest .NET features, performance i
 <li>DuctFittingAndAccessoryData.AirViscosity &rarr; DuctSettings.AirDynamicViscosity</li>
 </ul>
 <p><a name="4.1.11"></a><h2 class="new">1.11.  Reinforcement API changes</h2></p>
-<p><a name="4.1.11.1"></a><h2 class="new">1.11.1.  Rebar</h2></p>
+<p><a name="4.1.11.1"></a><h3 class="new">1.11.1.  Rebar</h3></p>
 <ul>
 <li>Deprecated member(s) &rarr; Replacement member(s)</li>
 <li>RebarConstraintsManager.SetPreferredConstraintForHandle(RebarConstrainedHandle handle, RebarConstraint constraint) &rarr; RebarConstraintsManager.SetPreferredConstraint(RebarConstraint constraint) &ndash; Use the new replacement method to set RebarConstraint as preferred constraint target that avoids issues where one could apply the RebarConstraint bounded to handle 'A' to another handle 'B'.</li>
@@ -433,14 +433,14 @@ This upgrade keeps Revit up to date with the latest .NET features, performance i
 <li>SlabShapeEditor.DrawSplitline &rarr; SlabShapeEditor.AddSplitLine(SlabShapeVertex startVertex, SlabShapeVertex endVertex)</li>
 </ul>
 <p><a name="4.1.13"></a><h2 class="new">1.13.  Structure API changes</h2></p>
-<p><a name="4.1.13.1"></a><h2 class="new">1.13.1.  Bending details in view</h2></p>
+<p><a name="4.1.13.1"></a><h3 class="new">1.13.1.  Bending details in view</h3></p>
 <p>The following parameters were renamed without any changes to their functionality.</p>
 <ul>
 <li>Deprecated member(s) &rarr; Replacement member(s)</li>
 <li>BENDING_DETAIL_SEGMENET_REPESENTATION &rarr; BENDING_DETAIL_SEGMENT_REPRESENTATION</li>
 <li>BENDING_DETAIL_REPESENTATION_FOR_3D_BARS  &rarr; BENDING_DETAIL_REPRESENTATION_FOR_3D_BARS</li>
 </ul>
-<p><a name="4.1.13.2"></a><h2 class="new">1.13.2.  Analytical Surface</h2></p>
+<p><a name="4.1.13.2"></a><h3 class="new">1.13.2.  Analytical Surface</h3></p>
 <p>The following new method was added that allows users to verify if contour is valid for this Analytical Surface.</p>
 <ul>
 <li>Deprecated members(s) &rarr; Replacement member(s)</li>
@@ -458,16 +458,16 @@ This upgrade keeps Revit up to date with the latest .NET features, performance i
 </ul>
 <p><a name="4.1.16"></a><h2 class="new">1.16.  Obsolete API removal</h2></p>
 <p>The following API members and classes which had previously been marked Deprecated have been removed in this release. Consult the API documentation from prior releases for information on the replacements to use:</p>
-<p><a name="4.1.16.1"></a><h2 class="new">1.16.1.  Classes</h2></p>
+<p><a name="4.1.16.1"></a><h3 class="new">1.16.1.  Classes</h3></p>
 <ul>
 <li>DocumentEntryPoint</li>
 </ul>
-<p><a name="4.1.16.2"></a><h2 class="new">1.16.2.  Properties</h2></p>
+<p><a name="4.1.16.2"></a><h3 class="new">1.16.2.  Properties</h3></p>
 <ul>
 <li>ViewSchedule.ImageRowHeight</li>
 <li>UIThemeManager.DefaultTheme</li>
 </ul>
-<p><a name="4.1.16.3"></a><h2 class="new">1.16.3.  Methods</h2></p>
+<p><a name="4.1.16.3"></a><h3 class="new">1.16.3.  Methods</h3></p>
 <ul>
 <li>FamilyManager.AddParameter(ExternalDefinition, BuiltInParameterGroup, bool)</li>
 <li>FamilyManager.AddParameter(string, BuiltInParameterGroup, Category, bool)</li>
@@ -494,7 +494,7 @@ This upgrade keeps Revit up to date with the latest .NET features, performance i
 <li>ParameterFilterRuleFactory.CreateEndsWithRule(ElementId, AString, bool)</li>
 <li>ParameterFilterRuleFactory.CreateNotEndsWithRule(ElementId, AString, bool)</li>
 </ul>
-<p><a name="4.1.16.4"></a><h2 class="new">1.16.4.  Enums</h2></p>
+<p><a name="4.1.16.4"></a><h3 class="new">1.16.4.  Enums</h3></p>
 <ul>
 <li>Autodesk.Revit.DB.Mechanical.OccupancyUnit &ndash; Removed enum value OccupancyUnit.UseDefaultValues</li>
 <li>Autodesk.Revit.DB.BaseLoadOn &ndash; Removed enum value BaseLoadOn.kUseDefaultLoad</li>
@@ -505,7 +505,7 @@ This upgrade keeps Revit up to date with the latest .NET features, performance i
 </div>
 <p></center></p>
 <p><a name="4.2.1"></a><h2 class="new">2.1. Add-ins and macros additions</h2></p>
-<p><a name="4.2.1.1"></a><h2 class="new">2.1.1. MacroManager API</h2></p>
+<p><a name="4.2.1.1"></a><h3 class="new">2.1.1. MacroManager API</h3></p>
 <p>The new property:</p>
 <ul>
 <li>MacroModule.ModuleFolder &ndash; Returns the folder of the module.</li>
@@ -521,19 +521,19 @@ This upgrade keeps Revit up to date with the latest .NET features, performance i
 </ul>
 <p>is raised after the macro modules are updated.</p>
 <p><a name="4.2.2"></a><h2 class="new">2.2. Analysis API additions</h2></p>
-<p><a name="4.2.2.1"></a><h2 class="new">2.2.1. MEP Analytical networks</h2></p>
+<p><a name="4.2.2.1"></a><h3 class="new">2.2.1. MEP Analytical networks</h3></p>
 <p>The new constructor allows users to traverse both sides of the specified analytical segment. In comparison, the existing constructor MEPNetworkIterator(Document, MEPAnalyticalNode, MEPAnalyticalSegment) only traverses one side of the analytical segment.</p>
 <ul>
 <li>Autodesk.Revit.DB.Analysis.MEPNetworkIterator(Document, MEPAnalyticalSegment)</li>
 </ul>
-<p><a name="4.2.2.2"></a><h2 class="new">2.2.2. MEP Duct/Pipe Pressure Loss calculation</h2></p>
+<p><a name="4.2.2.2"></a><h3 class="new">2.2.2. MEP Duct/Pipe Pressure Loss calculation</h3></p>
 <p>Users now have access to Duct/Pipe pressure loss characteristic allowing them to correlate the element and understand the calculation logic.</p>
 <p>The new classes:</p>
 <ul>
 <li>Autodesk.Revit.DB.Analysis.CriticalPathCollector &ndash; Provides the calculated flow and pressure drop values of the network critical path, so users can better select their equipment.</li>
 <li>Autodesk.Revit.DB.Analysis.CriticalPathIterator &ndash; Allows users to traverse the analytical segments on the network critical path.</li>
 </ul>
-<p><a name="4.2.2.3"></a><h2 class="new">2.2.3. MEP Space Engineering Parameters</h2></p>
+<p><a name="4.2.2.3"></a><h3 class="new">2.2.3. MEP Space Engineering Parameters</h3></p>
 <p>Users now have access to building operating day and year schedules allowing them to create and edit schedules that describe the usage of buildings (occupancy, power, lighting) for use in energy analysis.</p>
 <p>The new classes:</p>
 <ul>
@@ -562,7 +562,7 @@ This upgrade keeps Revit up to date with the latest .NET features, performance i
 </ul>
 <p>represents an instance of a Span Direction Symbol in Autodesk Revit.</p>
 <p><a name="4.2.4"></a><h2 class="new">2.4. Array API additions</h2></p>
-<p><a name="4.2.4.1"></a><h2 class="new">2.4.1. Linear Array</h2></p>
+<p><a name="4.2.4.1"></a><h3 class="new">2.4.1. Linear Array</h3></p>
 <p>The new methods:</p>
 <ul>
 <li>LinearArray.GetMinimumSize() &ndash; Allows users to get the minimum size of a linear array based on if the document is a family document.</li>
@@ -622,7 +622,7 @@ This upgrade keeps Revit up to date with the latest .NET features, performance i
 <li>Autodesk.Revit.DB.Electrical.ElectricalConnectedPhases &ndash; Defines the electrical connected phases of an electrical analytical node.</li>
 </ul>
 <p><a name="4.2.9"></a><h2 class="new">2.9. Energy Analysis API additions</h2></p>
-<p><a name="4.2.9.1"></a><h2 class="new">2.9.1. gbXML export options</h2></p>
+<p><a name="4.2.9.1"></a><h3 class="new">2.9.1. gbXML export options</h3></p>
 <p>We now provide support for legacy export of gbXML based on a conceptual energy analytical model from a conceptual mass model from add-ins/add-ons.</p>
 <p>The new methods:</p>
 <ul>
@@ -638,12 +638,12 @@ This upgrade keeps Revit up to date with the latest .NET features, performance i
 <li>IsConceptual &ndash; Indicates if the exported gbXML is based on a conceptual energy analytical model from a conceptual mass model.</li>
 </ul>
 <p><a name="4.2.10"></a><h2 class="new">2.10.  IFC API additions</h2></p>
-<p><a name="4.2.10.1"></a><h2 class="new">2.10.1.  IFC Hybrid Import</h2></p>
+<p><a name="4.2.10.1"></a><h3 class="new">2.10.1.  IFC Hybrid Import</h3></p>
 <ul>
 <li>IFCHybridImport.UpdateElements() &ndash; The new method allows users to update elements previously imported via a Hybrid IFC Link operation.</li>
 <li>IFCHybridImport.GetIFCStepIdToElementIdMap() &ndash; The new method allows users to retrieve the association between the original IFC STEP identifiers and the created or updated Elements.</li>
 </ul>
-<p><a name="4.2.10.2"></a><h2 class="new">2.10.2.  IFC Category Mapping</h2></p>
+<p><a name="4.2.10.2"></a><h3 class="new">2.10.2.  IFC Category Mapping</h3></p>
 <p>Added functionality that allows user to control the way how Revit categories are mapped to IFC Classes during IFC Export. User can now create, retrieve and modify IFC category mapping templates.</p>
 <p>The new classes:</p>
 <ul>
@@ -689,7 +689,7 @@ This upgrade keeps Revit up to date with the latest .NET features, performance i
 <li>BackgroundOperation &ndash; The value is true if a background process was requested for the background operation that raised the event.</li>
 </ul>
 <p><a name="4.2.13"></a><h2 class="new">2.13.  Reinforcement API additions</h2></p>
-<p><a name="4.2.13.1"></a><h2 class="new">2.13.1.  Rebar</h2></p>
+<p><a name="4.2.13.1"></a><h3 class="new">2.13.1.  Rebar</h3></p>
 <p>Users now have the ability to create and modify rebar constraints to surfaces.</p>
 <p>The new enum:</p>
 <ul>
@@ -714,7 +714,7 @@ This upgrade keeps Revit up to date with the latest .NET features, performance i
 <li>RebarConstraintsManager.SetPreferredConstraint() &ndash; Allows users to set the RebarConstraint as preferred constraint for its RebarConstrainedHandle.</li>
 <li>RebarConstraintsManager.GetAutomaticConstraintCandidatesForHandle() &ndash; For shape driven rebar returns all possible automatic RebarConstraints that could be used for a specified RebarConstrainedHandle. For free form rebar it returns an empty list.</li>
 </ul>
-<p><a name="4.2.13.2"></a><h2 class="new">2.13.2.  Rebar splice type options and rules</h2></p>
+<p><a name="4.2.13.2"></a><h3 class="new">2.13.2.  Rebar splice type options and rules</h3></p>
 <p>Added functionality for splicing the rebar. Users can now splice a rebar, remove the splice (keeping the bars separated), unify into one bar, modify the data related to splice and modify the constraints of the spliced bars seeing as splice chain.</p>
 <p>The new classes:</p>
 <ul>
@@ -813,7 +813,7 @@ This upgrade keeps Revit up to date with the latest .NET features, performance i
 </li>
 </ul>
 <p><a name="4.2.14"></a><h2 class="new">2.14.  Selection API additions</h2></p>
-<p><a name="4.2.14.1"></a><h2 class="new">2.14.1.  UI Application</h2></p>
+<p><a name="4.2.14.1"></a><h3 class="new">2.14.1.  UI Application</h3></p>
 <p>The new enum:</p>
 <ul>
 <li>ThemeType &ndash; Represents the application frame theme type. It has the following values:<ul>
@@ -827,7 +827,7 @@ This upgrade keeps Revit up to date with the latest .NET features, performance i
 <li>ThemeChangedType &ndash; Returns ThemeType enum that indicates the kind of change triggered the current event.</li>
 </ul>
 <p><a name="4.2.15"></a><h2 class="new">2.15.  Sketched Element API additions</h2></p>
-<p><a name="4.2.15.1"></a><h2 class="new">2.15.1.  Wall APIs</h2></p>
+<p><a name="4.2.15.1"></a><h3 class="new">2.15.1.  Wall APIs</h3></p>
 <p>The new methods now allow users to selectively enable or disable end wrapping for a specific wall end when the wall's end wrap is activated in the Wall Type dialog.</p>
 <ul>
 <li>Revit.DB.Wall.GetWrappingLocationAsReferences(int locationIndex) &ndash; Allows users to get an array of references to faces at the location.</li>
@@ -838,18 +838,18 @@ This upgrade keeps Revit up to date with the latest .NET features, performance i
 <li>Revit.DB.Wall.IsWrappingAtLocationAllowed(int locationIndex)</li>
 </ul>
 <p><a name="4.2.16"></a><h2 class="new">2.16.  Structure API additions</h2></p>
-<p><a name="4.2.16.1"></a><h2 class="new">2.16.1.  Analytical Elements</h2></p>
+<p><a name="4.2.16.1"></a><h3 class="new">2.16.1.  Analytical Elements</h3></p>
 <p>The new methods:</p>
 <ul>
 <li>AnalyticalElement.IsValidTransform() &ndash; Allows users to check whether the value set for Local Coordinate System is valid for an Analytical Element.</li>
 <li>AnalyticalElement.SetTransform() &ndash; Allows users to set the transform of Analytical Element Local Coordinate System.</li>
 </ul>
-<p><a name="4.2.16.2"></a><h2 class="new">2.16.2.  Analytical Surface</h2></p>
+<p><a name="4.2.16.2"></a><h3 class="new">2.16.2.  Analytical Surface</h3></p>
 <p>The new method:</p>
 <ul>
 <li>AnalyticalSurfaceBase.IsOuterContourValid() &ndash; Allows users to verify if contour is valid for this Analytical Surface.</li>
 </ul>
-<p><a name="4.2.16.3"></a><h2 class="new">2.16.3.  Bending Details on Drawings</h2></p>
+<p><a name="4.2.16.3"></a><h3 class="new">2.16.3.  Bending Details on Drawings</h3></p>
 <p>Added new functionality for enhancing bending details. These include the ability to create and customize the size of schematic bending detail boxes, set specific tag types for bending details, adjust the position and rotation of tags relative to the bending detail, customize the tag alignment option, and add multiple hosts for the schematic bending detail. This update offers greater flexibility and precision in the representation and annotation of bending details in Revit models.</p>
 <p>The new methods:</p>
 <ul>
@@ -877,7 +877,7 @@ This upgrade keeps Revit up to date with the latest .NET features, performance i
 <li>Autodesk.Revit.DB.Structure.BendingDetailDisplayMode</li>
 </ul>
 <p>represents the mode in which the Bending Detail will be represented.</p>
-<p><a name="4.2.16.4"></a><h2 class="new">2.16.4.  Radial Array</h2></p>
+<p><a name="4.2.16.4"></a><h3 class="new">2.16.4.  Radial Array</h3></p>
 <p>The new methods:</p>
 <ul>
 <li>RadialArray.GetMinimumSize() &ndash; Allows users to get the minimum size of a radial array based on if the document is a family document.</li>
@@ -942,7 +942,7 @@ This upgrade keeps Revit up to date with the latest .NET features, performance i
 <li>IntersectingElementData.IntersectionVolume</li>
 </ul>
 <p><a name="4.2.19"></a><h2 class="new">2.19.  UI API additions</h2></p>
-<p><a name="4.2.19.1"></a><h2 class="new">2.19.1.  Context Menu</h2></p>
+<p><a name="4.2.19.1"></a><h3 class="new">2.19.1.  Context Menu</h3></p>
 <p>We now provide functionality to create context menu from an add-in.</p>
 <p>The new Interface:</p>
 <ul>
@@ -964,7 +964,7 @@ This upgrade keeps Revit up to date with the latest .NET features, performance i
 <li>UIControlledApplication.RegisterContextMenu() &ndash; Allow user to add new context menu creators with application name.</li>
 </ul>
 <p><a name="4.2.20"></a><h2 class="new">2.20.  View API additions</h2></p>
-<p><a name="4.2.20.1"></a><h2 class="new">2.20.1.  SheetCollection</h2></p>
+<p><a name="4.2.20.1"></a><h3 class="new">2.20.1.  SheetCollection</h3></p>
 <p>The new class:</p>
 <ul>
 <li>Autodesk.Revit.DB.SheetCollection &ndash; Represents a sheet collection in Autodesk Revit.</li>
