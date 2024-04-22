@@ -103,12 +103,12 @@ the <a href="https://www.autodesk.com/developer-network/platform-technologies/re
 </center></p>
 <p>For convenient, easy, and effective web searching, this blog post provides a cleaned-up online HTML version of that information with numbering and table of contents added, as well as the following PDF printout of the original document included in the SDK with table of contents and page numbers added:</p>
 <ul>
-<li><a href="zip/Revit_Platform_API_Changes_and_Additions_2025_01.pdf">Revit_Platform_API_Changes_and_Additions_2025.pdf</a></li>
+<li><a href="doc/revit_2025_api_changes_and_additions.pdf">Revit_Platform_API_Changes_and_Additions_2025.pdf</a></li>
 </ul>
-<p>The <em>What's New</em> section and the <em>Changes and Additions</em> document provide important information, both for discovering and exploring the newly added API functionality and for later reference.</p>
+<p>The <em>What's New</em> section and the <em>Changes and Additions</em> document provide important information for discovering and exploring the newly added API functionality and for later reference.</p>
 <p>If you encounter any issues migrating your existing add-ins between different versions, this is one of the first places to look.</p>
 <p>For detailed information on all other aspects of the Revit API, please refer to the rest of the API documentation and samples provided in the SDK.</p>
-<p>The most important things to install and always keep at hand are:</p>
+<p>The most important things to install and keep at hand are:</p>
 <ul>
 <li>The Revit API help file <code>RevitAPI.chm</code></li>
 <li>The Visual Studio solution containing all the SDK samples, <code>Samples\SDKSamples.sln</code></li>
@@ -416,14 +416,14 @@ in the <a href="http://help.autodesk.com/view/RVT/2025/ENU">Revit 2025 online he
 <li>Deprecated member(s) &rarr; Replacement member(s)</li>
 <li>RebarConstraintsManager.SetPreferredConstraintForHandle(RebarConstrainedHandle handle, RebarConstraint constraint) &rarr; RebarConstraintsManager.SetPreferredConstraint(RebarConstraint constraint) &ndash; Use the new replacement method to set RebarConstraint as preferred constraint target that avoids issues where one could apply the RebarConstraint bounded to handle 'A' to another handle 'B'.</li>
 <li>RebarConstraintsManager.GetConstraintCandidatesForHandle(RebarConstrainedHandle handle)
-  &rarr; RebarConstraintsManager.GetConstraintCandidatesForHandle(Structure.RebarConstrainedHandle, ElementId),
+  &rarr; RebarConstraintsManager.GetConstraintCandidatesForHandle(Structure.RebarConstrainedHandle, ElementId) and
   RebarConstraintsManager.GetConstraintCandidatesForHandle(Structure.RebarConstrainedHandle, Reference)
   &ndash; For getting the direct neighbors of a rebar host, use Structure.RebarHostData.GetRebarHostDirectNeighbors(Element hostElement);
-  For getting all the rebars in a host, use Structure.RebarHostData.GetRebarsInHost()</li>
-<li>Rebar.DistributionType
-  The enum having values:
-  Uniform 0 &ndash; Represents uniform distribution;
-  VaryingLength 1 &ndash; Represents varying length distribution
+  for getting all the rebars in a host, use Structure.RebarHostData.GetRebarsInHost()</li>
+<li>Rebar.DistributionType;
+  the enum values
+  <code>Uniform</code> <code>0</code> representing uniform distribution and
+  <code>VaryingLength</code> <code>1</code> representing varying length distribution
   &rarr; RebarShapeDrivenAccessor.UseRebarConstraintsToProduceVaryingBars</li>
 </ul>
 <p><a name="4.1.12"></a><h2 class="new">1.12.  Slab API changes</h2></p>
