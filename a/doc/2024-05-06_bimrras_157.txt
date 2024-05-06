@@ -1,0 +1,331 @@
+Episodio 157: Building with code
+
+Objetivo. Guión.
+
+Saludo Presentación Programa
+
+Introducción Invitado
+
+[Evelio]
+
+[Evelio] Background [Evelio] Autodesk
+
+Acabamos...
+
+Las fuentes de información Las herramientas
+
+Despedida
+
+
+
+Objetivo.
+
+Entrevistamos a Jeremy Tamick para conocer más sobre las tripas detrás de la herramienta de modelado BIM más extendida y a la persona detrás de la API que ha extendido la herramienta para superar sus carencias o limitaciones.
+
+Guión.
+
+Saludo
+
+This is BIMrras, the podcast about BIM and technology applied to construction, the podcast that even Chuck Norris doesn't dare to listen to!
+
+Presentación
+
+Welcome to BIMrras Podcast, the place where we chat about BIM methodology and technology in the construction sector.
+
+Programa
+
+Introducción
+
+No te has equivocado de episodio. No.
+
+Esto sigue siendo BIMrras y seguimos tratando de que Chuck Norris escuche alguno de nuestros episodios, pero ese no es el motivo para torturarte con mi inglés de Galicia, ni siquiera se debe a que estemos probando una IA para que haga BIMrras en inglés (y te aseguro que lo hemos barajado...).
+
+El motivo de haber hecho el saludo en inglés es para ponerte en guardia. Esta será nuestra primera entrevista en inglés y ello pese a que nuestro invitado de hoy se desenvuelve con soltura en 6 idiomas, entre los que está el español, por supuesto.
+
+El inglés es el idioma del código, como lo es en muchísimos aspectos del BIM, o como lo es de muchos otros campos, así que nos hemos animado a desempolvar nuestro “inglés medio” y vamos allá!
+
+Invitado
+
+I must say that today, I am very, very excited to dive into the world of AEC technology with someone who has been, and is, behind some of the most popular CAD and BIM tools.
+
+Jeremy Tammik, also known as The building coder, is Consulting Analyst at Autodesk, has been a cornerstone of the company since 1988. His journey began as a technology evangelist, spreading the gospel of AutoCAD development across continents. After a stint away working on HVAC applications, Jeremy returned to Autodesk in 2005, and ever since,
+
+
+
+he’s been deeply embedded in the Autodesk Developer Network, specializing in the Revit API.
+
+So, yes, Jeremy is the man you blame on when something doesn’t work in your plugin or when you don’t understand why in the hell there’s no way to do whatever in an easier way when struggling with the Revit API.
+
+Jerremy has an amazing academic background in mathematics and physics, he has worked as a teacher, translator, and a C++ programmer on pioneering GUI and multitasking projects. As I said before, fluent in six languages, he’s a cultural savant who also enjoys playing the flute, reading, traveling, and engaging in theater improvisation, but he also is a yogi, carpenter, and used to enjoy climbing cliffs or navigating oceans.
+
+All those things while maintaining a family life with four children and involvement in community-focused projects.
+
+I just can say what have I been doing my entire life, Jeremy? Welcome to BIMrras.
+
+[Evelio]
+
+Please, let me introduce my partners before continuing, because I must say hello to Rogelio, who is helping me to destroy Shakespeare’s language while pretending to interview you.
+
+Hi there, Rogelio, how are you doing?
+
+[Evelio] Background
+
+You’ve been with Autodesk since 1988, which means you’ve been there since Autocad 10. Means a lot for many of us because it’s time to ask what was wrong with our hatches boundaries?
+
+Many people are aware of your Maths and Physics background, but it tells just a tiny piece of your history. I’m not talking about your philosophy or martial arts interests but it makes me wonder what was the way from your early studies in humanities to be a computer guy? I don’t know if nerd or geek is offensive, so I’ll avoid it by now.
+
+happy to be a geek and nerd.
+sometimes wish i wasn't
+most people studying math probably are
+i'm still working hard at becoming a normal humen being
+my partner helps me with that
+very tolerant
+
+[Evelio] Personal interests
+
+Anybody can read in the internet that you’re fluent in six languages, we really appreciate that you’ve offered to be interviewed in Spanish, and not only you speak six languages but you are an avid reader too.
+
+That’s only the peak
+
+How do these skills and hobbies influence your technical work?"
+
+very little
+i'm afraid i belong to the boomer generation fully, so i'm a workaholic
+still unable to let go of that trait
+still workig and functioning to earn a right to exist
+
+
+
+- "With interests in yoga, climbing, and music, how do you find these activities impact your professional performance or creativity?"
+
+yoga is good for me and my body
+my body is my temple
+unfortunately, i pay much to little attention excepth when things go wrong
+
+
+[Evelio] Autodesk
+
+Jeremy, most of us and most of our audience has a history to tell about how they ended in BIM or how they discovered a more productive way to work using BIM tools, I must say, using your BIM tools.
+
+Your background is anything but the usual, I mean, you are a mathematician working in an AEC related company, how was it even linked? could you start off by sharing a bit about your journey to Autodesk and with Autodesk?
+
+after studies looking for a first job
+in my university town of marburg
+big university, not many jobs to be had for newly hatched student
+contract with pharmaceutical company, with meetings all the way up to the big boss who wanted to know things like what i thought about trade unions and stuff
+unfortunately, i am not honest when confronted with authority, so i tell people what i think they want to hear.
+so, i got the contract, singed by them.
+before i signed, i met a your guy in the streets
+i liked him, he liked me
+he offered me a programming job for half the pay, dealing with graphics, mouse, and the C programming language
+drivers, interrupts, DOS, memory expander and memory extender
+tom and jerry
+no question answered
+learning the hard way
+programming and teaching
+also, towards the end of our work together, Thomas was also investing in C++ and marketing Borland C++, one of the first desktop C++ compilers
+so, i learned and taught some C++ as well as C
+
+
+[Evelio] Revit
+
+And then Revit... how did you get involved with Revit and the Revit API? [Evelio] Revit plugins
+
+I’m one of the firsts on claiming that one of the smartest things in Revit is the API. I’ve said many times that it’s very clever to launch an incomplete product that can be finished or adapted by their owners, well owners... you know, their users.
+
+I think it is fair to say that you came from Autocad where a lot of people learnt functional programming, even if they didn’t know Lisp was a functional programming language. How was born the idea of opening the app to be completed by their users?
+
+brainchild of John Walker
+XLISP was public domain
+he integrated it into AutoCAD
+thus was born AutoLISP, which became the largest Lisp dialect on the planet
+my original mission at autoesk was to teacch AutoList to programmers
+only a handfulk of people worldwide were doing that, and none of them wer in europe, so i was the one and only european developer support for AutoLisp, the one and only Autodesk API
+customisation proved hugely successful
+nobody could have imagined what developers would use it for, and how much they could achieve
+
+then cam the need to more speed, performance, and above all the need to integrate external functionality, libraries
+
+AutoSolid, a CSG constructive solid geometry modeler
+John Walker again integrated a C interface to the AutoLisp kernel, and thus was born ADS, the AutoCAD Development System
+
+so, we had C in AutoCAD, and i was a hard-core C expert... so things went well for me there.
+i got to train developers worldwide in ADS
+
+i also published my one and only book so far on the subject, in German language
+
+then came the discovery that OOP was a good thing, a requirement for large projects,
+
+AutoCAD was getting pretty large, with many people developers involved
+
+so, convert AutoCAD to C++
+
+Bill Adkison was tasked with rewriting AutoCAD from the ground up
+
+initially Smalltalk
+
+it became C++, and ARX was born, the AutoCAD runtime extension, consisting of a runtime kernel and all the rest added on as extensions. very complex, completely undocumented,
+
+and guess what? i knew C++
+
+just around then, i also felt i would like to do some real programming, not just tell the developer community wehat they ought to do.
+
+so, i joined a very small but quite advanced Swiss HVAC company with a huge AutoLISP HVAC app and worked with them for years to onvert it to ObjectARX.
+challenging, and one ends up fixing bug and serving customer requests rather than playing with the new exciting technologies
+i know a few developers who can do both, but i ended up feeling a bit locked in to the old stuff
+
+in the end i rejoined autodesk, half in consdulting in Munich and half a developer support, mainly focussed on Inventor and mechanical projects
+
+after a couple of years, i became full-time developer support again, and moved to Revit, because nobody else was covering that
+
+kean walmsley had started his blog throuigh the interface, and we searched for suitable candidated to start bloggin about Revit and Inventor as well.
+
+The Building Coder was born in 2008 and became one of ther main Revit API resources.
+
+i am a passionate developer, or more generally a passionate problem solver, be it maths or plumbing, or carpenty, building, whatever.
+
+so i love programming. i'm not so good at planning, so i prefer to hack and think in parallel
+
+but even more than that i love efficiency and functionality. and the problem i am faced with is to help the revit API community create great stuff.
+
+so, more and more, i tended away from programming myself towards the work of a libraries, knowledge menewgement, editing, perfecting and publishing the results of others.
+
+that is what the building coder does.
+
+[Evelio] Revit API migration
+
+It is well known that the Revit API was based on .NET 4.8 framework, but you’ve done a huge jump in Revit 2025 API changing from the .NET 4.8 to the .NET Core 8. This is a significant upgrade, isn’t it? Why now?
+
+long overdue
+
+And it’s not only because of this change but also because you’ve included a lot of enhancements, which is your first advice to all those developers who were resting while their applications only needed minor changes between Revit releases?
+
+learn new things
+
+embrace AI
+
+Given all the changes and enhancements in the Revit 2025 API, have you any advice to developers to make the most out of these updates? At least to suffer just the minimun during the migration.
+
+keep up to date
+
+remove all use of deprecated API
+
+[Evelio] Electrical an MEP in Revit 2025 API
+
+The Revit 2025 API has introduced some additions in the Electrical and MEP sectors. Could you highlight a couple of these additions and their potential impact?
+
+nope, sorry, i don't even know what they are
+
+[Rogelio] AEC Modelers development
+
+I’m an Archicad old time user who knows a thing or two about how an authoring software has evolved since its initial versions. I was very curious when Revit was launched and have followed the software since, although I’m not jumping to that wagon anytime soon, hopefully. Love my Archicad too much. But, and here comes the question, I’m very worried about how and where the authoring software is heading its course. Once upon a time we thought that we would be able to fill in every single hole of the creation process and the technical requirements that come with a project. But in the last decade what we have is some kind of stall in the development process.
+
+Autodesk changed its license model to a subscription service with the promise that all that money will be better invested in something like, for example, multithreading. None of that came alive. And now Graphisoft is following those steps. And it seems that legacy code within Revit or Archicad has become too heavy a weight to be lifted by the programming core of both companies, so the new features are more or less cosmetical features that add little value to the final user. In my humble opinion.
+
+Now, are we doom? I mean, Do we need a new kid on the block to spice things up? Has authoring software reached its peak level and now the curve of development has flatten?
+
+components
+
+no unsoved problems on the plante, and most solutions are also available as open source
+
+use the existing solutions
+
+don't reinvent the wheel unless you really know what you are doing and have explored and fully understood all the existing options first
+
+we stand on the shoulders of giants
+
+[Evelio] Helping community
+
+We BIMrras strongly believe in what community can build, that’s why we’ve built BIMrras INSIDERS, actually. You are known not only for being a rockstar in the developer community but also for blogging about Forge, BIM and the Revit API. What motivates you to share your knowledge so actively?
+
+problem solving, efficient use of resources, avoind waste, including wastedd effort
+
+larry wall: the three great virtues of a programmer; Laziness, Impatience and Hubris -- thethreevirtues.com
+
+[Rogelio] OpenSource inspiration
+
+Our AEC sector is crowded with a lot of extremely small companies. We made an inquiry some time ago for something like 500 hundred professionals and we found that almost 98% were working in companies of 5 or less people. And they do everything: the architecture, the structural analysis, MEP analysis and design. You name it. And the license cost of all that software needed is a heavy heavy burden that can kill a small company in a blink. So, many of them are looking at the community with the hope that someday somehow a solution from the community will come to save them. Not only cost related, but information property too. We’ve seen such a white knight in other sectors: photography, office software, 3d modeling. Why is it so difficult to produce an open source AEC modeler?
+
+big, heavy, big customers, guarantees, liability issues
+
+why was windows so successful even though linux was more powerful and robust?
+
+[Evelio] what’s next?
+
+You’ve witnessed almost the entire history of AEC software being a developer into the construction industry. I’ve been hearing and listening more and more how a BIM manager, let’s say BIM expert, must know about programming. I’me very fond on having coding knowledge but I’m pretty sure about this: to be a BIM manager has nothing to do with being a developer, however, I believe that a certain knowledge of programming can be tremendously useful in any technical environment.
+
+Do you agree? Any advice for professionals or students who might be listening and considering focusing their career on coding?
+
+you need to understand what you can do with programming
+
+nowadays, you also need to uderstand what you can do with AI
+
+and both of areas are evolving fast
+
+and the pace if accelerating
+
+exciting times we live in, fraught with possibilities as well as danger
+
+[Evelio] one more thing
+
+My last question is almost obliged, taking into account your privileged position I must ask what do you think is coming, what technologies or trends are you most excited about in our sector? please don’t say Artificial Intelligence...
+
+AI for sure.
+
+my job can easily be taken over to way over 70%.
+in fact, i acively started expling ways to implement that back in 2017...
+look at the building coder and search for Q4R4 --
+https://duckduckgo.com/?q=Q4R4+building
+
+Acabamos...
+
+As we wrap up our conversation today, we're curious about the tools and resources that inspire and support your work. This insight not only helps us understand how you stay ahead in your field but also offers our listeners some great resources to explore, so...
+
+Las fuentes de información
+
+What are your main sources of information? What are those you regularly rely on?
+
+internet, pulic discussion forums, internal company communications, slack channels, meeting with my colleagues
+
+Las herramientas
+
+Could you share with us one essential tool, whether it's software, hardware, or something else, that you find indispensable in your daily routine?
+
+i work on the Unix command line using shell scripts, python tools, a text editor, email. almost nothing else.
+
+ten years ago, before switching to he mac, i used the DOS command line, batch files and python under windows.
+
+i was able to migrate all my important tools within hours from Windows to Mac.
+
+i hguess that is one way yo define a nerd.
+
+all the work i have ever done is contained in pure text files.
+
+for example, you scriptn on google docs i printed out to pdf, copied the text into my editor, and added some thoughts to it there.
+ready to become a blog post, for instance.
+
+another example for text based fanaticism: Ppt2txt for comparing slide decks:
+https://github.com/jeremytammik/Ppt2txt
+
+i can search and find very rapidly back to the last millenium.
+
+Despedida
+
+Well, folks, that’s all. This is the end of today’s show.
+
+My goal was to keep everyone awake and engaged, and I hope we've managed just that.
+
+To wrap everything up, it’s clear that building involves code more and more which means that APIs, frameworks, programming languages, and all that stuff has found its way into our computers an BIM skills.
+
+I’m not saying that everybody should learn to program, which I strongly recommend, but it’s very clear to me that coders are becoming more and more common in the AEC sector.
+
+Jeremy, anything to add before we close? That’s it for today.
+
+Thanks, Jeremy, for sharing your insights and stories. I hope you enjoyed spending this time with us or, at least, not suffered too much.
+
+And before we go, remember to join our community where you can dive deeper into technology and innovation in the AEC sector: BIMrras INSIDERS
+
+Don’t miss out on connecting with top minds in the field.
+
+Best regards and until the next episode of the BIMrras podcast. The podcast about BIM that even Chuck Norris doesn’t dare to listen to!
+
