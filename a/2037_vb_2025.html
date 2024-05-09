@@ -163,12 +163,13 @@ I think this little additional piece of information would go a long way in helpi
 <p>Adding another note to this...</p>
 <p>I'm not sure what the upgrade process does differently from one project to the next but, whatever it is it isn't consistent.</p>
 <p>On the next project, the framework references came in differently; the <code>FrameworkReference</code> tag that the previous project required caused a warning and I had errors due to a missing reference that had been automatically added to the other projects when I set the target to windows using</p>
-<p>&lt;TargetFramework&gt;net8.0-windows&lt;/TargetFramework&gt;</p>
+<pre><code>&lt;TargetFramework&gt;net8.0-windows&lt;/TargetFramework&gt;</code></pre>
+
 <p>So I had to do this to make it all come together:</p>
-<pre><code>  &lt;ItemGroup&gt;
-    &lt;!--&lt;FrameworkReference Include="Microsoft.WindowsDesktop.App" /&gt;--&gt;
-    &lt;FrameworkReference Include="Microsoft.WindowsDesktop.App.WindowsForms" /&gt;
-  &lt;/ItemGroup&gt;
+<pre><code>&lt;ItemGroup&gt;
+<br/>  &lt;!-- &lt;FrameworkReference Include="Microsoft.WindowsDesktop.App" /&gt; --&gt;
+<br/>  &lt;FrameworkReference Include="Microsoft.WindowsDesktop.App.WindowsForms" /&gt;
+<br/>&lt;/ItemGroup&gt;
 </code></pre>
 
 <p><strong>Answer:</strong>
@@ -211,13 +212,13 @@ Good advice on the start a project from scratch note.
 Creating a project(s) from scratch (in a solution(s) created from scratch) for the different types of projects I had to deal with (WinForms project, WPF project, Console App, standalone executable [the last two not related to the Revit API, just noting them], etc) was one of the methods that helped me find what was actually required and what might be able to be safely removed.
 I would recommend that for anyone making the transition from Framework to SDK.</p>
 <p>I also found a few repeated tags that were added to <code>&lt;PropertyGroup&gt;</code> nodes by the upgrade tool whose removal helped greatly:</p>
-<pre><code>  &lt;!--&lt;OutputType&gt;Library&lt;/OutputType&gt;--&gt;
-  &lt;!--&lt;MyType&gt;Windows&lt;/MyType&gt;--&gt;
-  &lt;!--&lt;ImportWindowsDesktopTargets&gt;true&lt;/ImportWindowsDesktopTargets&gt;--&gt;
-  &lt;!--&lt;GenerateAssemblyInfo&gt;false&lt;/GenerateAssemblyInfo&gt;--&gt;
+<pre><code>&lt;!--&lt;OutputType&gt;Library&lt;/OutputType&gt;--&gt;
+<br/>&lt;!--&lt;MyType&gt;Windows&lt;/MyType&gt;--&gt;
+<br/>&lt;!--&lt;ImportWindowsDesktopTargets&gt;true&lt;/ImportWindowsDesktopTargets&gt;--&gt;
+<br/>&lt;!--&lt;GenerateAssemblyInfo&gt;false&lt;/GenerateAssemblyInfo&gt;--&gt;
 </code></pre>
 
-<p>The GenerateAssemblyInfo and ImportWindowsDesktopTargets seemed like they would belong yet they were causing issues that seemed contra-indicative to what they would seem to be adding to the whole...</p>
+<p>The <code>GenerateAssemblyInfo</code> and <code>ImportWindowsDesktopTargets</code> seemed like they would belong yet they were causing issues that seemed contra-indicative to what they would seem to be adding to the whole...</p>
 <p>Oh well, if it was easy it wouldn't be any fun right?</p>
 <h4><a name="3"></a> GenAI and LLM Updates</h4>
 <p>Recent weeks have seen updates to several of the main publicly accessible LLMs, each one claiming to be measurably superior to all its predecessors, e.g., Claude, ChatGPT, Gemini, Meta AI.
