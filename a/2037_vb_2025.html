@@ -1,0 +1,272 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css"></p>
+<!-- https://highlightjs.org/#usage
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+-->
+
+<!-- https://prismjs.com -->
+<p><link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css" rel="stylesheet" /></p>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+<style> code[class*=language-], pre[class*=language-] { font-size : 90%; } </style>
+<p></head></p>
+<!---
+
+- VB projects in Revit 2025 API
+  https://forums.autodesk.com/t5/revit-api-forum/vb-project-solution-framework-upgrade-to-sdk-for-revit-2025/m-p/12723698
+
+- Prompt library https://docs.anthropic.com/claude/prompt-library
+
+- GPT-4 can exploit zero-day security vulnerabilities all by itself
+  https://www.techspot.com/news/102701-gpt-4-can-exploit-zero-day-security-vulnerabilities.html
+
+- An AI took on a human pilot in a DARPA-sponsored dogfight
+  https://www.defenseone.com/technology/2024/04/man-vs-machine-ai-agents-take-human-pilot-dogfight/395930/
+
+- integration of generative 3D (and 2d to 3d creation) in the Spline UI
+  https://spline.design/ai-generate
+
+- successful AI-conic coffee blend
+  https://apnews.com/article/artificial-intelligence-finland-coffee-blend-0cd12d5ae15a6d0e928c4cb4d7635b09
+  no human intervention required
+
+- Meta AI released, and
+  answered
+  https://forums.autodesk.com/t5/revit-api-forum/binding-different-lists-to-different-rows-in-datagrid/td-p/12722925
+  summarised
+  https://forums.autodesk.com/t5/revit-api-forum/structural-framing-cut-by-reference-plane/m-p/12260041/highlight/false#M74290
+
+- AI tools:
+  ChatGPT
+  Gemini + https://notebooklm.google/
+  Claude
+  Meta AI
+
+- The State of Generative AI, 2024
+  https://www.thealgorithmicbridge.com/p/the-state-of-generative-ai-2024
+
+- Ferret: Refer and Ground Anything Anywhere at Any Granularity
+  https://arxiv.org/abs/2310.07704
+  The Ferret multimodal LLM understands spatial referring of any shape or granularity within an image and accurately grounds open-vocabulary descriptions, e.g.:
+  /Users/jta/a/doc/revit/tbc/git/a/img/ferret_mllm.png
+
+- Pankesh Bamotra
+  https://chat.openai.com
+  Now you can use ChatGPT 3.5 without logging in.
+  Likely to collect more data
+
+- Models All The Way Down
+  https://knowingmachines.org/models-all-the-way
+  by Christo Buschek & Jer Thorp
+  Timo Gmeiner on slack
+  nice visualizations - makes a boring dataset bias examination much more engaging!
+  Content is great! I love the look and feel as well.
+  Loved it, this part is probably my favorite:
+  > Here we find an important truth about LAION-5B:
+  It contains less about how humans see the world than it does about how search engines see the world. It is a dataset that is powerfully shaped by commercial logics.
+
+- ScrapeGraphAI: You Only Scrape Once
+  https://github.com/VinciGit00/Scrapegraph-ai
+
+- video conferencing: jitsi meet
+  https://jitsi.org/
+  More secure, more flexible, and completely free video conferencing
+
+- World Happiness Report 2024
+  https://worldhappiness.report/ed/2024/
+
+twitter:
+
+The Revit 2025 API is based on .NET 8, so we discuss upgrading from the .NET 4.8 framework, .NET 8 migration webinar recording and the Revit API .NET 8 migration guide for the #RevitAPI @AutodeskRevit #BIM @DynamoBIM https://autode.sk/dotnet8migration
+
+&ndash; ...
+
+linkedin:
+
+#BIM #DynamoBIM #AutodeskAPS #Revit #API #IFC #SDK #Autodesk #AEC #adsk
+
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+
+<center>
+<img src="img/" alt="" title="" width="600"/>
+<p style="font-size: 80%; font-style:italic"></p>
+</center>
+
+-->
+
+<h3>Migrating VB to .NET Core 8 and Lots of AI</h3>
+<p>There is so much news on advances in LLMs and AI; I list a few items that caught my attention.
+First, however, we round off the Revit 2025 API migration with some observations on VB.NET add-ins:</p>
+<ul>
+<li><a href="#2">Migrating VB add-in to Revit 2025</a></li>
+<li><a href="#3">GenAI and LLM updates</a></li>
+<li><a href="#4">Jitsi Meet video conferencing</a></li>
+<li><a href="#5">World Happiness Report 2024</a></li>
+</ul>
+<h4><a name="2"></a> Migrating VB Add-In to Revit 2025</h4>
+<p>Gary Orr and
+Richard <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1035859">RPThomas108</a> Thomas
+discovered and share some interesting insights
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/vb-project-solution-framework-upgrade-to-sdk-for-revit-2025/m-p/12723698">VB projects in Revit 2025 API</a>:</p>
+<p><strong>Question:</strong>
+I've read all of the posts regarding upgrading, I have applied everything that my limited experience allows me to understand (Been doing this for years, but on a limited basis as writing code isn't even in my job description these days and I can barely decipher all of the C# examples since I'm not bilingual and my native language is VB).</p>
+<p>So far I have managed, through days of trial and error, to port one of my solutions (with 3 Projects) and have slowly whittled away the errors and warnings. My WinForms dialogs were a real bear but I finally managed to delete enough tags in the VBproj files to get them working (creating a new WinForms solution and project from scratch and doing some comparisons helped with that as it didn't have all the extra gobbledygook in it).</p>
+<p>Finally upgraded successfully with one exception:</p>
+<ul>
+<li>Warning MSB3277 Found conflicts between different versions of "WindowsBase" that could not be resolved.</li>
+</ul>
+<p>I've updated to all of the latest (which I'm beginning to believe might be my issue).
+I'm working in
+Visual Studio Community 2022 Version 17.9.6
+with
+dotnet SDK 8.0.204.</p>
+<p>I get this warning on both the ported/upgraded solution/projects as well as the solution/project that I started from scratch.</p>
+<p>Has anyone seen this warning or know a solution for resolving the conflict between the Revit API references and the newer native .NET references?</p>
+<p><strong>Answer:</strong>
+First, congratulations on making progress, and sorry the migration is causing such a hassle for you.</p>
+<p>Warnings can be ignored.
+They do no harm.
+Of course, it is nicer to eliminate them.</p>
+<p>Actually, the very warning MSB3277 that you mention is also listed in
+the <a href="https://thebuildingcoder.typepad.com/blog/2024/04/migrating-from-net-48-to-net-core-8.html">official Revit API .NET 8 migration guide</a>:</p>
+<blockquote>
+<p>Common Issues...
+Here are some common issues you may encounter when upgrading to .NET 8:</p>
+<ul>
+<li>Build Warning MSB3277
+When building code that references RevitAPI or RevitUIAPI, you will see the build warning MSB3277.
+To fix this, add a reference to the Windows Desktop framework: &lt;FrameworkReference Include="Microsoft.WindowsDesktop.App"/&gt;</li>
+</ul>
+</blockquote>
+<p><strong>Response:</strong>
+I did see that reference, but it doesn't say where to put it or what container node it required (I had correctly assumed that I could use the vbproj file, since it's the same xml as the csproj file) and tried adding it to the (a) <code>&lt;PropertyGroup&gt;</code>node at which VS completely wigged out and said that an invalid call forced VS to unload the project...
+I then spent a day following link after link in the MS documents trying to figure it out as well...</p>
+<p>I had also tried using the <code>Add Reference</code> function to see if I could load it that way, but I couldn't find it as an available loadable reference.</p>
+<p>So, with your prompting I tried again...
+This time I used VS intellicode to help me work it out:
+Create a node, check to see if that node contained the <code>&lt;FrameworkReference&gt;</code> property, repeat until I found the correct one.
+I think this little additional piece of information would go a long way in helping people like myself</p>
+<pre><code>  &lt;ItemGroup&gt;
+    &lt;FrameworkReference Include="Microsoft.WindowsDesktop.App" /&gt;
+  &lt;/ItemGroup&gt;
+</code></pre>
+
+<p>Now I have these references:</p>
+<p><center>
+<img src="img/vb_2025_2.png" alt="VB 2025" title="VB 2025" width="359"/> <!-- Pixel Height: 431 Pixel Width: 359 -->
+</center></p>
+<p>... along with a warning free build.</p>
+<p>Now perhaps I'll tackle the big toolset...</p>
+<p>Adding another note to this...</p>
+<p>I'm not sure what the upgrade process does differently from one project to the next but, whatever it is it isn't consistent.</p>
+<p>On the next project, the framework references came in differently; the <code>FrameworkReference</code> tag that the previous project required caused a warning and I had errors due to a missing reference that had been automatically added to the other projects when I set the target to windows using</p>
+<p>&lt;TargetFramework&gt;net8.0-windows&lt;/TargetFramework&gt;</p>
+<p>So I had to do this to make it all come together:</p>
+<pre><code>  &lt;ItemGroup&gt;
+    &lt;!--&lt;FrameworkReference Include="Microsoft.WindowsDesktop.App" /&gt;--&gt;
+    &lt;FrameworkReference Include="Microsoft.WindowsDesktop.App.WindowsForms" /&gt;
+  &lt;/ItemGroup&gt;
+</code></pre>
+
+<p><strong>Answer:</strong>
+Also found this works:</p>
+<pre><code>  &lt;UseWindowsForms&gt;true&lt;/UseWindowsForms&gt;</code></pre>
+
+<p>This just highlights the way things have gone a bit backwards i.e. System.Drawing 4.0 instead of 8.0???
+So, you add additional things to the point it basically becomes .NetFramework again anyway.
+Yet they still can't open Revit on their mac or their phone and were never aiming to.</p>
+<p>Think they should have got rid of application macros not the document ones.
+Document macros offered the ability to transmit functionality across offices on a project specific level, i.e., with the project files, not as some separate things such as dynamo script etc.
+Application macros are just another way of doing the same thing as VS or pyRevit or half a dozen other things similar.</p>
+<p><strong>Response:</strong>
+<code>UseWindowsForms</code> was the first tag I used (thanks to a lot of reading in the API help and the posts made here by some people that, unlike myself, actually know what they're doing)...</p>
+<p>But... it didn't do the complete job.
+I had to delete extra lines/tags and add a few additional lines/tags...
+and scratch my head, and cuss, and try deleting some more and try adding others...
+then cuss some more...
+then scratch my head some more...
+But I do now have everything compiling properly for two solutions with a total of four projects...</p>
+<p>Each project ended up requiring a slightly different combination to get them working...
+I only have two more solutions to go, yay.</p>
+<p><strong>Answer:</strong>
+Yes, certain things are fixed into the Frameworks, aren't they (more than there was with .NetFramework), so you have to review those already included reference versions and if you've referenced them separately historically then you have to take those out.
+In this example there was newer references used in the Revit API DLLs due to options they compiled those with.
+So, the baseline references used in .NET 8 were older in version than the ones included with windows desktop option.
+So, in a lot of cases, it may be easier starting over with the project file references and adding references back as you see the related missing references errors for those.</p>
+<p>So, as an example:
+Microsoft.NetCore.App
+contains
+Microsoft.VisualBasic 10.0.0.0
+but
+Microsoft.WindowsDesktop.App
+contains
+Microsoft.VisualBasic 10.1.0.0</p>
+<p>So, if you don't include the desktop option but include a reference that does i.e. RevitAPI.dll it tells you it is going to ignore 10.1.0.0 (since that is not added in your project). This would be a problem I suspect if you used a call from 10.0.0.0 that didn't exist anymore in 10.1.0.0 (since Revit is likely to be loading 10.1.0.0 not 10.0.0.0, first come first served).</p>
+<p>So, isn't really VB specific that is just one of the affected assemblies that is part of Microsoft.NetCore.App but there are similar warnings for System.Drawing etc. You only encounter them if you use them in code so different projects will have same problem with different things.</p>
+<p><strong>Response:</strong>
+Good advice on the start a project from scratch note.
+Creating a project(s) from scratch (in a solution(s) created from scratch) for the different types of projects I had to deal with (WinForms project, WPF project, Console App, standalone executable [the last two not related to the Revit API, just noting them], etc) was one of the methods that helped me find what was actually required and what might be able to be safely removed.
+I would recommend that for anyone making the transition from Framework to SDK.</p>
+<p>I also found a few repeated tags that were added to <code>&lt;PropertyGroup&gt;</code> nodes by the upgrade tool whose removal helped greatly:</p>
+<pre><code>  &lt;!--&lt;OutputType&gt;Library&lt;/OutputType&gt;--&gt;
+  &lt;!--&lt;MyType&gt;Windows&lt;/MyType&gt;--&gt;
+  &lt;!--&lt;ImportWindowsDesktopTargets&gt;true&lt;/ImportWindowsDesktopTargets&gt;--&gt;
+  &lt;!--&lt;GenerateAssemblyInfo&gt;false&lt;/GenerateAssemblyInfo&gt;--&gt;
+</code></pre>
+
+<p>The GenerateAssemblyInfo and ImportWindowsDesktopTargets seemed like they would belong yet they were causing issues that seemed contra-indicative to what they would seem to be adding to the whole...</p>
+<p>Oh well, if it was easy it wouldn't be any fun right?</p>
+<h4><a name="3"></a> GenAI and LLM Updates</h4>
+<p>Recent weeks have seen updates to several of the main publicly accessible LLMs, each one claiming to be measurably superior to all its predecessors, e.g., Claude, ChatGPT, Gemini, Meta AI.
+I have tried them all out briefly with satisfactory results.</p>
+<p>Now you can now use <a href="https://chat.openai.com">ChatGPT 3.5</a> without logging in.
+Possibly to collect more data?</p>
+<p>I used Meta AI very effectively to answer the Revit API discussion forum thread
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/binding-different-lists-to-different-rows-in-datagrid/td-p/12722925">binding different lists to different rows in DataGrid</a>,
+and sumarise another,
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/structural-framing-cut-by-reference-plane/m-p/12260041">structural framing cut by reference plane</a></p>
+<p>For a nice collection of LLM prompts, you can check out the <a href="https://docs.anthropic.com/claude/prompt-library">Anthropic Prompt Library</a> for Claude.</p>
+<p>Alberto Romero of The Algorithmic Bridge provides an interesting report
+on <a href="https://www.thealgorithmicbridge.com/p/the-state-of-generative-ai-2024">The State of Generative AI, 2024</a>.</p>
+<p><a href="https://knowingmachines.org/models-all-the-way">Models All The Way Down</a> by Christo Buschek and Jer Thorp
+presents an in-depth analysis of the sources used to generate the huge amount of material required to train an LLM, presented in a novel and engaging fashion with lots of visualisation and animation, making an otherwise possibly boring dataset bias examination much more engaging.
+In particular, it examines the ubiquitous LAION-5B dataset:</p>
+<blockquote>
+<p>... an important truth about LAION-5B:
+It contains less about how humans see the world than it does about how search engines see the world.
+It is a dataset that is powerfully shaped by commercial logics.</p>
+</blockquote>
+<p>Interesting new capabilities exhibited by LLMs:</p>
+<ul>
+<li><a href="https://www.techspot.com/news/102701-gpt-4-can-exploit-zero-day-security-vulnerabilities.html">GPT-4 can exploit zero-day security vulnerabilities all by itself</a></li>
+<li><a href="https://www.defenseone.com/technology/2024/04/man-vs-machine-ai-agents-take-human-pilot-dogfight/395930/">An AI took on a human pilot in a DARPA-sponsored dogfight</a></li>
+<li>A Finnish company released the <a href="https://apnews.com/article/artificial-intelligence-finland-coffee-blend-0cd12d5ae15a6d0e928c4cb4d7635b09">AI-conic coffee blend</a> designed and marketed by AI with hardly any human intervention required</li>
+<li><a href="https://spline.design/ai-generate">Spline AI 3D Generation</a> integrates generative 3D (and 2d to 3d creation) in the UI, enabling creation of 3D objects from text prompts and images</li>
+<li><a href="https://github.com/VinciGit00/Scrapegraph-ai">ScrapeGraphAI</a> implements a web scraping python library that uses LLM and direct graph logic to create scraping pipelines for websites, documents and XML files</li>
+<li>The Ferret multimodal LLM understands spatial referring of any shape or granularity within an image and accurately grounds open-vocabulary descriptions, documented
+in <a href="https://arxiv.org/abs/2310.07704">Ferret: Refer and Ground Anything Anywhere at Any Granularity</a>,
+for example like this:</li>
+</ul>
+<p><center>
+<img src="img/ferret_mllm.png" alt="Ferret multimodal LLM" title="Ferret multimodal LLM" width="800"/> <!-- Pixel Height: 452 Pixel Width: 1,718 -->
+</center></p>
+<p><a href="https://www.linkedin.com/posts/reidhoffman_can-talking-with-an-ai-generated-version-activity-7188916775692947456-Dw6q?utm_source=share&amp;utm_medium=member_desktop">Reid Hoffman engages with his AI digital twin</a>,
+spending 15 minutes or so exploring:</p>
+<blockquote>
+<p>Can talking with an AI-generated version of myself lead to a deeper awareness of how I think?
+That's what I wanted to find out as I continue to explore the latest AI technologies in hands-on ways.</p>
+</blockquote>
+<h4><a name="4"></a> Jitsi Meet Video Conferencing</h4>
+<p>Moving off the AI topic, I discovered a secure, flexible, and free video conferencing platform,
+<a href="https://jitsi.org/">Jitsi meet</a>,
+based on the Jitsi set of open-source projects that allows you to easily build and deploy secure video conferencing solutions.</p>
+<h4><a name="5"></a> World Happiness Report 2024</h4>
+<p>And finally, for the really important aspects of life, the <a href="https://worldhappiness.report/ed/2024/">World Happiness Report 2024</a>
+focuses on the happiness of people at different stages of life:</p>
+<blockquote>
+<p>Happiness research shows a nuanced picture that is changing over time...
+We encourage you to explore the 2024 report for the latest findings on the happiness of the world’s young, the old, and everyone in between.</p>
+</blockquote>
