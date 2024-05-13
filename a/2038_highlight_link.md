@@ -224,7 +224,7 @@ Thank you both, Mohamed Arshad K and Moustafa Khalil, for chipping in on this!
 ####<a name="4"></a> IsMainWindowActive Predicate
 
 Aleksandr '@ModPlus' Pekshev raised the question and shared his working solution
-for [how to detect is opened preview document in type properties?](https://forums.autodesk.com/t5/revit-api-forum/how-to-detect-is-opened-preview-document-in-type-properties/m-p/12768772):
+for [how to detect is opened preview document in type properties](https://forums.autodesk.com/t5/revit-api-forum/how-to-detect-is-opened-preview-document-in-type-properties/m-p/12768772):
 
 **Question:**
 There is a `Preview` button in the type properties dialog.
