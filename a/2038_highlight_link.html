@@ -51,7 +51,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 <h4><a name="2"></a> Highlight Linked Element</h4>
 <p>Lately, Moustafa Khalil very kindly provided a lot of helpful support in
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a>.</p>
-<p>He now took a step further, sharing hiw research and explanation on how
+<p>He now took a step further, sharing his research and explanation on how
 to <a href="https://forums.autodesk.com/t5/revit-api-forum/highlight-elements-from-a-linked-document/td-p/12768033">highlight elements from a linked document</a>,
 a frequently raised topic, and even starting a new BIM blog, saying:</p>
 <p>The past 2 days I was scratching my head of how to highlight an element from a linked document.
@@ -142,7 +142,7 @@ Yes, it can be done.
 The API wraps the UI functionality, so the best way to address this is to determine the optimal workflow and best practices manually in the user interface first.
 How do you solve this in the UI?</p>
 <p>So, the API does not directly support changing the duct length.
-One workaround is to delete the existing one and create a new duct with a new length, then update the neighboring duct length according to that:</p>
+One workaround is to delete the existing one and create a new duct with a new length, then update the neighbouring duct length according to that:</p>
 <pre><code class="language-cs">  UIDocument uiDoc = commandData.Application.ActiveUIDocument;
   Document doc = uiDoc.Document;
 
@@ -183,8 +183,8 @@ locCurve.Curve = extendedCurve;
 <p>If the duct is connected to neighbouring elements, you can let Revit modify and adapt its length automatically by moving those neighbours and their connection points.
 Look at an exploration of different approaches to modifying pipe length in the blog post series
 on <a href="http://thebuildingcoder.typepad.com/blog/2014/01/final-rolling-offset-using-pipecreate.html">implementing a rolling offset</a>.</p>
-<p>Just moving the neighbor elements will keep all the connections intact.</p>
-<p>To add another approach, for those MEP curves without neighbor connections:
+<p>Just moving the neighbour elements will keep all the connections intact.</p>
+<p>To add another approach, for those MEP curves without neighbour connections:
 We may also extend the curve directly by its connector, which means no new line or assigning a location curve is needed:</p>
 <pre><code class="language-cs">Connector connector = getMyConnector();
 double extendby = 1; // extend by 1 feet for example

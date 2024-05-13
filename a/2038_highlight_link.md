@@ -55,7 +55,7 @@ Today, let's stick with some pure Revit API issues fresh from the forum:
 Lately, Moustafa Khalil very kindly provided a lot of helpful support in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160).
 
-He now took a step further, sharing hiw research and explanation on how
+He now took a step further, sharing his research and explanation on how
 to [highlight elements from a linked document](https://forums.autodesk.com/t5/revit-api-forum/highlight-elements-from-a-linked-document/td-p/12768033),
 a frequently raised topic, and even starting a new BIM blog, saying:
 
@@ -160,7 +160,7 @@ The API wraps the UI functionality, so the best way to address this is to determ
 How do you solve this in the UI?
 
 So, the API does not directly support changing the duct length.
-One workaround is to delete the existing one and create a new duct with a new length, then update the neighboring duct length according to that:
+One workaround is to delete the existing one and create a new duct with a new length, then update the neighbouring duct length according to that:
 
 <pre><code class="language-cs">  UIDocument uiDoc = commandData.Application.ActiveUIDocument;
   Document doc = uiDoc.Document;
@@ -206,9 +206,9 @@ If the duct is connected to neighbouring elements, you can let Revit modify and 
 Look at an exploration of different approaches to modifying pipe length in the blog post series
 on [implementing a rolling offset](http://thebuildingcoder.typepad.com/blog/2014/01/final-rolling-offset-using-pipecreate.html).
 
-Just moving the neighbor elements will keep all the connections intact.
+Just moving the neighbour elements will keep all the connections intact.
 
-To add another approach, for those MEP curves without neighbor connections:
+To add another approach, for those MEP curves without neighbour connections:
 We may also extend the curve directly by its connector, which means no new line or assigning a location curve is needed:
 
 <pre><code class="language-cs">Connector connector = getMyConnector();
