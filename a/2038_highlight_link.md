@@ -19,6 +19,8 @@
 - highlight elements from a linked document
   https://forums.autodesk.com/t5/revit-api-forum/highlight-elements-from-a-linked-document/td-p/12768033
 
+- Modify Duct Length in Revit API Despite Read-Only Property Constraint
+  https://forums.autodesk.com/t5/revit-api-forum/modify-duct-length-in-revit-api-despite-read-only-property/m-p/12763233
 
 twitter:
 
@@ -123,6 +125,85 @@ UiDoc.Selection.SetReferences([reference]);
 </center>
 
 Many thanks to Moustafa for this clear explanation and demonstration, and for all his other great support in the discussion forum!
+
+####<a name="3"></a> Modify Duct Length
+
+Moustafa also helped resolve how
+to [Modify Duct Length in Revit API Despite Read-Only Property Constraint](https://forums.autodesk.com/t5/revit-api-forum/modify-duct-length-in-revit-api-despite-read-only-property/m-p/12763233):
+
+**Question:**
+I'm wondering if it's possible to alter the length of a duct in Revit through the API.
+Upon trying, I noticed that the duct length property appears to be set as read-only.
+Is there a workaround to modify the duct length?
+
+**Answer:**
+Yes, it can be done.
+The API wraps the UI functionality, so the best way to address this is to determine the optimal workflow and best practices manually in the user interface first.
+How do you solve this in the UI?
+
+So, the API does not directly support changing the duct length.
+One workaround is to delete the existing one and create a new duct with a new length, then update the neighboring duct length according to that:
+
+UIDocument uiDoc = commandData.Application.ActiveUIDocument;
+            Document doc = uiDoc.Document;
+
+            Reference refer = uiDoc.Selection.PickObject(Autodesk.Revit.UI.Selection.ObjectType.Element);
+
+            Duct duct = doc.GetElement(refer) as Duct;
+
+            ///New Length Dimension
+            double newLength = UnitUtils.ConvertToInternalUnits(10000,UnitTypeId.Millimeters);
+
+            ///Calculating New Length
+            LocationCurve curve = duct.Location as LocationCurve;
+            XYZ p1 = curve.Curve.GetEndPoint(0);
+            XYZ p2 = p1 + ((curve.Curve as Line).Direction * newLength);
+
+            using (Transaction deleteDuctAndCreateNew = new Transaction(doc, "Delete Existing Duct and Create New"))
+            {
+                deleteDuctAndCreateNew.Start();
+
+                //Create New Duct
+                Duct.Create(doc, duct.MEPSystem.GetTypeId(),duct.GetTypeId(), duct.ReferenceLevel.Id, p1, p2);
+
+                doc.Delete(duct.Id);
+
+                deleteDuctAndCreateNew.Commit();
+            }
+
+Reference Video
+ChangeDuctLength.gif
+
+change_duct_length.gif
+
+Pixel Height: 559 Pixel Width: 999
+
+However, deleting an existing element means disconnecting it from the System and losing all instance property values such as mark or comment.
+
+I would be more inclined to  only increase the length of the MepCurve (duct, pipe, conduit...etc.):
+
+
+var locCurve = ductObject.Location as LocationCurve;
+locCurve.Curve = extendedCurve;
+
+
+If the duct is connected to neighbouring elements, you can let Revit modify and adapt its length automatically by moving those neighbours and their connection points.
+Look at an exploration of different approaches to modifying pipe length in the blog post series on implementing a rolling offset:
+
+http://thebuildingcoder.typepad.com/blog/2014/01/final-rolling-offset-using-pipecreate.html
+
+Just moving the neighbor elements will keep all the connections intact.
+
+To add another approach, for those MEP curves without neighbor connections:
+We may also extend the curve directly by its connector, which means no new line or assigning a location curve is needed:
+
+Connector connector = getMyConnector();
+double extendby = 1; // extend by 1 feet for example
+XYZ direction = ductCurve.Direction; // assuming the duct is linear curve
+connector.Origin = connector.Origin + direction * extendby;
+
+Thank you both, Mohamed Arshad K and Moustafa Khalil, for chipping in on this!
+
 
 
 
