@@ -22,6 +22,9 @@
 - Modify Duct Length in Revit API Despite Read-Only Property Constraint
   https://forums.autodesk.com/t5/revit-api-forum/modify-duct-length-in-revit-api-despite-read-only-property/m-p/12763233
 
+- How to detect is opened preview document in type properties?
+  https://forums.autodesk.com/t5/revit-api-forum/how-to-detect-is-opened-preview-document-in-type-properties/m-p/12768772
+
 twitter:
 
  the @AutodeskRevit #RevitAPI #BIM @DynamoBIM
@@ -144,34 +147,36 @@ How do you solve this in the UI?
 So, the API does not directly support changing the duct length.
 One workaround is to delete the existing one and create a new duct with a new length, then update the neighboring duct length according to that:
 
-UIDocument uiDoc = commandData.Application.ActiveUIDocument;
-            Document doc = uiDoc.Document;
+<pre><code>  UIDocument uiDoc = commandData.Application.ActiveUIDocument;
+  Document doc = uiDoc.Document;
 
-            Reference refer = uiDoc.Selection.PickObject(Autodesk.Revit.UI.Selection.ObjectType.Element);
+  Reference refer = uiDoc.Selection.PickObject(Autodesk.Revit.UI.Selection.ObjectType.Element);
 
-            Duct duct = doc.GetElement(refer) as Duct;
+  Duct duct = doc.GetElement(refer) as Duct;
 
-            ///New Length Dimension
-            double newLength = UnitUtils.ConvertToInternalUnits(10000,UnitTypeId.Millimeters);
+  ///New Length Dimension
+  double newLength = UnitUtils.ConvertToInternalUnits(10000,UnitTypeId.Millimeters);
 
-            ///Calculating New Length
-            LocationCurve curve = duct.Location as LocationCurve;
-            XYZ p1 = curve.Curve.GetEndPoint(0);
-            XYZ p2 = p1 + ((curve.Curve as Line).Direction * newLength);
+  ///Calculating New Length
+  LocationCurve curve = duct.Location as LocationCurve;
+  XYZ p1 = curve.Curve.GetEndPoint(0);
+  XYZ p2 = p1 + ((curve.Curve as Line).Direction * newLength);
 
-            using (Transaction deleteDuctAndCreateNew = new Transaction(doc, "Delete Existing Duct and Create New"))
-            {
-                deleteDuctAndCreateNew.Start();
+  using (Transaction deleteDuctAndCreateNew = new Transaction(doc, "Delete Existing Duct and Create New"))
+  {
+    deleteDuctAndCreateNew.Start();
 
-                //Create New Duct
-                Duct.Create(doc, duct.MEPSystem.GetTypeId(),duct.GetTypeId(), duct.ReferenceLevel.Id, p1, p2);
+    //Create New Duct
+    Duct.Create(doc, duct.MEPSystem.GetTypeId(),duct.GetTypeId(), duct.ReferenceLevel.Id, p1, p2);
 
-                doc.Delete(duct.Id);
+    doc.Delete(duct.Id);
 
-                deleteDuctAndCreateNew.Commit();
-            }
+    deleteDuctAndCreateNew.Commit();
+  }
+</code></pre>
 
 Reference Video
+
 ChangeDuctLength.gif
 
 change_duct_length.gif
@@ -182,10 +187,9 @@ However, deleting an existing element means disconnecting it from the System and
 
 I would be more inclined to  only increase the length of the MepCurve (duct, pipe, conduit...etc.):
 
-
-var locCurve = ductObject.Location as LocationCurve;
+<pre><code>var locCurve = ductObject.Location as LocationCurve;
 locCurve.Curve = extendedCurve;
-
+</code></pre>
 
 If the duct is connected to neighbouring elements, you can let Revit modify and adapt its length automatically by moving those neighbours and their connection points.
 Look at an exploration of different approaches to modifying pipe length in the blog post series on implementing a rolling offset:
@@ -197,13 +201,69 @@ Just moving the neighbor elements will keep all the connections intact.
 To add another approach, for those MEP curves without neighbor connections:
 We may also extend the curve directly by its connector, which means no new line or assigning a location curve is needed:
 
-Connector connector = getMyConnector();
+<pre><code>Connector connector = getMyConnector();
 double extendby = 1; // extend by 1 feet for example
 XYZ direction = ductCurve.Direction; // assuming the duct is linear curve
 connector.Origin = connector.Origin + direction * extendby;
+</code></pre>
 
 Thank you both, Mohamed Arshad K and Moustafa Khalil, for chipping in on this!
 
+####<a name="3"></a> IsMainWindowActive Predicate
+
+Aleksandr Pekshev
+@ModPlus
+
+[How to detect is opened preview document in type properties?](https://forums.autodesk.com/t5/revit-api-forum/how-to-detect-is-opened-preview-document-in-type-properties/m-p/12768772)
 
 
+There is a `Preview` button in the type properties dialog.
+If you click it, then, as far as I know, a copy of the current document will be created with a new view (I could be wrong here):
 
+Screenshot_3.png
+
+The problem is that in this case `IUpdater` is triggered, which can lead to negative consequences.
+
+Question: how can I detect that this Preview is open or how can I detect that the dialog for editing type properties is open?
+
+**Answer:**
+You can use the native Windows API to detect that a specific Windows form is open.
+Presumably, this can also be done in .NET.
+You can search for something like [.net detect form open](https://duckduckgo.com/?q=.net+detect+form+open) to learn more.
+
+You might also try to track the `DocumentChanged` event; Revit creates elements and a view with a persistent name ‘Modify type attributes’.
+This name is probably language dependent, but Revit does not create any other events:
+
+nice3point_0-1715548594591.png
+
+I ended up using the built-in Revit API functionality to implement a small auxiliary class to solve it like this:
+
+<pre><code>using System;
+using System.Runtime.InteropServices;
+using Autodesk.Revit.UI;
+
+/// <summary>
+/// Initializes a new instance of the <see cref="RevitWindowUtils"/> class.
+/// </summary>
+/// <param name="uiApplication"><see cref="UIApplication"/></param>
+public class RevitWindowUtils(UIApplication uiApplication)
+{
+  private readonly IntPtr _mainWindowHandle = uiApplication.MainWindowHandle;
+
+  [DllImport("user32.dll")]
+  private static extern IntPtr GetActiveWindow();
+
+  /// <summary>
+  /// Is main Revit window active
+  /// </summary>
+  public bool IsMainWindowActive() => GetActiveWindow() == _mainWindowHandle;
+}
+</code></pre>
+
+I create and store its static instance in the application class, and check it in IUpdater as follows:
+
+<pre><code>public void Execute(UpdaterData data)
+{
+  if (!App.RevitWindowUtils.IsMainWindowActive())
+    return;
+</code></pre>
