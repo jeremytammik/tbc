@@ -149,7 +149,7 @@ Best of luck and much success with your new blog!
 ####<a name="3"></a> Modify Duct Length
 
 Moustafa also helped resolve how
-to [Modify Duct Length in Revit API Despite Read-Only Property Constraint](https://forums.autodesk.com/t5/revit-api-forum/modify-duct-length-in-revit-api-despite-read-only-property/m-p/12763233):
+to [modify duct length in Revit API despite read-only property constraint](https://forums.autodesk.com/t5/revit-api-forum/modify-duct-length-in-revit-api-despite-read-only-property/m-p/12763233):
 
 **Question:**
 I'm wondering if it's possible to alter the length of a duct in Revit through the API.
