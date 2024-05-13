@@ -44,18 +44,23 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Highlight Linked Element
 
+Today, let's stick with some pure Revit API issues fresh from the forum:
+
+- [Highlight linked element](#2)
+- [Modify duct length](#3)
+- [IsMainWindowActive predicate](#4)
 
 ####<a name="2"></a> Highlight Linked Element
 
-Lately, Moustafa Khalil has very kindly provided a huge amount of helpful support in
+Lately, Moustafa Khalil very kindly provided a lot of helpful support in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160).
 
 He now took a step further, sharing hiw research and explanation on how
 to [highlight elements from a linked document](https://forums.autodesk.com/t5/revit-api-forum/highlight-elements-from-a-linked-document/td-p/12768033),
-a frequently raised topic, saying:
+a frequently raised topic, and even starting a new BIM blog, saying:
 
 The past 2 days I was scratching my head of how to highlight an element from a linked document.
-I tried many API statements and I also found many existing posts requesting the same:
+I tried different API approaches and found several existing posts requesting this, e.g.:
 
 - [How to select linked element by element Id](https://forums.autodesk.com/t5/revit-api-forum/how-to-select-linked-element-by-element-id/m-p/8245634)
 - [highlight and tag linked elements](https://forums.autodesk.com/t5/revit-api-forum/highlight-and-tag-linked-elements/m-p/5294217)
@@ -67,9 +72,9 @@ There is a corresponding wish in the Revit Idea Station:
 
 - [Highlight element selection in linked files](https://forums.autodesk.com/t5/revit-ideas/highlight-element-selection-in-linked-files/idi-p/7619701)
 
-The good news, after some readings over the Revit API Doc, it seems this wish have been granted since Revit 2023.
+The good news, after reading over the Revit API docs: it seems this wish has been granted since Revit 2023.
 
-A new `Selection` function called `SetReferences` has been added, allowing elements to be highlighted via set of references.
+A new `Selection` function called `SetReferences` was added, allowing elements to be highlighted via a set of references.
 I don't often use references to highlight elements, but rather to set hosts, like placing hosted families or extracting element IDs from a `ReferenceIntersector` or when selecting by picking.
 
 So, if we provide the `SetReferences` function with references from a linked document, will it work?
@@ -90,17 +95,17 @@ Let's attempt to highlight a face from an element in a linked document in the fo
 UiDoc.Selection.SetReferences([linkedFaceReference]);
 </code></pre>
 
-Now, this only happens when a user interacts with the UI.
+Now, this works when a user interacts with the UI.
 What if I have an element ID from a linked document that I want to highlight?
 The real question then becomes, how can I extract a reference from an `ElementId` that belongs to a linked document?
 
 This is achievable, but not directly from the `ElementId`;
 we need to work with the element itself.
 First, we need to get the element from the linked document, then create a reference for this element.
-However, this reference as it's only meaningful to the linked document, not the current one.
-Therefore, we must convert this reference to the current document using `CreateLinkReference` and `RevitLinkInstance`.
-It might sound confusing, but I've included the code below to demonstrate how it functions clearly.
-So, if you have the linked `ElementId`, you can directly start from line 10, without the need for selection:
+However, this reference is only meaningful to the linked document, not the current one.
+We can convert it to the current document using `CreateLinkReference` and the `RevitLinkInstance`.
+The code below clearly demonstrates how it functions.
+If you already have the linked `ElementId`, you can directly start from line 10, without the need for selection:
 
 <pre><code>var pickedReference = UiDoc.Selection.PickObject(
   Autodesk.Revit.UI.Selection.ObjectType.PointOnElement
@@ -113,7 +118,8 @@ var linkedDoc = linkedRvtInstance.GetLinkDocument();
 //get the Linked element from the linked document
 var linkedElement = linkedDoc.GetElement(pickedReference.LinkedElementId);
 
-// now create a reference from this element [ this is a reference inside the linked document]
+// now create a reference from this element
+// -- this is a reference inside the linked document
 var reference = new Reference(linkedElement);
 
 // convert the reference to be readable from the current document
@@ -127,16 +133,16 @@ UiDoc.Selection.SetReferences([reference]);
 <img src="img/highlight_linked_element.gif" alt="Highlight linked element" title="Highlight linked element" width="599"/> <!-- Pixel Height: 358 Pixel Width: 599 -->
 </center>
 
-Thanks!
-I have placed it on my fresh starting [Sharp BIM blog](https://sharpbim.hashnode.dev), that I will usually journal my findings there as well as here in the forum:
+Yes, the proposed solution is tested and works for me... I will be glad to know if there are any exception to this methodology.
+
+I have also published this on my fresh starting [Sharp BIM blog](https://sharpbim.hashnode.dev);
+I will usually journal my findings there as well as here in the forum:
 
 - [Highlight elements from a linked document](https://sharpbim.hashnode.dev/highlight-elements-from-a-linked-document)
 
-Yes, the proposed solution is tested and works for me... I will be glad to know if there are any exception to this methodology.
-
 Many thanks to Moustafa for this clear explanation and demonstration, and for all his other great support in the discussion forum!
 
-Best of luck and much success to your new blog!
+Best of luck and much success with your new blog!
 
 ####<a name="3"></a> Modify Duct Length
 
@@ -215,12 +221,10 @@ Thank you both, Mohamed Arshad K and Moustafa Khalil, for chipping in on this!
 
 ####<a name="4"></a> IsMainWindowActive Predicate
 
-Aleksandr Pekshev
-@ModPlus
+Aleksandr '@ModPlus' Pekshev raised the question and shared his working solution
+for [how to detect is opened preview document in type properties?](https://forums.autodesk.com/t5/revit-api-forum/how-to-detect-is-opened-preview-document-in-type-properties/m-p/12768772):
 
-[How to detect is opened preview document in type properties?](https://forums.autodesk.com/t5/revit-api-forum/how-to-detect-is-opened-preview-document-in-type-properties/m-p/12768772)
-
-
+**Question:**
 There is a `Preview` button in the type properties dialog.
 If you click it, then, as far as I know, a copy of the current document will be created with a new view (I could be wrong here):
 
@@ -230,11 +234,11 @@ If you click it, then, as far as I know, a copy of the current document will be 
 
 The problem is that in this case `IUpdater` is triggered, which can lead to negative consequences.
 
-Question: how can I detect that this Preview is open or how can I detect that the dialog for editing type properties is open?
+Question: how can I detect that this Preview is open, or how can I detect that the dialog for editing type properties is open?
 
 **Answer:**
 You can use the native Windows API to detect that a specific Windows form is open.
-Presumably, this can also be done in .NET.
+This can also be done in .NET.
 You can search for something like [.net detect form open](https://duckduckgo.com/?q=.net+detect+form+open) to learn more.
 
 You might also try to track the `DocumentChanged` event; Revit creates elements and a view with a persistent name ‘Modify type attributes’.
@@ -276,3 +280,5 @@ I create and store its static instance in the application class, and check it in
   if (!App.RevitWindowUtils.IsMainWindowActive())
     return;
 </code></pre>
+
+Many thanks to Aleksandr for this elegant solution.
