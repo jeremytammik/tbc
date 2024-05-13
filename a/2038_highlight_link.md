@@ -127,7 +127,16 @@ UiDoc.Selection.SetReferences([reference]);
 <img src="img/highlight_linked_element.gif" alt="Highlight linked element" title="Highlight linked element" width="599"/> <!-- Pixel Height: 358 Pixel Width: 599 -->
 </center>
 
+Thanks!
+I have placed it on my fresh starting [Sharp BIM blog](https://sharpbim.hashnode.dev), that I will usually journal my findings there as well as here in the forum:
+
+- [Highlight elements from a linked document](https://sharpbim.hashnode.dev/highlight-elements-from-a-linked-document)
+
+Yes, the proposed solution is tested and works for me... I will be glad to know if there are any exception to this methodology.
+
 Many thanks to Moustafa for this clear explanation and demonstration, and for all his other great support in the discussion forum!
+
+Best of luck and much success to your new blog!
 
 ####<a name="3"></a> Modify Duct Length
 
@@ -175,13 +184,9 @@ One workaround is to delete the existing one and create a new duct with a new le
   }
 </code></pre>
 
-Reference Video
-
-ChangeDuctLength.gif
-
-change_duct_length.gif
-
-Pixel Height: 559 Pixel Width: 999
+<center>
+<img src="img/change_duct_length.gif" alt="Highlight linked element" title="Highlight linked element" width="600"/> <!-- Pixel Height: 559 Pixel Width: 999 -->
+</center>
 
 However, deleting an existing element means disconnecting it from the System and losing all instance property values such as mark or comment.
 
@@ -192,9 +197,8 @@ locCurve.Curve = extendedCurve;
 </code></pre>
 
 If the duct is connected to neighbouring elements, you can let Revit modify and adapt its length automatically by moving those neighbours and their connection points.
-Look at an exploration of different approaches to modifying pipe length in the blog post series on implementing a rolling offset:
-
-http://thebuildingcoder.typepad.com/blog/2014/01/final-rolling-offset-using-pipecreate.html
+Look at an exploration of different approaches to modifying pipe length in the blog post series
+on [implementing a rolling offset](http://thebuildingcoder.typepad.com/blog/2014/01/final-rolling-offset-using-pipecreate.html).
 
 Just moving the neighbor elements will keep all the connections intact.
 
@@ -209,7 +213,7 @@ connector.Origin = connector.Origin + direction * extendby;
 
 Thank you both, Mohamed Arshad K and Moustafa Khalil, for chipping in on this!
 
-####<a name="3"></a> IsMainWindowActive Predicate
+####<a name="4"></a> IsMainWindowActive Predicate
 
 Aleksandr Pekshev
 @ModPlus
@@ -220,7 +224,9 @@ Aleksandr Pekshev
 There is a `Preview` button in the type properties dialog.
 If you click it, then, as far as I know, a copy of the current document will be created with a new view (I could be wrong here):
 
-Screenshot_3.png
+<center>
+<img src="img/type_properties_preview.png" alt="Type properties preview" title="Type properties preview" width="600"/> <!-- Pixel Height: 559 Pixel Width: 999 -->
+</center>
 
 The problem is that in this case `IUpdater` is triggered, which can lead to negative consequences.
 
@@ -234,8 +240,11 @@ You can search for something like [.net detect form open](https://duckduckgo.com
 You might also try to track the `DocumentChanged` event; Revit creates elements and a view with a persistent name ‘Modify type attributes’.
 This name is probably language dependent, but Revit does not create any other events:
 
-nice3point_0-1715548594591.png
+<center>
+<img src="img/revitlookup_documentchanged.png" alt="Type properties preview" title="Type properties preview" width="600"/> <!-- Pixel Height: 842 Pixel Width: 1,533 -->
+</center>
 
+**Response:**
 I ended up using the built-in Revit API functionality to implement a small auxiliary class to solve it like this:
 
 <pre><code>using System;
