@@ -29,6 +29,8 @@ twitter:
 
  the @AutodeskRevit #RevitAPI #BIM @DynamoBIM
 
+Highlighting linked elements using SetReferences, modifying duct length and determining whether a form is displayed using an IsMainWindowActive predicate...
+
 linkedin:
 
 #BIM #DynamoBIM #AutodeskAPS #Revit #API #IFC #SDK #Autodesk #AEC #adsk
@@ -42,7 +44,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Highlight Linked Element
+### Lengthen Ducts and Highlight Links
 
 Today, let's stick with some pure Revit API issues fresh from the forum:
 
@@ -191,7 +193,7 @@ One workaround is to delete the existing one and create a new duct with a new le
 </code></pre>
 
 <center>
-<img src="img/change_duct_length.gif" alt="Highlight linked element" title="Highlight linked element" width="600"/> <!-- Pixel Height: 559 Pixel Width: 999 -->
+<img src="img/change_duct_length.gif" alt="Change duct legth" title="Change duct legth" width="600"/> <!-- Pixel Height: 559 Pixel Width: 999 -->
 </center>
 
 However, deleting an existing element means disconnecting it from the System and losing all instance property values such as mark or comment.
@@ -245,7 +247,7 @@ You might also try to track the `DocumentChanged` event; Revit creates elements 
 This name is probably language dependent, but Revit does not create any other events:
 
 <center>
-<img src="img/revitlookup_documentchanged.png" alt="Type properties preview" title="Type properties preview" width="600"/> <!-- Pixel Height: 842 Pixel Width: 1,533 -->
+<img src="img/revitlookup_documentchanged.png" DocumentChanged monitor" title="RevitLookup DocumentChanged monitor" width="600"/> <!-- Pixel Height: 842 Pixel Width: 1,533 -->
 </center>
 
 **Response:**
