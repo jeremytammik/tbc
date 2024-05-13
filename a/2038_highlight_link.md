@@ -89,7 +89,7 @@ Let's attempt to highlight a face from an element in a linked document in the fo
 - Pass this reference to `SetReferences`, and it will highlight the face from the linked document.
 - Similarly, if you press Tab to cycle through line, face, and object, once you reach the object, select it to get the object reference.
 
-<pre><code>var linkedFaceReference = UiDoc.Selection.PickObject(
+<pre><code class="language-cs">var linkedFaceReference = UiDoc.Selection.PickObject(
   Autodesk.Revit.UI.Selection.ObjectType.PointOnElement
 );
 UiDoc.Selection.SetReferences([linkedFaceReference]);
@@ -107,7 +107,7 @@ We can convert it to the current document using `CreateLinkReference` and the `R
 The code below clearly demonstrates how it functions.
 If you already have the linked `ElementId`, you can directly start from line 10, without the need for selection:
 
-<pre><code>var pickedReference = UiDoc.Selection.PickObject(
+<pre><code class="language-cs"> var pickedReference = UiDoc.Selection.PickObject(
   Autodesk.Revit.UI.Selection.ObjectType.PointOnElement
 );
 
@@ -162,7 +162,7 @@ How do you solve this in the UI?
 So, the API does not directly support changing the duct length.
 One workaround is to delete the existing one and create a new duct with a new length, then update the neighboring duct length according to that:
 
-<pre><code>  UIDocument uiDoc = commandData.Application.ActiveUIDocument;
+<pre><code class="language-cs">  UIDocument uiDoc = commandData.Application.ActiveUIDocument;
   Document doc = uiDoc.Document;
 
   Reference refer = uiDoc.Selection.PickObject(Autodesk.Revit.UI.Selection.ObjectType.Element);
@@ -198,7 +198,7 @@ However, deleting an existing element means disconnecting it from the System and
 
 I would be more inclined to  only increase the length of the MepCurve (duct, pipe, conduit...etc.):
 
-<pre><code>var locCurve = ductObject.Location as LocationCurve;
+<pre><code class="language-cs">var locCurve = ductObject.Location as LocationCurve;
 locCurve.Curve = extendedCurve;
 </code></pre>
 
@@ -211,7 +211,7 @@ Just moving the neighbor elements will keep all the connections intact.
 To add another approach, for those MEP curves without neighbor connections:
 We may also extend the curve directly by its connector, which means no new line or assigning a location curve is needed:
 
-<pre><code>Connector connector = getMyConnector();
+<pre><code class="language-cs">Connector connector = getMyConnector();
 double extendby = 1; // extend by 1 feet for example
 XYZ direction = ductCurve.Direction; // assuming the duct is linear curve
 connector.Origin = connector.Origin + direction * extendby;
@@ -251,7 +251,7 @@ This name is probably language dependent, but Revit does not create any other ev
 **Response:**
 I ended up using the built-in Revit API functionality to implement a small auxiliary class to solve it like this:
 
-<pre><code>using System;
+<pre><code class="language-cs">using System;
 using System.Runtime.InteropServices;
 using Autodesk.Revit.UI;
 
@@ -275,7 +275,7 @@ public class RevitWindowUtils(UIApplication uiApplication)
 
 I create and store its static instance in the application class, and check it in IUpdater as follows:
 
-<pre><code>public void Execute(UpdaterData data)
+<pre><code class="language-cs">public void Execute(UpdaterData data)
 {
   if (!App.RevitWindowUtils.IsMainWindowActive())
     return;

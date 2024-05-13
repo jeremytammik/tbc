@@ -81,7 +81,7 @@ This means that the references we provide must be in a format that the current d
 <li>Pass this reference to <code>SetReferences</code>, and it will highlight the face from the linked document.</li>
 <li>Similarly, if you press Tab to cycle through line, face, and object, once you reach the object, select it to get the object reference.</li>
 </ul>
-<pre><code>var linkedFaceReference = UiDoc.Selection.PickObject(
+<pre><code class="language-cs">var linkedFaceReference = UiDoc.Selection.PickObject(
   Autodesk.Revit.UI.Selection.ObjectType.PointOnElement
 );
 UiDoc.Selection.SetReferences([linkedFaceReference]);
@@ -97,7 +97,7 @@ However, this reference is only meaningful to the linked document, not the curre
 We can convert it to the current document using <code>CreateLinkReference</code> and the <code>RevitLinkInstance</code>.
 The code below clearly demonstrates how it functions.
 If you already have the linked <code>ElementId</code>, you can directly start from line 10, without the need for selection:</p>
-<pre><code>var pickedReference = UiDoc.Selection.PickObject(
+<pre><code class="language-cs"> var pickedReference = UiDoc.Selection.PickObject(
   Autodesk.Revit.UI.Selection.ObjectType.PointOnElement
 );
 
@@ -143,7 +143,7 @@ The API wraps the UI functionality, so the best way to address this is to determ
 How do you solve this in the UI?</p>
 <p>So, the API does not directly support changing the duct length.
 One workaround is to delete the existing one and create a new duct with a new length, then update the neighboring duct length according to that:</p>
-<pre><code>  UIDocument uiDoc = commandData.Application.ActiveUIDocument;
+<pre><code class="language-cs">  UIDocument uiDoc = commandData.Application.ActiveUIDocument;
   Document doc = uiDoc.Document;
 
   Reference refer = uiDoc.Selection.PickObject(Autodesk.Revit.UI.Selection.ObjectType.Element);
@@ -176,7 +176,7 @@ One workaround is to delete the existing one and create a new duct with a new le
 </center></p>
 <p>However, deleting an existing element means disconnecting it from the System and losing all instance property values such as mark or comment.</p>
 <p>I would be more inclined to  only increase the length of the MepCurve (duct, pipe, conduit...etc.):</p>
-<pre><code>var locCurve = ductObject.Location as LocationCurve;
+<pre><code class="language-cs">var locCurve = ductObject.Location as LocationCurve;
 locCurve.Curve = extendedCurve;
 </code></pre>
 
@@ -186,7 +186,7 @@ on <a href="http://thebuildingcoder.typepad.com/blog/2014/01/final-rolling-offse
 <p>Just moving the neighbor elements will keep all the connections intact.</p>
 <p>To add another approach, for those MEP curves without neighbor connections:
 We may also extend the curve directly by its connector, which means no new line or assigning a location curve is needed:</p>
-<pre><code>Connector connector = getMyConnector();
+<pre><code class="language-cs">Connector connector = getMyConnector();
 double extendby = 1; // extend by 1 feet for example
 XYZ direction = ductCurve.Direction; // assuming the duct is linear curve
 connector.Origin = connector.Origin + direction * extendby;
@@ -215,7 +215,7 @@ This name is probably language dependent, but Revit does not create any other ev
 </center></p>
 <p><strong>Response:</strong>
 I ended up using the built-in Revit API functionality to implement a small auxiliary class to solve it like this:</p>
-<pre><code>using System;
+<pre><code class="language-cs">using System;
 using System.Runtime.InteropServices;
 using Autodesk.Revit.UI;
 
@@ -238,7 +238,7 @@ public class RevitWindowUtils(UIApplication uiApplication)
 </code></pre>
 
 <p>I create and store its static instance in the application class, and check it in IUpdater as follows:</p>
-<pre><code>public void Execute(UpdaterData data)
+<pre><code class="language-cs">public void Execute(UpdaterData data)
 {
   if (!App.RevitWindowUtils.IsMainWindowActive())
     return;
