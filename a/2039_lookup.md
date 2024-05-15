@@ -36,77 +36,93 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-###
+### RevitLookup 2025.0.3
 
 
-####<a name="2"></a>
+####<a name="2"></a> RevitLookup 2025.0.3
 
-- link revit files in acc docs
-  https://aps.autodesk.com/blog/bim360-docs-setting-external-references-between-files-upload-linked-files
-  we need to link 2 revit file (1 architectural and 1 structural) in ACC project via APS API.
-  https://stackoverflow.com/questions/78279915/aps-data-management-api-bim360-currently-does-not-support-the-creation-of-refs
-  https://aps.autodesk.com/blog/bim360-docs-setting-external-references-between-files-upload-linked-files
+Roman [@Nice3point](https://t.me/nice3point) Karpovich, aka Роман Карпович,
+published [RevitLookup release 2025.0.3](https://github.com/jeremytammik/RevitLookup/releases/tag/2025.0.3),
+integrating a tremendous amount of work
+by [Sergey Nefyodov](https://github.com/SergeyNefyodov) to expand coverage to numerous new classes, properties and contexts.
 
-- RevitLookup 2025.0.3
-  https://github.com/jeremytammik/RevitLookup/releases/tag/2025.0.3
-  ## General
-  - **Memory diagnoser**
-    ![изображение](https://github.com/jeremytammik/RevitLookup/assets/20504884/dfa0fc23-5a63-452d-8a73-25009424c99c)
-    Memory column contains the size of allocated **managed memory**.
-    Native ETW and allocations in C++ code are not included to avoid severe performance degradation.
-  ## Improvements
-  - The different method overloading variations, are now displayed in the `Variants` collection
-    ![изображение](https://github.com/jeremytammik/RevitLookup/assets/20504884/22d8c84b-097c-4da3-9dfa-f091a6de9b7f)
-    Previous: **GeometryElement**
-    Now: **Variants\<GeometryElement\>**
-  - ConnectorManager class support
-      - Added `ConnectorManager.Lookup` support by @SergeyNefyodov in https://github.com/jeremytammik/RevitLookup/pull/227
-  - Wire class support
-      - Added `Wire.GetVertex` support by @SergeyNefyodov in https://github.com/jeremytammik/RevitLookup/pull/228
-  - IndependentTag class support
-      - Added `IndependentTag.CanLeaderEndConditionBeAssigned` support by @SergeyNefyodov in https://github.com/jeremytammik/RevitLookup/pull/229
-      - Added `IndependentTag.GetLeaderElbow` support by @SergeyNefyodov in https://github.com/jeremytammik/RevitLookup/pull/229
-      - Added `IndependentTag.GetLeaderEnd` support by @SergeyNefyodov in https://github.com/jeremytammik/RevitLookup/pull/229
-      - Added `IndependentTag.HasLeaderElbow` support by @SergeyNefyodov in https://github.com/jeremytammik/RevitLookup/pull/229
-      - Added `IndependentTag.IsLeaderVisible` support by @SergeyNefyodov in https://github.com/jeremytammik/RevitLookup/pull/229
-  - CurveElement class support
-      - Added `CurveElement.GetAdjoinedCurveElements` support by @SergeyNefyodov in https://github.com/jeremytammik/RevitLookup/pull/230
-      - Added `CurveElement.HasTangentLocks` support by @SergeyNefyodov in https://github.com/jeremytammik/RevitLookup/pull/230
-      - Added `CurveElement.GetTangentLock` support by @SergeyNefyodov in https://github.com/jeremytammik/RevitLookup/pull/230
-      - Added `CurveElement.HasTangentJoin` support by @SergeyNefyodov in https://github.com/jeremytammik/RevitLookup/pull/230
-      - Added `CurveElement.IsAdjoinedCurveElement` support by @SergeyNefyodov in https://github.com/jeremytammik/RevitLookup/pull/230
-  - TableView class support
-      - Added `TableView.GetAvailableParameters` support by @SergeyNefyodov in https://github.com/jeremytammik/RevitLookup/pull/231
-      - Added `TableView.GetCalculatedValueName` support by @SergeyNefyodov in https://github.com/jeremytammik/RevitLookup/pull/231
-      - Added `TableView.GetCalculatedValueText` support by @SergeyNefyodov in https://github.com/jeremytammik/RevitLookup/pull/231
-      - Added `TableView.IsValidSectionType` support by @SergeyNefyodov in https://github.com/jeremytammik/RevitLookup/pull/231
-      - Added `TableView.GetCellText` support by @SergeyNefyodov in https://github.com/jeremytammik/RevitLookup/pull/231
-  - DatumPlane class support
-      - Added `DatumPlane.CanBeVisibleInView` support by @SergeyNefyodov in https://github.com/jeremytammik/RevitLookup/pull/232
-      - Added `DatumPlane.GetPropagationViews` support by @SergeyNefyodov in https://github.com/jeremytammik/RevitLookup/pull/232
-      - Added `DatumPlane.CanBeVisibleInView` support by @SergeyNefyodov in https://github.com/jeremytammik/RevitLookup/pull/232
-      - Added `DatumPlane.GetPropagationViews` support by @SergeyNefyodov in https://github.com/jeremytammik/RevitLookup/pull/232
-      - Added `DatumPlane.GetDatumExtentTypeInView` support by @SergeyNefyodov in https://github.com/jeremytammik/RevitLookup/pull/232
-      - Added `DatumPlane.HasBubbleInView` support by @SergeyNefyodov in https://github.com/jeremytammik/RevitLookup/pull/232
-      - Added `DatumPlane.IsBubbleVisibleInView` support by @SergeyNefyodov in https://github.com/jeremytammik/RevitLookup/pull/232
-      - Added `DatumPlane.GetCurvesInView` support by @SergeyNefyodov in https://github.com/jeremytammik/RevitLookup/pull/232
-      - Added `DatumPlane.GetLeader` support by @SergeyNefyodov in https://github.com/jeremytammik/RevitLookup/pull/232
-  - Extensions:
-    - Added Family class extension `FamilySizeTableManager.GetFamilySizeTableManager` by @SergeyNefyodov in https://github.com/jeremytammik/RevitLookup/pull/233
+Sergey packaged his enhancements in pull requests
+[227 (`ConnectorManager`)](https://github.com/jeremytammik/RevitLookup/pull/227),
+[228 (`Wire`)](https://github.com/jeremytammik/RevitLookup/pull/228),
+[229 (`IndependentTag`)](https://github.com/jeremytammik/RevitLookup/pull/229),
+[230 (`CurveElement`)](https://github.com/jeremytammik/RevitLookup/pull/230),
+[231 (`TableView`)](https://github.com/jeremytammik/RevitLookup/pull/231),
+[232 (`DatumPlane`)](https://github.com/jeremytammik/RevitLookup/pull/232)
+and [233 (extensions)](https://github.com/jeremytammik/RevitLookup/pull/233).
+
+Specific improvement include:
+
+- Memory diagnoser
+<center>
+<img src="https://github.com/jeremytammik/RevitLookup/assets/20504884/dfa0fc23-5a63-452d-8a73-25009424c99c" alt="Memory diagnoser" title="Memory diagnoser" width="99"/> <!-- Pixel Height: 358 Pixel Width: 599 -->
+</center>
+    - The `Memory` column shows the size of allocated **managed memory**.
+    - Native ETW and allocations in C++ code are not included to avoid severe performance degradation.
+- Different method overload variations now displayed in a `Variants` collection
+<center>
+<img src="https://github.com/jeremytammik/RevitLookup/assets/20504884/22d8c84b-097c-4da3-9dfa-f091a6de9b7f" alt="Overload variations" title="Overload variations" width="99"/> <!-- Pixel Height: 358 Pixel Width: 599 -->
+</center>
+    - Previously: `GeometryElement`
+    - Now: `Variants<GeometryElement>`
+- ConnectorManager class support
+    - Added `ConnectorManager.Lookup`
+- Wire class support
+    - Added `Wire.GetVertex`
+- IndependentTag class support
+    - Added `IndependentTag.CanLeaderEndConditionBeAssigned`
+    - Added `IndependentTag.GetLeaderElbow`
+    - Added `IndependentTag.GetLeaderEnd`
+    - Added `IndependentTag.HasLeaderElbow`
+    - Added `IndependentTag.IsLeaderVisible`
+- CurveElement class support
+    - Added `CurveElement.GetAdjoinedCurveElements`
+    - Added `CurveElement.HasTangentLocks`
+    - Added `CurveElement.GetTangentLock`
+    - Added `CurveElement.HasTangentJoin`
+    - Added `CurveElement.IsAdjoinedCurveElement`
+- TableView class support
+    - Added `TableView.GetAvailableParameters`
+    - Added `TableView.GetCalculatedValueName`
+    - Added `TableView.GetCalculatedValueText`
+    - Added `TableView.IsValidSectionType`
+    - Added `TableView.GetCellText`
+- DatumPlane class support
+    - Added `DatumPlane.CanBeVisibleInView`
+    - Added `DatumPlane.GetPropagationViews`
+    - Added `DatumPlane.CanBeVisibleInView`
+    - Added `DatumPlane.GetPropagationViews`
+    - Added `DatumPlane.GetDatumExtentTypeInView`
+    - Added `DatumPlane.HasBubbleInView`
+    - Added `DatumPlane.IsBubbleVisibleInView`
+    - Added `DatumPlane.GetCurvesInView`
+    - Added `DatumPlane.GetLeader`
+- Extensions:
+    - Added Family class extension `FamilySizeTableManager.GetFamilySizeTableManager`
     - Added FamilyInstance class extension `AdaptiveComponentInstanceUtils.GetInstancePlacementPointElementRefIds`
     - Added FamilyInstance class extension `AdaptiveComponentInstanceUtils.IsAdaptiveComponentInstance`
     - Added Solid class extension `SolidUtils.SplitVolumes`
     - Added Solid class extension `SolidUtils.IsValidForTessellation`
-  Full changelog: https://github.com/jeremytammik/RevitLookup/compare/2025.0.2...2025.0.3
-  RevitLookup versioning: https://github.com/jeremytammik/RevitLookup/wiki/Versions
+- [Full changelog 2025.0.2...2025.0.3](https://github.com/jeremytammik/RevitLookup/compare/2025.0.2...2025.0.3)
+- [RevitLookup versioning](https://github.com/jeremytammik/RevitLookup/wiki/Versions)
+
+Many thanks to Roman and Sergey for their impressive implementation and maintenance work!
+
+####<a name="3"></a> Linking Revit Files in ACC Docs
+
+- link revit files in acc docs
+https://aps.autodesk.com/blog/bim360-docs-setting-external-references-between-files-upload-linked-files
+we need to link 2 revit file (1 architectural and 1 structural) in ACC project via APS API.
+https://stackoverflow.com/questions/78279915/aps-data-management-api-bim360-currently-does-not-support-the-creation-of-refs
+https://aps.autodesk.com/blog/bim360-docs-setting-external-references-between-files-upload-linked-files
 
 
 <pre><code class="language-cs">
 </code></pre>
 
-
-<center>
-<img src="img/" alt="" title="" width="99"/> <!-- Pixel Height: 358 Pixel Width: 599 -->
-</center>
 
 

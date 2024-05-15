@@ -1,0 +1,135 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css"></p>
+<!-- https://highlightjs.org/#usage
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+-->
+
+<!-- https://prismjs.com -->
+<p><link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css" rel="stylesheet" /></p>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+<style> code[class*=language-], pre[class*=language-] { font-size : 90%; } </style>
+<p></head></p>
+<!---
+
+
+twitter:
+
+ the @AutodeskRevit #RevitAPI #BIM @DynamoBIM
+
+...
+
+linkedin:
+
+#BIM #DynamoBIM #AutodeskAPS #Revit #API #IFC #SDK #Autodesk #AEC #adsk
+
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+
+<center>
+<img src="img/" alt="" title="" width="600"/>
+<p style="font-size: 80%; font-style:italic"></p>
+</center>
+
+-->
+
+<h3>RevitLookup 2025.0.3</h3>
+<h4><a name="2"></a> RevitLookup 2025.0.3</h4>
+<p>Roman <a href="https://t.me/nice3point">@Nice3point</a> Karpovich, aka Роман Карпович,
+published <a href="https://github.com/jeremytammik/RevitLookup/releases/tag/2025.0.3">RevitLookup release 2025.0.3</a>,
+integrating a tremendous amount of work
+by <a href="https://github.com/SergeyNefyodov">Sergey Nefyodov</a> to expand coverage to numerous new classes, properties and contexts.</p>
+<p>Sergey packaged his enhancements in pull requests
+<a href="https://github.com/jeremytammik/RevitLookup/pull/227">227 (<code>ConnectorManager</code>)</a>,
+<a href="https://github.com/jeremytammik/RevitLookup/pull/228">228 (<code>Wire</code>)</a>,
+<a href="https://github.com/jeremytammik/RevitLookup/pull/229">229 (<code>IndependentTag</code>)</a>,
+<a href="https://github.com/jeremytammik/RevitLookup/pull/230">230 (<code>CurveElement</code>)</a>,
+<a href="https://github.com/jeremytammik/RevitLookup/pull/231">231 (<code>TableView</code>)</a>,
+<a href="https://github.com/jeremytammik/RevitLookup/pull/232">232 (<code>DatumPlane</code>)</a>
+and <a href="https://github.com/jeremytammik/RevitLookup/pull/233">233 (extensions)</a>.</p>
+<p>Specific improvement include:</p>
+<ul>
+<li>Memory diagnoser
+<center>
+<img src="https://github.com/jeremytammik/RevitLookup/assets/20504884/dfa0fc23-5a63-452d-8a73-25009424c99c" alt="Memory diagnoser" title="Memory diagnoser" width="99"/> <!-- Pixel Height: 358 Pixel Width: 599 -->
+</center><ul>
+<li>The <code>Memory</code> column shows the size of allocated <strong>managed memory</strong>.</li>
+<li>Native ETW and allocations in C++ code are not included to avoid severe performance degradation.</li>
+</ul>
+</li>
+<li>Different method overload variations now displayed in a <code>Variants</code> collection
+<center>
+<img src="https://github.com/jeremytammik/RevitLookup/assets/20504884/22d8c84b-097c-4da3-9dfa-f091a6de9b7f" alt="Overload variations" title="Overload variations" width="99"/> <!-- Pixel Height: 358 Pixel Width: 599 -->
+</center><ul>
+<li>Previously: <code>GeometryElement</code></li>
+<li>Now: <code>Variants&lt;GeometryElement&gt;</code></li>
+</ul>
+</li>
+<li>ConnectorManager class support<ul>
+<li>Added <code>ConnectorManager.Lookup</code></li>
+</ul>
+</li>
+<li>Wire class support<ul>
+<li>Added <code>Wire.GetVertex</code></li>
+</ul>
+</li>
+<li>IndependentTag class support<ul>
+<li>Added <code>IndependentTag.CanLeaderEndConditionBeAssigned</code></li>
+<li>Added <code>IndependentTag.GetLeaderElbow</code></li>
+<li>Added <code>IndependentTag.GetLeaderEnd</code></li>
+<li>Added <code>IndependentTag.HasLeaderElbow</code></li>
+<li>Added <code>IndependentTag.IsLeaderVisible</code></li>
+</ul>
+</li>
+<li>CurveElement class support<ul>
+<li>Added <code>CurveElement.GetAdjoinedCurveElements</code></li>
+<li>Added <code>CurveElement.HasTangentLocks</code></li>
+<li>Added <code>CurveElement.GetTangentLock</code></li>
+<li>Added <code>CurveElement.HasTangentJoin</code></li>
+<li>Added <code>CurveElement.IsAdjoinedCurveElement</code></li>
+</ul>
+</li>
+<li>TableView class support<ul>
+<li>Added <code>TableView.GetAvailableParameters</code></li>
+<li>Added <code>TableView.GetCalculatedValueName</code></li>
+<li>Added <code>TableView.GetCalculatedValueText</code></li>
+<li>Added <code>TableView.IsValidSectionType</code></li>
+<li>Added <code>TableView.GetCellText</code></li>
+</ul>
+</li>
+<li>DatumPlane class support<ul>
+<li>Added <code>DatumPlane.CanBeVisibleInView</code></li>
+<li>Added <code>DatumPlane.GetPropagationViews</code></li>
+<li>Added <code>DatumPlane.CanBeVisibleInView</code></li>
+<li>Added <code>DatumPlane.GetPropagationViews</code></li>
+<li>Added <code>DatumPlane.GetDatumExtentTypeInView</code></li>
+<li>Added <code>DatumPlane.HasBubbleInView</code></li>
+<li>Added <code>DatumPlane.IsBubbleVisibleInView</code></li>
+<li>Added <code>DatumPlane.GetCurvesInView</code></li>
+<li>Added <code>DatumPlane.GetLeader</code></li>
+</ul>
+</li>
+<li>Extensions:<ul>
+<li>Added Family class extension <code>FamilySizeTableManager.GetFamilySizeTableManager</code></li>
+<li>Added FamilyInstance class extension <code>AdaptiveComponentInstanceUtils.GetInstancePlacementPointElementRefIds</code></li>
+<li>Added FamilyInstance class extension <code>AdaptiveComponentInstanceUtils.IsAdaptiveComponentInstance</code></li>
+<li>Added Solid class extension <code>SolidUtils.SplitVolumes</code></li>
+<li>Added Solid class extension <code>SolidUtils.IsValidForTessellation</code></li>
+</ul>
+</li>
+<li><a href="https://github.com/jeremytammik/RevitLookup/compare/2025.0.2...2025.0.3">Full changelog 2025.0.2...2025.0.3</a></li>
+<li><a href="https://github.com/jeremytammik/RevitLookup/wiki/Versions">RevitLookup versioning</a></li>
+</ul>
+<p>Many thanks to Roman and Sergey for their impressive implementation and maintenance work!</p>
+<h4><a name="3"></a> Linking Revit Files in ACC Docs</h4>
+<ul>
+<li>link revit files in acc docs
+https://aps.autodesk.com/blog/bim360-docs-setting-external-references-between-files-upload-linked-files
+we need to link 2 revit file (1 architectural and 1 structural) in ACC project via APS API.
+https://stackoverflow.com/questions/78279915/aps-data-management-api-bim360-currently-does-not-support-the-creation-of-refs
+https://aps.autodesk.com/blog/bim360-docs-setting-external-references-between-files-upload-linked-files</li>
+</ul>
+<pre><code class="language-cs">
+</code></pre>
