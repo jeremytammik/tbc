@@ -38,12 +38,17 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### RevitLookup 2025.0.3
 
+A quick heads-up on the new release of RevitLookup covering numerous new classes and properties, and two unrelated notes:
+
+- [RevitLookup 2025.0.3](#2)
+- [`Outline` versus `BoundingBox`](#3)
+- [Linking Revit files in BIM360 Docs](#4)
 
 ####<a name="2"></a> RevitLookup 2025.0.3
 
 Roman [@Nice3point](https://t.me/nice3point) Karpovich, aka Роман Карпович,
 published [RevitLookup release 2025.0.3](https://github.com/jeremytammik/RevitLookup/releases/tag/2025.0.3),
-integrating a tremendous amount of work
+integrating extensive work
 by [Sergey Nefyodov](https://github.com/SergeyNefyodov) to expand coverage to numerous new classes, properties and contexts.
 
 Sergey packaged his enhancements in pull requests
@@ -59,13 +64,13 @@ Specific improvement include:
 
 - Memory diagnoser
 <center>
-<img src="https://github.com/jeremytammik/RevitLookup/assets/20504884/dfa0fc23-5a63-452d-8a73-25009424c99c" alt="Memory diagnoser" title="Memory diagnoser" width="99"/> <!-- Pixel Height: 358 Pixel Width: 599 -->
+<img src="img/revitlookup_memory.png" alt="Memory diagnoser" title="Memory diagnoser" width="800"/> <!-- Pixel Height: 555 Pixel Width: 1,016 -->
 </center>
     - The `Memory` column shows the size of allocated **managed memory**.
     - Native ETW and allocations in C++ code are not included to avoid severe performance degradation.
 - Different method overload variations now displayed in a `Variants` collection
 <center>
-<img src="https://github.com/jeremytammik/RevitLookup/assets/20504884/22d8c84b-097c-4da3-9dfa-f091a6de9b7f" alt="Overload variations" title="Overload variations" width="99"/> <!-- Pixel Height: 358 Pixel Width: 599 -->
+<img src="img/revitlookup_variants.png" alt="Overload variations" title="Overload variations" width="800"/> <!-- Pixel Height: 555 Pixel Width: 1,016 -->
 </center>
     - Previously: `GeometryElement`
     - Now: `Variants<GeometryElement>`
@@ -112,17 +117,14 @@ Specific improvement include:
 
 Many thanks to Roman and Sergey for their impressive implementation and maintenance work!
 
-####<a name="3"></a> Linking Revit Files in ACC Docs
+####<a name="3"></a> Outline Versus BoundingBox
 
-- link revit files in acc docs
-https://aps.autodesk.com/blog/bim360-docs-setting-external-references-between-files-upload-linked-files
-we need to link 2 revit file (1 architectural and 1 structural) in ACC project via APS API.
-https://stackoverflow.com/questions/78279915/aps-data-management-api-bim360-currently-does-not-support-the-creation-of-refs
-https://aps.autodesk.com/blog/bim360-docs-setting-external-references-between-files-upload-linked-files
+Some interesting aspects of different kinds of bounding boxes and their uses in intersection filters are discussed in the thread
+on [`Outline` vs `BoundingBoxXYZ` in Revit API](https://forums.autodesk.com/t5/revit-api-forum/outline-vs-boundingboxxyz-in-revit-api/m-p/12670522).
 
+####<a name="4"></a> Linking Revit Files in BIM360 Docs
 
-<pre><code class="language-cs">
-</code></pre>
-
-
+Several users asked whether it is possible to link Revit projects directly in ACC and BIM360 Docs.
+Luckily, Eason Kang has covered that topic extensively in his article
+on [BIM360 Docs: Setting up external references between files (Upload Linked Files)](https://aps.autodesk.com/blog/bim360-docs-setting-external-references-between-files-upload-linked-files).
 

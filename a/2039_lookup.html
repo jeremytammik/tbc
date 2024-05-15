@@ -36,10 +36,16 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 -->
 
 <h3>RevitLookup 2025.0.3</h3>
+<p>A quick heads-up on the new release of RevitLookup covering numerous new classes and properties, and two unrelated notes:</p>
+<ul>
+<li><a href="#2">RevitLookup 2025.0.3</a></li>
+<li><a href="#3"><code>Outline</code> versus <code>BoundingBox</code></a></li>
+<li><a href="#4">Linking Revit files in BIM360 Docs</a></li>
+</ul>
 <h4><a name="2"></a> RevitLookup 2025.0.3</h4>
 <p>Roman <a href="https://t.me/nice3point">@Nice3point</a> Karpovich, aka Роман Карпович,
 published <a href="https://github.com/jeremytammik/RevitLookup/releases/tag/2025.0.3">RevitLookup release 2025.0.3</a>,
-integrating a tremendous amount of work
+integrating extensive work
 by <a href="https://github.com/SergeyNefyodov">Sergey Nefyodov</a> to expand coverage to numerous new classes, properties and contexts.</p>
 <p>Sergey packaged his enhancements in pull requests
 <a href="https://github.com/jeremytammik/RevitLookup/pull/227">227 (<code>ConnectorManager</code>)</a>,
@@ -53,7 +59,7 @@ and <a href="https://github.com/jeremytammik/RevitLookup/pull/233">233 (extensio
 <ul>
 <li>Memory diagnoser
 <center>
-<img src="https://github.com/jeremytammik/RevitLookup/assets/20504884/dfa0fc23-5a63-452d-8a73-25009424c99c" alt="Memory diagnoser" title="Memory diagnoser" width="99"/> <!-- Pixel Height: 358 Pixel Width: 599 -->
+<img src="img/revitlookup_memory.png" alt="Memory diagnoser" title="Memory diagnoser" width="800"/> <!-- Pixel Height: 555 Pixel Width: 1,016 -->
 </center><ul>
 <li>The <code>Memory</code> column shows the size of allocated <strong>managed memory</strong>.</li>
 <li>Native ETW and allocations in C++ code are not included to avoid severe performance degradation.</li>
@@ -61,7 +67,7 @@ and <a href="https://github.com/jeremytammik/RevitLookup/pull/233">233 (extensio
 </li>
 <li>Different method overload variations now displayed in a <code>Variants</code> collection
 <center>
-<img src="https://github.com/jeremytammik/RevitLookup/assets/20504884/22d8c84b-097c-4da3-9dfa-f091a6de9b7f" alt="Overload variations" title="Overload variations" width="99"/> <!-- Pixel Height: 358 Pixel Width: 599 -->
+<img src="img/revitlookup_variants.png" alt="Overload variations" title="Overload variations" width="800"/> <!-- Pixel Height: 555 Pixel Width: 1,016 -->
 </center><ul>
 <li>Previously: <code>GeometryElement</code></li>
 <li>Now: <code>Variants&lt;GeometryElement&gt;</code></li>
@@ -123,13 +129,10 @@ and <a href="https://github.com/jeremytammik/RevitLookup/pull/233">233 (extensio
 <li><a href="https://github.com/jeremytammik/RevitLookup/wiki/Versions">RevitLookup versioning</a></li>
 </ul>
 <p>Many thanks to Roman and Sergey for their impressive implementation and maintenance work!</p>
-<h4><a name="3"></a> Linking Revit Files in ACC Docs</h4>
-<ul>
-<li>link revit files in acc docs
-https://aps.autodesk.com/blog/bim360-docs-setting-external-references-between-files-upload-linked-files
-we need to link 2 revit file (1 architectural and 1 structural) in ACC project via APS API.
-https://stackoverflow.com/questions/78279915/aps-data-management-api-bim360-currently-does-not-support-the-creation-of-refs
-https://aps.autodesk.com/blog/bim360-docs-setting-external-references-between-files-upload-linked-files</li>
-</ul>
-<pre><code class="language-cs">
-</code></pre>
+<h4><a name="3"></a> Outline Versus BoundingBox</h4>
+<p>Some interesting aspects of different kinds of bounding boxes and their uses in intersection filters are discussed in the thread
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/outline-vs-boundingboxxyz-in-revit-api/m-p/12670522"><code>Outline</code> vs <code>BoundingBoxXYZ</code> in Revit API</a>.</p>
+<h4><a name="4"></a> Linking Revit Files in BIM360 Docs</h4>
+<p>Several users asked whether it is possible to link Revit projects directly in ACC and BIM360 Docs.
+Luckily, Eason Kang has covered that topic extensively in his article
+on <a href="https://aps.autodesk.com/blog/bim360-docs-setting-external-references-between-files-upload-linked-files">BIM360 Docs: Setting up external references between files (Upload Linked Files)</a>.</p>
