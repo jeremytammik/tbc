@@ -41,8 +41,9 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 A quick heads-up on the new release of RevitLookup covering numerous new classes and properties, and two unrelated notes:
 
 - [RevitLookup 2025.0.3](#2)
-- [`Outline` versus `BoundingBox`](#3)
-- [Linking Revit files in BIM360 Docs](#4)
+- [RevitLookup 2025.0.4](#3)
+- [`Outline` versus `BoundingBox`](#4)
+- [Linking Revit files in BIM360 Docs](#5)
 
 ####<a name="2"></a> RevitLookup 2025.0.3
 
@@ -115,16 +116,65 @@ Specific improvement include:
 - [Full changelog 2025.0.2...2025.0.3](https://github.com/jeremytammik/RevitLookup/compare/2025.0.2...2025.0.3)
 - [RevitLookup versioning](https://github.com/jeremytammik/RevitLookup/wiki/Versions)
 
+####<a name="3"></a> RevitLookup 2025.0.4
+
+
+https://github.com/SergeyNefyodov
+
+https://github.com/jeremytammik/RevitLookup/pull/236
+
+https://github.com/jeremytammik/RevitLookup/pull/235
+
+https://github.com/jeremytammik/RevitLookup/compare/2025.0.3...2025.0.4
+
+https://github.com/jeremytammik/RevitLookup/wiki/Versions
+
+
+
+A new Release focused on improving core functionalities and robustness of the product.
+
+## Improvements
+
+- Introducing a preview feature for **Family Size Table**, making it easier to manage and visualize family sizes by @SergeyNefyodov in https://github.com/jeremytammik/RevitLookup/pull/236
+<center>
+<img src="img/revitlookup_2025_0_4.png" alt="Family size table" title="Family size table" width="800"/> <!-- Pixel Height: 555 Pixel Width: 1,016 -->
+</center>
+To access it:
+  - Enable **Show Extensions** in the view menu
+  - Select any **FamilyInstance**
+  - Navigate to the **Symbol**
+  - Navigate to the **Family** (or just search for Family class objects in the **Snoop database** command)
+  - Navigate to the **GetFamilySizeTableManager** method
+  - Navigate to the **GetSizeTable** method
+  - Right-click on one of the tables and select the **Show table** command
+
+  _Note: Family size table is currently in read-only mode_
+
+- Added new context menu item for selecting elements without showing
+- Added new fresh, intuitive icons to the context menu for a more user-friendly interface.
+- Refined labels, class names, and exception messages
+
+## Bugs
+
+- Resolved an issue where the delete action was not displayed in the context menu for ElementType classes
+- Fixed the context menu display issue for Element classes, broken in previous release
+- Fixed the order of descriptors to prevent missing extensions and context menu items in some classes, broken in previous release by @SergeyNefyodov in https://github.com/jeremytammik/RevitLookup/pull/235
+
+Full changelog: https://github.com/jeremytammik/RevitLookup/compare/2025.0.3...2025.0.4
+RevitLookup versioning: https://github.com/jeremytammik/RevitLookup/wiki/Versions
+
+
 Many thanks to Roman and Sergey for their impressive implementation and maintenance work!
 
-####<a name="3"></a> Outline Versus BoundingBox
+####<a name="4"></a> Outline Versus BoundingBox
 
 Some interesting aspects of different kinds of bounding boxes and their uses in intersection filters are discussed in the thread
 on [`Outline` vs `BoundingBoxXYZ` in Revit API](https://forums.autodesk.com/t5/revit-api-forum/outline-vs-boundingboxxyz-in-revit-api/m-p/12670522).
 
-####<a name="4"></a> Linking Revit Files in BIM360 Docs
+####<a name="5"></a> Linking Revit Files in BIM360 Docs
 
 Several users asked whether it is possible to link Revit projects directly in ACC and BIM360 Docs.
 Luckily, Eason Kang has covered that topic extensively in his article
 on [BIM360 Docs: Setting up external references between files (Upload Linked Files)](https://aps.autodesk.com/blog/bim360-docs-setting-external-references-between-files-upload-linked-files).
+
 
