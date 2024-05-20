@@ -45,6 +45,18 @@ A quick heads-up on the new release of RevitLookup covering numerous new classes
 - [`Outline` versus `BoundingBox`](#4)
 - [Linking Revit files in BIM360 Docs](#5)
 
+####<a name="2"></a> BIMrras Podcast Interview
+
+https://www.bimrras.com/
+
+BIMrras Podcast
+El Primer Podcast BIM Colaborativo
+¡El Podcast Sobre BIM Que Chuck Norris No Se Atreve A Escuchar!
+con Evelio Sánchez y Rogelio Carballo
+
+[157 Building with code, with Jeremy Tammik](https://www.bimrras.com/episodio/157-building-with-code-with-jeremy-tammik/)
+
+
 ####<a name="2"></a> RevitLookup 2025.0.3
 
 Roman [@Nice3point](https://t.me/nice3point) Karpovich, aka Роман Карпович,
