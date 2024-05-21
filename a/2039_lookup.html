@@ -26,7 +26,12 @@ twitter:
 
  the @AutodeskRevit #RevitAPI #BIM @DynamoBIM
 
-...
+New releases of RevitLookup vastly expand coverage to include numerous new classes and properties
+&ndash; BIMrras podcast interview
+&ndash; RevitLookup 2025.0.3
+&ndash; RevitLookup 2025.0.4
+&ndash; <code>Outline</code> versus <code>BoundingBox</code>
+&ndash; Linking Revit files in BIM360 Docs...
 
 linkedin:
 
@@ -44,7 +49,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 <h3>RevitLookup Updates, Bounding Boxes and Podcast</h3>
 <p>A quick heads-up on a podcast interview, new releases of RevitLookup vastly expanding coverage to include numerous new classes and properties, and other notes of interest:</p>
 <ul>
-<li><a href="#2">BIMrras Podcast Interview</a></li>
+<li><a href="#2">BIMrras podcast interview</a></li>
 <li><a href="#3">RevitLookup 2025.0.3</a></li>
 <li><a href="#4">RevitLookup 2025.0.4</a></li>
 <li><a href="#5"><code>Outline</code> versus <code>BoundingBox</code></a></li>
@@ -73,19 +78,24 @@ by <a href="https://github.com/SergeyNefyodov">Sergey Nefyodov</a> to expand cov
 <a href="https://github.com/jeremytammik/RevitLookup/pull/232">232 (<code>DatumPlane</code>)</a>
 and <a href="https://github.com/jeremytammik/RevitLookup/pull/233">233 (extensions)</a>.</p>
 <p>Specific improvement include:</p>
-<ul>
-<li>Memory diagnoser
-<center>
+<p>Memory diagnoser:</p>
+<p><center>
 <img src="img/revitlookup_memory.png" alt="Memory diagnoser" title="Memory diagnoser" width="800"/> <!-- Pixel Height: 555 Pixel Width: 1,016 -->
-</center>
-  &ndash; The <code>Memory</code> column shows the size of allocated <strong>managed memory</strong>
-  &ndash; Native ETW and allocations in C++ code are not included to avoid severe performance degradation</li>
-<li>Different method overload variations now displayed in a <code>Variants</code> collection
-<center>
+</center></p>
+<ul>
+<li>The <code>Memory</code> column shows the size of allocated <strong>managed memory</strong></li>
+<li>Native ETW and allocations in C++ code are not included to avoid severe performance degradation</li>
+</ul>
+<p>Different method overload variations now displayed in a <code>Variants</code> collection:</p>
+<ul>
+<li>Previously: <code>GeometryElement</code></li>
+<li>Now: <code>Variants&lt;GeometryElement&gt;</code></li>
+</ul>
+<p><center>
 <img src="img/revitlookup_variants.png" alt="Overload variations" title="Overload variations" width="800"/> <!-- Pixel Height: 555 Pixel Width: 1,016 -->
-</center>
-  &ndash; Previously: <code>GeometryElement</code>
-  &ndash; Now: <code>Variants&lt;GeometryElement&gt;</code></li>
+</center></p>
+<p>More:</p>
+<ul>
 <li>ConnectorManager class support
   &ndash; Added <code>ConnectorManager.Lookup</code></li>
 <li>Wire class support

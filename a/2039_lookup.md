@@ -27,7 +27,12 @@ twitter:
 
  the @AutodeskRevit #RevitAPI #BIM @DynamoBIM
 
-...
+New releases of RevitLookup vastly expand coverage to include numerous new classes and properties
+&ndash; BIMrras podcast interview
+&ndash; RevitLookup 2025.0.3
+&ndash; RevitLookup 2025.0.4
+&ndash; <code>Outline</code> versus <code>BoundingBox</code>
+&ndash; Linking Revit files in BIM360 Docs...
 
 linkedin:
 
@@ -46,7 +51,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 A quick heads-up on a podcast interview, new releases of RevitLookup vastly expanding coverage to include numerous new classes and properties, and other notes of interest:
 
-- [BIMrras Podcast Interview](#2)
+- [BIMrras podcast interview](#2)
 - [RevitLookup 2025.0.3](#3)
 - [RevitLookup 2025.0.4](#4)
 - [`Outline` versus `BoundingBox`](#5)
@@ -81,18 +86,26 @@ and [233 (extensions)](https://github.com/jeremytammik/RevitLookup/pull/233).
 
 Specific improvement include:
 
-- Memory diagnoser
+Memory diagnoser:
+
 <center>
 <img src="img/revitlookup_memory.png" alt="Memory diagnoser" title="Memory diagnoser" width="800"/> <!-- Pixel Height: 555 Pixel Width: 1,016 -->
 </center>
-  &ndash; The `Memory` column shows the size of allocated **managed memory**
-  &ndash; Native ETW and allocations in C++ code are not included to avoid severe performance degradation
-- Different method overload variations now displayed in a `Variants` collection
+
+- The `Memory` column shows the size of allocated **managed memory**
+- Native ETW and allocations in C++ code are not included to avoid severe performance degradation
+
+Different method overload variations now displayed in a `Variants` collection:
+
+- Previously: `GeometryElement`
+- Now: `Variants<GeometryElement>`
+
 <center>
 <img src="img/revitlookup_variants.png" alt="Overload variations" title="Overload variations" width="800"/> <!-- Pixel Height: 555 Pixel Width: 1,016 -->
 </center>
-  &ndash; Previously: `GeometryElement`
-  &ndash; Now: `Variants<GeometryElement>`
+
+More:
+
 - ConnectorManager class support
   &ndash; Added `ConnectorManager.Lookup`
 - Wire class support
