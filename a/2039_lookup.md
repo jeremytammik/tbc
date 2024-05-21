@@ -40,10 +40,11 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 A quick heads-up on the new release of RevitLookup covering numerous new classes and properties, and two unrelated notes:
 
-- [RevitLookup 2025.0.3](#2)
-- [RevitLookup 2025.0.4](#3)
-- [`Outline` versus `BoundingBox`](#4)
-- [Linking Revit files in BIM360 Docs](#5)
+- [BIMrras Podcast Interview](#2)
+- [RevitLookup 2025.0.3](#3)
+- [RevitLookup 2025.0.4](#4)
+- [`Outline` versus `BoundingBox`](#5)
+- [Linking Revit files in BIM360 Docs](#6)
 
 ####<a name="2"></a> BIMrras Podcast Interview
 
@@ -57,7 +58,7 @@ con Evelio Sánchez y Rogelio Carballo
 [157 Building with code, with Jeremy Tammik](https://www.bimrras.com/episodio/157-building-with-code-with-jeremy-tammik/)
 
 
-####<a name="2"></a> RevitLookup 2025.0.3
+####<a name="3"></a> RevitLookup 2025.0.3
 
 Roman [@Nice3point](https://t.me/nice3point) Karpovich, aka Роман Карпович,
 published [RevitLookup release 2025.0.3](https://github.com/jeremytammik/RevitLookup/releases/tag/2025.0.3),
@@ -128,14 +129,18 @@ Specific improvement include:
 - [Full changelog 2025.0.2...2025.0.3](https://github.com/jeremytammik/RevitLookup/compare/2025.0.2...2025.0.3)
 - [RevitLookup versioning](https://github.com/jeremytammik/RevitLookup/wiki/Versions)
 
-####<a name="3"></a> RevitLookup 2025.0.4
+####<a name="4"></a> RevitLookup 2025.0.4
+
+As if thatr were not enough, Roman and Sergey immediately followed up
+with [RevitLookup release 2025.0.4](https://github.com/jeremytammik/RevitLookup/releases/tag/2025.0.4),
+integrating the further pull requests
+[235](https://github.com/jeremytammik/RevitLookup/pull/235)
+and [236](https://github.com/jeremytammik/RevitLookup/pull/236):
 
 
-https://github.com/SergeyNefyodov
 
-https://github.com/jeremytammik/RevitLookup/pull/236
 
-https://github.com/jeremytammik/RevitLookup/pull/235
+
 
 https://github.com/jeremytammik/RevitLookup/compare/2025.0.3...2025.0.4
 
@@ -178,15 +183,13 @@ RevitLookup versioning: https://github.com/jeremytammik/RevitLookup/wiki/Version
 
 Many thanks to Roman and Sergey for their impressive implementation and maintenance work!
 
-####<a name="4"></a> Outline Versus BoundingBox
+####<a name="5"></a> Outline Versus BoundingBox
 
 Some interesting aspects of different kinds of bounding boxes and their uses in intersection filters are discussed in the thread
 on [`Outline` vs `BoundingBoxXYZ` in Revit API](https://forums.autodesk.com/t5/revit-api-forum/outline-vs-boundingboxxyz-in-revit-api/m-p/12670522).
 
-####<a name="5"></a> Linking Revit Files in BIM360 Docs
+####<a name="6"></a> Linking Revit Files in BIM360 Docs
 
 Several users asked whether it is possible to link Revit projects directly in ACC and BIM360 Docs.
 Luckily, Eason Kang has covered that topic extensively in his article
 on [BIM360 Docs: Setting up external references between files (Upload Linked Files)](https://aps.autodesk.com/blog/bim360-docs-setting-external-references-between-files-upload-linked-files).
-
-
