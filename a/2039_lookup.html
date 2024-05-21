@@ -15,6 +15,12 @@
 <p></head></p>
 <!---
 
+- bimrras
+  email [Re: [BIMrras] Interview Publication Tomorrow] Evelio E. Sánchez Juncal <eveliosanchez@spaplaneamento.com>
+  https://www.bimrras.com/episodio/157-building-with-code-with-jeremy-tammik/?utm_source=newsletter&utm_medium=tuit&utm_campaign=episodio
+  https://bit.ly/BIMrras157Bol
+  2024-05-06_bimrras_157a.pdf
+  /Users/jta/a/doc/revit/tbc/git/a/doc/2024-05-06_bimrras_157b.txt
 
 twitter:
 
@@ -35,14 +41,25 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-<h3>RevitLookup 2025.0.3</h3>
-<p>A quick heads-up on the new release of RevitLookup covering numerous new classes and properties, and two unrelated notes:</p>
+<h3>RevitLookup Updates, Bounding Boxes and Podcast</h3>
+<p>A quick heads-up on the new releases of RevitLookup covering numerous new classes and properties, and two unrelated notes:</p>
 <ul>
-<li><a href="#2">RevitLookup 2025.0.3</a></li>
-<li><a href="#3"><code>Outline</code> versus <code>BoundingBox</code></a></li>
-<li><a href="#4">Linking Revit files in BIM360 Docs</a></li>
+<li><a href="#2">BIMrras Podcast Interview</a></li>
+<li><a href="#3">RevitLookup 2025.0.3</a></li>
+<li><a href="#4">RevitLookup 2025.0.4</a></li>
+<li><a href="#5"><code>Outline</code> versus <code>BoundingBox</code></a></li>
+<li><a href="#6">Linking Revit files in BIM360 Docs</a></li>
 </ul>
-<h4><a name="2"></a> RevitLookup 2025.0.3</h4>
+<h4><a name="2"></a> BIMrras Podcast Interview</h4>
+<p>Evelio Sánchez y Rogelio Carballo invited me to participate in
+their <a href="https://www.bimrras.com/">BIMrras Podcast</a>:</p>
+<blockquote>
+<p>El Primer Podcast BIM Colaborativo
+<br/>¡El Podcast Sobre BIM Que Chuck Norris No Se Atreve A Escuchar!</p>
+</blockquote>
+<p>I joined them for a very pleasant chat in
+episode <a href="https://www.bimrras.com/episodio/157-building-with-code-with-jeremy-tammik/">157 Building with code, with Jeremy Tammik</a>.</p>
+<h4><a name="3"></a> RevitLookup 2025.0.3</h4>
 <p>Roman <a href="https://t.me/nice3point">@Nice3point</a> Karpovich, aka Роман Карпович,
 published <a href="https://github.com/jeremytammik/RevitLookup/releases/tag/2025.0.3">RevitLookup release 2025.0.3</a>,
 integrating extensive work
@@ -128,11 +145,43 @@ and <a href="https://github.com/jeremytammik/RevitLookup/pull/233">233 (extensio
 <li><a href="https://github.com/jeremytammik/RevitLookup/compare/2025.0.2...2025.0.3">Full changelog 2025.0.2...2025.0.3</a></li>
 <li><a href="https://github.com/jeremytammik/RevitLookup/wiki/Versions">RevitLookup versioning</a></li>
 </ul>
-<p>Many thanks to Roman and Sergey for their impressive implementation and maintenance work!</p>
-<h4><a name="3"></a> Outline Versus BoundingBox</h4>
-<p>Some interesting aspects of different kinds of bounding boxes and their uses in intersection filters are discussed in the thread
+<h4><a name="4"></a> RevitLookup 2025.0.4</h4>
+<p>As if that were not enough, Roman and Sergey immediately followed up
+with <a href="https://github.com/jeremytammik/RevitLookup/releases/tag/2025.0.4">RevitLookup release 2025.0.4</a>,
+integrating the further pull requests
+<a href="https://github.com/jeremytammik/RevitLookup/pull/235">235</a>
+and <a href="https://github.com/jeremytammik/RevitLookup/pull/236">236</a>,
+focused on improving core functionalities and robustness of the product.</p>
+<ul>
+<li>Introducing a preview feature for <strong>Family Size Table</strong>, making it easier to manage and visualize family sizes
+<center>
+<img src="img/revitlookup_family_size_table.png" alt="Family size table" title="Family size table" width="800"/> <!-- Pixel Height: 555 Pixel Width: 1,016 -->
+</center>
+To access it:<ul>
+<li>Enable <strong>Show Extensions</strong> in the view menu</li>
+<li>Select any <strong>FamilyInstance</strong></li>
+<li>Navigate to the <strong>Symbol</strong></li>
+<li>Navigate to the <strong>Family</strong> (or just search for Family class objects in the <strong>Snoop database</strong> command)</li>
+<li>Navigate to the <strong>GetFamilySizeTableManager</strong> method</li>
+<li>Navigate to the <strong>GetSizeTable</strong> method</li>
+<li>Right-click on one of the tables and select the <strong>Show table</strong> command</li>
+<li>Note: Family size table is currently in read-only mode</li>
+</ul>
+</li>
+<li>Added new context menu item for selecting elements without showing</li>
+<li>Added new fresh, intuitive icons to the context menu for a more user-friendly interface.</li>
+<li>Refined labels, class names, and exception messages</li>
+<li>Resolved an issue where the delete action was not displayed in the context menu for ElementType classes</li>
+<li>Fixed the context menu display issue for Element classes, broken in previous release</li>
+<li>Fixed the order of descriptors to prevent missing extensions and context menu items in some classes, broken in previous release</li>
+<li><a href="https://github.com/jeremytammik/RevitLookup/compare/2025.0.3...2025.0.4">Full changelog</a></li>
+<li><a href="https://github.com/jeremytammik/RevitLookup/wiki/Versions">RevitLookup versioning</a></li>
+</ul>
+<p>Ever so many thanks to Roman and Sergey for their impressive and untiring implementation and maintenance work!</p>
+<h4><a name="5"></a> Outline Versus BoundingBox</h4>
+<p>Interesting aspects of different kinds of bounding boxes and their uses in intersection filters are discussed in the thread
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/outline-vs-boundingboxxyz-in-revit-api/m-p/12670522"><code>Outline</code> vs <code>BoundingBoxXYZ</code> in Revit API</a>.</p>
-<h4><a name="4"></a> Linking Revit Files in BIM360 Docs</h4>
+<h4><a name="6"></a> Linking Revit Files in BIM360 Docs</h4>
 <p>Several users asked whether it is possible to link Revit projects directly in ACC and BIM360 Docs.
 Luckily, Eason Kang has covered that topic extensively in his article
 on <a href="https://aps.autodesk.com/blog/bim360-docs-setting-external-references-between-files-upload-linked-files">BIM360 Docs: Setting up external references between files (Upload Linked Files)</a>.</p>

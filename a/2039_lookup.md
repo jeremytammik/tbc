@@ -16,6 +16,12 @@
 
 <!---
 
+- bimrras
+  email [Re: [BIMrras] Interview Publication Tomorrow] Evelio E. Sánchez Juncal <eveliosanchez@spaplaneamento.com>
+  https://www.bimrras.com/episodio/157-building-with-code-with-jeremy-tammik/?utm_source=newsletter&utm_medium=tuit&utm_campaign=episodio
+  https://bit.ly/BIMrras157Bol
+  2024-05-06_bimrras_157a.pdf
+  /Users/jta/a/doc/revit/tbc/git/a/doc/2024-05-06_bimrras_157b.txt
 
 twitter:
 
@@ -36,9 +42,9 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### RevitLookup 2025.0.3
+### RevitLookup Updates, Bounding Boxes and Podcast
 
-A quick heads-up on the new release of RevitLookup covering numerous new classes and properties, and two unrelated notes:
+A quick heads-up on the new releases of RevitLookup covering numerous new classes and properties, and two unrelated notes:
 
 - [BIMrras Podcast Interview](#2)
 - [RevitLookup 2025.0.3](#3)
@@ -48,15 +54,14 @@ A quick heads-up on the new release of RevitLookup covering numerous new classes
 
 ####<a name="2"></a> BIMrras Podcast Interview
 
-https://www.bimrras.com/
+Evelio Sánchez y Rogelio Carballo invited me to participate in
+their [BIMrras Podcast](https://www.bimrras.com/):
 
-BIMrras Podcast
-El Primer Podcast BIM Colaborativo
-¡El Podcast Sobre BIM Que Chuck Norris No Se Atreve A Escuchar!
-con Evelio Sánchez y Rogelio Carballo
+> El Primer Podcast BIM Colaborativo
+<br/>¡El Podcast Sobre BIM Que Chuck Norris No Se Atreve A Escuchar!
 
-[157 Building with code, with Jeremy Tammik](https://www.bimrras.com/episodio/157-building-with-code-with-jeremy-tammik/)
-
+I joined them for a very pleasant chat in
+episode [157 Building with code, with Jeremy Tammik](https://www.bimrras.com/episodio/157-building-with-code-with-jeremy-tammik/).
 
 ####<a name="3"></a> RevitLookup 2025.0.3
 
@@ -131,61 +136,40 @@ Specific improvement include:
 
 ####<a name="4"></a> RevitLookup 2025.0.4
 
-As if thatr were not enough, Roman and Sergey immediately followed up
+As if that were not enough, Roman and Sergey immediately followed up
 with [RevitLookup release 2025.0.4](https://github.com/jeremytammik/RevitLookup/releases/tag/2025.0.4),
 integrating the further pull requests
 [235](https://github.com/jeremytammik/RevitLookup/pull/235)
-and [236](https://github.com/jeremytammik/RevitLookup/pull/236):
+and [236](https://github.com/jeremytammik/RevitLookup/pull/236),
+focused on improving core functionalities and robustness of the product.
 
-
-
-
-
-
-https://github.com/jeremytammik/RevitLookup/compare/2025.0.3...2025.0.4
-
-https://github.com/jeremytammik/RevitLookup/wiki/Versions
-
-
-
-A new Release focused on improving core functionalities and robustness of the product.
-
-## Improvements
-
-- Introducing a preview feature for **Family Size Table**, making it easier to manage and visualize family sizes by @SergeyNefyodov in https://github.com/jeremytammik/RevitLookup/pull/236
+- Introducing a preview feature for **Family Size Table**, making it easier to manage and visualize family sizes
 <center>
-<img src="img/revitlookup_2025_0_4.png" alt="Family size table" title="Family size table" width="800"/> <!-- Pixel Height: 555 Pixel Width: 1,016 -->
+<img src="img/revitlookup_family_size_table.png" alt="Family size table" title="Family size table" width="800"/> <!-- Pixel Height: 555 Pixel Width: 1,016 -->
 </center>
 To access it:
-  - Enable **Show Extensions** in the view menu
-  - Select any **FamilyInstance**
-  - Navigate to the **Symbol**
-  - Navigate to the **Family** (or just search for Family class objects in the **Snoop database** command)
-  - Navigate to the **GetFamilySizeTableManager** method
-  - Navigate to the **GetSizeTable** method
-  - Right-click on one of the tables and select the **Show table** command
-
-  _Note: Family size table is currently in read-only mode_
-
+    - Enable **Show Extensions** in the view menu
+    - Select any **FamilyInstance**
+    - Navigate to the **Symbol**
+    - Navigate to the **Family** (or just search for Family class objects in the **Snoop database** command)
+    - Navigate to the **GetFamilySizeTableManager** method
+    - Navigate to the **GetSizeTable** method
+    - Right-click on one of the tables and select the **Show table** command
+    - Note: Family size table is currently in read-only mode
 - Added new context menu item for selecting elements without showing
 - Added new fresh, intuitive icons to the context menu for a more user-friendly interface.
 - Refined labels, class names, and exception messages
-
-## Bugs
-
 - Resolved an issue where the delete action was not displayed in the context menu for ElementType classes
 - Fixed the context menu display issue for Element classes, broken in previous release
-- Fixed the order of descriptors to prevent missing extensions and context menu items in some classes, broken in previous release by @SergeyNefyodov in https://github.com/jeremytammik/RevitLookup/pull/235
+- Fixed the order of descriptors to prevent missing extensions and context menu items in some classes, broken in previous release
+- [Full changelog](https://github.com/jeremytammik/RevitLookup/compare/2025.0.3...2025.0.4)
+- [RevitLookup versioning](https://github.com/jeremytammik/RevitLookup/wiki/Versions)
 
-Full changelog: https://github.com/jeremytammik/RevitLookup/compare/2025.0.3...2025.0.4
-RevitLookup versioning: https://github.com/jeremytammik/RevitLookup/wiki/Versions
-
-
-Many thanks to Roman and Sergey for their impressive implementation and maintenance work!
+Ever so many thanks to Roman and Sergey for their impressive and untiring implementation and maintenance work!
 
 ####<a name="5"></a> Outline Versus BoundingBox
 
-Some interesting aspects of different kinds of bounding boxes and their uses in intersection filters are discussed in the thread
+Interesting aspects of different kinds of bounding boxes and their uses in intersection filters are discussed in the thread
 on [`Outline` vs `BoundingBoxXYZ` in Revit API](https://forums.autodesk.com/t5/revit-api-forum/outline-vs-boundingboxxyz-in-revit-api/m-p/12670522).
 
 ####<a name="6"></a> Linking Revit Files in BIM360 Docs
