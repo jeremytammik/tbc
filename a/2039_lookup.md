@@ -44,7 +44,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### RevitLookup Updates, Bounding Boxes and Podcast
 
-A quick heads-up on the new releases of RevitLookup covering numerous new classes and properties, and two unrelated notes:
+A quick heads-up on a podcast interview, new releases of RevitLookup vastly expanding coverage to include numerous new classes and properties, and other notes of interest:
 
 - [BIMrras Podcast Interview](#2)
 - [RevitLookup 2025.0.3](#3)
@@ -58,7 +58,7 @@ Evelio Sánchez y Rogelio Carballo invited me to participate in
 their [BIMrras Podcast](https://www.bimrras.com/):
 
 > El Primer Podcast BIM Colaborativo
-<br/>¡El Podcast Sobre BIM Que Chuck Norris No Se Atreve A Escuchar!
+<br/>¡El podcast sobre BIM que Chuck Norris no se atreve a escuchar!
 
 I joined them last week for a very pleasant chat in
 episode [157 Building with code, with Jeremy Tammik](https://www.bimrras.com/episodio/157-building-with-code-with-jeremy-tammik/).
@@ -85,52 +85,28 @@ Specific improvement include:
 <center>
 <img src="img/revitlookup_memory.png" alt="Memory diagnoser" title="Memory diagnoser" width="800"/> <!-- Pixel Height: 555 Pixel Width: 1,016 -->
 </center>
-    - The `Memory` column shows the size of allocated **managed memory**.
-    - Native ETW and allocations in C++ code are not included to avoid severe performance degradation.
+  &ndash; The `Memory` column shows the size of allocated **managed memory**
+  &ndash; Native ETW and allocations in C++ code are not included to avoid severe performance degradation
 - Different method overload variations now displayed in a `Variants` collection
 <center>
 <img src="img/revitlookup_variants.png" alt="Overload variations" title="Overload variations" width="800"/> <!-- Pixel Height: 555 Pixel Width: 1,016 -->
 </center>
-    - Previously: `GeometryElement`
-    - Now: `Variants<GeometryElement>`
+  &ndash; Previously: `GeometryElement`
+  &ndash; Now: `Variants<GeometryElement>`
 - ConnectorManager class support
-    - Added `ConnectorManager.Lookup`
+  &ndash; Added `ConnectorManager.Lookup`
 - Wire class support
-    - Added `Wire.GetVertex`
+  &ndash; Added `Wire.GetVertex`
 - IndependentTag class support
-    - Added `IndependentTag.CanLeaderEndConditionBeAssigned`
-    - Added `IndependentTag.GetLeaderElbow`
-    - Added `IndependentTag.GetLeaderEnd`
-    - Added `IndependentTag.HasLeaderElbow`
-    - Added `IndependentTag.IsLeaderVisible`
+  &ndash; Added `IndependentTag.CanLeaderEndConditionBeAssigned`, `IndependentTag.GetLeaderElbow`, `IndependentTag.GetLeaderEnd`, `IndependentTag.HasLeaderElbow`, `IndependentTag.IsLeaderVisible`
 - CurveElement class support
-    - Added `CurveElement.GetAdjoinedCurveElements`
-    - Added `CurveElement.HasTangentLocks`
-    - Added `CurveElement.GetTangentLock`
-    - Added `CurveElement.HasTangentJoin`
-    - Added `CurveElement.IsAdjoinedCurveElement`
+  &ndash; Added `CurveElement.GetAdjoinedCurveElements`, `CurveElement.HasTangentLocks`, `CurveElement.GetTangentLock`, `CurveElement.HasTangentJoin`, `CurveElement.IsAdjoinedCurveElement`
 - TableView class support
-    - Added `TableView.GetAvailableParameters`
-    - Added `TableView.GetCalculatedValueName`
-    - Added `TableView.GetCalculatedValueText`
-    - Added `TableView.IsValidSectionType`
-    - Added `TableView.GetCellText`
+  &ndash; Added `TableView.GetAvailableParameters`, `TableView.GetCalculatedValueName`, `TableView.GetCalculatedValueText`, `TableView.IsValidSectionType`, `TableView.GetCellText`
 - DatumPlane class support
-    - Added `DatumPlane.CanBeVisibleInView`
-    - Added `DatumPlane.GetPropagationViews`
-    - Added `DatumPlane.CanBeVisibleInView`
-    - Added `DatumPlane.GetPropagationViews`
-    - Added `DatumPlane.GetDatumExtentTypeInView`
-    - Added `DatumPlane.HasBubbleInView`
-    - Added `DatumPlane.IsBubbleVisibleInView`
-    - Added `DatumPlane.GetCurvesInView`
-    - Added `DatumPlane.GetLeader`
-- Extensions:
-    - Added Family class extension `FamilySizeTableManager.GetFamilySizeTableManager`
-    - Added FamilyInstance class extension `AdaptiveComponentInstanceUtils.GetInstancePlacementPointElementRefIds`
-    - Added FamilyInstance class extension `AdaptiveComponentInstanceUtils.IsAdaptiveComponentInstance`
-    - Added Solid class extension `SolidUtils.SplitVolumes`
-    - Added Solid class extension `SolidUtils.IsValidForTessellation`
+  &ndash; Added `DatumPlane.CanBeVisibleInView`, `DatumPlane.GetPropagationViews`, `DatumPlane.CanBeVisibleInView`, `DatumPlane.GetPropagationViews`, `DatumPlane.GetDatumExtentTypeInView`, `DatumPlane.HasBubbleInView`, `DatumPlane.IsBubbleVisibleInView`, `DatumPlane.GetCurvesInView`, `DatumPlane.GetLeader`
+- Extensions
+  &ndash; Added Family class extension `FamilySizeTableManager.GetFamilySizeTableManager`, FamilyInstance class extension `AdaptiveComponentInstanceUtils.GetInstancePlacementPointElementRefIds`, FamilyInstance class extension `AdaptiveComponentInstanceUtils.IsAdaptiveComponentInstance`, Solid class extension `SolidUtils.SplitVolumes`, Solid class extension `SolidUtils.IsValidForTessellation`
 - [Full changelog 2025.0.2...2025.0.3](https://github.com/jeremytammik/RevitLookup/compare/2025.0.2...2025.0.3)
 - [RevitLookup versioning](https://github.com/jeremytammik/RevitLookup/wiki/Versions)
 
@@ -144,18 +120,24 @@ and [236](https://github.com/jeremytammik/RevitLookup/pull/236),
 focused on improving core functionalities and robustness of the product.
 
 - Introducing a preview feature for **Family Size Table**, making it easier to manage and visualize family sizes
+
 <center>
 <img src="img/revitlookup_family_size_table.png" alt="Family size table" title="Family size table" width="800"/> <!-- Pixel Height: 555 Pixel Width: 1,016 -->
 </center>
+
 To access it:
-    - Enable **Show Extensions** in the view menu
-    - Select any **FamilyInstance**
-    - Navigate to the **Symbol**
-    - Navigate to the **Family** (or just search for Family class objects in the **Snoop database** command)
-    - Navigate to the **GetFamilySizeTableManager** method
-    - Navigate to the **GetSizeTable** method
-    - Right-click on one of the tables and select the **Show table** command
-    - Note: Family size table is currently in read-only mode
+
+- Enable **Show Extensions** in the view menu
+- Select any **FamilyInstance**
+- Navigate to the **Symbol**
+- Navigate to the **Family** (or just search for Family class objects in the **Snoop database** command)
+- Navigate to the **GetFamilySizeTableManager** method
+- Navigate to the **GetSizeTable** method
+- Right-click on one of the tables and select the **Show table** command
+- Note: Family size table is currently in read-only mode
+
+More:
+
 - Added new context menu item for selecting elements without showing
 - Added new fresh, intuitive icons to the context menu for a more user-friendly interface.
 - Refined labels, class names, and exception messages

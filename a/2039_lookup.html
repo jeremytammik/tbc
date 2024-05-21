@@ -42,7 +42,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 -->
 
 <h3>RevitLookup Updates, Bounding Boxes and Podcast</h3>
-<p>A quick heads-up on the new releases of RevitLookup covering numerous new classes and properties, and two unrelated notes:</p>
+<p>A quick heads-up on a podcast interview, new releases of RevitLookup vastly expanding coverage to include numerous new classes and properties, and other notes of interest:</p>
 <ul>
 <li><a href="#2">BIMrras Podcast Interview</a></li>
 <li><a href="#3">RevitLookup 2025.0.3</a></li>
@@ -55,9 +55,9 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 their <a href="https://www.bimrras.com/">BIMrras Podcast</a>:</p>
 <blockquote>
 <p>El Primer Podcast BIM Colaborativo
-<br/>¡El Podcast Sobre BIM Que Chuck Norris No Se Atreve A Escuchar!</p>
+<br/>¡El podcast sobre BIM que Chuck Norris no se atreve a escuchar!</p>
 </blockquote>
-<p>I joined them for a very pleasant chat in
+<p>I joined them last week for a very pleasant chat in
 episode <a href="https://www.bimrras.com/episodio/157-building-with-code-with-jeremy-tammik/">157 Building with code, with Jeremy Tammik</a>.</p>
 <h4><a name="3"></a> RevitLookup 2025.0.3</h4>
 <p>Roman <a href="https://t.me/nice3point">@Nice3point</a> Karpovich, aka Роман Карпович,
@@ -77,71 +77,29 @@ and <a href="https://github.com/jeremytammik/RevitLookup/pull/233">233 (extensio
 <li>Memory diagnoser
 <center>
 <img src="img/revitlookup_memory.png" alt="Memory diagnoser" title="Memory diagnoser" width="800"/> <!-- Pixel Height: 555 Pixel Width: 1,016 -->
-</center><ul>
-<li>The <code>Memory</code> column shows the size of allocated <strong>managed memory</strong>.</li>
-<li>Native ETW and allocations in C++ code are not included to avoid severe performance degradation.</li>
-</ul>
-</li>
+</center>
+  &ndash; The <code>Memory</code> column shows the size of allocated <strong>managed memory</strong>
+  &ndash; Native ETW and allocations in C++ code are not included to avoid severe performance degradation</li>
 <li>Different method overload variations now displayed in a <code>Variants</code> collection
 <center>
 <img src="img/revitlookup_variants.png" alt="Overload variations" title="Overload variations" width="800"/> <!-- Pixel Height: 555 Pixel Width: 1,016 -->
-</center><ul>
-<li>Previously: <code>GeometryElement</code></li>
-<li>Now: <code>Variants&lt;GeometryElement&gt;</code></li>
-</ul>
-</li>
-<li>ConnectorManager class support<ul>
-<li>Added <code>ConnectorManager.Lookup</code></li>
-</ul>
-</li>
-<li>Wire class support<ul>
-<li>Added <code>Wire.GetVertex</code></li>
-</ul>
-</li>
-<li>IndependentTag class support<ul>
-<li>Added <code>IndependentTag.CanLeaderEndConditionBeAssigned</code></li>
-<li>Added <code>IndependentTag.GetLeaderElbow</code></li>
-<li>Added <code>IndependentTag.GetLeaderEnd</code></li>
-<li>Added <code>IndependentTag.HasLeaderElbow</code></li>
-<li>Added <code>IndependentTag.IsLeaderVisible</code></li>
-</ul>
-</li>
-<li>CurveElement class support<ul>
-<li>Added <code>CurveElement.GetAdjoinedCurveElements</code></li>
-<li>Added <code>CurveElement.HasTangentLocks</code></li>
-<li>Added <code>CurveElement.GetTangentLock</code></li>
-<li>Added <code>CurveElement.HasTangentJoin</code></li>
-<li>Added <code>CurveElement.IsAdjoinedCurveElement</code></li>
-</ul>
-</li>
-<li>TableView class support<ul>
-<li>Added <code>TableView.GetAvailableParameters</code></li>
-<li>Added <code>TableView.GetCalculatedValueName</code></li>
-<li>Added <code>TableView.GetCalculatedValueText</code></li>
-<li>Added <code>TableView.IsValidSectionType</code></li>
-<li>Added <code>TableView.GetCellText</code></li>
-</ul>
-</li>
-<li>DatumPlane class support<ul>
-<li>Added <code>DatumPlane.CanBeVisibleInView</code></li>
-<li>Added <code>DatumPlane.GetPropagationViews</code></li>
-<li>Added <code>DatumPlane.CanBeVisibleInView</code></li>
-<li>Added <code>DatumPlane.GetPropagationViews</code></li>
-<li>Added <code>DatumPlane.GetDatumExtentTypeInView</code></li>
-<li>Added <code>DatumPlane.HasBubbleInView</code></li>
-<li>Added <code>DatumPlane.IsBubbleVisibleInView</code></li>
-<li>Added <code>DatumPlane.GetCurvesInView</code></li>
-<li>Added <code>DatumPlane.GetLeader</code></li>
-</ul>
-</li>
-<li>Extensions:<ul>
-<li>Added Family class extension <code>FamilySizeTableManager.GetFamilySizeTableManager</code></li>
-<li>Added FamilyInstance class extension <code>AdaptiveComponentInstanceUtils.GetInstancePlacementPointElementRefIds</code></li>
-<li>Added FamilyInstance class extension <code>AdaptiveComponentInstanceUtils.IsAdaptiveComponentInstance</code></li>
-<li>Added Solid class extension <code>SolidUtils.SplitVolumes</code></li>
-<li>Added Solid class extension <code>SolidUtils.IsValidForTessellation</code></li>
-</ul>
-</li>
+</center>
+  &ndash; Previously: <code>GeometryElement</code>
+  &ndash; Now: <code>Variants&lt;GeometryElement&gt;</code></li>
+<li>ConnectorManager class support
+  &ndash; Added <code>ConnectorManager.Lookup</code></li>
+<li>Wire class support
+  &ndash; Added <code>Wire.GetVertex</code></li>
+<li>IndependentTag class support
+  &ndash; Added <code>IndependentTag.CanLeaderEndConditionBeAssigned</code>, <code>IndependentTag.GetLeaderElbow</code>, <code>IndependentTag.GetLeaderEnd</code>, <code>IndependentTag.HasLeaderElbow</code>, <code>IndependentTag.IsLeaderVisible</code></li>
+<li>CurveElement class support
+  &ndash; Added <code>CurveElement.GetAdjoinedCurveElements</code>, <code>CurveElement.HasTangentLocks</code>, <code>CurveElement.GetTangentLock</code>, <code>CurveElement.HasTangentJoin</code>, <code>CurveElement.IsAdjoinedCurveElement</code></li>
+<li>TableView class support
+  &ndash; Added <code>TableView.GetAvailableParameters</code>, <code>TableView.GetCalculatedValueName</code>, <code>TableView.GetCalculatedValueText</code>, <code>TableView.IsValidSectionType</code>, <code>TableView.GetCellText</code></li>
+<li>DatumPlane class support
+  &ndash; Added <code>DatumPlane.CanBeVisibleInView</code>, <code>DatumPlane.GetPropagationViews</code>, <code>DatumPlane.CanBeVisibleInView</code>, <code>DatumPlane.GetPropagationViews</code>, <code>DatumPlane.GetDatumExtentTypeInView</code>, <code>DatumPlane.HasBubbleInView</code>, <code>DatumPlane.IsBubbleVisibleInView</code>, <code>DatumPlane.GetCurvesInView</code>, <code>DatumPlane.GetLeader</code></li>
+<li>Extensions
+  &ndash; Added Family class extension <code>FamilySizeTableManager.GetFamilySizeTableManager</code>, FamilyInstance class extension <code>AdaptiveComponentInstanceUtils.GetInstancePlacementPointElementRefIds</code>, FamilyInstance class extension <code>AdaptiveComponentInstanceUtils.IsAdaptiveComponentInstance</code>, Solid class extension <code>SolidUtils.SplitVolumes</code>, Solid class extension <code>SolidUtils.IsValidForTessellation</code></li>
 <li><a href="https://github.com/jeremytammik/RevitLookup/compare/2025.0.2...2025.0.3">Full changelog 2025.0.2...2025.0.3</a></li>
 <li><a href="https://github.com/jeremytammik/RevitLookup/wiki/Versions">RevitLookup versioning</a></li>
 </ul>
@@ -153,11 +111,13 @@ integrating the further pull requests
 and <a href="https://github.com/jeremytammik/RevitLookup/pull/236">236</a>,
 focused on improving core functionalities and robustness of the product.</p>
 <ul>
-<li>Introducing a preview feature for <strong>Family Size Table</strong>, making it easier to manage and visualize family sizes
-<center>
+<li>Introducing a preview feature for <strong>Family Size Table</strong>, making it easier to manage and visualize family sizes</li>
+</ul>
+<p><center>
 <img src="img/revitlookup_family_size_table.png" alt="Family size table" title="Family size table" width="800"/> <!-- Pixel Height: 555 Pixel Width: 1,016 -->
-</center>
-To access it:<ul>
+</center></p>
+<p>To access it:</p>
+<ul>
 <li>Enable <strong>Show Extensions</strong> in the view menu</li>
 <li>Select any <strong>FamilyInstance</strong></li>
 <li>Navigate to the <strong>Symbol</strong></li>
@@ -167,7 +127,8 @@ To access it:<ul>
 <li>Right-click on one of the tables and select the <strong>Show table</strong> command</li>
 <li>Note: Family size table is currently in read-only mode</li>
 </ul>
-</li>
+<p>More:</p>
+<ul>
 <li>Added new context menu item for selecting elements without showing</li>
 <li>Added new fresh, intuitive icons to the context menu for a more user-friendly interface.</li>
 <li>Refined labels, class names, and exception messages</li>
