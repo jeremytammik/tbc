@@ -60,7 +60,7 @@ their [BIMrras Podcast](https://www.bimrras.com/):
 > El Primer Podcast BIM Colaborativo
 <br/>¡El Podcast Sobre BIM Que Chuck Norris No Se Atreve A Escuchar!
 
-I joined them for a very pleasant chat in
+I joined them last week for a very pleasant chat in
 episode [157 Building with code, with Jeremy Tammik](https://www.bimrras.com/episodio/157-building-with-code-with-jeremy-tammik/).
 
 ####<a name="3"></a> RevitLookup 2025.0.3
