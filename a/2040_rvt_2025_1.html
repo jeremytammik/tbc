@@ -46,19 +46,19 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 <p>A quick heads-up on the first update release of Revit 2025, a solution for placing a detail group in ASP Design Automation, lacking the UI, and an LLM retrieval augmented generation in 10 lines of code:</p>
 <ul>
 <li><a href="#2">Revit 2025.1</a><ul>
-<li><a href="#2.1">Software Included</a></li>
+<li><a href="#2.1">Software included</a></li>
 <li><a href="#2.2">Enhancements</a></li>
-<li><a href="#2.3">Issues Resolved</a></li>
+<li><a href="#2.3">Issues resolved</a></li>
 <li><a href="#2.4">Revit 2025.1 SDK</a></li>
 </ul>
 </li>
-<li><a href="#3">Placing Detail Group Without UI Access</a></li>
-<li><a href="#4">Hacker's Guide to LLM and 10-Line RAG</a></li>
+<li><a href="#3">Placing detail group without UI access</a></li>
+<li><a href="#4">Hacker's guide to LLM and 10-Line RAG</a></li>
 </ul>
 <h4><a name="2"></a> Revit 2025.1</h4>
-<p>The Revit 2025.1 update release was made available on May 22, 2024 and is available via Autodesk Access or via download from the Autodesk subscription site.</p>
-<p>The official <a href="https://help.autodesk.com/view/RVT/2025/ENU/?guid=RevitReleaseNotes_2025updates_2025_1_html">2025.1 update release notes</a> list
-the following full details:</p>
+<p>The Revit 2025.1 update release was made available on May 22, 2024, via Autodesk Access or from the Autodesk subscription site.</p>
+<p>The official <a href="https://help.autodesk.com/view/RVT/2025/ENU/?guid=RevitReleaseNotes_2025updates_2025_1_html">Revit 2025.1 update release notes</a> list
+the following details:</p>
 <h4><a name="2.1"></a> Software Included</h4>
 <ul>
 <li>Core Package Component for Revit 2025 - version 25.1.0.44</li>
@@ -231,7 +231,7 @@ the following full details:</p>
 </li>
 <li>Revit Home<ul>
 <li>Fixed an auto-refresh issue with the new Revit Home when there was a change in accounts and projects.</li>
-<li>Fixed the issue that Revit Home is not updating when there is changes for folders and files in ACC and BIM360.</li>
+<li>Fixed the issue that Revit Home is not updating when there are changes for folders and files in ACC and BIM360.</li>
 </ul>
 </li>
 <li>Selection<ul>
@@ -263,15 +263,26 @@ the following full details:</p>
 </li>
 </ul>
 <h4><a name="2.4"></a> Revit 2025.1 SDK</h4>
-<p>The Revit SDK was also updated, with one single minute change in the documentation:</p>
+<p>The Revit SDK was also updated.
+One small change in the documentation right up front says:</p>
 <blockquote>
 <p>Major changes and renovations to the Revit 2025.1 API</p>
 <p>API additions</p>
 <p>AspNetCore</p>
 <p>Revit now has a framework reference to Microsoft.AspNetCore.App, so that addins can use AspNetCore.</p>
 </blockquote>
+<p>Furthermore, note the API-related issues listed above, some of them not under the API heading:</p>
+<ul>
+<li>Updated the Revit SDK MacroSample to .NET 8</li>
+<li>Fixed an API issue where GetAllInstalledRevitProducts does not properly return the correct Revit 2025 version</li>
+<li>Fixed an issue which prevented ASP.Net Core from being used in Revit addins</li>
+<li>Fixed issue that could occur when the Windows region was set to Thai/Thailand</li>
+<li>Fixed an API issue where PartUtils.FindMergeableClusters would return invalid clusters,
+  cf. the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
+  reporting that <a href="https://forums.autodesk.com/t5/revit-api-forum/partutils-findmergeableclusters-finds-clusters-which-are-not/m-p/12402263">PartUtils.FindMergeableClusters finds clusters which are not valid for merge</a></li>
+</ul>
 <p><center>
-<img src="img/.png" alt="" title="" width="800"/> <!-- Pixel Height: 585 Pixel Width: 1,000 -->
+<img src="img/rvt_2025_1.png" alt="Revit 2025.1" title="Revit 2025.1" width="800"/> <!-- Pixel Height: 585 Pixel Width: 1,000 -->
 </center></p>
 <h4><a name="3"></a> Placing Detail Group Without UI Access</h4>
 <p>Luiz Henrique <a href="https://ricaun.com/">@ricaun</a> Cassettari provided a nice workaround to
