@@ -1,0 +1,308 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css"></p>
+<!-- https://highlightjs.org/#usage
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+-->
+
+<!-- https://prismjs.com -->
+<p><link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css" rel="stylesheet" /></p>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+<style> code[class*=language-], pre[class*=language-] { font-size : 90%; } </style>
+<p></head></p>
+<!---
+
+- Placing detail group in legend view without access to UI (Design Automation)
+  https://forums.autodesk.com/t5/revit-api-forum/placing-detail-group-in-legend-view-without-access-to-ui-design/m-p/12795399
+
+- implement RAG in 10 lines
+  https://x.com/Yampeleg/status/1793698848616960393
+  retrieval augmented generation:
+  https://fastai.github.io/lm-hackers/lm-hackers.html#retrieval-augmented-generation
+
+twitter:
+
+ in the @AutodeskRevit #RevitAPI #BIM @DynamoBIM
+
+&ndash; ...
+
+linkedin:
+
+#BIM #DynamoBIM #AutodeskAPS #Revit #API #IFC #SDK #Autodesk #AEC #adsk
+
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+
+<center>
+<img src="img/" alt="" title="" width="600"/>
+<p style="font-size: 80%; font-style:italic"></p>
+</center>
+
+-->
+
+<h3>Revit 2025.1</h3>
+<p>A quick heads-up on the first update release of Revit 2025, a solution for placing a detail group in ASP Design Automation, lacking the UI, and an LLM retrieval augmented generation in 10 lines of code:</p>
+<ul>
+<li><a href="#2">Revit 2025.1</a><ul>
+<li><a href="#2.1">Software Included</a></li>
+<li><a href="#2.2">Enhancements</a></li>
+<li><a href="#2.3">Issues Resolved</a></li>
+<li><a href="#2.4">Revit 2025.1 SDK</a></li>
+</ul>
+</li>
+<li><a href="#3">Placing Detail Group Without UI Access</a></li>
+<li><a href="#4">Hacker's Guide to LLM and 10-Line RAG</a></li>
+</ul>
+<h4><a name="2"></a> Revit 2025.1</h4>
+<p>The Revit 2025.1 update release was made available on May 22, 2024 and is available via Autodesk Access or via download from the Autodesk subscription site.</p>
+<p>The official <a href="https://help.autodesk.com/view/RVT/2025/ENU/?guid=RevitReleaseNotes_2025updates_2025_1_html">2025.1 update release notes</a> list
+the following full details:</p>
+<h4><a name="2.1"></a> Software Included</h4>
+<ul>
+<li>Core Package Component for Revit 2025 - version 25.1.0.44</li>
+<li>Core-RVT Package Component for Revit 2025 - version 25.1.0.44</li>
+<li>ATF for Revit 2025 - version 25.1.0.44</li>
+<li>Core Package Component Cloud for Revit 2025 - version 25.1.0.44</li>
+<li>Dynamo Core for Revit 2025 - version 25.1.0.44</li>
+<li>TwinMotion Package Component for Revit 2025 - version 25.1.0.44</li>
+<li>Unit Schemas for Revit 2025 - version 25.1.0.44</li>
+<li>Generative Design For Revit - version 25.3.21.0</li>
+<li>Personal Accelerator for Revit 2025 - version 24.4.21.0</li>
+</ul>
+<h4><a name="2.2"></a> Enhancements</h4>
+<ul>
+<li>Coordination Model<ul>
+<li>Added a tooltip for the truncated model name for the selected model in the Coordination Model Changes dialog.</li>
+<li>Fixed an issue that could occur when using the unload and reload options for Coordination Model Changes.</li>
+</ul>
+</li>
+<li>Export PDF<ul>
+<li>Improved the message for cancelling background PDF export.</li>
+<li>Provided an error message when "Coordination Model Changes" mode is turned on during background PDF export.</li>
+<li>Resolved the issue of the default 3D view not being correctly exported to PDF in the background when its orientation was changed but unsaved.</li>
+<li>Improved the performance of background PDF export - for example, in one model where exporting 16 views previously took 34 minutes, it now takes 3 minutes.</li>
+</ul>
+</li>
+<li>Family Editor<ul>
+<li>Simplified the Additional Settings ribbon menu by removing the dividing lines.</li>
+</ul>
+</li>
+<li>IFC<ul>
+<li>Improved performance of some elongated elements export to IFC 4.</li>
+</ul>
+</li>
+<li>Macros<ul>
+<li>Updated the Revit SDK MacroSample to .NET 8.</li>
+</ul>
+</li>
+<li>Pressure Loss Calculations<ul>
+<li>Fixed an issue that caused a graphic override to not be applied to analytical segments for duct and pipe fittings.</li>
+</ul>
+</li>
+<li>Reinforcement<ul>
+<li>Dimensions on bars in area and path reinforcement are maintained after removing the path or area system.</li>
+</ul>
+</li>
+<li>Site<ul>
+<li>Sub-divisions share the Cut line settings as toposolid.</li>
+<li>Improved the wording in the Generate Toposolid from Toposurface dialog.</li>
+<li>Improved the link topography to be more stable with hosted elements and Boolean results when reloading links.</li>
+</ul>
+</li>
+<li>Slab<ul>
+<li>Added a confirmation for the Reset Shape command when resetting to the original shape.</li>
+</ul>
+</li>
+<li>Truss<ul>
+<li>Enabled the scheduling of shared parameters defined in the structural truss family.</li>
+</ul>
+</li>
+<li>User Interface<ul>
+<li>Improved several rename dialogs to make them wider by default and resizable to fit long names.</li>
+</ul>
+</li>
+</ul>
+<h4><a name="2.3"></a> Issues Resolved</h4>
+<ul>
+<li>General<ul>
+<li>Addressed potential security vulnerabilities.</li>
+</ul>
+</li>
+<li>Annotation<ul>
+<li>Resolved the issue that edit boundary command is grayed out when editing the filled region.</li>
+</ul>
+</li>
+<li>API<ul>
+<li>Fixed an API issue where GetAllInstalledRevitProducts does not properly return the correct Revit 2025 version.</li>
+<li>Fixed an issue which prevented ASP.Net Core from being used in Revit addins.</li>
+<li>Fixed issue that could occur when the Windows region was set to Thai/Thailand.</li>
+</ul>
+</li>
+<li>Assembly<ul>
+<li>Resolved the issue that customers cannot adjust text leader in assembly view.</li>
+</ul>
+</li>
+<li>Coordination Model<ul>
+<li>Fixed an issue for parameters created under “Other” group when editing families from a Revit model.</li>
+<li>Fixed an issue regarding the positioning of local coordination models linked by shared coordinates.</li>
+<li>Fixed an issue that could occur when changing the path type of a local coordination model.</li>
+</ul>
+</li>
+<li>Copy-Cut-Paste<ul>
+<li>Improved stability when trying to insert 2D elements into a Drafting View.</li>
+</ul>
+</li>
+<li>Dynamo for Revit<ul>
+<li>Fixed an issue where Remember nodes would be removed from old Dynamo graphs when opened in Revit.</li>
+</ul>
+</li>
+<li>Dynamo Player<ul>
+<li>Fixed an issue with numeric display in Generative Design in some languages.</li>
+</ul>
+</li>
+<li>Energy Model<ul>
+<li>Improved stability when regenerating the energy analytical model while another user is borrowing it.</li>
+<li>Improved stability when running an energy analysis.</li>
+<li>Improved stability when generating an energy analytical model when system time is set to a time zone close to the international date line.</li>
+</ul>
+</li>
+<li>Export DWG/DXF<ul>
+<li>Fixed an issue where solid hatches would get the wrong index color when exported to DWG.</li>
+</ul>
+</li>
+<li>Export PDF<ul>
+<li>Resolved the issue where elements from closed worksets were exported to PDF in the background.</li>
+<li>Resolved the issue where the value of keynote tag from a linked Revit model was missing in the background export result.</li>
+<li>Resolved the issue where file size increases after cancelling background PDF export.</li>
+<li>Resolved the issue that grid heads in linked model was not exported correctly after running background PDF export.</li>
+</ul>
+</li>
+<li>File Open/Save<ul>
+<li>Fixed an issue that a pasted local path can't be navigated in File Open and Import/Link RVT dialog.</li>
+<li>Improved stability when opening Revit Server models from different site of host without Revit Server Accelerator.</li>
+</ul>
+</li>
+<li>Fill Patterns<ul>
+<li>Fixed an issue where Solid fills on model objects that have a transparent override were not exported to DWG when the far clip of the view was active.</li>
+</ul>
+</li>
+<li>Keyboard Shortcuts<ul>
+<li>Restored two keyboard shortcuts (EOH and VOH) that can be used for element and category halftone overrides.</li>
+</ul>
+</li>
+<li>Location<ul>
+<li>Improved stability of the Location dialog.</li>
+</ul>
+</li>
+<li>MEP Connectors<ul>
+<li>Fixed an issue that caused disconnection errors when a family containing adjustable connectors is modified.</li>
+</ul>
+</li>
+<li>Part Elements<ul>
+<li>Improved stability when editing intersecting named references for dividing parts.</li>
+<li>Fixed an API issue where PartUtils.FindMergeableClusters would return invalid clusters.</li>
+</ul>
+</li>
+<li>Plan Regions<ul>
+<li>Resolved the issue where applying a plan region affected the graphics of elements outside its boundary.</li>
+</ul>
+</li>
+<li>Precast<ul>
+<li>Improved the behavior of Precast CAM export to take into account moved and removed bars in rebar sets.</li>
+</ul>
+</li>
+<li>Pressure Loss Calculations<ul>
+<li>Fixed an issue that led the background worker process into an endless flow and pressure loss calculation.</li>
+<li>Fixed an issue that prevented network-based duct flow calculations when the flow was set on the source equipment.</li>
+</ul>
+</li>
+<li>Reinforcement<ul>
+<li>Fixed an issue where a multi-rebar annotation would get an incorrect orientation when referencing rebar sets that are slightly rotated with respect to the view.</li>
+<li>Improved stability when editing new rebar shape families in a project.</li>
+<li>Improved the behavior when dimensioning rebar to allow picking the end reference for rebar shapes with multiple segments in any view orientation.</li>
+</ul>
+</li>
+<li>Revit Cloud Model (workshared)<ul>
+<li>Fixed an issue where the Save File dialog is shown after synchronizing with a Revit Server model.</li>
+<li>Fixed an issue where Revit would become unresponsive during service disruptions with Revit Cloud Worksharing.</li>
+</ul>
+</li>
+<li>Revit Home<ul>
+<li>Fixed an auto-refresh issue with the new Revit Home when there was a change in accounts and projects.</li>
+<li>Fixed the issue that Revit Home is not updating when there is changes for folders and files in ACC and BIM360.</li>
+</ul>
+</li>
+<li>Selection<ul>
+<li>Fixed the issue of Select Multiple button status not updating correctly when working with roof.</li>
+</ul>
+</li>
+<li>Site<ul>
+<li>Fixed an issue regarding workset edit for link topography.</li>
+<li>Fixed an issue when partial sketch lines constrained by walls.</li>
+</ul>
+</li>
+<li>Solar Analysis<ul>
+<li>Updated the message that displays when trying to do a solar analysis in a perspective view.</li>
+</ul>
+</li>
+<li>Startup/Shutdown<ul>
+<li>Improved stability when exiting Revit.</li>
+<li>Improved stability during Revit shutdown for cases that could have previously triggered an error report after close.</li>
+</ul>
+</li>
+<li>Tags<ul>
+<li>Fixed an issue where multi-leader keynote tags would incorrectly show "varies" when some leaders where hidden.</li>
+</ul>
+</li>
+<li>User Interface<ul>
+<li>Improved the stability when working with UI theme.</li>
+<li>Resolved an issue with the Options Bar user interface when using modification tools.</li>
+</ul>
+</li>
+</ul>
+<h4><a name="2.4"></a> Revit 2025.1 SDK</h4>
+<p>The Revit SDK was also updated, with one single minute change in the documentation:</p>
+<blockquote>
+<p>Major changes and renovations to the Revit 2025.1 API</p>
+<p>API additions</p>
+<p>AspNetCore</p>
+<p>Revit now has a framework reference to Microsoft.AspNetCore.App, so that addins can use AspNetCore.</p>
+</blockquote>
+<p><center>
+<img src="img/.png" alt="" title="" width="800"/> <!-- Pixel Height: 585 Pixel Width: 1,000 -->
+</center></p>
+<h4><a name="3"></a> Placing Detail Group Without UI Access</h4>
+<p>Luiz Henrique <a href="https://ricaun.com/">@ricaun</a> Cassettari provided a nice workaround to
+enable <a href="https://forums.autodesk.com/t5/revit-api-forum/placing-detail-group-in-legend-view-without-access-to-ui-design/m-p/12795399">placing detail group in legend view without access to UI, e.g., for Design Automation</a>:</p>
+<p><strong>Question:</strong> I would like to <em>place a detail group in legend view without access to UI  for Design Automation</em>:
+in Design Automation for Revit, I want to place detail groups onto a legend view. The approach would typically be:</p>
+<ul>
+<li><a href="https://www.revitapidocs.com/2017/b6adb74b-39af-9213-c37b-f54db76b75a3.htm">change active view</a></li>
+<li><a href="https://www.revitapidocs.com/2019/586d4f2e-0985-2d0b-dbb7-ea6d2f704336.htm">call PlaceGroup()</a></li>
+</ul>
+<p>However, in Design Automation, I don't have access to the UI and therefore cannot set <code>UIDocument.Activeview</code>.
+Is there an alternative method for placing detail groups which takes in a <code>View</code> as an argument?
+Or are there ways to change the <code>ActiveView</code> in Design Automation?</p>
+<p>Ricaun provided non-UI-dependent code that places both model and detail groups.
+It just lacks the possibility to control the target view.</p>
+<p>However, this can be worked around by letting Revit place the detail group in any old view,
+then copy and paste to the desired target view and delete the intermediate element.</p>
+<p>Here is a 30-minute video testing <a href="https://youtu.be/oSCvXGx4SaM">placement of a detail group in both Revit on the Windows desktop and Revit for Design Automation</a>:</p>
+<p><center></p>
+<iframe width="480" height="270" src="https://www.youtube.com/embed/oSCvXGx4SaM?si=MU_SFS--lr4zLW15" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+<p></center></p>
+<p>Going even further, ricaun
+implemented <a href="https://github.com/ricaun-io/RevitTestPlaceGroup.Tests"><code>RevitTestPlaceGroup.Tests</code>, a unit test project for the PlaceGroup problem</a> and
+shows it running in another 36-minute video
+on <a href="https://youtu.be/VhaFv_UaHGU">creating <code>PlaceGroupDetail</code> unit test for Revit API</a>:</p>
+<p><center></p>
+<iframe width="480" height="270" src="https://www.youtube.com/embed/VhaFv_UaHGU?si=Gj1VWrgOh3ajtSsa" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+<p></center></p>
+<p>Ever so many thanks to ricaun for the very helpful work and excellent documentation!</p>
+<h4><a name="4"></a> Hacker's Guide to LLM and 10-Line RAG</h4>
+<p><a href="https://fastai.github.io/lm-hackers/lm-hackers.html">A hacker’s guide to Language Models</a> provides
+a nice introduction to the topic and includes subjects like
+implementing <a href="https://fastai.github.io/lm-hackers/lm-hackers.html#retrieval-augmented-generation">retrieval augmented generation</a>
+e.g., <a href="https://x.com/Yampeleg/status/1793698848616960393">how to implement RAG in 10 lines</a>.</p>
