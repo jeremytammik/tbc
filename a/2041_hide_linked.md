@@ -119,6 +119,8 @@ public static void ComponentManagerOnUIElementActivated(
 Thank you so much for the prompt response!
 I think this is exactly what I need!
 
+Many thanks to Chuong Ho for the comprehensive solution.
+
 ####<a name="3"></a> Hiding Linked Elements
 
 - hide elements in linked model
