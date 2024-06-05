@@ -21,20 +21,6 @@
   find ribbon tabs and or panels and delete
   https://forums.autodesk.com/t5/revit-api-forum/find-ribbon-tabs-and-or-panels-and-delete/m-p/12793159#M79071
 
-- hide elements in linked model
-  https://forums.autodesk.com/t5/revit-ideas/hide-elements-in-linked-model/idc-p/12786934#M57768
-  Hide elements in linked file
-  https://forums.autodesk.com/t5/revit-api-forum/hide-elements-in-linked-file/td-p/5777305
-  @lvirone
-  Lorenzo VIRONE
-  I've found a solution:
-  //Select elements using UIDocument and then use PostCommand "HideElements"
-  //elemsFromRevitLinkInstance is "List<Element>", there are the elements you want to hide in the link
-  var refs = elemsFromRevitLinkInstance.Select(x => new Reference(x).CreateLinkReference(revitLinkInstance)).ToList();
-  uidoc.Selection.SetReferences(refs);
-  uidoc.Application.PostCommand(RevitCommandId.LookupPostableCommandId(PostableCommand.HideElements));
-  demonstrate how to preselect elements for PostCommand processing
-
 twitter:
 
  in the @AutodeskRevit #RevitAPI #BIM @DynamoBIM https://autode.sk/revit_2025_1
@@ -54,15 +40,27 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Hiding Panel, Button and Linked Element
+### Removing Docs Zip Files, Panels and Buttons
 
 ####<a name="2"></a>
 
+Call for feedback: No more ZIP files when downloading Revit Cloud Models from Docs
+https://aps.autodesk.com/blog/call-feedback-no-more-zip-files-when-downloading-revit-cloud-models-docs
+
+RCM Revit Cloud Model
+
+Mikako Harada to Everyone (4 Jun 2024, 13:43)
+https://wiki.autodesk.com/pages/viewpage.action?spaceKey=DTAL&title=DevTech+Processes
+
+Caroline Gitonga to Everyone (4 Jun 2024, 13:48)
+https://github.com/autodesk-platform-services/aps-webhook-notifier
+
+
 <center>
-<img src="img/rvt_2025_1.png" alt="Revit 2025.1" title="Revit 2025.1" width="800"/> <!-- Pixel Height: 585 Pixel Width: 1,000 -->
+<img src="img/.png" alt="" title="" width="100"/> <!-- Pixel Height: 585 Pixel Width: 1,000 -->
 </center>
 
-####<a name="2"></a> Removing Ribbon Panel and Button
+####<a name="3"></a> Removing Ribbon Panel and Button
 
 [Chuong Ho](https://chuongmep.com/) provided a solution to
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
@@ -121,94 +119,3 @@ I think this is exactly what I need!
 
 Many thanks to Chuong Ho for the comprehensive solution.
 
-####<a name="3"></a> Hiding Linked Elements
-
-We habve an open Revit Ideas wish list item
-to [hide elements in linked model](https://forums.autodesk.com/t5/revit-ideas/hide-elements-in-linked-model/idc-p/12786934).
-Lorenzo Virone shared a solution to it using `PostCommand` and element pre-selection via `Selection.SetReferences`,
-explaining the detailed approach in
-the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread on how
-to [hide elements in linked file](https://forums.autodesk.com/t5/revit-api-forum/hide-elements-in-linked-file/td-p/5777305):
-
-I found a solution that also demonstrates how to preselect elements for `PostCommand` processing:
-
-<pre><code class="language-cs">// Select elements using UIDocument
-// then use PostCommand "HideElements"
-// elemsFromRevitLinkInstance is "List&lt;Element&gt;"
-// these are the elements you want to hide in the link
-
-var refs = elemsFromRevitLinkInstance.Select( x
-  => new Reference(x).CreateLinkReference(revitLinkInstance))
-    .ToList();
-
-uidoc.Selection.SetReferences(refs);
-
-uidoc.Application.PostCommand(
-  RevitCommandId.LookupPostableCommandId(
-    PostableCommand.HideElements));
-</code></pre>
-
-**Response:** Can you provide a description of the process for using your code to hide elements only in a linked model?
-I am not familiar with the API and deploying a script like this.
-
-**Answer:**
-Here is an sample that selects the first RevitLinkInstance, retrieve its floors and hides them:
-
-<pre><code class="language-cs">// Get a link
-var filter = new ElementClassFilter(typeof(RevitLinkInstance));
-
-var firstInstanceLink
-  = (RevitLinkInstance) new FilteredElementCollector(doc)
-    .WherePasses(filter)
-    .FirstElement();
-
-// Get its floors
-filter = new ElementClassFilter(typeof(Floor));
-var elemsFromRevitLinkInstance
-  = new FilteredElementCollector(
-    firstInstanceLink.GetLinkDocument())
-      .WherePasses(filter)
-      .ToElements();
-
-// Isolate them
-var refs = elemsFromRevitLinkInstance.Select( x
-  => new Reference(x).CreateLinkReference(firstInstanceLink))
-    .ToList();
-
-uidoc.Selection.SetReferences(refs);
-
-uidoc.Application.PostCommand(
-  RevitCommandId.LookupPostableCommandId(
-    PostableCommand.HideElements));
-</code></pre>
-
-
-
-What's new in Autodesk Revit 2025 API
-https://www.youtube.com/playlist?list=PLuFh5NgXkweMoOwwM2NlYmQ7FdMKPEBS_
-1
-6:58
-Introduction and .NET 8 Migration
-https://www.youtube.com/watch?v=ONLf4BuGBU8&list=PLuFh5NgXkweMoOwwM2NlYmQ7FdMKPEBS_&index=1&pp=iAQB
-2
-15:27
-Breaking changes and removed API
-https://www.youtube.com/watch?v=huj3ynWwejA&list=PLuFh5NgXkweMoOwwM2NlYmQ7FdMKPEBS_&index=2&pp=iAQB
-3
-40:04
-New APIs and Capabilities
-https://www.youtube.com/watch?v=jExac5Kv-Qs&list=PLuFh5NgXkweMoOwwM2NlYmQ7FdMKPEBS_&index=3&pp=iAQB
-
-Call for feedback: No more ZIP files when downloading Revit Cloud Models from Docs
-https://aps.autodesk.com/blog/call-feedback-no-more-zip-files-when-downloading-revit-cloud-models-docs
-
-RCM Revit Cloud Model
-
-
-
-
-Mikako Harada to Everyone (4 Jun 2024, 13:43)
-https://wiki.autodesk.com/pages/viewpage.action?spaceKey=DTAL&title=DevTech+Processes
-
-Caroline Gitonga to Everyone (4 Jun 2024, 13:48)
-https://github.com/autodesk-platform-services/aps-webhook-notifier

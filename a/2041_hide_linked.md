@@ -16,11 +16,6 @@
 
 <!---
 
-- remove ribbon panel and ribbon button
-  https://chuongmep.com/posts/2024-04-19-reload-ribbon-revit.html#remove-panel
-  find ribbon tabs and or panels and delete
-  https://forums.autodesk.com/t5/revit-api-forum/find-ribbon-tabs-and-or-panels-and-delete/m-p/12793159#M79071
-
 - hide elements in linked model
   https://forums.autodesk.com/t5/revit-ideas/hide-elements-in-linked-model/idc-p/12786934#M57768
   Hide elements in linked file
