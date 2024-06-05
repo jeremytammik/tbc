@@ -1,6 +1,6 @@
-<head>
+<p><head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<link rel="stylesheet" type="text/css" href="bc.css">
+<link rel="stylesheet" type="text/css" href="bc.css"></p>
 <!-- https://highlightjs.org/#usage
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
@@ -8,12 +8,11 @@
 -->
 
 <!-- https://prismjs.com -->
-<link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css" rel="stylesheet" />
+<p><link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css" rel="stylesheet" /></p>
 <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
 <style> code[class*=language-], pre[class*=language-] { font-size : 90%; } </style>
-</head>
-
+<p></head></p>
 <!---
 
 - remove ribbon panel and ribbon button
@@ -54,47 +53,41 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Revit 2025 API Video and Hiding Linked Elements
-
-The video recording on what's new in the Revit 2025 API has been released, and we discuss a nice example combining element pre-selection and `PostCommand`:
-
-- [Revit 2025 API video](#2)
-- [Hiding linked elements](#3)
-
-####<a name="2"></a> Revit 2025 API Video
-
-Boris Shafiro and Michael Morris present the video recording of the presentations
-on [What's new in Autodesk Revit 2025 API](https://www.youtube.com/playlist?list=PLuFh5NgXkweMoOwwM2NlYmQ7FdMKPEBS_).
-It consists of three parts:
-
-- [Introduction and .NET 8 Migration](https://youtu.be/ONLf4BuGBU8) (7 minutes)
-- [Breaking changes and removed API](https://youtu.be/huj3ynWwejA) (15 minutes)
-- [New APIs and Capabilities](https://youtu.be/jExac5Kv-Qs) (40 minutes)
-
-<center>
+<h3>Revit 2025 API Video and Hiding Linked Elements</h3>
+<p>The video recording on what's new in the Revit 2025 API has been released, and we discuss a nice example combining element pre-selection and <code>PostCommand</code>:</p>
+<ul>
+<li><a href="#2">Revit 2025 API video</a></li>
+<li><a href="#3">Hiding linked elements</a></li>
+</ul>
+<h4><a name="2"></a> Revit 2025 API Video</h4>
+<p>Boris Shafiro and Michael Morris present the video recording of the presentations
+on <a href="https://www.youtube.com/playlist?list=PLuFh5NgXkweMoOwwM2NlYmQ7FdMKPEBS_">What's new in Autodesk Revit 2025 API</a>.
+It consists of three parts:</p>
+<ul>
+<li><a href="https://youtu.be/ONLf4BuGBU8">Introduction and .NET 8 Migration</a> (7 minutes)</li>
+<li><a href="https://youtu.be/huj3ynWwejA">Breaking changes and removed API</a> (15 minutes)</li>
+<li><a href="https://youtu.be/jExac5Kv-Qs">New APIs and Capabilities</a> (40 minutes)</li>
+</ul>
+<p><center>
 <img src="img/rvt2025apivideo.png" alt="Revit 2025 API video" title="Revit 2025 API video" width="800"/>
-</center>
-
-Please also refer to the following previous articles related to Revit 2025 API:
-
-- [Revit 2025 and RevitLookup 2025](https://thebuildingcoder.typepad.com/blog/2024/04/revit-2025-and-revitlookup-2025.html)
-- [The Building Coder Samples 2025](https://thebuildingcoder.typepad.com/blog/2024/04/the-building-coder-samples-2025.html)
-- [RevitLookup Hotfix and The Revit 2025 SDK](https://thebuildingcoder.typepad.com/blog/2024/04/revitlookup-hotfix-and-the-revit-2025-sdk.html)
-- [What's New in the Revit 2025 API](https://thebuildingcoder.typepad.com/blog/2024/04/whats-new-in-the-revit-2025-api.html)
-- [Migrating VB to .NET Core 8](https://thebuildingcoder.typepad.com/blog/2024/05/migrating-vb-to-net-core-8-and-ai-news.html)
-- [Revit 2025.1](https://thebuildingcoder.typepad.com/blog/2024/05/revit-20251-and-handling-lack-of-ui-in-da.html)
-
-####<a name="3"></a> Hiding Linked Elements
-
-Turning to a topic that has not yet been addressed by the new release, the open Revit Ideas wish list item
-to [hide elements in linked model](https://forums.autodesk.com/t5/revit-ideas/hide-elements-in-linked-model/idc-p/12786934),
-Lorenzo Virone shared a solution using `PostCommand` and element pre-selection via `Selection.SetReferences`.
+</center></p>
+<p>Please also refer to the following previous articles related to Revit 2025 API:</p>
+<ul>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2024/04/revit-2025-and-revitlookup-2025.html">Revit 2025 and RevitLookup 2025</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2024/04/the-building-coder-samples-2025.html">The Building Coder Samples 2025</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2024/04/revitlookup-hotfix-and-the-revit-2025-sdk.html">RevitLookup Hotfix and The Revit 2025 SDK</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2024/04/whats-new-in-the-revit-2025-api.html">What's New in the Revit 2025 API</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2024/05/migrating-vb-to-net-core-8-and-ai-news.html">Migrating VB to .NET Core 8</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2024/05/revit-20251-and-handling-lack-of-ui-in-da.html">Revit 2025.1</a></li>
+</ul>
+<h4><a name="3"></a> Hiding Linked Elements</h4>
+<p>Turning to a topic that has not yet been addressed by the new release, the open Revit Ideas wish list item
+to <a href="https://forums.autodesk.com/t5/revit-ideas/hide-elements-in-linked-model/idc-p/12786934">hide elements in linked model</a>,
+Lorenzo Virone shared a solution using <code>PostCommand</code> and element pre-selection via <code>Selection.SetReferences</code>.
 He explains the detailed approach in
-the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread on how
-to [hide elements in linked file](https://forums.autodesk.com/t5/revit-api-forum/hide-elements-in-linked-file/td-p/5777305):
-
-This solution also demonstrates how to preselect elements for `PostCommand` processing:
-
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread on how
+to <a href="https://forums.autodesk.com/t5/revit-api-forum/hide-elements-in-linked-file/td-p/5777305">hide elements in linked file</a>:</p>
+<p>This solution also demonstrates how to preselect elements for <code>PostCommand</code> processing:</p>
 <pre><code class="language-cs">// Select elements using UIDocument
 // then use PostCommand "HideElements"
 // elemsFromRevitLinkInstance is "List&lt;Element&gt;"
@@ -111,12 +104,10 @@ uidoc.Application.PostCommand(
     PostableCommand.HideElements));
 </code></pre>
 
-**Response:** Can you provide a description of the process for using your code to hide elements only in a linked model?
-I am not familiar with the API and deploying a script like this.
-
-**Answer:**
-Here is an sample that selects the first RevitLinkInstance, retrieve its floors and hides them:
-
+<p><strong>Response:</strong> Can you provide a description of the process for using your code to hide elements only in a linked model?
+I am not familiar with the API and deploying a script like this.</p>
+<p><strong>Answer:</strong>
+Here is an sample that selects the first RevitLinkInstance, retrieve its floors and hides them:</p>
 <pre><code class="language-cs">// Get a link
 var filter = new ElementClassFilter(typeof(RevitLinkInstance));
 
@@ -145,5 +136,4 @@ uidoc.Application.PostCommand(
     PostableCommand.HideElements));
 </code></pre>
 
-Many thanks to Lorenzo for addressing this need and sharing his helpful solution!
-
+<p>Many thanks to Lorenzo for addressing this need and sharing his helpful solution!</p>
