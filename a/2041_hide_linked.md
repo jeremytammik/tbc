@@ -40,6 +40,13 @@ The video recording on what's new in the Revit 2025 API has been released, and w
 
 linkedin:
 
+The video recording on What's New in the Revit 2025 API has been released, and we discuss a nice example combining element pre-selection and PostCommand for hiding linked elements in the #RevitAPI
+
+https://autode.sk/hidelinkedelement
+
+- Revit 2025 API video
+- Hiding linked elements...
+
 #BIM #DynamoBIM #AutodeskAPS #Revit #API #IFC #SDK #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
