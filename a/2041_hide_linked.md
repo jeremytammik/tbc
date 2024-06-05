@@ -32,7 +32,7 @@
 
 twitter:
 
- in the @AutodeskRevit #RevitAPI #BIM @DynamoBIM https://autode.sk/revit_2025_1
+The video recording on What's New in the Revit 2025 API has been released, and we discuss a nice example combining element pre-selection and PostCommand for hiding linked elements in the @AutodeskRevit #RevitAPI #BIM @DynamoBIM https://autode.sk/hidelinkedelement
 
 The video recording on what's new in the Revit 2025 API has been released, and we discuss a nice example combining element pre-selection and PostCommand
 &ndash; Revit 2025 API video
