@@ -56,40 +56,81 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Hiding Panel, Button and Linked Element
 
-
-####<a name="2"></a> Revit 2025 API News Video
-
-Boris Shafiro and Michael Morris present the video recording of the presentations
-on [What's new in Autodesk Revit 2025 API](https://www.youtube.com/playlist?list=PLuFh5NgXkweMoOwwM2NlYmQ7FdMKPEBS_).
-It consists of three parts:
-
-- [Introduction and .NET 8 Migration](https://youtu.be/ONLf4BuGBU8) (7 minutes)
-- [Breaking changes and removed API](https://youtu.be/huj3ynWwejA) (15 minutes)
-- [New APIs and Capabilities](https://youtu.be/jExac5Kv-Qs) (40 minutes)
+####<a name="2"></a>
 
 <center>
-<img src="img/rvt2025apivideo.png" alt="Revit 2025 API news video" title="Revit 2025 API news video" width="800"/>
+<img src="img/rvt_2025_1.png" alt="Revit 2025.1" title="Revit 2025.1" width="800"/> <!-- Pixel Height: 585 Pixel Width: 1,000 -->
 </center>
 
-Please also refer to the following previous articles related to Revit 2025 API:
+####<a name="2"></a> Removing Ribbon Panel and Button
 
-- [Revit 2025 and RevitLookup 2025](https://thebuildingcoder.typepad.com/blog/2024/04/revit-2025-and-revitlookup-2025.html)
-- [The Building Coder Samples 2025](https://thebuildingcoder.typepad.com/blog/2024/04/the-building-coder-samples-2025.html)
-- [RevitLookup Hotfix and The Revit 2025 SDK](https://thebuildingcoder.typepad.com/blog/2024/04/revitlookup-hotfix-and-the-revit-2025-sdk.html)
-- [What's New in the Revit 2025 API](https://thebuildingcoder.typepad.com/blog/2024/04/whats-new-in-the-revit-2025-api.html)
-- [Migrating VB to .NET Core 8](https://thebuildingcoder.typepad.com/blog/2024/05/migrating-vb-to-net-core-8-and-ai-news.html)
-- [Revit 2025.1](https://thebuildingcoder.typepad.com/blog/2024/05/revit-20251-and-handling-lack-of-ui-in-da.html)
+[Chuong Ho](https://chuongmep.com/) provided a solution to
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on how to [find ribbon tabs and or panels and delete](https://forums.autodesk.com/t5/revit-api-forum/find-ribbon-tabs-and-or-panels-and-delete/m-p/12793159) in
+his comprehensive article on
+[how to remove panel ribbon without restart Revit](https://chuongmep.com/posts/2024-04-19-reload-ribbon-revit.html#remove-panel):
+
+**Question:**
+Is there an option in Revit 2025 to dynamically delete "PushButtonData" from the "RibbonPanel", or maybe hide it so that a new button can link to a new DLL?
+Also, is it possible to create a "PushButtonData" from a DLL located in the resources of another DLL?
+Is it generally required that at the time of creation or registration in the panel (before it is clicked and called), the DLL meets all the conditions (class name, location, etc.), or can it already be solved at the time of the call?
+
+**Answer:**
+This article explains, and points out how to resolve an issue with Private Dictionary to store RibbonItemDictionary;
+you need do some tricks to remove panel:
+
+- [How to remove panel ribbon without restart Revit](https://chuongmep.com/posts/2024-04-19-reload-ribbon-revit.html#remove-panel)
+
+**Response:**
+Incredible job! Thank you very much! Added to bookmarks.
+
+Can we get the name of the button, its description, or some kind of indicator after clicking it?
+
+For example, I created one class MyCommand : IExternalCommand and registered it for several "PushButtonData" ("MyButtonOne", "MyButtonTwo").
+After clicking on the button both times through the debugger, I will get to the same Execute() method of the MyCommand class.
+In this case, is it possible to determine which of the buttons called this method? Any way, even the most perverted...
+
+**Answer:**
+You can do it with some step like this:
+
+- Add assembly reference `AdWindows.dll`
+- Add a event tracking user click on the button at IExternalApplication when user click to any button:
+
+<pre><code class="language-cs">using AW = Autodesk.Windows;
+
+Autodesk.Windows.ComponentManager.UIElementActivated
+  += RibbonUtils.ComponentManagerOnUIElementActivated;
+
+public static void ComponentManagerOnUIElementActivated(
+  object sender,
+  AW.UIElementActivatedEventArgs e)
+{
+  try
+  {
+    var id = e.Item.Id;
+    // match with id string contents here and set to some where,
+    // after thatm match with all command exist in your plugin
+  }
+</code></pre>
+
+- Call the action from external command match with id return from the event clicked
+
+**Response:**
+Thank you so much for the prompt response!
+I think this is exactly what I need!
+
+Many thanks to Chuong Ho for the comprehensive solution.
 
 ####<a name="3"></a> Hiding Linked Elements
 
-Turning to a topic that has not yet been addressed by the new release, the open Revit Ideas wish list item
+We habve an open Revit Ideas wish list item
 to [hide elements in linked model](https://forums.autodesk.com/t5/revit-ideas/hide-elements-in-linked-model/idc-p/12786934).
-Lorenzo Virone shared a solution using `PostCommand` and element pre-selection via `Selection.SetReferences`,
+Lorenzo Virone shared a solution to it using `PostCommand` and element pre-selection via `Selection.SetReferences`,
 explaining the detailed approach in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread on how
 to [hide elements in linked file](https://forums.autodesk.com/t5/revit-api-forum/hide-elements-in-linked-file/td-p/5777305):
 
-This solution also demonstrates how to preselect elements for `PostCommand` processing:
+I found a solution that also demonstrates how to preselect elements for `PostCommand` processing:
 
 <pre><code class="language-cs">// Select elements using UIDocument
 // then use PostCommand "HideElements"
@@ -141,5 +182,33 @@ uidoc.Application.PostCommand(
     PostableCommand.HideElements));
 </code></pre>
 
-Many thanks to Lorenzo for addressing this need and sharing his helpful solution!
 
+
+What's new in Autodesk Revit 2025 API
+https://www.youtube.com/playlist?list=PLuFh5NgXkweMoOwwM2NlYmQ7FdMKPEBS_
+1
+6:58
+Introduction and .NET 8 Migration
+https://www.youtube.com/watch?v=ONLf4BuGBU8&list=PLuFh5NgXkweMoOwwM2NlYmQ7FdMKPEBS_&index=1&pp=iAQB
+2
+15:27
+Breaking changes and removed API
+https://www.youtube.com/watch?v=huj3ynWwejA&list=PLuFh5NgXkweMoOwwM2NlYmQ7FdMKPEBS_&index=2&pp=iAQB
+3
+40:04
+New APIs and Capabilities
+https://www.youtube.com/watch?v=jExac5Kv-Qs&list=PLuFh5NgXkweMoOwwM2NlYmQ7FdMKPEBS_&index=3&pp=iAQB
+
+Call for feedback: No more ZIP files when downloading Revit Cloud Models from Docs
+https://aps.autodesk.com/blog/call-feedback-no-more-zip-files-when-downloading-revit-cloud-models-docs
+
+RCM Revit Cloud Model
+
+
+
+
+Mikako Harada to Everyone (4 Jun 2024, 13:43)
+https://wiki.autodesk.com/pages/viewpage.action?spaceKey=DTAL&title=DevTech+Processes
+
+Caroline Gitonga to Everyone (4 Jun 2024, 13:48)
+https://github.com/autodesk-platform-services/aps-webhook-notifier
