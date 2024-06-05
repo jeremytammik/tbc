@@ -54,10 +54,14 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Hiding Panel, Button and Linked Element
+### Revit 2025 API Video and Hiding Linked Elements
 
+Here comes the video recording on what's new in the Revit 2025 API, and a nice example combining element pre-selection and `PostCommand`:
 
-####<a name="2"></a> Revit 2025 API News Video
+- [Revit 2025 API video](#2)
+- [Hiding linked elements](#3)
+
+####<a name="2"></a> Revit 2025 API Video
 
 Boris Shafiro and Michael Morris present the video recording of the presentations
 on [What's new in Autodesk Revit 2025 API](https://www.youtube.com/playlist?list=PLuFh5NgXkweMoOwwM2NlYmQ7FdMKPEBS_).
@@ -68,7 +72,7 @@ It consists of three parts:
 - [New APIs and Capabilities](https://youtu.be/jExac5Kv-Qs) (40 minutes)
 
 <center>
-<img src="img/rvt2025apivideo.png" alt="Revit 2025 API news video" title="Revit 2025 API news video" width="800"/>
+<img src="img/rvt2025apivideo.png" alt="Revit 2025 API video" title="Revit 2025 API video" width="800"/>
 </center>
 
 Please also refer to the following previous articles related to Revit 2025 API:
