@@ -81,7 +81,7 @@ Please also refer to the following previous articles related to Revit 2025 API:
 
 - [Revit 2025 and RevitLookup 2025](https://thebuildingcoder.typepad.com/blog/2024/04/revit-2025-and-revitlookup-2025.html)
 - [The Building Coder Samples 2025](https://thebuildingcoder.typepad.com/blog/2024/04/the-building-coder-samples-2025.html)
-- [RevitLookup Hotfix and The Revit 2025 SDK](https://thebuildingcoder.typepad.com/blog/2024/04/revitlookup-hotfix-and-the-revit-2025-sdk.html)
+- [RevitLookup Hotfix and the Revit 2025 SDK](https://thebuildingcoder.typepad.com/blog/2024/04/revitlookup-hotfix-and-the-revit-2025-sdk.html)
 - [What's New in the Revit 2025 API](https://thebuildingcoder.typepad.com/blog/2024/04/whats-new-in-the-revit-2025-api.html)
 - [Migrating VB to .NET Core 8](https://thebuildingcoder.typepad.com/blog/2024/05/migrating-vb-to-net-core-8-and-ai-news.html)
 - [Revit 2025.1](https://thebuildingcoder.typepad.com/blog/2024/05/revit-20251-and-handling-lack-of-ui-in-da.html)
