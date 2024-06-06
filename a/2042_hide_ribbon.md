@@ -42,23 +42,46 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Removing Docs Zip Files, Panels and Buttons
 
-####<a name="2"></a>
+####<a name="2"></a> No Zips Downloading RCM from Docs?
 
-Call for feedback: No more ZIP files when downloading Revit Cloud Models from Docs
-https://aps.autodesk.com/blog/call-feedback-no-more-zip-files-when-downloading-revit-cloud-models-docs
-
-RCM Revit Cloud Model
-
-Mikako Harada to Everyone (4 Jun 2024, 13:43)
-https://wiki.autodesk.com/pages/viewpage.action?spaceKey=DTAL&title=DevTech+Processes
-
-Caroline Gitonga to Everyone (4 Jun 2024, 13:48)
-https://github.com/autodesk-platform-services/aps-webhook-notifier
-
+This  is a reposting of
+the [Call for feedback: No more ZIP files when downloading Revit Cloud Models from Docs](https://aps.autodesk.com/blog/call-feedback-no-more-zip-files-when-downloading-revit-cloud-models-docs):
 
 <center>
-<img src="img/.png" alt="" title="" width="100"/> <!-- Pixel Height: 585 Pixel Width: 1,000 -->
+<img src="img/rcm_no_zip.png" alt="No Zips Downloading RCM from Docs?" title="No Zips Downloading RCM from Docs?" width="600"/>
 </center>
+
+
+Does your application download Revit models from Autodesk/BIM 360 Docs, aka Revit Cloud Model or RCM?
+If so, you are probably aware that the model is sometimes downloaded as ZIP.
+This happens when a host model is linked to unpublished models.
+It often causes confusion to both customers and application developers.
+
+The Revit team is planning to change that and eliminate the ZIP.
+Then, when downloading a host model, you will get only the host model without any linked models.
+
+For developers, the process of downloading a source file itself does not change.
+However, this will be a behaviour change.
+This change might affect your application, depending on what it does.
+Therefore, we would like to understand your use cases to avoid any possible disruption.
+
+If you think this change might affect your application, are willing to share your use case scenarios and to give us feedback, please contact us through:
+
+<center>
+ [email to rcm.download.api.feedback@autodesk.com with the subject ”“RCM download API feedback"](mailto:rcm.download.api.feedback@autodesk.com?subject=“RCM download API feedback")
+</center>
+
+For more information about current behavior of downloading a Revit model from Autodesk/BIM 360 Docs, please refer to the article
+on [Why is a Revit model sometimes downloaded as ZIP from BIM 360 or ACC?](https://www.autodesk.com/support/technical/article/caas/sfdcarticles/sfdcarticles/Why-a-RVT-model-is-sometimes-downloaded-as-ZIP-from-BIM-360.html)
+
+Here are blog posts on how to handle RCM zip or composite models in APS that list potential use cases which might affect your application:
+
+- [BIM360 Docs: Setting up external references between files (Upload Linked Files)](https://aps.autodesk.com/blog/bim360-docs-setting-external-references-between-files-upload-linked-files)
+- [Make composite Revit design work with Design Automation API for Revit](https://aps.autodesk.com/blog/make-composite-revit-design-work-design-automation-api-revit)
+- [Revit Cloud Worksharing - fast extraction of Revit zip files with partials](https://aps.autodesk.com/blog/revit-cloud-worksharing-fast-extraction-revit-zip-files-partials)
+
+We looking forward to hearing from you.
+Thank you!
 
 ####<a name="3"></a> Removing Ribbon Panel and Button
 
