@@ -42,7 +42,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Removing Docs Zip Files, Panels and Buttons
 
-A call for feedback ona planned change downloading RCM from Docs, and a tricky solution to remove ribbon panels and buttons:
+A call for feedback on a planned change downloading a RCM from Docs, and a tricky solution to remove ribbon panels and buttons:
 
 - [No zips downloading RCM from Docs?](#2)
 - [Removing ribbon panel and button](#3)
@@ -50,7 +50,7 @@ A call for feedback ona planned change downloading RCM from Docs, and a tricky s
 ####<a name="2"></a> No Zips Downloading RCM from Docs?
 
 This  is a reposting of
-the [Call for feedback: No more ZIP files when downloading Revit Cloud Models from Docs](https://aps.autodesk.com/blog/call-feedback-no-more-zip-files-when-downloading-revit-cloud-models-docs):
+the [call for feedback: No more ZIP files when downloading Revit Cloud Models from Docs](https://aps.autodesk.com/blog/call-feedback-no-more-zip-files-when-downloading-revit-cloud-models-docs):
 
 <center>
 <img src="img/rcm_no_zip.png" alt="No Zips Downloading RCM from Docs?" title="No Zips Downloading RCM from Docs?" width="600"/>
@@ -61,24 +61,23 @@ If so, you are probably aware that the model is sometimes downloaded as ZIP.
 This happens when a host model is linked to unpublished models.
 It often causes confusion to both customers and application developers.
 
-The Revit team is planning to change that and eliminate the ZIP.
-Then, when downloading a host model, you will get only the host model without any linked models.
+The Revit team is planning to change this behaviour and eliminate the ZIP.
+Then, when downloading a host model, linked models will not be included.
 
 For developers, the process of downloading a source file itself does not change.
-However, this will be a behaviour change.
-This change might affect your application, depending on what it does.
+However, this change might affect your application, depending on what it does.
 Therefore, we would like to understand your use cases to avoid any possible disruption.
 
-If you think this change might affect your application, are willing to share your use case scenarios and to give us feedback, please contact us through:
+If you think this change might affect your application, are willing to share your use case scenarios and give us feedback, please contact us through:
 
 <center>
- [email to rcm.download.api.feedback@autodesk.com with the subject ”“RCM download API feedback"](mailto:rcm.download.api.feedback@autodesk.com?subject=“RCM download API feedback")
+ [email to `rcm.download.api.feedback@autodesk.com` with the subject `RCM download API feedback`](mailto:rcm.download.api.feedback@autodesk.com?subject=“RCM download API feedback")
 </center>
 
-For more information about current behavior of downloading a Revit model from Autodesk/BIM 360 Docs, please refer to the article
-on [Why is a Revit model sometimes downloaded as ZIP from BIM 360 or ACC?](https://www.autodesk.com/support/technical/article/caas/sfdcarticles/sfdcarticles/Why-a-RVT-model-is-sometimes-downloaded-as-ZIP-from-BIM-360.html)
+For more information about the current behaviour downloading a Revit model from Autodesk BIM 360 Docs, please refer to the article
+on [why is a Revit model sometimes downloaded as ZIP from BIM 360 or ACC?](https://www.autodesk.com/support/technical/article/caas/sfdcarticles/sfdcarticles/Why-a-RVT-model-is-sometimes-downloaded-as-ZIP-from-BIM-360.html)
 
-Here are blog posts on how to handle RCM zip or composite models in APS that list potential use cases which might affect your application:
+The following blog posts on how to handle RCM zip or composite models in APS list potential use cases which might affect your application:
 
 - [BIM360 Docs: Setting up external references between files (Upload Linked Files)](https://aps.autodesk.com/blog/bim360-docs-setting-external-references-between-files-upload-linked-files)
 - [Make composite Revit design work with Design Automation API for Revit](https://aps.autodesk.com/blog/make-composite-revit-design-work-design-automation-api-revit)

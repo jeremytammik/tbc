@@ -1,0 +1,128 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css"></p>
+<!-- https://highlightjs.org/#usage
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+-->
+
+<!-- https://prismjs.com -->
+<p><link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css" rel="stylesheet" /></p>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+<style> code[class*=language-], pre[class*=language-] { font-size : 90%; } </style>
+<p></head></p>
+<!---
+
+- remove ribbon panel and ribbon button
+  https://chuongmep.com/posts/2024-04-19-reload-ribbon-revit.html#remove-panel
+  find ribbon tabs and or panels and delete
+  https://forums.autodesk.com/t5/revit-api-forum/find-ribbon-tabs-and-or-panels-and-delete/m-p/12793159#M79071
+
+twitter:
+
+ in the @AutodeskRevit #RevitAPI #BIM @DynamoBIM https://autode.sk/revit_2025_1
+
+...
+
+linkedin:
+
+#BIM #DynamoBIM #AutodeskAPS #Revit #API #IFC #SDK #Autodesk #AEC #adsk
+
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+
+<center>
+<img src="img/" alt="" title="" width="600"/>
+<p style="font-size: 80%; font-style:italic"></p>
+</center>
+
+-->
+
+<h3>Removing Docs Zip Files, Panels and Buttons</h3>
+<p>A call for feedback on a planned change downloading a RCM from Docs, and a tricky solution to remove ribbon panels and buttons:</p>
+<ul>
+<li><a href="#2">No zips downloading RCM from Docs?</a></li>
+<li><a href="#3">Removing ribbon panel and button</a></li>
+</ul>
+<h4><a name="2"></a> No Zips Downloading RCM from Docs?</h4>
+<p>This  is a reposting of
+the <a href="https://aps.autodesk.com/blog/call-feedback-no-more-zip-files-when-downloading-revit-cloud-models-docs">call for feedback: No more ZIP files when downloading Revit Cloud Models from Docs</a>:</p>
+<p><center>
+<img src="img/rcm_no_zip.png" alt="No Zips Downloading RCM from Docs?" title="No Zips Downloading RCM from Docs?" width="600"/>
+</center></p>
+<p>Does your application download Revit models from Autodesk/BIM 360 Docs, aka Revit Cloud Model or RCM?
+If so, you are probably aware that the model is sometimes downloaded as ZIP.
+This happens when a host model is linked to unpublished models.
+It often causes confusion to both customers and application developers.</p>
+<p>The Revit team is planning to change this behaviour and eliminate the ZIP.
+Then, when downloading a host model, linked models will not be included.</p>
+<p>For developers, the process of downloading a source file itself does not change.
+However, this change might affect your application, depending on what it does.
+Therefore, we would like to understand your use cases to avoid any possible disruption.</p>
+<p>If you think this change might affect your application, are willing to share your use case scenarios and give us feedback, please contact us through:</p>
+<p><center>
+ <a href="mailto:rcm.download.api.feedback@autodesk.com?subject=“RCM download API feedback&quot;">email to <code>rcm.download.api.feedback@autodesk.com</code> with the subject <code>RCM download API feedback</code></a>
+</center></p>
+<p>For more information about the current behaviour downloading a Revit model from Autodesk BIM 360 Docs, please refer to the article
+on <a href="https://www.autodesk.com/support/technical/article/caas/sfdcarticles/sfdcarticles/Why-a-RVT-model-is-sometimes-downloaded-as-ZIP-from-BIM-360.html">why is a Revit model sometimes downloaded as ZIP from BIM 360 or ACC?</a></p>
+<p>The following blog posts on how to handle RCM zip or composite models in APS list potential use cases which might affect your application:</p>
+<ul>
+<li><a href="https://aps.autodesk.com/blog/bim360-docs-setting-external-references-between-files-upload-linked-files">BIM360 Docs: Setting up external references between files (Upload Linked Files)</a></li>
+<li><a href="https://aps.autodesk.com/blog/make-composite-revit-design-work-design-automation-api-revit">Make composite Revit design work with Design Automation API for Revit</a></li>
+<li><a href="https://aps.autodesk.com/blog/revit-cloud-worksharing-fast-extraction-revit-zip-files-partials">Revit Cloud Worksharing - fast extraction of Revit zip files with partials</a></li>
+</ul>
+<p>We looking forward to hearing from you.
+Thank you!</p>
+<h4><a name="3"></a> Removing Ribbon Panel and Button</h4>
+<p><a href="https://chuongmep.com/">Chuong Ho</a> provided a solution to
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
+on how to <a href="https://forums.autodesk.com/t5/revit-api-forum/find-ribbon-tabs-and-or-panels-and-delete/m-p/12793159">find ribbon tabs and or panels and delete</a> in
+his comprehensive article on
+<a href="https://chuongmep.com/posts/2024-04-19-reload-ribbon-revit.html#remove-panel">how to remove panel ribbon without restart Revit</a>:</p>
+<p><strong>Question:</strong>
+Is there an option in Revit 2025 to dynamically delete "PushButtonData" from the "RibbonPanel", or maybe hide it so that a new button can link to a new DLL?
+Also, is it possible to create a "PushButtonData" from a DLL located in the resources of another DLL?
+Is it generally required that at the time of creation or registration in the panel (before it is clicked and called), the DLL meets all the conditions (class name, location, etc.), or can it already be solved at the time of the call?</p>
+<p><strong>Answer:</strong>
+This article explains, and points out how to resolve an issue with Private Dictionary to store RibbonItemDictionary;
+you need do some tricks to remove panel:</p>
+<ul>
+<li><a href="https://chuongmep.com/posts/2024-04-19-reload-ribbon-revit.html#remove-panel">How to remove panel ribbon without restart Revit</a></li>
+</ul>
+<p><strong>Response:</strong>
+Incredible job! Thank you very much! Added to bookmarks.</p>
+<p>Can we get the name of the button, its description, or some kind of indicator after clicking it?</p>
+<p>For example, I created one class MyCommand : IExternalCommand and registered it for several "PushButtonData" ("MyButtonOne", "MyButtonTwo").
+After clicking on the button both times through the debugger, I will get to the same Execute() method of the MyCommand class.
+In this case, is it possible to determine which of the buttons called this method? Any way, even the most perverted...</p>
+<p><strong>Answer:</strong>
+You can do it with some step like this:</p>
+<ul>
+<li>Add assembly reference <code>AdWindows.dll</code></li>
+<li>Add a event tracking user click on the button at IExternalApplication when user click to any button:</li>
+</ul>
+<pre><code class="language-cs">using AW = Autodesk.Windows;
+
+Autodesk.Windows.ComponentManager.UIElementActivated
+  += RibbonUtils.ComponentManagerOnUIElementActivated;
+
+public static void ComponentManagerOnUIElementActivated(
+  object sender,
+  AW.UIElementActivatedEventArgs e)
+{
+  try
+  {
+    var id = e.Item.Id;
+    // match with id string contents here and set to some where,
+    // after thatm match with all command exist in your plugin
+  }
+</code></pre>
+
+<ul>
+<li>Call the action from external command match with id return from the event clicked</li>
+</ul>
+<p><strong>Response:</strong>
+Thank you so much for the prompt response!
+I think this is exactly what I need!</p>
+<p>Many thanks to Chuong Ho for the comprehensive solution.</p>
