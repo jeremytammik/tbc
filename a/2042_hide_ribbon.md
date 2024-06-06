@@ -42,6 +42,11 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Removing Docs Zip Files, Panels and Buttons
 
+A call for feedback ona planned change downloading RCM from Docs, and a tricky solution to remove ribbon panels and buttons:
+
+- [No zips downloading RCM from Docs?](#2)
+- [Removing ribbon panel and button](#3)
+
 ####<a name="2"></a> No Zips Downloading RCM from Docs?
 
 This  is a reposting of
@@ -50,7 +55,6 @@ the [Call for feedback: No more ZIP files when downloading Revit Cloud Models fr
 <center>
 <img src="img/rcm_no_zip.png" alt="No Zips Downloading RCM from Docs?" title="No Zips Downloading RCM from Docs?" width="600"/>
 </center>
-
 
 Does your application download Revit models from Autodesk/BIM 360 Docs, aka Revit Cloud Model or RCM?
 If so, you are probably aware that the model is sometimes downloaded as ZIP.
