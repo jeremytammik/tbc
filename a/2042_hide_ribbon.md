@@ -83,7 +83,7 @@ The following blog posts on how to handle RCM zip or composite models in APS lis
 - [Make composite Revit design work with Design Automation API for Revit](https://aps.autodesk.com/blog/make-composite-revit-design-work-design-automation-api-revit)
 - [Revit Cloud Worksharing - fast extraction of Revit zip files with partials](https://aps.autodesk.com/blog/revit-cloud-worksharing-fast-extraction-revit-zip-files-partials)
 
-We looking forward to hearing from you.
+We are looking forward to hearing from you.
 Thank you!
 
 ####<a name="3"></a> Removing Ribbon Panel and Button
@@ -112,13 +112,14 @@ Can we get the name of the button, its description, or some kind of indicator af
 
 For example, I created one class MyCommand : IExternalCommand and registered it for several "PushButtonData" ("MyButtonOne", "MyButtonTwo").
 After clicking on the button both times through the debugger, I will get to the same Execute() method of the MyCommand class.
-In this case, is it possible to determine which of the buttons called this method? Any way, even the most perverted...
+In this case, is it possible to determine which of the buttons called this method?
+Any way at all, even the most perverted...
 
 **Answer:**
 You can do it with some step like this:
 
 - Add assembly reference `AdWindows.dll`
-- Add a event tracking user click on the button at IExternalApplication when user click to any button:
+- Add an event tracking user click on the button at `IExternalApplication` when user click to any button:
 
 <pre><code class="language-cs">using AW = Autodesk.Windows;
 
@@ -132,8 +133,8 @@ public static void ComponentManagerOnUIElementActivated(
   try
   {
     var id = e.Item.Id;
-    // match with id string contents here and set to some where,
-    // after thatm match with all command exist in your plugin
+    // match with id string contents here and save
+    // after that match with all commands in your plugin
   }
 </code></pre>
 
