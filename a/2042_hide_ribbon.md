@@ -21,6 +21,63 @@
   find ribbon tabs and or panels and delete
   https://forums.autodesk.com/t5/revit-api-forum/find-ribbon-tabs-and-or-panels-and-delete/m-p/12793159#M79071
 
+- Open-Endedness is Essential for Artificial Superhuman Intelligence
+https://arxiv.org/abs/2406.04268
+
+- ACCURATE FORECASTS, FINALLY? —
+No physics? No problem. AI weather forecasting is already making huge strides.
+New model that predicts global weather can run on a single desktop computer.
+https://arstechnica.com/ai/2024/06/as-a-potentially-historic-hurricane-season-looms-can-ai-forecast-models-help/
+
+- bilinguals get dementia on average four years later than monolinguals
+  https://www.economist.com/books-and-arts/2020/02/29/the-advantages-of-speaking-a-second-language
+  /Users/jta/a/doc/revit/tbc/git/a/doc/bilingual.txt
+
+- language speed and information density
+  Different languages, similar encoding efficiency: Comparable information rates across the human communicative niche
+  https://www.science.org/doi/10.1126/sciadv.aaw2594
+  /Users/jta/a/doc/revit/tbc/git/a/img/language_speed_information.png
+
+- Stockholm Wood City by Atrium Ljungberg
+  https://www.al.se/en/sickla
+  Stockholm Wood City will be built in Sickla, an area in the south of the Swedish capital.
+  Construction on the 250,000 square-metre site will begin in 2025.
+  When complete, ten years later, it will contain 2,000 homes and 7,000 offices, along with restaurants and shops.
+  The 12bn-krona ($1.4bn) project is led by Atrium Ljungberg, a Swedish urban development company.
+
+- General Purpose Interfaces
+  https://modemworks.com/research/general-purpose-interfaces/
+  > The emergence of AI agents lets us reimagine the ways we interact with our digital devices
+  ... explore the next phase of user interface design, as enabled by AI
+  ... principles for designing a single interface that can replace many
+
+- AI headphones let wearer listen to a single person in a crowd, by looking at them just once
+  https://www.washington.edu/news/2024/05/23/ai-headphones-noise-cancelling-target-speech-hearing/
+
+- EU directive on the energy performance of buildings
+  Directive (EU) 2024/1275 of the European Parliament and of the Council
+  of 24 April 2024
+  on the energy performance of buildings
+  https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024L1275
+  The European Union has formally adopted and published a recast directive on energy performance for buildings. What’s changing?
+  - New buildings must be net-zero by 2030
+  - Existing buildings must be renovated to meet energy performance requirements
+  - Building performance data to become more accessible, with improved funding
+  - New incentives to deploy digital solutions, including building modeling and simulation
+  Article 7
+  New buildings
+  1. Member States shall ensure that new buildings are zero-emission buildings in accordance with Article 11:
+  (a) from 1 January 2028, new buildings owned by public bodies; and
+  (b) from 1 January 2030, all new buildings;
+  Article 8 Existing buildings
+  Article 10 Solar energy in buildings
+
+- llama3v open source multi-modal LLM
+  https://huggingface.co/mustafaaljadery/llama3v
+  Comparable performance to GPT4-V, Gemini Ultra, Claude Opus with a 100x smaller model
+  SOTA open source VLM for Llama3 8B
+  RAG in 10 lines
+
 twitter:
 
  in the @AutodeskRevit #RevitAPI #BIM @DynamoBIM https://autode.sk/revit_2025_1
@@ -145,4 +202,79 @@ Thank you so much for the prompt response!
 I think this is exactly what I need!
 
 Many thanks to Chuong Ho for the comprehensive solution.
+
+####<a name="4"></a> EU Building Energy Performance Directive
+
+EU directive on the energy performance of buildings
+Directive (EU) 2024/1275 of the European Parliament and of the Council
+of 24 April 2024
+on the energy performance of buildings
+https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024L1275
+The European Union has formally adopted and published a recast directive on energy performance for buildings. What’s changing?
+- New buildings must be net-zero by 2030
+- Existing buildings must be renovated to meet energy performance requirements
+- Building performance data to become more accessible, with improved funding
+- New incentives to deploy digital solutions, including building modeling and simulation
+Article 7
+New buildings
+1. Member States shall ensure that new buildings are zero-emission buildings in accordance with Article 11:
+(a) from 1 January 2028, new buildings owned by public bodies; and
+(b) from 1 January 2030, all new buildings;
+Article 8 Existing buildings
+Article 10 Solar energy in buildings
+
+####<a name="5"></a> Stockholm Wood City
+
+Stockholm Wood City by Atrium Ljungberg
+https://www.al.se/en/sickla
+Stockholm Wood City will be built in Sickla, an area in the south of the Swedish capital.
+Construction on the 250,000 square-metre site will begin in 2025.
+When complete, ten years later, it will contain 2,000 homes and 7,000 offices, along with restaurants and shops.
+The 12bn-krona ($1.4bn) project is led by Atrium Ljungberg, a Swedish urban development company.
+
+####<a name="6"></a> Bilinguals Get Dementia Later
+
+bilinguals get dementia on average four years later than monolinguals
+https://www.economist.com/books-and-arts/2020/02/29/the-advantages-of-speaking-a-second-language
+/Users/jta/a/doc/revit/tbc/git/a/doc/bilingual.txt
+
+####<a name="7"></a> Language Speed And Information Density
+
+language speed and information density
+Different languages, similar encoding efficiency: Comparable information rates across the human communicative niche
+https://www.science.org/doi/10.1126/sciadv.aaw2594
+/Users/jta/a/doc/revit/tbc/git/a/img/language_speed_information.png
+
+####<a name="8"></a> Ai Headphones Target Single Person
+
+AI headphones let wearer listen to a single person in a crowd, by looking at them just once
+https://www.washington.edu/news/2024/05/23/ai-headphones-noise-cancelling-target-speech-hearing/
+
+####<a name="9"></a> Accurate AI Weather Forecast
+
+ACCURATE FORECASTS, FINALLY? —
+No physics? No problem. AI weather forecasting is already making huge strides.
+New model that predicts global weather can run on a single desktop computer.
+https://arstechnica.com/ai/2024/06/as-a-potentially-historic-hurricane-season-looms-can-ai-forecast-models-help/
+
+####<a name="10"></a> General Purpose Interfaces
+
+General Purpose Interfaces
+https://modemworks.com/research/general-purpose-interfaces/
+> The emergence of AI agents lets us reimagine the ways we interact with our digital devices
+... explore the next phase of user interface design, as enabled by AI
+... principles for designing a single interface that can replace many
+
+####<a name="11"></a> Llama3V Open Source Multi-Modal LLM
+
+llama3v open source multi-modal LLM
+https://huggingface.co/mustafaaljadery/llama3v
+Comparable performance to GPT4-V, Gemini Ultra, Claude Opus with a 100x smaller model
+SOTA open source VLM for Llama3 8B
+RAG in 10 lines
+
+####<a name="12"></a> Open-Endedness for Superhuman AI
+
+Open-Endedness is Essential for Artificial Superhuman Intelligence
+https://arxiv.org/abs/2406.04268
 
