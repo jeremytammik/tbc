@@ -103,6 +103,15 @@ A call for feedback on a planned change downloading a RCM from Docs, and a trick
 
 - [No zips downloading RCM from Docs?](#2)
 - [Removing ribbon panel and button](#3)
+- [EU building energy performance directive](#4)
+- [Stockholm wood city](#5)
+- [Bilinguals get dementia later](#6)
+- [Language speed and information density](#7)
+- [Ai headphones target single person](#8)
+- [Accurate AI weather forecast](#9)
+- [General purpose interfaces](#10)
+- [Llama3V open source multi-modal LLM](#11)
+- [Open-endedness for superhuman AI](#12)
 
 ####<a name="2"></a> No Zips Downloading RCM from Docs?
 
