@@ -99,7 +99,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Removing Docs Zip Files, Panels and Buttons
 
-A call for feedback on a planned change downloading a RCM from Docs, a tricky solution to remove ribbon panels and buttons, and a bunch of news bites that I found interesting on sustainability, language and AI discoveries; new EU AEC energy ruling, ecological wooden buildings in Scandinavia, spoken human language speed and information dentsity, AI uses as a hearing aid enhancement, weather forecasting, interface assistant, AI open-source and future directions:
+A call for feedback on a planned change downloading a RCM from Docs, a tricky solution to remove ribbon panels and buttons, and a bunch of news bites that I found interesting on sustainability, language and AI discoveries; new EU AEC energy ruling, ecological wooden buildings in Scandinavia, spoken human language speed and information density, AI uses as a hearing aid enhancement, weather forecasting, interface assistant, AI open-source and future directions:
 
 - [No zips downloading RCM from Docs?](#2)
 - [Removing ribbon panel and button](#3)
@@ -287,7 +287,7 @@ Many large popular AI tools are proprietary,
 That need not be.
 The [llama3v open source multi-modal LLM](https://huggingface.co/mustafaaljadery/llama3v) provides:
 
-- Comparable performance to GPT4-V, Gemini Ultra abd Claude Opus
+- Comparable performance to GPT4-V, Gemini Ultra and Claude Opus
 - Its model is 100x smaller
 - SOTA open source VLM for Llama3 8B
 - RAG in 10 lines of code
