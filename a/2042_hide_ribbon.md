@@ -82,7 +82,7 @@ twitter:
 
  in the @AutodeskRevit #RevitAPI #BIM @DynamoBIM https://autode.sk/revit_2025_1
 
-...
+A call for feedback on a planned change downloading a RCM from Docs, a tricky solution to remove ribbon panels and buttons, and a bunch of news bites that I found interesting on sustainability, language and AI discoveries; new EU AEC energy ruling, ecological wooden buildings in Scandinavia, spoken human language speed and information density, AI uses as a hearing aid enhancement, weather forecasting, interface assistant, AI open-source and future directions...
 
 linkedin:
 
@@ -137,7 +137,7 @@ Therefore, we would like to understand your use cases to avoid any possible disr
 If you think this change might affect your application, are willing to share your use case scenarios and give us feedback, please contact us through:
 
 <center>
- [email to `rcm.download.api.feedback@autodesk.com` with the subject `RCM download API feedback`](mailto:rcm.download.api.feedback@autodesk.com?subject=“RCM download API feedback")
+<a href="mailto:rcm.download.api.feedback@autodesk.com?subject=RCM download API feedback">email to `rcm.download.api.feedback@autodesk.com` with the subject `RCM download API feedback`</a>
 </center>
 
 For more information about the current behaviour downloading a Revit model from Autodesk BIM 360 Docs, please refer to the article
