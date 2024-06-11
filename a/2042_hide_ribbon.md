@@ -99,7 +99,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Removing Docs Zip Files, Panels and Buttons
 
-A call for feedback on a planned change downloading a RCM from Docs, and a tricky solution to remove ribbon panels and buttons:
+A call for feedback on a planned change downloading a RCM from Docs, a tricky solution to remove ribbon panels and buttons, and a bunch of newsbits that I found interesting on sustainability, language and AI discoveries; new EU AEC energy ruling, ecological wooden buildings in Scandinavia, spoken human language speed and information dentsity, AI uses as a hearing aid enhancement, weather forecasting, interface assistant, AI open-source and future directions:
 
 - [No zips downloading RCM from Docs?](#2)
 - [Removing ribbon panel and button](#3)
@@ -185,7 +185,8 @@ Any way at all, even the most perverted...
 You can do it with some step like this:
 
 - Add assembly reference `AdWindows.dll`
-- Add an event tracking user click on the button at `IExternalApplication` when user click to any button:
+- Add the event tracking user click on the button at `IExternalApplication` below
+- Call the action from external command matching the id returned from the event clicked
 
 <pre><code class="language-cs">using AW = Autodesk.Windows;
 
@@ -204,8 +205,6 @@ public static void ComponentManagerOnUIElementActivated(
   }
 </code></pre>
 
-- Call the action from external command match with id return from the event clicked
-
 **Response:**
 Thank you so much for the prompt response!
 I think this is exactly what I need!
@@ -214,76 +213,89 @@ Many thanks to Chuong Ho for the comprehensive solution.
 
 ####<a name="4"></a> EU Building Energy Performance Directive
 
-EU directive on the energy performance of buildings
-Directive (EU) 2024/1275 of the European Parliament and of the Council
-of 24 April 2024
-on the energy performance of buildings
-https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024L1275
-The European Union has formally adopted and published a recast directive on energy performance for buildings. What’s changing?
+Some n otes on the new EU ruling on the energy performance of buildings,
+[Directive EU 2024/1275 of the European Parliament and of the Council](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024L1275) of 24 April 2024:
+
+The European Union has formally adopted and published a recast directive on energy performance for buildings:
+
 - New buildings must be net-zero by 2030
 - Existing buildings must be renovated to meet energy performance requirements
 - Building performance data to become more accessible, with improved funding
 - New incentives to deploy digital solutions, including building modeling and simulation
-Article 7
-New buildings
-1. Member States shall ensure that new buildings are zero-emission buildings in accordance with Article 11:
+
+Article 7, New buildings, states that
+(1) Member States shall ensure that new buildings are zero-emission buildings in accordance with Article 11
 (a) from 1 January 2028, new buildings owned by public bodies; and
-(b) from 1 January 2030, all new buildings;
-Article 8 Existing buildings
-Article 10 Solar energy in buildings
+(b) from 1 January 2030, all new buildings...
+
+Article 8 discusses existing buildings, Article 10, solar energy in buildings.
+
+I will be interesting to see how these rulings will work out in the next couple of years.
 
 ####<a name="5"></a> Stockholm Wood City
 
-Stockholm Wood City by Atrium Ljungberg
-https://www.al.se/en/sickla
-Stockholm Wood City will be built in Sickla, an area in the south of the Swedish capital.
+In Scandinavia, wood is really taking of in AEC.
+For example, look at
+the [Stockholm Wood City](https://www.al.se/en/sickla) by Atrium Ljungberg:
+
+> Stockholm Wood City will be built in Sickla, an area in the south of the Swedish capital.
 Construction on the 250,000 square-metre site will begin in 2025.
 When complete, ten years later, it will contain 2,000 homes and 7,000 offices, along with restaurants and shops.
-The 12bn-krona ($1.4bn) project is led by Atrium Ljungberg, a Swedish urban development company.
+The 12bn-krona ($1.4bn) project...
 
 ####<a name="6"></a> Bilinguals Get Dementia Later
 
-bilinguals get dementia on average four years later than monolinguals
-https://www.economist.com/books-and-arts/2020/02/29/the-advantages-of-speaking-a-second-language
-/Users/jta/a/doc/revit/tbc/git/a/doc/bilingual.txt
+Personally, I am interested in human spoken languages as well as programming, and was happy to read
+about some [advantages of speaking a second language](https://www.economist.com/books-and-arts/2020/02/29/the-advantages-of-speaking-a-second-language):
+
+> Most notably, they have shown that bilinguals get dementia on average four years later than monolinguals, and that they have an edge in “executive control” &ndash; a basket of abilities that aid people doing complex tasks, including focusing attention, ignoring irrelevant information and updating working memory.
 
 ####<a name="7"></a> Language Speed And Information Density
 
-language speed and information density
-Different languages, similar encoding efficiency: Comparable information rates across the human communicative niche
-https://www.science.org/doi/10.1126/sciadv.aaw2594
-/Users/jta/a/doc/revit/tbc/git/a/img/language_speed_information.png
+Another recent investigation looks at language speed and information density and discovers
+the [different languages have similar encoding efficiency: comparable information rates across the human communicative niche](https://www.science.org/doi/10.1126/sciadv.aaw2594).
+
+<center>
+<img src="img/language_speed_information.png" alt="Language speed and information density" title="Language speed and information density" width="600"/>
+</center>
 
 ####<a name="8"></a> Ai Headphones Target Single Person
 
-AI headphones let wearer listen to a single person in a crowd, by looking at them just once
-https://www.washington.edu/news/2024/05/23/ai-headphones-noise-cancelling-target-speech-hearing/
+As an elegant lead over from language topic to AI,
+new [AI headphones let wearer listen to a single person in a crowd, by looking at them just once](https://www.washington.edu/news/2024/05/23/ai-headphones-noise-cancelling-target-speech-hearing/).
 
 ####<a name="9"></a> Accurate AI Weather Forecast
 
-ACCURATE FORECASTS, FINALLY? —
-No physics? No problem. AI weather forecasting is already making huge strides.
+AI can also help improve weather forecasting, and possibly
+even [accurate forecasts, finally](https://arstechnica.com/ai/2024/06/as-a-potentially-historic-hurricane-season-looms-can-ai-forecast-models-help/):
+
+> No physics? No problem.
+AI weather forecasting is already making huge strides.
 New model that predicts global weather can run on a single desktop computer.
-https://arstechnica.com/ai/2024/06/as-a-potentially-historic-hurricane-season-looms-can-ai-forecast-models-help/
 
 ####<a name="10"></a> General Purpose Interfaces
 
-General Purpose Interfaces
-https://modemworks.com/research/general-purpose-interfaces/
+How to simplify the ever-growing complexity facing us in everyday life and the growing number of devices we use?
+Maybe [general purpose interfaces](https://modemworks.com/research/general-purpose-interfaces/) can help:
+
 > The emergence of AI agents lets us reimagine the ways we interact with our digital devices
 ... explore the next phase of user interface design, as enabled by AI
 ... principles for designing a single interface that can replace many
 
 ####<a name="11"></a> Llama3V Open Source Multi-Modal LLM
 
-llama3v open source multi-modal LLM
-https://huggingface.co/mustafaaljadery/llama3v
-Comparable performance to GPT4-V, Gemini Ultra, Claude Opus with a 100x smaller model
-SOTA open source VLM for Llama3 8B
-RAG in 10 lines
+Many large popular AI tools are proprietary,
+That need not be, and
+the [llama3v open source multi-modal LLM](https://huggingface.co/mustafaaljadery/llama3v) provides:
+
+- Comparable performance to GPT4-V, Gemini Ultra abd Claude Opus
+- Its model is 100x smaller
+- SOTA open source VLM for Llama3 8B
+- RAG in 10 lines
 
 ####<a name="12"></a> Open-Endedness for Superhuman AI
 
-Open-Endedness is Essential for Artificial Superhuman Intelligence
-https://arxiv.org/abs/2406.04268
+Finally, for a couple of thought on the tricky topic of where AI research might head in the coming years, a paper
+explaining how [open-endedness is essential for artificial superhuman intelligence](https://arxiv.org/abs/2406.04268).
 
+So, let's end here, with an open end.

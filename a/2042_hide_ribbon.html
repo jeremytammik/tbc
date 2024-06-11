@@ -20,6 +20,63 @@
   find ribbon tabs and or panels and delete
   https://forums.autodesk.com/t5/revit-api-forum/find-ribbon-tabs-and-or-panels-and-delete/m-p/12793159#M79071
 
+- Open-Endedness is Essential for Artificial Superhuman Intelligence
+https://arxiv.org/abs/2406.04268
+
+- ACCURATE FORECASTS, FINALLY? —
+No physics? No problem. AI weather forecasting is already making huge strides.
+New model that predicts global weather can run on a single desktop computer.
+https://arstechnica.com/ai/2024/06/as-a-potentially-historic-hurricane-season-looms-can-ai-forecast-models-help/
+
+- bilinguals get dementia on average four years later than monolinguals
+  https://www.economist.com/books-and-arts/2020/02/29/the-advantages-of-speaking-a-second-language
+  /Users/jta/a/doc/revit/tbc/git/a/doc/bilingual.txt
+
+- language speed and information density
+  Different languages, similar encoding efficiency: Comparable information rates across the human communicative niche
+  https://www.science.org/doi/10.1126/sciadv.aaw2594
+  /Users/jta/a/doc/revit/tbc/git/a/img/language_speed_information.png
+
+- Stockholm Wood City by Atrium Ljungberg
+  https://www.al.se/en/sickla
+  Stockholm Wood City will be built in Sickla, an area in the south of the Swedish capital.
+  Construction on the 250,000 square-metre site will begin in 2025.
+  When complete, ten years later, it will contain 2,000 homes and 7,000 offices, along with restaurants and shops.
+  The 12bn-krona ($1.4bn) project is led by Atrium Ljungberg, a Swedish urban development company.
+
+- General Purpose Interfaces
+  https://modemworks.com/research/general-purpose-interfaces/
+  > The emergence of AI agents lets us reimagine the ways we interact with our digital devices
+  ... explore the next phase of user interface design, as enabled by AI
+  ... principles for designing a single interface that can replace many
+
+- AI headphones let wearer listen to a single person in a crowd, by looking at them just once
+  https://www.washington.edu/news/2024/05/23/ai-headphones-noise-cancelling-target-speech-hearing/
+
+- EU directive on the energy performance of buildings
+  Directive (EU) 2024/1275 of the European Parliament and of the Council
+  of 24 April 2024
+  on the energy performance of buildings
+  https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024L1275
+  The European Union has formally adopted and published a recast directive on energy performance for buildings. What’s changing?
+  - New buildings must be net-zero by 2030
+  - Existing buildings must be renovated to meet energy performance requirements
+  - Building performance data to become more accessible, with improved funding
+  - New incentives to deploy digital solutions, including building modeling and simulation
+  Article 7
+  New buildings
+  1. Member States shall ensure that new buildings are zero-emission buildings in accordance with Article 11:
+  (a) from 1 January 2028, new buildings owned by public bodies; and
+  (b) from 1 January 2030, all new buildings;
+  Article 8 Existing buildings
+  Article 10 Solar energy in buildings
+
+- llama3v open source multi-modal LLM
+  https://huggingface.co/mustafaaljadery/llama3v
+  Comparable performance to GPT4-V, Gemini Ultra, Claude Opus with a 100x smaller model
+  SOTA open source VLM for Llama3 8B
+  RAG in 10 lines
+
 twitter:
 
  in the @AutodeskRevit #RevitAPI #BIM @DynamoBIM https://autode.sk/revit_2025_1
@@ -40,10 +97,19 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 -->
 
 <h3>Removing Docs Zip Files, Panels and Buttons</h3>
-<p>A call for feedback on a planned change downloading a RCM from Docs, and a tricky solution to remove ribbon panels and buttons:</p>
+<p>A call for feedback on a planned change downloading a RCM from Docs, a tricky solution to remove ribbon panels and buttons, and a bunch of newsbits that I found interesting on sustainability, language and AI discoveries; new EU AEC energy ruling, ecological wooden buildings in Scandinavia, spoken human language speed and information dentsity, AI uses as a hearing aid enhancement, weather forecasting, interface assistant, AI open-source and future directions:</p>
 <ul>
 <li><a href="#2">No zips downloading RCM from Docs?</a></li>
 <li><a href="#3">Removing ribbon panel and button</a></li>
+<li><a href="#4">EU building energy performance directive</a></li>
+<li><a href="#5">Stockholm wood city</a></li>
+<li><a href="#6">Bilinguals get dementia later</a></li>
+<li><a href="#7">Language speed and information density</a></li>
+<li><a href="#8">Ai headphones target single person</a></li>
+<li><a href="#9">Accurate AI weather forecast</a></li>
+<li><a href="#10">General purpose interfaces</a></li>
+<li><a href="#11">Llama3V open source multi-modal LLM</a></li>
+<li><a href="#12">Open-endedness for superhuman AI</a></li>
 </ul>
 <h4><a name="2"></a> No Zips Downloading RCM from Docs?</h4>
 <p>This  is a reposting of
@@ -72,7 +138,7 @@ on <a href="https://www.autodesk.com/support/technical/article/caas/sfdcarticles
 <li><a href="https://aps.autodesk.com/blog/make-composite-revit-design-work-design-automation-api-revit">Make composite Revit design work with Design Automation API for Revit</a></li>
 <li><a href="https://aps.autodesk.com/blog/revit-cloud-worksharing-fast-extraction-revit-zip-files-partials">Revit Cloud Worksharing - fast extraction of Revit zip files with partials</a></li>
 </ul>
-<p>We looking forward to hearing from you.
+<p>We are looking forward to hearing from you.
 Thank you!</p>
 <h4><a name="3"></a> Removing Ribbon Panel and Button</h4>
 <p><a href="https://chuongmep.com/">Chuong Ho</a> provided a solution to
@@ -95,12 +161,14 @@ Incredible job! Thank you very much! Added to bookmarks.</p>
 <p>Can we get the name of the button, its description, or some kind of indicator after clicking it?</p>
 <p>For example, I created one class MyCommand : IExternalCommand and registered it for several "PushButtonData" ("MyButtonOne", "MyButtonTwo").
 After clicking on the button both times through the debugger, I will get to the same Execute() method of the MyCommand class.
-In this case, is it possible to determine which of the buttons called this method? Any way, even the most perverted...</p>
+In this case, is it possible to determine which of the buttons called this method?
+Any way at all, even the most perverted...</p>
 <p><strong>Answer:</strong>
 You can do it with some step like this:</p>
 <ul>
 <li>Add assembly reference <code>AdWindows.dll</code></li>
-<li>Add a event tracking user click on the button at IExternalApplication when user click to any button:</li>
+<li>Add the event tracking user click on the button at <code>IExternalApplication</code> below</li>
+<li>Call the action from external command matching the id returned from the event clicked</li>
 </ul>
 <pre><code class="language-cs">using AW = Autodesk.Windows;
 
@@ -114,15 +182,83 @@ public static void ComponentManagerOnUIElementActivated(
   try
   {
     var id = e.Item.Id;
-    // match with id string contents here and set to some where,
-    // after thatm match with all command exist in your plugin
+    // match with id string contents here and save
+    // after that match with all commands in your plugin
   }
 </code></pre>
 
-<ul>
-<li>Call the action from external command match with id return from the event clicked</li>
-</ul>
 <p><strong>Response:</strong>
 Thank you so much for the prompt response!
 I think this is exactly what I need!</p>
 <p>Many thanks to Chuong Ho for the comprehensive solution.</p>
+<h4><a name="4"></a> EU Building Energy Performance Directive</h4>
+<p>Some n otes on the new EU ruling on the energy performance of buildings,
+<a href="https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024L1275">Directive EU 2024/1275 of the European Parliament and of the Council</a> of 24 April 2024:</p>
+<p>The European Union has formally adopted and published a recast directive on energy performance for buildings:</p>
+<ul>
+<li>New buildings must be net-zero by 2030</li>
+<li>Existing buildings must be renovated to meet energy performance requirements</li>
+<li>Building performance data to become more accessible, with improved funding</li>
+<li>New incentives to deploy digital solutions, including building modeling and simulation</li>
+</ul>
+<p>Article 7, New buildings, states that
+(1) Member States shall ensure that new buildings are zero-emission buildings in accordance with Article 11
+(a) from 1 January 2028, new buildings owned by public bodies; and
+(b) from 1 January 2030, all new buildings...</p>
+<p>Article 8 discusses existing buildings, Article 10, solar energy in buildings.</p>
+<p>I will be interesting to see how these rulings will work out in the next couple of years.</p>
+<h4><a name="5"></a> Stockholm Wood City</h4>
+<p>In Scandinavia, wood is really taking of in AEC.
+For example, look at
+the <a href="https://www.al.se/en/sickla">Stockholm Wood City</a> by Atrium Ljungberg:</p>
+<blockquote>
+<p>Stockholm Wood City will be built in Sickla, an area in the south of the Swedish capital.
+Construction on the 250,000 square-metre site will begin in 2025.
+When complete, ten years later, it will contain 2,000 homes and 7,000 offices, along with restaurants and shops.
+The 12bn-krona ($1.4bn) project...</p>
+</blockquote>
+<h4><a name="6"></a> Bilinguals Get Dementia Later</h4>
+<p>Personally, I am interested in human spoken languages as well as programming, and was happy to read
+about some <a href="https://www.economist.com/books-and-arts/2020/02/29/the-advantages-of-speaking-a-second-language">advantages of speaking a second language</a>:</p>
+<blockquote>
+<p>Most notably, they have shown that bilinguals get dementia on average four years later than monolinguals, and that they have an edge in “executive control” &ndash; a basket of abilities that aid people doing complex tasks, including focusing attention, ignoring irrelevant information and updating working memory.</p>
+</blockquote>
+<h4><a name="7"></a> Language Speed And Information Density</h4>
+<p>Another recent investigation looks at language speed and information density and discovers
+the <a href="https://www.science.org/doi/10.1126/sciadv.aaw2594">different languages have similar encoding efficiency: comparable information rates across the human communicative niche</a>.</p>
+<p><center>
+<img src="img/language_speed_information.png" alt="Language speed and information density" title="Language speed and information density" width="600"/>
+</center></p>
+<h4><a name="8"></a> Ai Headphones Target Single Person</h4>
+<p>As an elegant lead over from language topic to AI,
+new <a href="https://www.washington.edu/news/2024/05/23/ai-headphones-noise-cancelling-target-speech-hearing/">AI headphones let wearer listen to a single person in a crowd, by looking at them just once</a>.</p>
+<h4><a name="9"></a> Accurate AI Weather Forecast</h4>
+<p>AI can also help improve weather forecasting, and possibly
+even <a href="https://arstechnica.com/ai/2024/06/as-a-potentially-historic-hurricane-season-looms-can-ai-forecast-models-help/">accurate forecasts, finally</a>:</p>
+<blockquote>
+<p>No physics? No problem.
+AI weather forecasting is already making huge strides.
+New model that predicts global weather can run on a single desktop computer.</p>
+</blockquote>
+<h4><a name="10"></a> General Purpose Interfaces</h4>
+<p>How to simplify the ever-growing complexity facing us in everyday life and the growing number of devices we use?
+Maybe <a href="https://modemworks.com/research/general-purpose-interfaces/">general purpose interfaces</a> can help:</p>
+<blockquote>
+<p>The emergence of AI agents lets us reimagine the ways we interact with our digital devices
+... explore the next phase of user interface design, as enabled by AI
+... principles for designing a single interface that can replace many</p>
+</blockquote>
+<h4><a name="11"></a> Llama3V Open Source Multi-Modal LLM</h4>
+<p>Many large popular AI tools are proprietary,
+That need not be, and
+the <a href="https://huggingface.co/mustafaaljadery/llama3v">llama3v open source multi-modal LLM</a> provides:</p>
+<ul>
+<li>Comparable performance to GPT4-V, Gemini Ultra abd Claude Opus</li>
+<li>Its model is 100x smaller</li>
+<li>SOTA open source VLM for Llama3 8B</li>
+<li>RAG in 10 lines</li>
+</ul>
+<h4><a name="12"></a> Open-Endedness for Superhuman AI</h4>
+<p>Finally, for a couple of thought on the tricky topic of where AI research might head in the coming years, a paper
+explaining how <a href="https://arxiv.org/abs/2406.04268">open-endedness is essential for artificial superhuman intelligence</a>.</p>
+<p>So, let's end here, with an open end.</p>
