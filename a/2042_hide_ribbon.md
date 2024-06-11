@@ -80,7 +80,7 @@
 
 twitter:
 
- in the @AutodeskRevit #RevitAPI #BIM @DynamoBIM https://autode.sk/revit_2025_1
+Feedback on no Zips downloading RCM from Docs, EU AEC energy directive, wooden buildings, spoken human language speed and information density, AI news and removing ribbon panels and buttons in the @AutodeskRevit #RevitAPI #BIM @DynamoBIM https://autode.sk/nozipsfromdocs
 
 A call for feedback on a planned change downloading a RCM from Docs, a tricky solution to remove ribbon panels and buttons, and a bunch of news bites that I found interesting on sustainability, language and AI discoveries; new EU AEC energy ruling, ecological wooden buildings in Scandinavia, spoken human language speed and information density, AI uses as a hearing aid enhancement, weather forecasting, interface assistant, AI open-source and future directions...
 
