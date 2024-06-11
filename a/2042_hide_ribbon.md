@@ -22,12 +22,12 @@
   https://forums.autodesk.com/t5/revit-api-forum/find-ribbon-tabs-and-or-panels-and-delete/m-p/12793159#M79071
 
 - Open-Endedness is Essential for Artificial Superhuman Intelligence
-https://arxiv.org/abs/2406.04268
+  https://arxiv.org/abs/2406.04268
 
-- ACCURATE FORECASTS, FINALLY? —
-No physics? No problem. AI weather forecasting is already making huge strides.
-New model that predicts global weather can run on a single desktop computer.
-https://arstechnica.com/ai/2024/06/as-a-potentially-historic-hurricane-season-looms-can-ai-forecast-models-help/
+- accurate forecasts, finally?
+  No physics? No problem. AI weather forecasting is already making huge strides.
+  New model that predicts global weather can run on a single desktop computer.
+  https://arstechnica.com/ai/2024/06/as-a-potentially-historic-hurricane-season-looms-can-ai-forecast-models-help/
 
 - bilinguals get dementia on average four years later than monolinguals
   https://www.economist.com/books-and-arts/2020/02/29/the-advantages-of-speaking-a-second-language
@@ -99,7 +99,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Removing Docs Zip Files, Panels and Buttons
 
-A call for feedback on a planned change downloading a RCM from Docs, a tricky solution to remove ribbon panels and buttons, and a bunch of newsbits that I found interesting on sustainability, language and AI discoveries; new EU AEC energy ruling, ecological wooden buildings in Scandinavia, spoken human language speed and information dentsity, AI uses as a hearing aid enhancement, weather forecasting, interface assistant, AI open-source and future directions:
+A call for feedback on a planned change downloading a RCM from Docs, a tricky solution to remove ribbon panels and buttons, and a bunch of news bites that I found interesting on sustainability, language and AI discoveries; new EU AEC energy ruling, ecological wooden buildings in Scandinavia, spoken human language speed and information dentsity, AI uses as a hearing aid enhancement, weather forecasting, interface assistant, AI open-source and future directions:
 
 - [No zips downloading RCM from Docs?](#2)
 - [Removing ribbon panel and button](#3)
@@ -213,28 +213,27 @@ Many thanks to Chuong Ho for the comprehensive solution.
 
 ####<a name="4"></a> EU Building Energy Performance Directive
 
-Some n otes on the new EU ruling on the energy performance of buildings,
+Some notes on the new EU ruling on the energy performance of buildings,
 [Directive EU 2024/1275 of the European Parliament and of the Council](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024L1275) of 24 April 2024:
 
-The European Union has formally adopted and published a recast directive on energy performance for buildings:
+The European Union has formally adopted and published a directive on energy performance for buildings:
 
 - New buildings must be net-zero by 2030
 - Existing buildings must be renovated to meet energy performance requirements
 - Building performance data to become more accessible, with improved funding
 - New incentives to deploy digital solutions, including building modeling and simulation
 
-Article 7, New buildings, states that
-(1) Member States shall ensure that new buildings are zero-emission buildings in accordance with Article 11
+Article 7, New buildings, states that member states shall ensure that new buildings are zero-emission buildings in accordance with Article 11
 (a) from 1 January 2028, new buildings owned by public bodies; and
-(b) from 1 January 2030, all new buildings...
+(b) from 1 January 2030, all new buildings.
 
 Article 8 discusses existing buildings, Article 10, solar energy in buildings.
 
-I will be interesting to see how these rulings will work out in the next couple of years.
+It will be interesting to see how these rulings pan out.
 
 ####<a name="5"></a> Stockholm Wood City
 
-In Scandinavia, wood is really taking of in AEC.
+In Scandinavia, wood is taking off in AEC.
 For example, look at
 the [Stockholm Wood City](https://www.al.se/en/sickla) by Atrium Ljungberg:
 
@@ -261,13 +260,13 @@ the [different languages have similar encoding efficiency: comparable informatio
 
 ####<a name="8"></a> Ai Headphones Target Single Person
 
-As an elegant lead over from language topic to AI,
+As an elegant lead over from languages to AI,
 new [AI headphones let wearer listen to a single person in a crowd, by looking at them just once](https://www.washington.edu/news/2024/05/23/ai-headphones-noise-cancelling-target-speech-hearing/).
 
 ####<a name="9"></a> Accurate AI Weather Forecast
 
-AI can also help improve weather forecasting, and possibly
-even [accurate forecasts, finally](https://arstechnica.com/ai/2024/06/as-a-potentially-historic-hurricane-season-looms-can-ai-forecast-models-help/):
+AI may help provide
+more [accurate weather forecasts](https://arstechnica.com/ai/2024/06/as-a-potentially-historic-hurricane-season-looms-can-ai-forecast-models-help/):
 
 > No physics? No problem.
 AI weather forecasting is already making huge strides.
@@ -285,17 +284,17 @@ Maybe [general purpose interfaces](https://modemworks.com/research/general-purpo
 ####<a name="11"></a> Llama3V Open Source Multi-Modal LLM
 
 Many large popular AI tools are proprietary,
-That need not be, and
-the [llama3v open source multi-modal LLM](https://huggingface.co/mustafaaljadery/llama3v) provides:
+That need not be.
+The [llama3v open source multi-modal LLM](https://huggingface.co/mustafaaljadery/llama3v) provides:
 
 - Comparable performance to GPT4-V, Gemini Ultra abd Claude Opus
 - Its model is 100x smaller
 - SOTA open source VLM for Llama3 8B
-- RAG in 10 lines
+- RAG in 10 lines of code
 
 ####<a name="12"></a> Open-Endedness for Superhuman AI
 
-Finally, for a couple of thought on the tricky topic of where AI research might head in the coming years, a paper
+Finally, for a couple of thoughts on the tricky topic of where AI research might head in the coming years, a paper
 explaining how [open-endedness is essential for artificial superhuman intelligence](https://arxiv.org/abs/2406.04268).
 
 So, let's end here, with an open end.
