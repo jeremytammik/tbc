@@ -68,7 +68,6 @@ Enhance your BIM workflow with this powerful tool!
 <img src="img/revitlookup_geovis01.jpg" alt="RevitLookup geometry visualisation" title="RevitLookup geometry visualisation" width="600"/>
 </center>
 
-
 ####<a name="2"></a> RevitLookup 1000 Stars on GitHub
 
 We're proud to share that RevitLookup has achieved 1000 stars on GitHub!
@@ -101,13 +100,13 @@ Whether you are dealing with simple shapes or intricate structures, having the a
 
 To illustrate the power of these visualization capabilities, here are samples of the geometric objects you can now explore directly within RevitLookup:
 
-| Mesh        | ![изображение](https://github.com/jeremytammik/RevitLookup/assets/20504884/84cd42fe-5248-4c13-8f30-0869396ad3b8) |
-| Face        | ![изображение](https://github.com/jeremytammik/RevitLookup/assets/20504884/15ba15da-325e-499f-935e-fa5cc9b71390) |
-| Solid       | ![изображение](https://github.com/jeremytammik/RevitLookup/assets/20504884/feacdb95-e5ea-43d0-9aef-b6a1f5116b37) |
-| Curve       | ![изображение](https://github.com/jeremytammik/RevitLookup/assets/20504884/d08b0bf3-0622-4f49-b999-4365a0955129) |
-| Edge        | ![изображение](https://github.com/jeremytammik/RevitLookup/assets/20504884/30291e03-8eb8-4de2-a54f-0c288ee4dcb2) |
-| BoundingBox | ![изображение](https://github.com/jeremytammik/RevitLookup/assets/20504884/f800a552-86df-4554-8d5b-c53561720f0d) |
-| XYZ         | ![изображение](https://github.com/jeremytammik/RevitLookup/assets/20504884/72b3f7cb-279c-4465-9cff-7918e0aaf37c) |
+| Mesh        geovis02mesh.png|
+| Face        geovis03face.png|
+| Solid       geovis04solid.png|
+| Curve       geovis05curve.png|
+| Edge        geovis06edge.png|
+| BoundingBox geovis07boundingbox.png|
+| XYZ         geovis08xyz.png|
 
 For detailed documentation, check
 the [wiki documentation of RevitLookup Geometry Visualization](https://github.com/jeremytammik/RevitLookup/wiki/Visualization).
@@ -151,8 +150,6 @@ Thanks!
 
 Made with love by [@Nice3point](https://t.me/nice3point).
 
-[Full changelog](https://github.com/jeremytammik/RevitLookup/compare/2025.0.4...2025.0.5)
-
 ####<a name="5"></a> RevitLookup 2025.0.6
 
 [RevitLookup 2025.0.6](https://github.com/jeremytammik/RevitLookup/releases/edit/2025.0.6) implements:
@@ -169,26 +166,28 @@ Solid scaling:
 
 Visualisation now supports scaling a solid, relative to its centre. Exploring small objects is now even easier https://github.com/jeremytammik/RevitLookup/issues/251
 
-![изображение](https://github.com/jeremytammik/RevitLookup/assets/20504884/dbe36b89-3065-469a-8768-fbd151bbe442)
+<center>
+<img src="img/geovis09solid2.png" alt="Solid scaling" title="Solid scaling" width="600"/>
+</center>
 
 Theme synchronisation with Revit:
 
-Starting with Revit 2024, you can choose to automatically change the RevitLookup theme. Fans of darker colors will no longer have to dig through the settings every time
+Starting with Revit 2024, you can choose to automatically change the RevitLookup theme.
+Fans of darker colors will no longer have to dig through the settings every time
 
-![изображение](https://github.com/jeremytammik/RevitLookup/assets/20504884/40844c42-ff8b-4bc6-949b-5a1b3660adf2)
+<center>
+<img src="img/geovis10theme.png" alt="Theme synchronisation" title="Theme synchronisation" width="600"/>
+</center>
 
 Other improvements:
 
 - Improved arrow position for vertical edges on visualization
 - Multithreading visualization support. Changing settings now does not affect rendering. Previously there were artifacts due to fast settings changes
 - Added new `Element` extensions:
-
-| Element        | GetCuttingSolids                          | Gets all the solids which cut the input element                                      |
-| Element        | GetSolidsBeingCut                         | Get all the solids which are cut by the input element                                |
-| Element        | IsAllowedForSolidCut                      | Validates that the element is eligible for a solid-solid cut                         |
-| Element        | IsElementFromAppropriateContext           | Validates that the element is from an appropriate document                           |
-
-[Full changelog](https://github.com/jeremytammik/RevitLookup/compare/2025.0.6...2025.0.7)
+    - GetCuttingSolids &ndash; Gets all the solids which cut the input element
+    - GetSolidsBeingCut &ndash; Get all the solids which are cut by the input element
+    - IsAllowedForSolidCut &ndash; Validates that the element is eligible for a solid-solid cut
+    - IsElementFromAppropriateContext &ndash; Validates that the element is from an appropriate document
 
 ####<a name="7"></a> RevitLookup Versions and Visualisation Wiki
 
