@@ -67,7 +67,7 @@ Roman [@Nice3point](https://t.me/nice3point) Karpovich, aka Роман Карп�
 presents a huge new chunk of RevitLookup functionality enabling Revit BIM element geometry visualization:
 
 <center>
-<img src="img/revitlookup_geovis01.jpg" alt="RevitLookup geometry visualisation" title="RevitLookup geometry visualisation" width="600"/>
+<img src="img/geovis01.jpg" alt="RevitLookup geometry visualisation" title="RevitLookup geometry visualisation" width="600"/>
 </center>
 
 ####<a name="2"></a> 1000 Stars and Geometry Visualisation
@@ -76,13 +76,15 @@ We are proud to share that RevitLookup has achieved 1000 stars on GitHub!
 This milestone is a testament to its value and the dedication of our community.
 Thank you for helping us reach this landmark!
 
+<center>
 <a href="https://star-history.com/#jeremytammik/RevitLookup&Date">
     <picture>
-        <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=jeremytammik/RevitLookup&type=Date&theme=dark" />
+        <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=jeremytammik/RevitLookup&type=Date" />
         <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=jeremytammik/RevitLookup&type=Date" />
         <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=jeremytammik/RevitLookup&type=Date" />
     </picture>
 </a>
+</center>
 
 To celebrate it, we are excited to introduce a major new feature in this release that will transform your interaction with models, offering a deeper understanding of the geometric objects that constitute your models:
 
@@ -165,25 +167,24 @@ Other improvements include:
 - Added **Edit parameter** icon
 - Added **Select** context menu action for Reference type
 - Added **Export family size table** for FamilySizeTableManager type by @SergeyNefyodov in https://github.com/jeremytammik/RevitLookup/pull/244
-- Added new extensions:
 
-| Type           | Extension                                 | Description                                                        |
-|:---------------|-------------------------------------------|--------------------------------------------------------------------|
-| Application    | GetFormulaFunctions                       | Gets list of function names supported by formula engine            |
-| Application    | GetFormulaOperators                       | Gets list of operator names supported by formula engine            |
-| BoundingBoxXYZ | Centroid                                  | Gets the bounding box center point                                 |
-| BoundingBoxXYZ | Vertices                                  | Gets list of bounding box vertices                                 |
-| BoundingBoxXYZ | Volume                                    | Evaluate bounding box volume                                       |
-| BoundingBoxXYZ | SurfaceArea                               | Evaluate bounding box surface area                                 |
-| Document       | GetAllGlobalParameters                    | Returns all global parameters available in the given document      |
-| Document       | GetLightGroupManager                      | Gets a light group manager object from the given document          |
-| Document       | GetTemporaryGraphicsManager               | Gets a TemporaryGraphicsManager reference of the document          |
-| Document       | GetAnalyticalToPhysicalAssociationManager | Gets a AnalyticalToPhysicalAssociationManager for this document    |
-| Document       | GetFamilySizeTableManager                 | Gets a FamilySizeTableManager from a Family                        |
-| UIApplication  | CurrentTheme                              | Gets a current theme                                               |
-| UIApplication  | CurrentCanvasTheme                        | Gets a current canvas theme                                        |
-| UIApplication  | FollowSystemColorTheme                    | Indicate if the overall theme follows operating system color theme |
-| View           | GetSpatialFieldManager                    | Retrieves manager object for the given view                        |
+Added new extensions:
+
+- Application: GetFormulaFunctions &ndash; Gets list of function names supported by formula engine
+- Application: GetFormulaOperators &ndash; Gets list of operator names supported by formula engine
+- BoundingBoxXYZ: Centroid &ndash; Gets the bounding box center point
+- BoundingBoxXYZ: Vertices &ndash; Gets list of bounding box vertices
+- BoundingBoxXYZ: Volume &ndash; Evaluate bounding box volume
+- BoundingBoxXYZ: SurfaceArea &ndash; Evaluate bounding box surface area
+- Document: GetAllGlobalParameters &ndash; Returns all global parameters available in the given document
+- Document: GetLightGroupManager &ndash; Gets a light group manager object from the given document
+- Document: GetTemporaryGraphicsManager &ndash; Gets a TemporaryGraphicsManager reference of the document
+- Document: GetAnalyticalToPhysicalAssociationManager &ndash; Gets a AnalyticalToPhysicalAssociationManager for this document
+- Document: GetFamilySizeTableManager &ndash; Gets a FamilySizeTableManager from a Family
+- UIApplication: CurrentTheme &ndash; Gets a current theme
+- UIApplication: CurrentCanvasTheme &ndash; Gets a current canvas theme
+- UIApplication: FollowSystemColorTheme &ndash; Indicate if the overall theme follows operating system color theme
+- View: GetSpatialFieldManager &ndash; Retrieves manager object for the given view
 
 Hope everyone enjoys the new release.
 Thanks!
@@ -223,11 +224,13 @@ Other improvements:
 
 - Improved arrow position for vertical edges on visualization
 - Multithreading visualization support. Changing settings now does not affect rendering. Previously there were artifacts due to fast settings changes
-- Added new `Element` extensions:
-    - GetCuttingSolids &ndash; Gets all the solids which cut the input element
-    - GetSolidsBeingCut &ndash; Get all the solids which are cut by the input element
-    - IsAllowedForSolidCut &ndash; Validates that the element is eligible for a solid-solid cut
-    - IsElementFromAppropriateContext &ndash; Validates that the element is from an appropriate document
+
+New `Element` extensions:
+
+- GetCuttingSolids &ndash; Gets all the solids which cut the input element
+- GetSolidsBeingCut &ndash; Get all the solids which are cut by the input element
+- IsAllowedForSolidCut &ndash; Validates that the element is eligible for a solid-solid cut
+- IsElementFromAppropriateContext &ndash; Validates that the element is from an appropriate document
 
 ####<a name="7"></a> Versions and Visualisation Wiki
 
