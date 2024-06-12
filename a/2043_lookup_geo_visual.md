@@ -96,7 +96,7 @@ Enhance your BIM workflow with this powerful tool!
 
 The new functionality is described in
 the [wiki documentation of RevitLookup Geometry Visualization](https://github.com/jeremytammik/RevitLookup/wiki/Visualization).
-It was mainly implemented in release 2025.0.5, with further enahncements following in 2025.0.6 and 2025.0.7.
+It was mainly implemented in release 2025.0.5, with further enhancements following in 2025.0.6 and 2025.0.7.
 
 ####<a name="4"></a> RevitLookup 2025.0.5
 
@@ -201,7 +201,7 @@ Made with love by [@Nice3point](https://t.me/nice3point).
 ####<a name="6"></a> RevitLookup 2025.0.7
 
 [RevitLookup 2025.0.7](https://github.com/jeremytammik/RevitLookup/releases/edit/2025.0.7) implements
-solid scaling, theme synchronisation with revit and other improvements:
+solid scaling, theme synchronisation with Revit and other improvements:
 
 Solid scaling:
 
