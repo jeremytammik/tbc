@@ -54,23 +54,25 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 A small step for Roman, a giant leap for the Revit add-in developer community:
 
+- [1000 stars on GitHub](#2)
+- [RevitLookup Geometry Visualization](#3)
+- [RevitLookup 2025.0.5](#4)
+- [RevitLookup 2025.0.6](#5)
+- [RevitLookup 2025.0.7](#6)
+- [Versions and Visualisation Wiki](#7)
 
 RevitLookup has been rewarded 1000 well-earned stars on GitHub.
 To celebrate,
 Roman [@Nice3point](https://t.me/nice3point) Karpovich, aka Роман Карпович,
 presents a huge new chunk of RevitLookup functionality enabling Revit BIM element geometry visualization:
 
-> Introducing the new Geometry Visualization feature in RevitLookup!
-Now you can visualize various geometry objects directly within the interface.
-Enhance your BIM workflow with this powerful tool!
-
 <center>
 <img src="img/revitlookup_geovis01.jpg" alt="RevitLookup geometry visualisation" title="RevitLookup geometry visualisation" width="600"/>
 </center>
 
-####<a name="2"></a> RevitLookup 1000 Stars on GitHub
+####<a name="2"></a> 1000 Stars and Geometry Visualisation
 
-We're proud to share that RevitLookup has achieved 1000 stars on GitHub!
+We are proud to share that RevitLookup has achieved 1000 stars on GitHub!
 This milestone is a testament to its value and the dedication of our community.
 Thank you for helping us reach this landmark!
 
@@ -82,11 +84,15 @@ Thank you for helping us reach this landmark!
     </picture>
 </a>
 
-To celebrate it, we are excited to introduce a major new feature in this release that will transform your interaction with models, offering a deeper understanding of the geometric objects that constitute your models.
+To celebrate it, we are excited to introduce a major new feature in this release that will transform your interaction with models, offering a deeper understanding of the geometric objects that constitute your models:
 
 ####<a name="3"></a> RevitLookup Geometry Visualization
 
-The new visualisation functionality is described in
+> Introducing the new Geometry Visualization feature in RevitLookup!
+Now you can visualize various geometry objects directly within the interface.
+Enhance your BIM workflow with this powerful tool!
+
+The new functionality is described in
 the [wiki documentation of RevitLookup Geometry Visualization](https://github.com/jeremytammik/RevitLookup/wiki/Visualization).
 It was mainly implemented in release 2025.0.5, with further enahncements following in 2025.0.6 and 2025.0.7.
 
@@ -100,13 +106,47 @@ Whether you are dealing with simple shapes or intricate structures, having the a
 
 To illustrate the power of these visualization capabilities, here are samples of the geometric objects you can now explore directly within RevitLookup:
 
-| Mesh        geovis02mesh.png|
-| Face        geovis03face.png|
-| Solid       geovis04solid.png|
-| Curve       geovis05curve.png|
-| Edge        geovis06edge.png|
-| BoundingBox geovis07boundingbox.png|
-| XYZ         geovis08xyz.png|
+Mesh:
+
+<center>
+<img src="img/geovis02mesh.png" alt="Mesh" title="Mesh" width="600"/>
+</center>
+
+Face:
+
+<center>
+<img src="img/geovis03face.png" alt="Face" title="Face" width="600"/>
+</center>
+
+Solid:
+
+<center>
+<img src="img/geovis04solid.png" alt="Solid" title="Solid" width="600"/>
+</center>
+
+Curve:
+
+<center>
+<img src="img/geovis05curve.png" alt="Curve" title="Curve" width="600"/>
+</center>
+
+Edge:
+
+<center>
+<img src="img/geovis06edge.png" alt="Edge" title="Edge" width="600"/>
+</center>
+
+BoundingBox:
+
+<center>
+<img src="img/geovis07boundingbox.png" alt="BoundingBox" title="BoundingBox" width="600"/>
+</center>
+
+XYZ:
+
+<center>
+<img src="img/geovis08xyz.png" alt="XYZ" title="XYZ" width="600"/>
+</center>
 
 For detailed documentation, check
 the [wiki documentation of RevitLookup Geometry Visualization](https://github.com/jeremytammik/RevitLookup/wiki/Visualization).
@@ -189,7 +229,7 @@ Other improvements:
     - IsAllowedForSolidCut &ndash; Validates that the element is eligible for a solid-solid cut
     - IsElementFromAppropriateContext &ndash; Validates that the element is from an appropriate document
 
-####<a name="7"></a> RevitLookup Versions and Visualisation Wiki
+####<a name="7"></a> Versions and Visualisation Wiki
 
 - [RevitLookup versioning](https://github.com/jeremytammik/RevitLookup/wiki/Versions)
 - [RevitLookup visualization](https://github.com/jeremytammik/RevitLookup/wiki/Visualization)
