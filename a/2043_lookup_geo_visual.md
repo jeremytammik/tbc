@@ -35,7 +35,9 @@ twitter:
 
  in the @AutodeskRevit #RevitAPI #BIM @DynamoBIM
 
-...
+New RevitLookup BIM element geometry visualization, and 1000 GitHub stars
+&ndash; Versions 2025.0.5, 2025.0.6 and 2025.0.7
+&ndash; Wiki...
 
 linkedin:
 
@@ -94,9 +96,12 @@ To celebrate it, we are excited to introduce a major new feature in this release
 Now you can visualize various geometry objects directly within the interface.
 Enhance your BIM workflow with this powerful tool!
 
-The new functionality is described in
+It is built using the Revit API `DirectContext3D` functionality and described in
 the [wiki documentation of RevitLookup Geometry Visualization](https://github.com/jeremytammik/RevitLookup/wiki/Visualization).
 It was mainly implemented in release 2025.0.5, with further enhancements following in 2025.0.6 and 2025.0.7.
+
+Please feel free to submit your feedback, wishes and suggestions regarding visualization in
+the [comments on pull request 245](https://github.com/jeremytammik/RevitLookup/pull/245).
 
 ####<a name="4"></a> RevitLookup 2025.0.5
 
@@ -195,7 +200,7 @@ Made with love by [@Nice3point](https://t.me/nice3point).
 
 [RevitLookup 2025.0.6](https://github.com/jeremytammik/RevitLookup/releases/edit/2025.0.6) implements:
 
-- Visualization dark theme support https://github.com/jeremytammik/RevitLookup/issues/250
+- [Visualization dark theme support](https://github.com/jeremytammik/RevitLookup/issues/250)
 - [Full changelog](https://github.com/jeremytammik/RevitLookup/compare/2025.0.5...2025.0.6)
 
 ####<a name="6"></a> RevitLookup 2025.0.7
@@ -205,7 +210,9 @@ solid scaling, theme synchronisation with Revit and other improvements:
 
 Solid scaling:
 
-Visualisation now supports scaling a solid, relative to its centre. Exploring small objects is now even easier https://github.com/jeremytammik/RevitLookup/issues/251
+Visualisation now supports scaling a solid, relative to its centre.
+Exploring small objects is now even easier, cf.,
+[issue 251](https://github.com/jeremytammik/RevitLookup/issues/251):
 
 <center>
 <img src="img/geovis09solid2.png" alt="Solid scaling" title="Solid scaling" width="600"/>
@@ -214,7 +221,7 @@ Visualisation now supports scaling a solid, relative to its centre. Exploring sm
 Theme synchronisation with Revit:
 
 Starting with Revit 2024, you can choose to automatically change the RevitLookup theme.
-Fans of darker colors will no longer have to dig through the settings every time
+Fans of darker colors will no longer have to dig through the settings every time:
 
 <center>
 <img src="img/geovis10theme.png" alt="Theme synchronisation" title="Theme synchronisation" width="600"/>
