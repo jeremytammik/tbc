@@ -66,11 +66,7 @@ A small step for Roman, a giant leap for the Revit add-in developer community:
 RevitLookup has been rewarded 1000 well-earned stars on GitHub.
 To celebrate,
 Roman [@Nice3point](https://t.me/nice3point) Karpovich, aka Роман Карпович,
-presents a huge new chunk of RevitLookup functionality enabling Revit BIM element geometry visualization:
-
-<center>
-<img src="img/geovis01.jpg" alt="RevitLookup geometry visualisation" title="RevitLookup geometry visualisation" width="600"/>
-</center>
+presents a huge new chunk of RevitLookup functionality enabling Revit BIM element geometry visualization.
 
 ####<a name="2"></a> 1000 Stars and Geometry Visualisation
 
@@ -95,6 +91,10 @@ To celebrate it, we are excited to introduce a major new feature in this release
 > Introducing the new Geometry Visualization feature in RevitLookup!
 Now you can visualize various geometry objects directly within the interface.
 Enhance your BIM workflow with this powerful tool!
+
+<center>
+<img src="img/geovis01.jpg" alt="RevitLookup geometry visualisation" title="RevitLookup geometry visualisation" width="600"/>
+</center>
 
 It is built using the Revit API `DirectContext3D` functionality and described in
 the [wiki documentation of RevitLookup Geometry Visualization](https://github.com/jeremytammik/RevitLookup/wiki/Visualization).
