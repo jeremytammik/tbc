@@ -33,7 +33,7 @@ likelovecelebrate
 
 twitter:
 
- in the @AutodeskRevit #RevitAPI #BIM @DynamoBIM
+RevitLookup earns 1000 GitHub stars and implementes BIM element geometry visualization and Wiki for the @AutodeskRevit #RevitAPI #BIM @DynamoBIM https://autode.sk/lookupgeometry
 
 New RevitLookup BIM element geometry visualization, and 1000 GitHub stars
 &ndash; Versions 2025.0.5, 2025.0.6 and 2025.0.7
