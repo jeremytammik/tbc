@@ -252,28 +252,29 @@ I was thinking about making my own page with selling options, but right now bein
 Still, I will probably end up with a cheaper version on my webpage which will collects correct info as per your page and more expensive on an Autodesk App Store. So far I prefer to spend my free time coding something cool 😉
 
 How the Autodesk app store works (if you use entitlement class provided by Autodesk and their system)
-1. You submit the app &ndash; after revision by Autodesk, the app is being published on the market.
-2. Someone wants to buy your app:
-a) On PayPal &ndash; the process is automated with problems mentioned above. Customers are redirected to PayPal, pay there, and then the system brings them back to the page informing the Autodesk App Store about the successful transaction.
-b) You have a possibility to simply add new users:
-this is how it looks for my Drafter. Autodesk doesn't care why you are adding these and what are you doing with them &ndash; You can add or delete them however you like (they are marked below as Published Added):
 
+- You submit the app &ndash; after revision by Autodesk, the app is being published on the market.
+- Someone wants to buy your app:
+    - On PayPal &ndash; the process is automated with problems mentioned above. Customers are redirected to PayPal, pay there, and then the system brings them back to the page informing the Autodesk App Store about the successful transaction.
+    - You have a possibility to simply add new users:
+    this is how it looks for my Drafter. Autodesk doesn't care why you are adding these and what are you doing with them &ndash; You can add or delete them however you like (they are marked below as Published Added):
 
 <center>
 <img src="img/autodesk_appstore.jpg" alt="Autodesk AppStore" title="Autodesk AppStore" width="600"/> <!-- Pixel Height: 579 Pixel Width: 1,000 -->
 </center>
 
 So far I hit 2 problems with it.
-A) people need to log into the market.
-B) they need to agree to the market rules &ndash; to do it they need to download something 😉 really 😉  It is another reasons why I made trial for Drafter &ndash; before I had to tell people to download randomly something free.
-3. Only after that, you will be able to add them a licence.
-4. After that, they will be able to download your app and install it.
-5. While starting the app, the correctly implemented entitlement class will try to connect with market server with userId and AppId. In return, you will get an error, true or false &ndash; it is up to you what you want to do with it or how you're going to manage problems. Personally, after checking, I am creating a hashed licence file with result.  Depending on result, I am freezing and blocking the possibility of using my tools. Also, each command will double-check the licence from my files. That is more or less what's going on there.
-6. Users can normally use the app. If they log out, they will be log-out by Autodesk and the revit will stop working;)
-7. Each time they start Revit the process will repeat from point 5. You can implement some code to stay offline and so you don't have to check online every time, as it makes Revit starts slowly.
+
+- people need to log into the market.
+- they need to agree to the market rules &ndash; to do it they need to download something 😉 really 😉  It is another reasons why I made trial for Drafter &ndash; before I had to tell people to download randomly something free.
+- Only after that, you will be able to add them a licence.
+- After that, they will be able to download your app and install it.
+- While starting the app, the correctly implemented entitlement class will try to connect with market server with userId and AppId. In return, you will get an error, true or false &ndash; it is up to you what you want to do with it or how you're going to manage problems. Personally, after checking, I am creating a hashed licence file with result.  Depending on result, I am freezing and blocking the possibility of using my tools. Also, each command will double-check the licence from my files. That is more or less what's going on there.
+- Users can normally use the app. If they log out, they will be log-out by Autodesk and the revit will stop working;)
+- Each time they start Revit the process will repeat from point 5. You can implement some code to stay offline and so you don't have to check online every time, as it makes Revit starts slowly.
 
 **Answer 3:**
-in your case, it does not make sense to add an option to your website, and yes adding the plugin to the App Store is a great way to get exposure, I have some plugins in there as well.
+In your case, it does not make sense to add an option to your website, and yes adding the plugin to the App Store is a great way to get exposure, I have some plugins in there as well.
 
 That image with an option to Add Download Entitlement is new, never saw any tutorial with that image about the Entitlement API.
 
@@ -281,23 +282,31 @@ If you use PayPal as a payment and use Entitlement API with the @Julian.Wandzila
 
 **Answer from AppStore:**
 Thank you for sharing your concerns. Yes, we are aware of the issues and concerns over Taxation. Our App Store Engineering team is working on these things and will share the details once available.
-Could you please try to implement IPN mechanism for your apps to get more information on the users? Please go through following links: instant-payment-notification-ipn-format.pdf (autodesk.net) and source code: GitHub &ndash; ADN-DevTech/Exchange-IPNListener-Sample: An ASP.Net sample demonstrating how to connect and...
+Could you please try to implement IPN mechanism for your apps to get more information on the users? Please go through following links:
+
+- [Autodesk App Store: IPN notification format](https://damassets.autodesk.net/content/dam/autodesk/www/adn/pdf/instant-payment-notification-ipn-format.pdf)
+- [GitHub source code for Exchange-IPNListener-Sample](https://github.com/ADN-DevTech/Exchange-IPNListener-Sample)
+
 Please feel free to contact us via [appsubmissions@autodesk.com](appsubmissions@autodesk.com) for any queries related to App Store.
 
 **Answer:**
 I can confirm that larger organisations use flexnet licencing always. My discipline is structural engineering and have worked for a lot of global engineering firms such as URS, AECOM, Jacobs, Arup (1000s of revit users) and smaller national consultancies (>10 users <100) and all have used flex net licencing. I am develping my own plug ins at the moment and see the single sign on licence as a constraint on sales to these bigger organisations who use flex net. Plus I have worked in secure industries where security and internet access can be limited, again if you need to check your licence every time you log in this would cause issues. Another concern I have with trying to sell to the bigger organisations is that many of them cant purchase software for such a small value as £10 , I found out trying to purchase software from the app store through a global organisation two things:
-1) they often have a minimum purchase order value, i.e they cant right a cheque or make a payment for <£200
+
+- they often have a minimum purchase order value, i.e they cant right a cheque or make a payment for <£200
 and so a local manager was going to purchase the app on his credit card and claim the money back
-2) When the IT dept looked at the App and it didnt have a valid signed security certificate (you know the message that pops up about your app and says 'the publisher of this add in could not be verified') they would not sanction its use on company systems and we could not purchase the app.
+- When the IT dept looked at the App and it didnt have a valid signed security certificate (you know the message that pops up about your app and says 'the publisher of this add in could not be verified') they would not sanction its use on company systems and we could not purchase the app.
+
 From this I have come to the following strategy,
-1) Sell single sign on version of the app for a reasonable price on the app store say £40, licence controlled by the app store rest call
-2) sell a multi seat version of the app say 8 seats for £250 on the app store , for big organisations, this app has no security or licence control and licence control is based on the 'trust system' of these large organisations who often employ dedicated software to manage there licences deployed.
+
+- Sell single sign on version of the app for a reasonable price on the app store say £40, licence controlled by the app store rest call
+- sell a multi seat version of the app say 8 seats for £250 on the app store , for big organisations, this app has no security or licence control and licence control is based on the 'trust system' of these large organisations who often employ dedicated software to manage there licences deployed.
+
 I went through the process of getting a certiport digital security certificate to sign my apps .dll with so as to be able to sell to larger organisations. Once signed the message only pops up once at the start if the plug in is signed.
 
 These organisations do use certain plug in such as rushforth tools, who sell an enterprise version on there own website, so a licencing system for flexnet can be implemented,  there are  pre-purchased licencing software solutions I have seen which can be purchased off the shelf to do this like QLM(quick licence manager) by soraco but obviously have a cost associted with them.
 
 **Response:**
-Autodesk is planning to add some [Multi-user license](https://portal.productboard.com/autodeskforge/20-autodesk-platform-services-roadmap/c/202-multi-user-license-management.
+Autodesk is planning to add some [Multi-user license](https://portal.productboard.com/autodeskforge/20-autodesk-platform-services-roadmap/c/202-multi-user-license-management).
 The question is if using flexnet licencing in a modern Revit is possible to run without a user connected. I don't think that is possible.
 Today I only have a single user license in my plugins, I can swap to another user manually. A floating license is a thing that planing to create, would be really handy to enable a floating license to all the users with the same domain email.
 
@@ -310,27 +319,32 @@ Here are snapshots of the flexnet licence; notice there is no user signed in to 
 
 i think the idea of using the domain is the right way to go I think Rushforth tools use this approach. The below text is from the licencing section of Rushforth website, see enterprise licences at the bottom.
 
-Summary
-For individual licenses, install and click the activation button to complete an individual activation request. Check your spam folder or send a follow up email if your registration key is not sent within 24 hours of sending your activation request email.
-For Site licenses, all users can input the same key or that process can be automated by deploying a windows registy key.
-Installation
-The .exe installer is a per-user installer and does not require any admin install privileges. Don't "Run as Admin" or it may not appear on the current user's profile.
-The .msi installer is a per-machine installer and will require admin install privileges.
-Both installers have a -quiet switch for silent installation by deployment software.
+Summary:
+
+- For individual licenses, install and click the activation button to complete an individual activation request. Check your spam folder or send a follow up email if your registration key is not sent within 24 hours of sending your activation request email.
+- For Site licenses, all users can input the same key or that process can be automated by deploying a windows registy key.
+
+Installation:
+
+- The .exe installer is a per-user installer and does not require any admin install privileges. Don't "Run as Admin" or it may not appear on the current user's profile.
+- The .msi installer is a per-machine installer and will require admin install privileges.
+- Both installers have a -quiet switch for silent installation by deployment software.
+
 Single-User Licenses:
-Purchase
-Purchase the quantity of licenses needed for your team.
-All licenses purchased are attributed to the company email domain name (unless using a personal email).
-Each single user license authorizes you to register two computers for the same user. A unique registration code must be requested from each computer. A separate license should be purchased for each user that will use the tools.
-Notify Users
-You can immediately notify users that they can install and activate the software.
-Each user license request will be counted toward the total number purchased for the company on a first come, first served basis. If you would like to submit a list of authorized users via email to control who can request activations, that can be accommodated as well.
-Click Activate
-Your user(s) can immediately install the tools and click the Licensing/Activation button on the RF Tools ribbon in Revit to generate and send in an individual activation request code via email to get back a machine-specific registration key. As long as the user email address domain matches the purchasing company email address domain, the activation will be attributed to the purchase.
+
+- Purchase
+    - Purchase the quantity of licenses needed for your team.
+    - All licenses purchased are attributed to the company email domain name (unless using a personal email).
+    - Each single user license authorizes you to register two computers for the same user. A unique registration code must be requested from each computer. A separate license should be purchased for each user that will use the tools.
+- Notify Users
+    - You can immediately notify users that they can install and activate the software.
+    - Each user license request will be counted toward the total number purchased for the company on a first come, first served basis. If you would like to submit a list of authorized users via email to control who can request activations, that can be accommodated as well.
+- Click Activate
+    - Your user(s) can immediately install the tools and click the Licensing/Activation button on the RF Tools ribbon in Revit to generate and send in an individual activation request code via email to get back a machine-specific registration key. As long as the user email address domain matches the purchasing company email address domain, the activation will be attributed to the purchase.
+
 Enterprise Site License:
-Description
-Install the tools on an unlimited number of computers on a network. A single network license key code can be used to activate any number of computers in any number of offices around the world that share a common network domain name. This license code can be deployed as a windows registry key to all users as well. Site license also includes authorization to request individual activation codes for up to 20 non-network connected computers such as personal laptops or home computers. Previously purchased single-user licenses can be applied toward the purchase of an Enterprise Site License of the same version.
-To receive the Network License Key:
-Have one of your users click the 'Licensing/Activation' button on the RF Tools tab in Revit (after they have installed the tools). Click the Enterprise Site License button to request your Network License Key. This will prepare an email with the name of the domain to be registered. Once verified, you will receive a reply with a license key that will work for all computers connected to the same domain name.
+
+- Install the tools on an unlimited number of computers on a network. A single network license key code can be used to activate any number of computers in any number of offices around the world that share a common network domain name. This license code can be deployed as a windows registry key to all users as well. Site license also includes authorization to request individual activation codes for up to 20 non-network connected computers such as personal laptops or home computers. Previously purchased single-user licenses can be applied toward the purchase of an Enterprise Site License of the same version.
+- To receive the Network License Key: Have one of your users click the 'Licensing/Activation' button on the RF Tools tab in Revit (after they have installed the tools). Click the Enterprise Site License button to request your Network License Key. This will prepare an email with the name of the domain to be registered. Once verified, you will receive a reply with a license key that will work for all computers connected to the same domain name.
 
 Many thanks to all of you for sharing this.
