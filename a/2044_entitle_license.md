@@ -47,7 +47,7 @@ Today we highlight two illuminating posts from
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) on
 licensing and the entitlement API:
 
-####<a name="2"></a>
+####<a name="2"></a> Entitlement API for Revit 2020-2025
 
 Julian Wandzilak of [W7k](https://w7k.pl/) shared
 his [Entitlement Revit API update](https://forums.autodesk.com/t5/revit-api-forum/entitlement-revit-api-my-update/td-p/12761235):
@@ -60,45 +60,52 @@ his [Entitlement Revit API update](https://forums.autodesk.com/t5/revit-api-foru
 
 <pre><code class="language-cs">public static bool CheckOnline( string appId, string userId )
 {
-    Uri uri = new Uri($"https://apps.exchange.autodesk.com/webservices/checkentitlement/?userid={userId}&appid={appId}");
-    bool isValid = false;
+  Uri uri = new Uri( $"https://apps.exchange.autodesk.com/webservices/checkentitlement/?userid={userId}&appid={appId}" );
 
-    try
-    {
-        HttpClient myHttpClient = new HttpClient();
+  bool isValid = false;
 
-        Task&lt;HttpResponseMessage&gt; task = Task.Run(() =&gt; myHttpClient.GetAsync(uri));
-        task.Wait();
-        HttpResponseMessage response = task.Result;
+  try
+  {
+    HttpClient myHttpClient = new HttpClient();
 
-        Task&lt;string&gt; readTask = response.Content.ReadAsStringAsync();
-        string text = readTask.Result;
+    Task&lt;HttpResponseMessage&gt; task
+      = Task.Run(() =&gt; myHttpClient.GetAsync(uri));
 
-        EntitlementResponse entitlementResponse = JsonConvert.DeserializeObject&lt;EntitlementResponse&gt;(text);
+    task.Wait();
+    HttpResponseMessage response = task.Result;
 
-        isValid = entitlementResponse.IsValid;
-    }
-    catch
-    {
-        return false;
-    }
+    Task&lt;string&gt; readTask = response.Content.ReadAsStringAsync();
+    string text = readTask.Result;
 
-    return isValid;
+    EntitlementResponse entitlementResponse
+      = JsonConvert.DeserializeObject&lt;EntitlementResponse&gt;(text);
+
+    isValid = entitlementResponse.IsValid;
+  }
+  catch
+  {
+    return false;
+  }
+  return isValid;
 }
 
 [Serializable]
 public class EntitlementResponse
 {
-    public string UserId { get; set; }
-    public string AppId { get; set; }
-    public bool IsValid { get; set; }
-    public string Message { get; set; }
+  public string UserId { get; set; }
+  public string AppId { get; set; }
+  public bool IsValid { get; set; }
+  public string Message { get; set; }
 }
+</code></pre>
 
-Here is the code. I hope it might be useful to someone. Works for me in 2020 - 2025
-blog: w7k.pl more about me: Linkedin Profile
-My add-ins for Revit: Drafter(180+ scripts) & Leveler
+Here is the code.
+I hope it might be useful to someone.
+Works for me in all versions from Revit 2020 through Revit 2025.
 
+Many thanks to Julian for sharing this.
+
+####<a name="3"></a>
 
 <center>
 <img src="img/.jpg" alt="" title="" width="100"/>
