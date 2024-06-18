@@ -180,53 +180,9 @@ Sadly, this is where the things become problematic. (it is not a legal advice bu
 You are in Europe, so there are two ways of adding VAT:
 To companies &ndash; inverted 0% &ndash; you need their VAT ID, and they need to pay VAT in their own country later &ndash; great as it is neutral for them,
 To customers &ndash; according to your local regulations (23% in Poland) up to some amount and above there is EU system to pay it in each separate country according to its regulations.
-Similar situation is if you sell outside of EU, but it becomes more problematic as you need to check the situation in each country
-So why I said that Autodesk probably breaks the laws here? As an online market they should collect all this information for you and help with adding a correct VAT & Sales tax &ndash; In some countries they can be even the ones who should pay it in your name.
+Similar situation is if you sell outside of EU, but it becomes more problematic as you need to check the situation in each country.
+So, why I said that Autodesk probably breaks the laws here? As an online market they should collect all this information for you and help with adding a correct VAT & Sales tax &ndash; In some countries they can be even the ones who should pay it in your name.
 Sadly, right now, the only thing I get after transaction is PayPal account name + email address of PayPal account + Revit email address. So, I am sending an email asking about other information which is a stupid waste of time.
-
-
-Tags (0)
-Add tags
-Report
-MESSAGE 5 OF 20
-Julian.Wandzilak
-  Enthusiast Julian.Wandzilak  in reply to: gerhard.pawlat
-‎2024-03-23 06:39 AM
-
-The response is long, so I decided to split it by topics:
-
-My tools:
-Thanks. It is my way of making the AEC industry slightly less stupid. Or at least less confident about wasting peoples time
-It is hard to say. It started as my side project (plus a way of learning c#) and then I decided to make a product out of it. I started Drafter a year ago but was not working constantly on it. I am working on my plugins when I don’t have anything to do in my freelancing schedule or I need something to work faster &ndash; so it’s hard to say how much time it took. Plus, right now, I am in the process of publishing the third one
-Probably making documentation and all the icons was the worst So I am super happy that you like it!
-
-Autodesk App Store Code:
-For “entitlement” the code you need is available from the AEC DevBlog
-at [Entitlement API for Revit Exchange Store Apps](https://adndevblog.typepad.com/aec/2015/04/entitlement-api-for-revit-exchange-store-apps.html).
-In a nutshell, it is connecting with Autodesk AppStore and gives you back information about a licence from there.
-On top of that, I decided that my tools create a local licence file (Documents folder &ndash; not a tool folder, as it messes up uninstaller).
-So, each time you run the tool, it can check the licence without having to connect to the server.
-I would share the code, but first it needs some refactoring.
-
-Named users:
-I believe that nowadays you can’t use Revit without named users, but I might be wrong about it.
-Looking for an Autodesk licence? We’re retiring licences based on serial numbers and assigning each subscription to a named user. These new plans provide a range of capabilities for organizations of every size.
-Maintenance plans will retire on May 7, 2021 and multi-user subscriptions will retire on August 7, 2022. If you are still on a maintenance plan or multi-user subscription, choose a trade-in offer
-(from [Autodesk subscription plans](https://www.autodesk.com/licensing/overview)).
-
-Creating New Autodesk Account:
-I was thinking about it too. In the end I decided to make my tools as good as possible for someone who bought them &ndash; I can imagine situation when someone is leaving the office and new person must use their old computer.
-It is dot net, dll and it heavily uses API, so there are the worst things people can do to them pretty easily . Frankly speaking, I am making some videos this weekend where I will show how to code some of my scripts.
-That’s why I added 30-day trial &ndash; it gives me time to assign proper licences to the people working in the offices which bought the tools from me. I see some free riders who use them without buying them on some weird emails ($14 seriously ) but previously they were wasting my time asking for free licences to be able to show the tool in their offices &ndash; coincidentally they always want only a one licence just for them.
-
-Autodesk App Store Payment:
-Sadly, this is where the things become problematic. (it is not a legal advice but as I see it) Autodesk App Store allows us to make payments via PayPal, but it is a very old way of making payments. So, let’s start with some tax information:
-You are in Europe, so there are two ways of adding VAT:
-To companies &ndash; inverted 0% &ndash; you need their VAT ID, and they need to pay VAT in their own country later &ndash; great as it is neutral for them,
-To customers &ndash; according to your local regulations (23% in Poland) up to some amount and above there is EU system to pay it in each separate country according to its regulations.
-Similar situation is if you sell outside of EU, but it becomes more problematic as you need to check the situation in each country
-So why I said that Autodesk probably breaks the laws here? As an online market they should collect all this information for you and help with adding a correct VAT & Sales tax &ndash; In some countries they can be even the ones who should pay it in your name.
-Sadly, right now, the only thing I get after transaction is PayPal account name + email address of PayPal account + Revit email address. So, I am sending an email asking about other information, which is a stupid waste of time.
 
 I already raised some of the issues with the Autodesk AppStore Team in January and got some promising info:
 
@@ -284,7 +240,7 @@ I have worked in a company with 100 Revit users where logging in to an Autodesk 
 But if you had no connection to the company server you got this message:
 
 <center>
-<img src="img/flexnet_license.png" alt="Flexnet license" title="Flexnet license" width="496"/> <!-- Pixel Height: 430 Pixel Width: 496 -->
+<img src="img/flexnet_license_1.png" alt="Flexnet license" title="Flexnet license" width="496"/> <!-- Pixel Height: 430 Pixel Width: 496 -->
 </center>
 
 **Answer:**
@@ -301,7 +257,12 @@ How the Autodesk app store works (if you use entitlement class provided by Autod
 a) On PayPal &ndash; the process is automated with problems mentioned above. Customers are redirected to PayPal, pay there, and then the system brings them back to the page informing the Autodesk App Store about the successful transaction.
 b) You have a possibility to simply add new users:
 this is how it looks for my Drafter. Autodesk doesn't care why you are adding these and what are you doing with them &ndash; You can add or delete them however you like (they are marked below as Published Added):
-autodeskAppStore.jpg
+
+
+<center>
+<img src="img/autodesk_appstore.jpg" alt="Autodesk AppStore" title="Autodesk AppStore" width="600"/> <!-- Pixel Height: 579 Pixel Width: 1,000 -->
+</center>
+
 So far I hit 2 problems with it.
 A) people need to log into the market.
 B) they need to agree to the market rules &ndash; to do it they need to download something 😉 really 😉  It is another reasons why I made trial for Drafter &ndash; before I had to tell people to download randomly something free.
