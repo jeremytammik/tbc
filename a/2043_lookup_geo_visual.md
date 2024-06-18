@@ -16,20 +16,19 @@
 
 <!---
 
-https://www.linkedin.com/feed/update/urn:li:activity:7206337441664749569?utm_source=share&utm_medium=member_desktop
-Roman Karpovich
-Revit Geometry Visualization
-Introducing the new Geometry Visualization feature in RevitLookup! Now you can visualize various geometry objects directly within the interface. Enhance your BIM workflow with this powerful tool!
+- revitlookup
+  https://www.linkedin.com/feed/update/urn:li:activity:7206337441664749569?utm_source=share&utm_medium=member_desktop
+  Roman Karpovich
+  Revit Geometry Visualization
+  Introducing the new Geometry Visualization feature in RevitLookup! Now you can visualize various geometry objects directly within the interface. Enhance your BIM workflow with this powerful tool!
+  https://lnkd.in/dgZk9q7T
 
-https://lnkd.in/dgZk9q7T
-
-hashtag#Revit hashtag#BIM hashtag#Geometry hashtag#AEC
-Activate to view larger image,
-Image preview
-Activate to view larger image,
-likelovecelebrate
-208
-
+- revitlookup
+  2025.0.5
+  2025.0.6
+  2025.0.7
+  Visualization setting: Solid scale feature #251
+  https://github.com/jeremytammik/RevitLookup/issues/251#issuecomment-2159217724
 
 twitter:
 
@@ -40,6 +39,12 @@ New RevitLookup BIM element geometry visualization, and 1000 GitHub stars
 &ndash; Wiki...
 
 linkedin:
+
+RevitLookup earns 1000 GitHub stars and implementes BIM element geometry visualization and Wiki for the #RevitAPI
+
+https://autode.sk/lookupgeometry
+
+- Versions 2025.0.5, 2025.0.6 and 2025.0.7
 
 #BIM #DynamoBIM #AutodeskAPS #Revit #API #IFC #SDK #Autodesk #AEC #adsk
 
