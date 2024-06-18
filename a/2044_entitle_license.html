@@ -40,7 +40,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-<h3>RevitLookup Geometry Visualisation</h3>
+<h3>Entitlement API for Revit, Licensing for Add-Ins</h3>
 <p>Today we highlight two illuminating posts from
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> on
 licensing and the entitlement API:</p>
@@ -56,8 +56,9 @@ his <a href="https://forums.autodesk.com/t5/revit-api-forum/entitlement-revit-ap
 Thanks to this forum, everything went rather smoothly.
 Except I had some weird problems with my <code>CheckOnline</code> method based the AEC DevBlog article on
 the <a href="https://adndevblog.typepad.com/aec/2015/04/entitlement-api-for-revit-exchange-store-apps.html">Entitlement API for Revit Exchange Store Apps</a>.</p>
-<p>For some reason in 2025 I had some problems with RestSharp -&gt; while checking the licence during OnApplicationInitialized method, the process was abruptly stopped, weirdly enough, without even throwing errors on me.</p>
-<p>Update helped but as RestSharp change I started having problems with older revit versions. I decided to rewrite it completely, but this time using default HttpClient:</p>
+<p>For some reason in 2025 I had some problems with RestSharp; while checking the licence in the <code>OnApplicationInitialized</code> method, the process was abruptly stopped, weirdly enough, without even throwing errors.</p>
+<p>Update helped, but as RestSharp changed, I started having problems with older Revit versions.
+I decided to rewrite it completely, and this time use the default <code>HttpClient</code>:</p>
 </blockquote>
 <pre><code class="language-cs">public static bool CheckOnline( string appId, string userId )
 {
@@ -102,8 +103,8 @@ public class EntitlementResponse
 
 <p>Here is the code.
 I hope it might be useful to someone.
-Works for me in all versions from Revit 2020 through Revit 2025.</p>
-<p>Many thanks to Julian for sharing this.</p>
+Works for me in all versions from Revit 2020 through Revit 2025.
+Many thanks to Julian for sharing this.</p>
 <h4><a name="3"></a> Add-In Licensing</h4>
 <p>A wealth of ideas and information about how to add licensing to your own add-in is shared by Julian, Luiz Henrique <a href="https://ricaun.com/">@ricaun</a> Cassettari, Barry Newcombe and others in the discussion
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/licencing-plugins-what-revit-subscriptions-have-to-be-considered/m-p/12766353">licencing plugins &ndash; what Revit subscriptions have to be considered?</a></p>
@@ -136,9 +137,9 @@ How long have you been working on that?</p>
 <p>Can you explain a little how it works when licensing with the appstore?
 Do you have to setup anything in the code to make it work? I assume the payment management will all be done by autodesk? I understand the problem with floating licenses and isn´t it also the case that monthly payment is not possible?</p>
 <p>I more and more like the idea of using the Autodesk ID for my purposes. The problem is in some companies the users don´t have Autodesk accounts, the Autodesk Licence works differently there. But I think that in general most Revit users have an Autodesk account and if not they should create one.
-I can check the active licenes for my plugins only once a month or even once a year, so the users are not forced to log in every day. I think this solution would be userfriendly enough?!</p>
-<p>The only way to pypass my licensing system would be to just create a new Autodesk account every month to start a new 30 day trial. I could additinally create a machine identifier from the cpu/mainboard ids to check if someone is using 30 day trials repeatedly....</p>
-<p>I can also implement floating licenses. Only disadvantage my self built solution has is that i have to manage payment manually by myself.</p>
+I can check the active licenses for my plugins only once a month or even once a year, so the users are not forced to log in every day. I think this solution would be user-friendly enough.</p>
+<p>The only way to bypass my licensing system would be to just create a new Autodesk account every month to start a new 30 day trial. I could additionally create a machine identifier from the cpu/mainboard ids to check if someone is using 30 day trials repeatedly...</p>
+<p>I can also implement floating licenses. Only disadvantage with my self-built solution is that I also have to manage payment manually myself.</p>
 <p><strong>Answer:</strong>
 The response is long, so I decided to split it by topics:</p>
 <p>My tools:
@@ -154,7 +155,7 @@ the <a href="https://adndevblog.typepad.com/aec/2015/04/entitlement-api-for-revi
 I believe that nowadays you can’t use Revit without named users, but I might be wrong about it.
 Looking for an Autodesk licence? We’re retiring licences based on serial numbers and assigning each subscription to a named user. These new plans provide a range of capabilities for organizations of every size.
 Maintenance plans will retire on May 7, 2021 and multi-user subscriptions will retire on August 7, 2022. If you are still on a maintenance plan or multi-user subscription, choose a trade-in offer.
-From https://www.autodesk.com/licensing/overview</p>
+From <a href="https://www.autodesk.com/ca-en/licensing/overview">Autodesk licensing options</a>.</p>
 <p>Creating New Autodesk Account:
 I was thinking about it too. In the end I decided to make my tools as good as possible for someone who bought them &ndash; I can imagine situation when someone is leaving the office and new person must use their old computer.
 It is dot net, dll and it heavily uses API, so there are the worst things people can do to them pretty easily . Frankly speaking, I am making some videos this weekend where I will show how to code some of my scripts.
@@ -185,9 +186,9 @@ Thank you for sharing this insight into your work.
 I think I will then use the Autodesk Appstore just for publishing but not for licencing.
 I´ll also share some code snippets here and for sure will report about my experiences as soon my system is ready.</p>
 <p><strong>Answer 2:</strong>
-The last Autodesk DevCon had some conversation about improving the Autodesk App Store, the roadmap has some items about the App Store: https://aps.autodesk.com/aps-roadmap.</p>
-<p>About the licensing, I created my entitlement API using the Autodesk UserId to identify the user connected inside Revit, without an account connected the plugin does not work.</p>
-<p>I have some plugins in the App Store with Trial or Free, and the payment is done outside the Autodesk App Store on my website using a platform that manages the tax depending on the region the user is buying the license.</p>
+The last Autodesk DevCon included some conversations about improving the Autodesk App Store, and the <a href="https://aps.autodesk.com/aps-roadmap">APS roadmap</a> includes items about the App Store.</p>
+<p>About the licensing, I created my entitlement API using the Autodesk UserId to identify the user connected inside Revit; without an account connected, the plugin does not work.</p>
+<p>I have some plugins in the App Store with Trial or Free, and the payment is done outside the Autodesk App Store on my website using a platform that manages taxes depending on the region where the user is buying the license.</p>
 <p>Is kinda simple to recreate a simple API using the Entitlement API as a reference to validate your plugin/user.</p>
 <pre><code class="language-cs">public class EntitlementResponse
 {
@@ -201,14 +202,17 @@ The last Autodesk DevCon had some conversation about improving the Autodesk App 
 <p>Here is a simple sample command and
 the <a href="https://gist.github.com/ricaun/e86e63c42bd1a5add1f8d08d6fa84aff">AppEntitlement class to work with Autodesk AppStore: Entitlement API</a>.</p>
 <p><strong>Response:</strong>
-So, from you experience you would say users are comfortable with the Autodesk ID check on every Revit startup? Because then I would just do the same and skip implementing an additional mechanism with a local file and just tell the users beeing logged in is necessary.
-And if someone has the patience and would mind to explain, I still don´t get how the appstore works. @ricaun how is it possible that you use the appstore licencing mechanism with an external payment service.
-How does the appstore know if a users has paid and has an active license?</p>
+So, from you experience you would say users are comfortable with the Autodesk ID check on every Revit startup? Because then I would just do the same and skip implementing an additional mechanism with a local file and just tell the users being logged in is necessary.
+If someone has the patience and would like to explain, I still don´t get how the appstore works.
+How is it possible that you use the appstore licencing mechanism with an external payment service?
+How does the appstore know if a user has paid and has an active license?</p>
 <p><strong>Answer:</strong>
-Yes, by default you need to have an account connected to use Revit. The plugin checks if the User is connected, and if that is the case check online to validate the license and create a temp file to enable work offline for some time.</p>
-<p>I don't use the default Autodesk App Store licensing mechanism, because is not flexible. I kinda don't need to have the plugins in App Store, all the payments and licenses are managed by my API system.</p>
+Yes, by default you need to have an account connected to use Revit.
+The plugin checks if the user is connected, and, if that is the case, checks online to validate the license and create a temp file to enable work offline for some time.</p>
+<p>I don't use the default Autodesk App Store licensing mechanism, because is not flexible.
+I kinda don't need to have the plugins in App Store, all the payments and licenses are managed by my API system.</p>
 <p><strong>Response:</strong>
-Thank you for the explananation!
+Thank you for the explanation!
 I now found out how the Autodesk licensing is called that even made me start this thread: Flexnet license.
 I have worked in a company with 100 Revit users where logging in to an Autodesk account was not necessary.
 But if you had no connection to the company server you got this message:</p>
@@ -236,13 +240,14 @@ this is how it looks for my Drafter. Autodesk doesn't care why you are adding th
 </center></p>
 <p>So far I hit 2 problems with it.</p>
 <ul>
-<li>people need to log into the market.</li>
-<li>they need to agree to the market rules &ndash; to do it they need to download something 😉 really 😉  It is another reasons why I made trial for Drafter &ndash; before I had to tell people to download randomly something free.</li>
+<li>People need to log into the market.</li>
+<li>They need to agree to the market rules &ndash; to do it they need to download something, really.
+It is another reason why I made trial for Drafter &ndash; before I had to tell people to download randomly something free.</li>
 <li>Only after that, you will be able to add them a licence.</li>
 <li>After that, they will be able to download your app and install it.</li>
-<li>While starting the app, the correctly implemented entitlement class will try to connect with market server with userId and AppId. In return, you will get an error, true or false &ndash; it is up to you what you want to do with it or how you're going to manage problems. Personally, after checking, I am creating a hashed licence file with result.  Depending on result, I am freezing and blocking the possibility of using my tools. Also, each command will double-check the licence from my files. That is more or less what's going on there.</li>
-<li>Users can normally use the app. If they log out, they will be log-out by Autodesk and the revit will stop working;)</li>
-<li>Each time they start Revit the process will repeat from point 5. You can implement some code to stay offline and so you don't have to check online every time, as it makes Revit starts slowly.</li>
+<li>While starting the app, the correctly implemented entitlement class will try to connect with market server with <code>userId</code> and <code>AppId</code>. In return, you will get an error, true or false &ndash; it is up to you what you want to do with it or how you're going to manage problems. Personally, after checking, I am creating a hashed licence file with result.  Depending on result, I am freezing and blocking the possibility of using my tools. Also, each command will double-check the licence from my files. That is more or less what's going on there.</li>
+<li>Users can normally use the app. If they log out, they will be logged out by Autodesk and Revit will stop working.</li>
+<li>Each time they start Revit, the process will repeat from point 5. You can implement some code to stay offline, so you don't have to check online every time, as it makes Revit start slowly.</li>
 </ul>
 <p><strong>Answer 3:</strong>
 In your case, it does not make sense to add an option to your website, and yes adding the plugin to the App Store is a great way to get exposure, I have some plugins in there as well.</p>
@@ -257,33 +262,33 @@ Could you please try to implement IPN mechanism for your apps to get more inform
 </ul>
 <p>Please feel free to contact us via <a href="appsubmissions@autodesk.com">appsubmissions@autodesk.com</a> for any queries related to App Store.</p>
 <p><strong>Answer:</strong>
-I can confirm that larger organisations use flexnet licencing always. My discipline is structural engineering and have worked for a lot of global engineering firms such as URS, AECOM, Jacobs, Arup (1000s of revit users) and smaller national consultancies (&gt;10 users &lt;100) and all have used flex net licencing. I am develping my own plug ins at the moment and see the single sign on licence as a constraint on sales to these bigger organisations who use flex net. Plus I have worked in secure industries where security and internet access can be limited, again if you need to check your licence every time you log in this would cause issues. Another concern I have with trying to sell to the bigger organisations is that many of them cant purchase software for such a small value as £10 , I found out trying to purchase software from the app store through a global organisation two things:</p>
+I can confirm that larger organisations use flexnet licencing always. My discipline is structural engineering and I have worked for a lot of global engineering firms such as URS, AECOM, Jacobs, Arup (1000s of Revit users) and smaller national consultancies (more than 10 users, less than 100) and all have used flexnet licencing. I am developing my own plugins at the moment and see the single sign on licence as a constraint on sales to these bigger organisations who use flexnet. Plus I have worked in secure industries where security and internet access can be limited, again if you need to check your licence every time you log in this would cause issues. Another concern I have with trying to sell to the bigger organisations is that many of them cant purchase software for such a small value as £10 , I found out trying to purchase software from the app store through a global organisation two things:</p>
 <ul>
-<li>they often have a minimum purchase order value, i.e they cant right a cheque or make a payment for &lt;£200
-and so a local manager was going to purchase the app on his credit card and claim the money back</li>
+<li>They often have a minimum purchase order value, i.e., they cant write a cheque or make a payment for less than £200
+and so a local manager was going to purchase the app on his credit card and claim the money back.</li>
 <li>When the IT dept looked at the App and it didnt have a valid signed security certificate (you know the message that pops up about your app and says 'the publisher of this add in could not be verified') they would not sanction its use on company systems and we could not purchase the app.</li>
 </ul>
-<p>From this I have come to the following strategy,</p>
+<p>From this I have come to the following strategy:</p>
 <ul>
-<li>Sell single sign on version of the app for a reasonable price on the app store say £40, licence controlled by the app store rest call</li>
-<li>sell a multi seat version of the app say 8 seats for £250 on the app store , for big organisations, this app has no security or licence control and licence control is based on the 'trust system' of these large organisations who often employ dedicated software to manage there licences deployed.</li>
+<li>Sell a single sign-on version of the app for a reasonable price on the app store, say £40, licence controlled by the app store REST call.</li>
+<li>Sell a multi-seat version of the app, say 8 seats for £250 on the app store, for big organisations, This app has no security or licence control and licence control is based on the 'trust system' of these large organisations who often employ dedicated software to manage their licences deployed.</li>
 </ul>
-<p>I went through the process of getting a certiport digital security certificate to sign my apps .dll with so as to be able to sell to larger organisations. Once signed the message only pops up once at the start if the plug in is signed.</p>
-<p>These organisations do use certain plug in such as rushforth tools, who sell an enterprise version on there own website, so a licencing system for flexnet can be implemented,  there are  pre-purchased licencing software solutions I have seen which can be purchased off the shelf to do this like QLM(quick licence manager) by soraco but obviously have a cost associted with them.</p>
+<p>I went through the process of getting a certiport digital security certificate to sign my app DLL with so as to be able to sell to larger organisations. Once signed, the message only pops up once at the start, if the plug in is signed.</p>
+<p>These organisations do use certain plug in such as rushforth tools, who sell an enterprise version on their own website, so a licencing system for flexnet can be implemented; there are pre-purchased licencing software solutions I have seen which can be purchased off the shelf to do this like QLM (quick licence manager) by soraco, but obviously have a cost associated with them.</p>
 <p><strong>Response:</strong>
 Autodesk is planning to add some <a href="https://portal.productboard.com/autodeskforge/20-autodesk-platform-services-roadmap/c/202-multi-user-license-management">Multi-user license</a>.
 The question is if using flexnet licencing in a modern Revit is possible to run without a user connected. I don't think that is possible.
-Today I only have a single user license in my plugins, I can swap to another user manually. A floating license is a thing that planing to create, would be really handy to enable a floating license to all the users with the same domain email.</p>
+Today I only have a single user license in my plugins, I can swap to another user manually. A floating license is a thing that I am planning to create, would be really handy to enable a floating license to all the users with the same domain email.</p>
 <p><strong>Answer:</strong>
-Here are snapshots of the flexnet licence; notice there is no user signed in to Autodesk and Revit fully runs, the bottom right photograph is when you have not connected to the server that is hosting the flex net licence.</p>
+Here are snapshots of the flexnet licence; notice there is no user signed in to Autodesk and Revit fully runs, the bottom right photograph is when you have not connected to the server that is hosting the flexnet licence.</p>
 <p><center>
 <img src="img/flexnet_licence_2.jpg" alt="Flexnet license" title="Flexnet license" width="496"/> <!-- Pixel Height: 430 Pixel Width: 496 -->
 </center></p>
-<p>i think the idea of using the domain is the right way to go I think Rushforth tools use this approach. The below text is from the licencing section of Rushforth website, see enterprise licences at the bottom.</p>
+<p>I think the idea of using the domain is the right way to go I think Rushforth tools use this approach. The below text is from the licencing section of Rushforth website, see enterprise licences at the bottom.</p>
 <p>Summary:</p>
 <ul>
 <li>For individual licenses, install and click the activation button to complete an individual activation request. Check your spam folder or send a follow up email if your registration key is not sent within 24 hours of sending your activation request email.</li>
-<li>For Site licenses, all users can input the same key or that process can be automated by deploying a windows registy key.</li>
+<li>For Site licenses, all users can input the same key or that process can be automated by deploying a Windows registry key.</li>
 </ul>
 <p>Installation:</p>
 <ul>
