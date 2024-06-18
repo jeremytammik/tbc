@@ -41,7 +41,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### RevitLookup Geometry Visualisation
+### Entitlement API for Revit, Licensing for Add-Ins
 
 Today we highlight two illuminating posts from
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) on
@@ -52,10 +52,13 @@ licensing and the entitlement API:
 
 ####<a name="2"></a> Multi-Version Revit Entitlement API
 
-Julian Wandzilak of [W7k](https://w7k.pl/) shared
+Julian [W7k](https://w7k.pl/) Wandzilak shared
 his [Entitlement Revit API update](https://forums.autodesk.com/t5/revit-api-forum/entitlement-revit-api-my-update/td-p/12761235):
 
-> I am recently updating all my paid apps to 2025 &ndash; Thanks to this forum, everything goes rather smooth. Except I had some weird problems with my CheckOnline method which was based on provided method here: https://adndevblog.typepad.com/aec/2015/04/entitlement-api-for-revit-exchange-store-apps.html
+> I am recently updating all my paid apps to 2025.
+Thanks to this forum, everything went rather smoothly.
+Except I had some weird problems with my `CheckOnline` method based the AEC DevBlog article on
+the [Entitlement API for Revit Exchange Store Apps](https://adndevblog.typepad.com/aec/2015/04/entitlement-api-for-revit-exchange-store-apps.html).
 
 > For some reason in 2025 I had some problems with RestSharp -> while checking the licence during OnApplicationInitialized method, the process was abruptly stopped, weirdly enough, without even throwing errors on me.
 
@@ -105,7 +108,6 @@ public class EntitlementResponse
 Here is the code.
 I hope it might be useful to someone.
 Works for me in all versions from Revit 2020 through Revit 2025.
-
 Many thanks to Julian for sharing this.
 
 ####<a name="3"></a> Add-In Licensing
@@ -149,7 +151,7 @@ Do you have to setup anything in the code to make it work? I assume the payment 
 I more and more like the idea of using the Autodesk ID for my purposes. The problem is in some companies the users don´t have Autodesk accounts, the Autodesk Licence works differently there. But I think that in general most Revit users have an Autodesk account and if not they should create one.
 I can check the active licenes for my plugins only once a month or even once a year, so the users are not forced to log in every day. I think this solution would be userfriendly enough?!
 
-The only way to pypass my licensing system would be to just create a new Autodesk account every month to start a new 30 day trial. I could additinally create a machine identifier from the cpu/mainboard ids to check if someone is using 30 day trials repeatedly....
+The only way to pypass my licensing system would be to just create a new Autodesk account every month to start a new 30 day trial. I could additinally create a machine identifier from the cpu/mainboard ids to check if someone is using 30 day trials repeatedly...
 
 I can also implement floating licenses. Only disadvantage my self built solution has is that i have to manage payment manually by myself.
 
@@ -161,9 +163,8 @@ Thanks. It is my way of making the AEC industry slightly less stupid. Or at leas
 It is hard to say. It started as my side project (plus a way of learning c#) and then I decided to make a product out of it. I started Drafter a year ago but was not working constantly on it. I am working on my plugins when I don’t have anything to do in my freelancing schedule or I need something to work faster &ndash; so it’s hard to say how much time it took. Plus, right now, I am in the process of publishing the third one
 Probably making documentation and all the icons was the worst So I am super happy that you like it!
 
-Autodesk AppStore Code:
-For “entitlement” the code you need is here:
-https://adndevblog.typepad.com/aec/2015/04/entitlement-api-for-revit-exchange-store-apps.html
+- Autodesk AppStore Code in the AEC DevBlog article on
+the [Entitlement API for Revit Exchange Store Apps](https://adndevblog.typepad.com/aec/2015/04/entitlement-api-for-revit-exchange-store-apps.html)
 
 In a nutshell, it is connecting with Autodesk App Store and gives you back information about a licence from there. On top of that, I decided that my tools create a local licence file (Documents folder &ndash; not a tool folder as it messes up uninstaller). So, each time you run the tool, it can check the licence without having to connect to the server. I would share the code, but first it needs some refactoring.
 
@@ -268,8 +269,8 @@ How the Autodesk app store works (if you use entitlement class provided by Autod
 
 So far I hit 2 problems with it.
 
-- people need to log into the market.
-- they need to agree to the market rules &ndash; to do it they need to download something 😉 really 😉  It is another reasons why I made trial for Drafter &ndash; before I had to tell people to download randomly something free.
+- People need to log into the market.
+- They need to agree to the market rules &ndash; to do it they need to download something 😉 really 😉  It is another reasons why I made trial for Drafter &ndash; before I had to tell people to download randomly something free.
 - Only after that, you will be able to add them a licence.
 - After that, they will be able to download your app and install it.
 - While starting the app, the correctly implemented entitlement class will try to connect with market server with userId and AppId. In return, you will get an error, true or false &ndash; it is up to you what you want to do with it or how you're going to manage problems. Personally, after checking, I am creating a hashed licence file with result.  Depending on result, I am freezing and blocking the possibility of using my tools. Also, each command will double-check the licence from my files. That is more or less what's going on there.
@@ -295,14 +296,14 @@ Please feel free to contact us via [appsubmissions@autodesk.com](appsubmissions@
 **Answer:**
 I can confirm that larger organisations use flexnet licencing always. My discipline is structural engineering and have worked for a lot of global engineering firms such as URS, AECOM, Jacobs, Arup (1000s of revit users) and smaller national consultancies (>10 users <100) and all have used flex net licencing. I am develping my own plug ins at the moment and see the single sign on licence as a constraint on sales to these bigger organisations who use flex net. Plus I have worked in secure industries where security and internet access can be limited, again if you need to check your licence every time you log in this would cause issues. Another concern I have with trying to sell to the bigger organisations is that many of them cant purchase software for such a small value as £10 , I found out trying to purchase software from the app store through a global organisation two things:
 
-- they often have a minimum purchase order value, i.e they cant right a cheque or make a payment for <£200
+- They often have a minimum purchase order value, i.e they cant right a cheque or make a payment for <£200
 and so a local manager was going to purchase the app on his credit card and claim the money back
 - When the IT dept looked at the App and it didnt have a valid signed security certificate (you know the message that pops up about your app and says 'the publisher of this add in could not be verified') they would not sanction its use on company systems and we could not purchase the app.
 
 From this I have come to the following strategy,
 
 - Sell single sign on version of the app for a reasonable price on the app store say £40, licence controlled by the app store rest call
-- sell a multi seat version of the app say 8 seats for £250 on the app store , for big organisations, this app has no security or licence control and licence control is based on the 'trust system' of these large organisations who often employ dedicated software to manage there licences deployed.
+- Sell a multi seat version of the app say 8 seats for £250 on the app store , for big organisations, this app has no security or licence control and licence control is based on the 'trust system' of these large organisations who often employ dedicated software to manage there licences deployed.
 
 I went through the process of getting a certiport digital security certificate to sign my apps .dll with so as to be able to sell to larger organisations. Once signed the message only pops up once at the start if the plug in is signed.
 
@@ -320,7 +321,7 @@ Here are snapshots of the flexnet licence; notice there is no user signed in to 
 <img src="img/flexnet_licence_2.jpg" alt="Flexnet license" title="Flexnet license" width="496"/> <!-- Pixel Height: 430 Pixel Width: 496 -->
 </center>
 
-i think the idea of using the domain is the right way to go I think Rushforth tools use this approach. The below text is from the licencing section of Rushforth website, see enterprise licences at the bottom.
+I think the idea of using the domain is the right way to go I think Rushforth tools use this approach. The below text is from the licencing section of Rushforth website, see enterprise licences at the bottom.
 
 Summary:
 
