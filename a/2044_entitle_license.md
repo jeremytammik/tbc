@@ -47,7 +47,10 @@ Today we highlight two illuminating posts from
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) on
 licensing and the entitlement API:
 
-####<a name="2"></a> Entitlement API for Revit 2020-2025
+- [Multi-version Revit entitlement API](#2)
+- [Add-in licensing](#3)
+
+####<a name="2"></a> Multi-Version Revit Entitlement API
 
 Julian Wandzilak of [W7k](https://w7k.pl/) shared
 his [Entitlement Revit API update](https://forums.autodesk.com/t5/revit-api-forum/entitlement-revit-api-my-update/td-p/12761235):
@@ -105,7 +108,7 @@ Works for me in all versions from Revit 2020 through Revit 2025.
 
 Many thanks to Julian for sharing this.
 
-####<a name="3"></a> Licensing Add-ins
+####<a name="3"></a> Add-In Licensing
 
 A wealth of ideas and information about how to add licensing to your own add-in is shared by Julian, Luiz Henrique [@ricaun](https://ricaun.com/) Cassettari, Barry Newcombe and others in the discussion
 on [licencing plugins &ndash; what Revit subscriptions have to be considered?](https://forums.autodesk.com/t5/revit-api-forum/licencing-plugins-what-revit-subscriptions-have-to-be-considered/m-p/12766353)
