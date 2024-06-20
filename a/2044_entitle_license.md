@@ -248,7 +248,7 @@ I have worked in a company with 100 Revit users where logging in to an Autodesk 
 But if you had no connection to the company server you got this message:
 
 <center>
-<img src="img/flexnet_license_1.png" alt="Flexnet license" title="Flexnet license" width="496"/> <!-- Pixel Height: 430 Pixel Width: 496 -->
+<img src="img/flexnet_license_1.png" alt="Flexnet license" title="Flexnet license" width="300"/> <!-- Pixel Height: 430 Pixel Width: 496 -->
 </center>
 
 **Answer:**
@@ -323,7 +323,7 @@ Today I only have a single user license in my plugins, I can swap to another use
 Here are snapshots of the flexnet licence; notice there is no user signed in to Autodesk and Revit fully runs, the bottom right photograph is when you have not connected to the server that is hosting the flexnet licence.
 
 <center>
-<img src="img/flexnet_licence_2.jpg" alt="Flexnet license" title="Flexnet license" width="496"/> <!-- Pixel Height: 430 Pixel Width: 496 -->
+<img src="img/flexnet_license_2.jpg" alt="Flexnet license" title="Flexnet license" width="496"/> <!-- Pixel Height: 430 Pixel Width: 496 -->
 </center>
 
 I think the idea of using the domain is the right way to go I think Rushforth tools use this approach. The below text is from the licencing section of Rushforth website, see enterprise licences at the bottom.
