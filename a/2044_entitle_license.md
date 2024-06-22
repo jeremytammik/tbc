@@ -24,9 +24,11 @@
 
 twitter:
 
- the @AutodeskRevit #RevitAPI #BIM @DynamoBIM
+Revit API discussions on @AutodeskRevit #RevitAPI add-in licensing and multi-version use of the AppStore Entitlement API #BIM @DynamoBIM https://autode.sk/entitlement
 
-&ndash; ...
+Two illuminating posts from the Revit API discussion forum on licensing and the entitlement API
+&ndash; Multi-version Revit entitlement API
+&ndash; Add-in licensing...
 
 linkedin:
 
