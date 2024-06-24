@@ -32,6 +32,13 @@ Two illuminating posts from the Revit API discussion forum on licensing and the 
 
 linkedin:
 
+Revit API discussions on #RevitAPI add-in licensing and multi-version use of the AppStore Entitlement API:
+
+https://autode.sk/entitlement
+
+- Multi-version Revit entitlement API
+- Add-in licensing...
+
 #BIM #DynamoBIM #AutodeskAPS #Revit #API #IFC #SDK #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
