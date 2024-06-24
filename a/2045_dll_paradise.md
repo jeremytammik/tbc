@@ -19,7 +19,6 @@
 - The difference between Length and ApproximateLength in Curve class
   https://forums.autodesk.com/t5/revit-api-forum/the-difference-between-length-and-approximatelength-in-curve/m-p/12841543/
 
-
 twitter:
 
 Revit API discussions on @AutodeskRevit #RevitAPI add-in licensing and multi-version use of the AppStore Entitlement API #BIM @DynamoBIM https://autode.sk/entitlement
@@ -52,8 +51,12 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 Exciting new RevitLookup release solves Revit add-in DLL hell, and a clarification on the arc length properties provided by curve elements:
 
+- [Curve Length versus ApproximateLength](#2)
+- [RevitLookup dependency isolation ends DLL hell](#3)
+- [Add-in dependencies isolation](#4)
 
-####<a name="2"></a> Length versus ApproximateLength
+
+####<a name="2"></a> Curve Length versus ApproximateLength
 
 Last week, the Revit development team helped to provide a useful clarification
 of [the difference between `Length` and `ApproximateLength` in `Curve` class](https://forums.autodesk.com/t5/revit-api-forum/the-difference-between-length-and-approximatelength-in-curve/m-p/12841543/):
@@ -141,7 +144,7 @@ Element:
 - GetModelUpdatesStatus: Gets the status of a single element in the central model
 - AreElementsValidForCreateParts: Identifies if the given elements can be used to create parts
 
-####<a name="4"></a> Add-in Dependencies Isolation
+####<a name="4"></a> Add-In Dependencies Isolation
 
 The RevitLookup isolated plugin dependency container is built using .NET `AssemblyLoadContext`.
 
