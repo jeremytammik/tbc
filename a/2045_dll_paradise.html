@@ -1,0 +1,154 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css"></p>
+<!-- https://highlightjs.org/#usage
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+-->
+
+<!-- https://prismjs.com -->
+<p><link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css" rel="stylesheet" /></p>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+<style> code[class*=language-], pre[class*=language-] { font-size : 90%; } </style>
+<p></head></p>
+<!---
+
+- The difference between Length and ApproximateLength in Curve class
+  https://forums.autodesk.com/t5/revit-api-forum/the-difference-between-length-and-approximatelength-in-curve/m-p/12841543/
+
+twitter:
+
+Revit API discussions on @AutodeskRevit #RevitAPI add-in licensing and multi-version use of the AppStore Entitlement API #BIM @DynamoBIM https://autode.sk/entitlement
+
+Two illuminating posts from the Revit API discussion forum on licensing and the entitlement API
+&ndash; Multi-version Revit entitlement API
+&ndash; Add-in licensing...
+
+linkedin:
+
+Revit API discussions on #RevitAPI add-in licensing and multi-version use of the AppStore Entitlement API:
+
+https://autode.sk/entitlement
+
+- Multi-version Revit entitlement API
+- Add-in licensing...
+
+#BIM #DynamoBIM #AutodeskAPS #Revit #API #IFC #SDK #Autodesk #AEC #adsk
+
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+
+<center>
+<img src="img/" alt="" title="" width="600"/>
+<p style="font-size: 80%; font-style:italic"></p>
+</center>
+
+-->
+
+<h3>Length Query and RevitLookup DLL Paradise</h3>
+<p>Exciting new RevitLookup release solves Revit add-in DLL hell, and a clarification on the arc length properties provided by curve elements:</p>
+<ul>
+<li><a href="#2">Curve Length versus ApproximateLength</a></li>
+<li><a href="#3">RevitLookup dependency isolation ends DLL hell</a></li>
+<li><a href="#4">Add-in dependencies isolation</a></li>
+</ul>
+<h4><a name="2"></a> Curve Length versus ApproximateLength</h4>
+<p>Last week, the Revit development team helped to provide a useful clarification
+of <a href="https://forums.autodesk.com/t5/revit-api-forum/the-difference-between-length-and-approximatelength-in-curve/m-p/12841543/">the difference between <code>Length</code> and <code>ApproximateLength</code> in <code>Curve</code> class</a>:</p>
+<p><strong>Question:</strong>
+The Curve class provides two properties to get the length of a curve, <code>Length</code> and <code>ApproximateLength</code>.
+What is the difference?</p>
+<p><strong>Answer:</strong>
+For many types of curves, the results will probably be identical.
+Differences probably only occur for complex curves.
+For example, there is no closed-form expression for the arc length of an ellipse.
+One efficient and fruitful way to address this kind of question is to implement a little test suite with benchmarking and try it out for yourself.</p>
+<p>The development team clarify:</p>
+<p>Seems pretty well documented in the remarks for the <code>ApproximateLength</code> property to me.
+ApproximateLength is completely accurate for uniform curves (lines and arcs) but could be off by as much as 2x for non-uniform curves, and so it may be worth checking the curve’s class and deciding which method to call from there, or just using the <code>Length</code> property in all cases, if accuracy is a concern.
+I recommend the latter, as the time savings hasn’t shown to be significant in my work.</p>
+<p><code>ApproximateLength</code> uses a rough approximation that depends on the curve type.
+There's no guarantee that the approximation method will be unchanged in future releases.</p>
+<p><code>Length</code> performs a line integral to compute the curve length, which can be considered exact for all practical purposes.
+Lines and arcs have closed-form expressions for their lengths that are used instead.
+I agree that a user is unlikely to see a noticeable performance difference between the two methods.
+The performance differences are mostly relevant for internal usage, e.g., in graphics functionality.</p>
+<p><center>
+<img src="img/arc_length.png" alt="Arc length" title="Arc length" width="300"/>
+</center></p>
+<h4><a name="3"></a> RevitLookup Dependency Isolation Ends DLL Hell</h4>
+<p>The new <a href="https://github.com/jeremytammik/RevitLookup/releases/tag/2025.0.8">RevitLookup release 2025.0.8</a> runs
+in an isolated container for addin dependencies.</p>
+<p>This new capability prevents conflicts and compatibility issues arising from different library versions between plugins, ensuring a more stable and reliable environment for plugin execution.</p>
+<p>This enhancement uses the <code>Nice3point.Revit.Toolkit</code> to manage the isolation process, effectively eliminating DLL conflicts.
+By integrating this package, RevitLookup ensures a consistent and predictable user experience.</p>
+<p>The detailed description how it works is provided in the release notes
+for <a href="https://github.com/jeremytammik/RevitLookup/releases/tag/2025.0.1">RevitLookup release 2025.0.1</a>
+(<a href="https://thebuildingcoder.typepad.com/blog/2024/04/revitlookup-hotfix-and-the-revit-2025-sdk.html#2">the recent hotfix</a>),
+also reproduced below.</p>
+<p>The dependency isolation is available starting with Revit 2025.
+Note that the isolation mechanism is implemented by an additional library that must be loaded into Revit at first startup for it to work.
+Therefore, if your other plugins use <code>Nice3point.Revit.Toolkit</code>, it must be updated to version <code>2025.0.1</code>, which introduces this feature.</p>
+<p>RevitLookup 2025.0.8 addresses the following issues:</p>
+<ul>
+<li>
+<p>Dependency conflicts <a href="https://github.com/jeremytammik/RevitLookup/issues/210">latest release won't run #210</a> and
+  <a href="https://github.com/jeremytammik/RevitLookup/issues/252">I get an error #252</a></p>
+</li>
+<li>
+<p><a href="https://github.com/jeremytammik/RevitLookup/issues/254">Request for adding <code>WorksharingTooltipInfo</code> properties #254</a></p>
+</li>
+<li>A discussion of the <code>AssemblyLoadContext</code> used to implement the dependency isolation,
+  <a href="https://github.com/jeremytammik/RevitLookup/issues/246">Build Automation Version is breaking Revit 2025 #246</a></li>
+</ul>
+<p>As further improvements, the following type extensions are added
+for the <a href="https://github.com/jeremytammik/RevitLookup/pull/255"><code>Part</code> class, associated classes #255</a>
+and <a href="https://github.com/jeremytammik/RevitLookup/pull/257"><code>WorksharingUtils</code> #257</a>:</p>
+<p>Part:</p>
+<ul>
+<li>IsMergedPart: Is the Part the result of a merge.</li>
+<li>IsPartDerivedFromLink: Is the Part derived from link geometry</li>
+<li>GetChainLengthToOriginal: Calculates the length of the longest chain of divisions/ merges to reach to an original non-Part element that is the source of the tested part</li>
+<li>GetMergedParts: Retrieves the element ids of the source elements of a merged part</li>
+<li>ArePartsValidForDivide: Identifies if provided members are valid for dividing parts</li>
+<li>FindMergeableClusters: Segregates a set of elements into subsets which are valid for merge</li>
+<li>ArePartsValidForMerge: Identifies whether Part elements may be merged</li>
+<li>GetAssociatedPartMaker: Gets associated PartMaker for an element</li>
+<li>GetSplittingCurves: Identifies the curves that were used to create the part</li>
+<li>GetSplittingElements: Identifies the elements ( reference planes, levels, grids ) that were used to create the part</li>
+<li>HasAssociatedParts: Checks if an element has associated parts</li>
+</ul>
+<p>PartMaker:
+- GetPartMakerMethodToDivideVolumeFW: Obtains the object allowing access to the divided volume properties of the PartMaker</p>
+<p>Element:
+- GetCheckoutStatus: Gets the ownership status of an element
+- GetWorksharingTooltipInfo: Gets worksharing information about an element to display in an in-canvas tooltip
+- GetModelUpdatesStatus: Gets the status of a single element in the central model
+- AreElementsValidForCreateParts: Identifies if the given elements can be used to create parts</p>
+<h4><a name="4"></a> Add-In Dependencies Isolation</h4>
+<p>The RevitLookup isolated plugin dependency container is built using .NET <code>AssemblyLoadContext</code>.</p>
+<p>This feature enables plugins to run in a separate, isolated context, ensuring independent execution and preventing conflicts from incompatible library versions.</p>
+<p>This enhancement is available for Revit 2025 and higher, addressing the limitations of Revit's traditional plugin loading mechanism, which loads plugins by path without native support for isolation.</p>
+<p>How it works:</p>
+<p>The core functionality centres on <code>AssemblyLoadContext</code>, which creates an isolated container for each plugin.</p>
+<p>When a plugin is loaded, it is assigned a unique <code>AssemblyLoadContext</code> instance, encapsulating the plugin and its dependencies to prevent interference with other plugins or the main application.</p>
+<p>To use this isolation feature, developers must inherit their classes from:</p>
+<ul>
+<li>ExternalCommand</li>
+<li>ExternalApplication</li>
+<li>ExternalDbApplication</li>
+<li>ExternalCommandAvailability</li>
+</ul>
+<p>These classes contain the built-in isolation mechanism under the hood.
+Plugins using interfaces such as <code>IExternalCommand</code> will not benefit from this isolation and will run in the default context.</p>
+<p>Limitations:</p>
+<ul>
+<li>The isolated plugin context feature is available starting with Revit 2025.</li>
+<li>For older Revit versions, this library uses a ResolveHelper to help load dependencies from the plugin's folder, but does not protect against conflicts arising from incompatible packages.</li>
+<li>Additionally, plugins that do not inherit from the specified classes will not be isolated and may experience compatibility issues if they rely on the default context.</li>
+</ul>
+<p>For further details, please refer to the discussion between ricaun and Nice3point
+on <a href="https://github.com/jeremytammik/RevitLookup/issues/246">build automation version breaking Revit 2025 #246</a></p>
+<p>They recommend that Autodesk and Revit adopt similar functionality and include it in the basic Revit API add-in handling architecture, so that all add-in dependencies are automatically isolated and DLL hell conflicts never occur.</p>
+<p>Many thanks to both of you for thoroughly implementing, testing, discussing and documenting this feature!</p>

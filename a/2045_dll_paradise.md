@@ -83,7 +83,7 @@ There's no guarantee that the approximation method will be unchanged in future r
 `Length` performs a line integral to compute the curve length, which can be considered exact for all practical purposes.
 Lines and arcs have closed-form expressions for their lengths that are used instead.
 I agree that a user is unlikely to see a noticeable performance difference between the two methods.
-The performance differences are mostly relevant for internal usage, e.g, in graphics functionality.
+The performance differences are mostly relevant for internal usage, e.g., in graphics functionality.
 
 <center>
 <img src="img/arc_length.png" alt="Arc length" title="Arc length" width="300"/>
@@ -99,7 +99,7 @@ This new capability prevents conflicts and compatibility issues arising from dif
 This enhancement uses the `Nice3point.Revit.Toolkit` to manage the isolation process, effectively eliminating DLL conflicts.
 By integrating this package, RevitLookup ensures a consistent and predictable user experience.
 
-The detailed detailed description how it works is provided in the release notes
+The detailed description how it works is provided in the release notes
 for [RevitLookup release 2025.0.1](https://github.com/jeremytammik/RevitLookup/releases/tag/2025.0.1)
 ([the recent hotfix](https://thebuildingcoder.typepad.com/blog/2024/04/revitlookup-hotfix-and-the-revit-2025-sdk.html#2)),
 also reproduced below.
@@ -114,10 +114,10 @@ RevitLookup 2025.0.8 addresses the following issues:
   [I get an error #252](https://github.com/jeremytammik/RevitLookup/issues/252)
 
 - [Request for adding `WorksharingTooltipInfo` properties #254](https://github.com/jeremytammik/RevitLookup/issues/254)
-- A discussion of the `AssemblyLoadContext` used to implement the dependnecy isolation,
+- A discussion of the `AssemblyLoadContext` used to implement the dependency isolation,
   [Build Automation Version is breaking Revit 2025 #246](https://github.com/jeremytammik/RevitLookup/issues/246)
 
-As further improvements, the follwowing type extensions are added
+As further improvements, the following type extensions are added
 for the [`Part` class, associated classes #255](https://github.com/jeremytammik/RevitLookup/pull/255)
 and [`WorksharingUtils` #257](https://github.com/jeremytammik/RevitLookup/pull/257):
 
@@ -154,7 +154,7 @@ This enhancement is available for Revit 2025 and higher, addressing the limitati
 
 How it works:
 
-The core functionality centers on `AssemblyLoadContext`, which creates an isolated container for each plugin.
+The core functionality centres on `AssemblyLoadContext`, which creates an isolated container for each plugin.
 
 When a plugin is loaded, it is assigned a unique `AssemblyLoadContext` instance, encapsulating the plugin and its dependencies to prevent interference with other plugins or the main application.
 
@@ -177,7 +177,7 @@ Limitations:
 For further details, please refer to the discussion between ricaun and Nice3point
 on [build automation version breaking Revit 2025 #246](https://github.com/jeremytammik/RevitLookup/issues/246)
 
-They streongky recommend that Autodesk and Revit should adopt similar functionality and include it in the basic Revit API add-in handling architecture, so that all add-in dependencies are automatically isolated and DLL hell conflicts never occur.
+They recommend that Autodesk and Revit adopt similar functionality and include it in the basic Revit API add-in handling architecture, so that all add-in dependencies are automatically isolated and DLL hell conflicts never occur.
 
 Many thanks to both of you for thoroughly implementing, testing, discussing and documenting this feature!
 
