@@ -183,17 +183,12 @@ on [build automation version breaking Revit 2025 #246](https://github.com/jeremy
 
 They recommend that Autodesk and Revit adopt similar functionality and include it in the basic Revit API add-in handling architecture, so that all add-in dependencies are automatically isolated and DLL hell conflicts never occur.
 
-Many thanks to both of you for thoroughly implementing, testing, discussing and documenting this feature!
+ricaun recorded a nine-minute video
+on [RevitLookup - End of DLL hell - Revit API](https://youtu.be/cpy4J_6-8WY) explaining
+and demonstrating exactly how RevitLookup for Revit 2025 can herald the end of DLL hell:
 
+<center>
+<iframe width="480" height="270" src="https://www.youtube.com/embed/cpy4J_6-8WY?si=05tXP34MEFOGqFGB" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+</center>
 
-
-
-RevitLookup - End of DLL hell - Revit API
-
-How the End of DLL hell works in the RevitLookup for Revit 2025.
-https://github.com/jeremytammik/RevitLookup/releases/tag/2025.0.8
-
-
-A bit of a wrong link. It should be: https://github.com/Nice3point/RevitToolkit/releases/tag/2025.0.1
-This mention has nothing to do with the RevitLookup 2025.0.1 release
-
+Many thanks to both of you for your thorough implementation, testing, discussion and documentation!
