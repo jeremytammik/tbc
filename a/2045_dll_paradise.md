@@ -100,9 +100,10 @@ This enhancement uses the `Nice3point.Revit.Toolkit` to manage the isolation pro
 By integrating this package, RevitLookup ensures a consistent and predictable user experience.
 
 The detailed description how it works is provided in the release notes
-for [RevitLookup release 2025.0.1](https://github.com/jeremytammik/RevitLookup/releases/tag/2025.0.1)
-([the recent hotfix](https://thebuildingcoder.typepad.com/blog/2024/04/revitlookup-hotfix-and-the-revit-2025-sdk.html#2)),
+for [RevitToolkit release 2025.0.1](https://github.com/Nice3point/RevitToolkit/releases/tag/2025.0.1),
 also reproduced below.
+Please note that this is unrelated
+to [the recent RevitLookup hotfix 2025.0.1](https://thebuildingcoder.typepad.com/blog/2024/04/revitlookup-hotfix-and-the-revit-2025-sdk.html#2).
 
 The dependency isolation is available starting with Revit 2025.
 Note that the isolation mechanism is implemented by an additional library that must be loaded into Revit at first startup for it to work.
@@ -180,4 +181,16 @@ on [build automation version breaking Revit 2025 #246](https://github.com/jeremy
 They recommend that Autodesk and Revit adopt similar functionality and include it in the basic Revit API add-in handling architecture, so that all add-in dependencies are automatically isolated and DLL hell conflicts never occur.
 
 Many thanks to both of you for thoroughly implementing, testing, discussing and documenting this feature!
+
+
+
+
+RevitLookup - End of DLL hell - Revit API
+
+How the End of DLL hell works in the RevitLookup for Revit 2025.
+https://github.com/jeremytammik/RevitLookup/releases/tag/2025.0.8
+
+
+A bit of a wrong link. It should be: https://github.com/Nice3point/RevitToolkit/releases/tag/2025.0.1
+This mention has nothing to do with the RevitLookup 2025.0.1 release
 
