@@ -101,9 +101,12 @@ By integrating this package, RevitLookup ensures a consistent and predictable us
 
 The detailed description how it works is provided in the release notes
 for [RevitToolkit release 2025.0.1](https://github.com/Nice3point/RevitToolkit/releases/tag/2025.0.1),
-also reproduced below.
+also reproduced [below](#4).
+
+<!--
 Please note that this is unrelated
 to [the recent RevitLookup hotfix 2025.0.1](https://thebuildingcoder.typepad.com/blog/2024/04/revitlookup-hotfix-and-the-revit-2025-sdk.html#2).
+-->
 
 The dependency isolation is available starting with Revit 2025.
 Note that the isolation mechanism is implemented by an additional library that must be loaded into Revit at first startup for it to work.
