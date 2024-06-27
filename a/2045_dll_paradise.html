@@ -20,11 +20,13 @@
 
 twitter:
 
-Revit API discussions on @AutodeskRevit #RevitAPI add-in licensing and multi-version use of the AppStore Entitlement API #BIM @DynamoBIM https://autode.sk/entitlement
 
-Two illuminating posts from the Revit API discussion forum on licensing and the entitlement API
-&ndash; Multi-version Revit entitlement API
-&ndash; Add-in licensing...
+ @AutodeskRevit #RevitAPI #BIM @DynamoBIM
+
+New RevitLookup solves Revit add-in DLL hell, and a clarification on the arc length properties provided by curve elements
+&ndash; Curve Length versus ApproximateLength
+&ndash; RevitLookup dependency isolation ends DLL hell
+&ndash; Add-in dependencies isolation...
 
 linkedin:
 
@@ -46,7 +48,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-<h3>Length Query and RevitLookup DLL Paradise</h3>
+<h3>Length Query and RevitLookup Heralds DLL Paradise</h3>
 <p>Exciting new RevitLookup release solves Revit add-in DLL hell, and a clarification on the arc length properties provided by curve elements:</p>
 <ul>
 <li><a href="#2">Curve Length versus ApproximateLength</a></li>
@@ -84,21 +86,21 @@ in an isolated container for addin dependencies.</p>
 <p>This enhancement uses the <code>Nice3point.Revit.Toolkit</code> to manage the isolation process, effectively eliminating DLL conflicts.
 By integrating this package, RevitLookup ensures a consistent and predictable user experience.</p>
 <p>The detailed description how it works is provided in the release notes
-for <a href="https://github.com/jeremytammik/RevitLookup/releases/tag/2025.0.1">RevitLookup release 2025.0.1</a>
-(<a href="https://thebuildingcoder.typepad.com/blog/2024/04/revitlookup-hotfix-and-the-revit-2025-sdk.html#2">the recent hotfix</a>),
-also reproduced below.</p>
+for <a href="https://github.com/Nice3point/RevitToolkit/releases/tag/2025.0.1">RevitToolkit release 2025.0.1</a>,
+also reproduced <a href="#4">below</a>.</p>
+<!--
+Please note that this is unrelated
+to [the recent RevitLookup hotfix 2025.0.1](https://thebuildingcoder.typepad.com/blog/2024/04/revitlookup-hotfix-and-the-revit-2025-sdk.html#2).
+-->
+
 <p>The dependency isolation is available starting with Revit 2025.
 Note that the isolation mechanism is implemented by an additional library that must be loaded into Revit at first startup for it to work.
 Therefore, if your other plugins use <code>Nice3point.Revit.Toolkit</code>, it must be updated to version <code>2025.0.1</code>, which introduces this feature.</p>
 <p>RevitLookup 2025.0.8 addresses the following issues:</p>
 <ul>
-<li>
-<p>Dependency conflicts <a href="https://github.com/jeremytammik/RevitLookup/issues/210">latest release won't run #210</a> and
-  <a href="https://github.com/jeremytammik/RevitLookup/issues/252">I get an error #252</a></p>
-</li>
-<li>
-<p><a href="https://github.com/jeremytammik/RevitLookup/issues/254">Request for adding <code>WorksharingTooltipInfo</code> properties #254</a></p>
-</li>
+<li>Dependency conflicts <a href="https://github.com/jeremytammik/RevitLookup/issues/210">latest release won't run #210</a> and
+  <a href="https://github.com/jeremytammik/RevitLookup/issues/252">I get an error #252</a></li>
+<li><a href="https://github.com/jeremytammik/RevitLookup/issues/254">Request for adding <code>WorksharingTooltipInfo</code> properties #254</a></li>
 <li>A discussion of the <code>AssemblyLoadContext</code> used to implement the dependency isolation,
   <a href="https://github.com/jeremytammik/RevitLookup/issues/246">Build Automation Version is breaking Revit 2025 #246</a></li>
 </ul>
@@ -151,4 +153,10 @@ Plugins using interfaces such as <code>IExternalCommand</code> will not benefit 
 <p>For further details, please refer to the discussion between ricaun and Nice3point
 on <a href="https://github.com/jeremytammik/RevitLookup/issues/246">build automation version breaking Revit 2025 #246</a></p>
 <p>They recommend that Autodesk and Revit adopt similar functionality and include it in the basic Revit API add-in handling architecture, so that all add-in dependencies are automatically isolated and DLL hell conflicts never occur.</p>
-<p>Many thanks to both of you for thoroughly implementing, testing, discussing and documenting this feature!</p>
+<p>ricaun recorded a nine-minute video
+on <a href="https://youtu.be/cpy4J_6-8WY">RevitLookup - End of DLL hell - Revit API</a> explaining
+and demonstrating exactly how RevitLookup for Revit 2025 can herald the end of DLL hell:</p>
+<p><center></p>
+<iframe width="480" height="270" src="https://www.youtube.com/embed/cpy4J_6-8WY?si=05tXP34MEFOGqFGB" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+<p></center></p>
+<p>Many thanks to both of you for your thorough implementation, testing, discussion and documentation!</p>

@@ -21,11 +21,13 @@
 
 twitter:
 
-Revit API discussions on @AutodeskRevit #RevitAPI add-in licensing and multi-version use of the AppStore Entitlement API #BIM @DynamoBIM https://autode.sk/entitlement
 
-Two illuminating posts from the Revit API discussion forum on licensing and the entitlement API
-&ndash; Multi-version Revit entitlement API
-&ndash; Add-in licensing...
+ @AutodeskRevit #RevitAPI #BIM @DynamoBIM
+
+New RevitLookup solves Revit add-in DLL hell, and a clarification on the arc length properties provided by curve elements
+&ndash; Curve Length versus ApproximateLength
+&ndash; RevitLookup dependency isolation ends DLL hell
+&ndash; Add-in dependencies isolation...
 
 linkedin:
 
@@ -47,14 +49,13 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Length Query and RevitLookup DLL Paradise
+### Length Query and RevitLookup Heralds DLL Paradise
 
 Exciting new RevitLookup release solves Revit add-in DLL hell, and a clarification on the arc length properties provided by curve elements:
 
 - [Curve Length versus ApproximateLength](#2)
 - [RevitLookup dependency isolation ends DLL hell](#3)
 - [Add-in dependencies isolation](#4)
-
 
 ####<a name="2"></a> Curve Length versus ApproximateLength
 
@@ -116,7 +117,6 @@ RevitLookup 2025.0.8 addresses the following issues:
 
 - Dependency conflicts [latest release won't run #210](https://github.com/jeremytammik/RevitLookup/issues/210) and
   [I get an error #252](https://github.com/jeremytammik/RevitLookup/issues/252)
-
 - [Request for adding `WorksharingTooltipInfo` properties #254](https://github.com/jeremytammik/RevitLookup/issues/254)
 - A discussion of the `AssemblyLoadContext` used to implement the dependency isolation,
   [Build Automation Version is breaking Revit 2025 #246](https://github.com/jeremytammik/RevitLookup/issues/246)
