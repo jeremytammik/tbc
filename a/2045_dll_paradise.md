@@ -21,8 +21,7 @@
 
 twitter:
 
-
- @AutodeskRevit #RevitAPI #BIM @DynamoBIM
+Clarification on the arc Length versus ApproximateLength properties provided by curve elements and the new RevitLookup add-in dependencies isolation solves @AutodeskRevit #RevitAPI add-in DLL hell #BIM @DynamoBIM https://autode.sk/end_dll_hell
 
 New RevitLookup solves Revit add-in DLL hell, and a clarification on the arc length properties provided by curve elements
 &ndash; Curve Length versus ApproximateLength
