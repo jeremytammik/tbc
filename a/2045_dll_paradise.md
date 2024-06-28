@@ -30,12 +30,13 @@ New RevitLookup solves Revit add-in DLL hell, and a clarification on the arc len
 
 linkedin:
 
-Revit API discussions on #RevitAPI add-in licensing and multi-version use of the AppStore Entitlement API:
+Clarification on the arc Length versus ApproximateLength properties provided by curve elements and the new RevitLookup add-in dependencies isolation solves #RevitAPI add-in DLL hell
 
-https://autode.sk/entitlement
+https://autode.sk/end_dll_hell
 
-- Multi-version Revit entitlement API
-- Add-in licensing...
+- Curve Length versus ApproximateLength
+- RevitLookup dependency isolation ends DLL hell
+- Add-in dependencies isolation...
 
 #BIM #DynamoBIM #AutodeskAPS #Revit #API #IFC #SDK #Autodesk #AEC #adsk
 
