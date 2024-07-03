@@ -95,24 +95,45 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Material Assets
 
+Today, we look at the Revit API to personalise material assets, access the built-in browser functionality, create schedules, search text and miscellaneous LLM-related news items:
 
-####<a name="2"></a>
+- [Personalised material asset properties](#2)
+- [CefSharp versus WebView2 embedded browser](#3)
+- [Twentytwo on schedule creation](#4)
+- [Ugrep enhanced grep](#5)
+- [AI mesh understanding](#6)
+- [LLM self-reflection](#7)
+- [LLM deep stupidity](#8)
+- [LLM AI sans `MatMul`](#9)
+
+####<a name="2"></a> Personalised Material Asset Properties
+
+Jacob Small provided a useful and succinct summary of info to help answer how
+to [create a custom material asset](https://forums.autodesk.com/t5/revit-api-forum/create-a-custom-material-asset/m-p/12700408):
 
 **Question:**
+I would like to know if it is possible to create a personalised material asset with personalised properties that can be displayed in the Material Browser. For example, a material asset called "Test" placed after "Thermal". And in "Test" put a property like "Address".
+If this isn't possible, is it possible to add the "Adress" property to an asset that already exists, for example "Identity"?
+If so, can we then create a new section in the Identity asset as "Additional information"?
 
 **Answer:**
+Some quick 'info' on what I think I know about material assets:
 
+The only "asset types" in the UI are Appearance, Thermal, and Physical. In the API these are called Appearance, Thermal, and Structural (because why would they match?). I'll be using the API names going forward because we're in that forum (perhaps someone curious can ask about the UI stuff in the other forum).
 
+The Thermal and Structural asset types can be deleted from a material in the UI and set as an invalid Element Id in the API. The Appearance asset cannot.
 
+The other tabs in the material editor are collections of properties and parameters of the material element itself, not a linked asset - but are masquerading as an asset due to how they are presented in the UI.  For example to get the name (shows in the identity tab) you get the Name property of a material element. To get the foreground surface pattern (shows in the graphics tab) you'd get the SurfaceForegroundPatternId property. To set the Comments in the Identity tab you'd use a Set method on the comment parameter.
 
-Many thanks to ... of you for your thorough implementation, testing, discussion and documentation!
+The only thing unavailable is the keywords (noted as missing in 2019 and as far as I know still unavailable).
 
+So the question becomes, how can you accomplish what you're after?
 
-####<a name="2"></a> jacob.small 'info' on what I think I know about material assets
+You could map a property from the identity tab (URL looks like an option) to an extensible storage object with the data you need; however users won't be able to edit it in the material editor. Personally I would make 'non-UserModifiable' parameters on the materials category, and associate them to the materials in your template, and let them be edited/reviewed via an add-in which would also allow updating the rest of the assets. This add-in could also ensure that materials added via your tool would have these hidden parameters quickly set when materials from your library (a sub-component of your add-in) are added to the model.
 
-jacob.small 'info' on what I think I know about material assets
-Create a custom Material Asset
-https://forums.autodesk.com/t5/revit-api-forum/create-a-custom-material-asset/m-p/12700408#M78130
+It'd be a big lift but likely one which many beyond your company would benefit.
+
+Many thanks to Jacob for this halpful summary.
 
 ####<a name="3"></a> CefSharp versus WebView2 Embedded Browser
 
@@ -124,7 +145,7 @@ If you are interested in new developments in this area in the context of Revit A
 you might want to check in to the corresponding discussion currently opened in
 the [Revit Preview Project](https://feedback.autodesk.com/key/LHMJFVHGJK085G2M).
 
-####<a name="4"></a> Twentytwo
+####<a name="4"></a> Twentytwo on Schedule Creation
 
 [Twentytwo](https://twentytwo.space), written by Min Naung, provides a place and resources for BIM Programming enthusiasts.
 Quite a while ago, I already mentioned

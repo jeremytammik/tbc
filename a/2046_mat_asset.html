@@ -93,40 +93,53 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 -->
 
 <h3>Material Assets</h3>
-<h4><a name="2"></a></h4>
-<p><strong>Question:</strong></p>
-<p><strong>Answer:</strong></p>
-<p>Many thanks to ... of you for your thorough implementation, testing, discussion and documentation!</p>
-<h4><a name="2"></a> jacob.small 'info' on what I think I know about material assets</h4>
-<p>jacob.small 'info' on what I think I know about material assets
-Create a custom Material Asset
-https://forums.autodesk.com/t5/revit-api-forum/create-a-custom-material-asset/m-p/12700408#M78130</p>
-<h4><a name="3"></a> future of embedded browser functionality</h4>
-<p>future of embedded browser functionality
-Feedback Request &ndash; Upgrade to WebView2
-We are excited to inform you that Revit has replaced CefSharp with WebView2 to provide a more robust and seamless web browsing experience within the software.
-Why the change?
-WebView2 is a web control provided by Microsoft Edge (Chromium) that allows developers to host web content in native applications. It offers better performance, compatibility, and support compared to the previously used CefSharp. This ensures consistent rendering across all Windows devices, improved security, and the ability to use the latest web technologies.
-What does this mean for you?
-The transition to WebView2 is designed to be as seamless as possible. However, as with any significant change, there may be minor adjustments. We kindly ask you to test if all the existing features work fine as usual.
-How can you help?
-Please spend some time using Revit as you normally would, and pay particular attention to any features that use web content. If you encounter any issues or notice any changes in functionality, we would greatly appreciate your feedback.
-We thank you in advance for testing this enhancement!</p>
-<h4><a name="4"></a> Twentytwo</h4>
-<p>Twentytwo
-a place for BIM Programming enthusiasts
-WRITTEN BY MIN.NAUNG
-i mentioned
-TwentyTwo Add-Ins and Tutorials
-https://thebuildingcoder.typepad.com/blog/2022/10/element-level-and-ifc-properties-.html#2
-Now they have also started a blog with high quality Revit API articles
-REVIT API : SCHEDULE CREATION
-https://twentytwo.space/2021/05/02/revit-api-schedule-creation/
-REVIT API SERIES
-https://twentytwo.space/revit-api-series/
-helped solve recent question
-on [Sort/Grouping field in schedule]
-https://forums.autodesk.com/t5/revit-api-forum/sort-grouping-field-in-schedule/m-p/12869665</p>
+<p>Today, we look at the Revit API to personalise material assets, access the built-in browser functionality, create schedules, search text and miscellaneous LLM-related news items:</p>
+<ul>
+<li><a href="#2">Personalised material asset properties</a></li>
+<li><a href="#3">CefSharp versus WebView2 embedded browser</a></li>
+<li><a href="#4">Twentytwo on schedule creation</a></li>
+<li><a href="#5">Ugrep enhanced grep</a></li>
+<li><a href="#6">AI mesh understanding</a></li>
+<li><a href="#7">LLM self-reflection</a></li>
+<li><a href="#8">LLM deep stupidity</a></li>
+<li><a href="#9">LLM AI sans <code>MatMul</code></a></li>
+</ul>
+<h4><a name="2"></a> Personalised Material Asset Properties</h4>
+<p>Jacob Small provided a useful and succinct summary of info to help answer how
+to <a href="https://forums.autodesk.com/t5/revit-api-forum/create-a-custom-material-asset/m-p/12700408">create a custom material asset</a>:</p>
+<p><strong>Question:</strong>
+I would like to know if it is possible to create a personalised material asset with personalised properties that can be displayed in the Material Browser. For example, a material asset called "Test" placed after "Thermal". And in "Test" put a property like "Address".
+If this isn't possible, is it possible to add the "Adress" property to an asset that already exists, for example "Identity"?
+If so, can we then create a new section in the Identity asset as "Additional information"?</p>
+<p><strong>Answer:</strong>
+Some quick 'info' on what I think I know about material assets:</p>
+<p>The only "asset types" in the UI are Appearance, Thermal, and Physical. In the API these are called Appearance, Thermal, and Structural (because why would they match?). I'll be using the API names going forward because we're in that forum (perhaps someone curious can ask about the UI stuff in the other forum).</p>
+<p>The Thermal and Structural asset types can be deleted from a material in the UI and set as an invalid Element Id in the API. The Appearance asset cannot.</p>
+<p>The other tabs in the material editor are collections of properties and parameters of the material element itself, not a linked asset - but are masquerading as an asset due to how they are presented in the UI.  For example to get the name (shows in the identity tab) you get the Name property of a material element. To get the foreground surface pattern (shows in the graphics tab) you'd get the SurfaceForegroundPatternId property. To set the Comments in the Identity tab you'd use a Set method on the comment parameter.</p>
+<p>The only thing unavailable is the keywords (noted as missing in 2019 and as far as I know still unavailable).</p>
+<p>So the question becomes, how can you accomplish what you're after?</p>
+<p>You could map a property from the identity tab (URL looks like an option) to an extensible storage object with the data you need; however users won't be able to edit it in the material editor. Personally I would make 'non-UserModifiable' parameters on the materials category, and associate them to the materials in your template, and let them be edited/reviewed via an add-in which would also allow updating the rest of the assets. This add-in could also ensure that materials added via your tool would have these hidden parameters quickly set when materials from your library (a sub-component of your add-in) are added to the model.</p>
+<p>It'd be a big lift but likely one which many beyond your company would benefit.</p>
+<p>Many thanks to Jacob for this halpful summary.</p>
+<h4><a name="3"></a> CefSharp versus WebView2 Embedded Browser</h4>
+<p>Revit currently includes the CefSharp embedded Chromium browser, and many internal and external add-ins make use of that.
+Another option for Chromium embedding is provided by WebView2, and some add-ins already use that instead.
+This StackOverflow question provides a comparison
+of <a href="https://stackoverflow.com/questions/70360189/cefsharp-vs-webview2">CefSharp vs WebView2</a>.
+If you are interested in new developments in this area in the context of Revit API add-in development,
+you might want to check in to the corresponding discussion currently opened in
+the <a href="https://feedback.autodesk.com/key/LHMJFVHGJK085G2M">Revit Preview Project</a>.</p>
+<h4><a name="4"></a> Twentytwo on Schedule Creation</h4>
+<p><a href="https://twentytwo.space">Twentytwo</a>, written by Min Naung, provides a place and resources for BIM Programming enthusiasts.
+Quite a while ago, I already mentioned
+the <a href="https://thebuildingcoder.typepad.com/blog/2022/10/element-level-and-ifc-properties-.html#2">TwentyTwo add-ins and tutorials</a>.
+They also write a blog with high quality Revit API articles,
+the <a href="https://twentytwo.space/revit-api-series/">Revit API series</a>.</p>
+<p>One of them, for instance,
+on <a href="https://twentytwo.space/2021/05/02/revit-api-schedule-creation/">schedule creation</a>,
+recently came in useful and helped solve the question
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/sort-grouping-field-in-schedule/m-p/12869665">sort/grouping field in schedule</a>.</p>
+<p>Many thanks to Min Naung for their work on writing and sharing this material!</p>
 <h4><a name="5"></a> Ugrep Enhanced Grep</h4>
 <p>I use <code>grep</code> a lot in my everyday work, searching for text in text files.
 With <code>ugrep</code>, this workflow can be easily expanded to cover all kinds of file formats and directory structures,
