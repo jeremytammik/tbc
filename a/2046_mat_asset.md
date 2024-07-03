@@ -131,7 +131,7 @@ So the question becomes, how can you accomplish what you're after?
 
 You could map a property from the identity tab (URL looks like an option) to an extensible storage object with the data you need; however users won't be able to edit it in the material editor. Personally I would make 'non-UserModifiable' parameters on the materials category, and associate them to the materials in your template, and let them be edited/reviewed via an add-in which would also allow updating the rest of the assets. This add-in could also ensure that materials added via your tool would have these hidden parameters quickly set when materials from your library (a sub-component of your add-in) are added to the model.
 
-It'd be a big lift but likely one which many beyond your company would benefit.
+It'd be a big lift but likely one which would benefit many beyond your company.
 
 Many thanks to Jacob for this helpful summary.
 
@@ -162,9 +162,9 @@ Many thanks to Min Naung for their work on writing and sharing this material!
 
 ####<a name="5"></a> Ugrep Enhanced Grep
 
-I use `grep` a lot in my everyday work, searching for text in text files.
-With `ugrep`, this workflow can be easily expanded to cover all kinds of file formats and directory structures,
-cf. [The ugrep file pattern searcher](https://ugrep.com), with
+I use `grep` in my everyday work to search for text in text files.
+With `ugrep`, this workflow can be easily expanded to cover all kinds of other file formats and directory structures,
+cf. [the ugrep file pattern searcher](https://ugrep.com), with
 its [ugrep GitHub repo](https://github.com/Genivia/ugrep).
 
 For instance, PDF support can be obtained by specifying a filter like this:
@@ -181,7 +181,8 @@ Fuzzy search is also supported, among tons of other features:
 
 ####<a name="6"></a> AI Mesh Understanding
 
-An overview of the MeshAnything project aiming to generate more effective meshing of 3D objects:
+AI and LLMs can be used with 3D objects, but often have trouble understanding and efficiently handling them.
+The MeshAnything project aims to generate more effective meshing of 3D objects:
 
 - 44-second video blurb: [AI just figured out Meshes](https://youtu.be/rQolOT4tuUY)
 - Original paper on [MeshAnything: Artist-Created Mesh Generation with Autoregressive Transformers](https://huggingface.co/papers/2406.10163)
@@ -191,7 +192,7 @@ An overview of the MeshAnything project aiming to generate more effective meshin
 
 ####<a name="7"></a> LLM Self-Reflection
 
-[Josh Whiton](https://x.com/joshwhiton/) performed an interesting experiment on LLM self-reflection showing
+[Josh Whiton](https://x.com/joshwhiton/) performed an experiment on LLM self-reflection showing
 that [Claude Sonnet 3.5 passes the AI mirror test](https://x.com/joshwhiton/status/1806000237728931910),
 ending with an LLM-generated poem on the topic:
 
@@ -201,13 +202,13 @@ ending with an LLM-generated poem on the topic:
 
 ####<a name="8"></a> LLM Deep Stupidity
 
-Mark Bishop wrote critical article stating
+On the other hand, Mark Bishop shares a critical article stating
 that [artificial intelligence is stupid and causal reasoning will not fix it](https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2020.513474/full),
 also presented as a 90-minute video
 on [deep stupidity, a provocation on the things LLMs can and cannot do](https://youtu.be/sN-vsd7SVqs).
 
 ####<a name="9"></a> LLM AI Sans MatMul
 
-This interesting research may affect both the enourmous resources consumed by AI and the chip maker stock prices:
+This new research may affect both the enourmous resources consumed by AI and the chip maker stock prices:
 [Researchers upend AI status quo by eliminating matrix multiplication in LLMs](https://arstechnica.com/information-technology/2024/06/researchers-upend-ai-status-quo-by-eliminating-matrix-multiplication-in-llms/).
 

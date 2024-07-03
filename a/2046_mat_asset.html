@@ -119,8 +119,8 @@ Some quick 'info' on what I think I know about material assets:</p>
 <p>The only thing unavailable is the keywords (noted as missing in 2019 and as far as I know still unavailable).</p>
 <p>So the question becomes, how can you accomplish what you're after?</p>
 <p>You could map a property from the identity tab (URL looks like an option) to an extensible storage object with the data you need; however users won't be able to edit it in the material editor. Personally I would make 'non-UserModifiable' parameters on the materials category, and associate them to the materials in your template, and let them be edited/reviewed via an add-in which would also allow updating the rest of the assets. This add-in could also ensure that materials added via your tool would have these hidden parameters quickly set when materials from your library (a sub-component of your add-in) are added to the model.</p>
-<p>It'd be a big lift but likely one which many beyond your company would benefit.</p>
-<p>Many thanks to Jacob for this halpful summary.</p>
+<p>It'd be a big lift but likely one which would benefit many beyond your company.</p>
+<p>Many thanks to Jacob for this helpful summary.</p>
 <h4><a name="3"></a> CefSharp versus WebView2 Embedded Browser</h4>
 <p>Revit currently includes the CefSharp embedded Chromium browser, and many internal and external add-ins make use of that.
 Another option for Chromium embedding is provided by WebView2, and some add-ins already use that instead.
@@ -141,9 +141,9 @@ recently came in useful and helped solve the question
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/sort-grouping-field-in-schedule/m-p/12869665">sort/grouping field in schedule</a>.</p>
 <p>Many thanks to Min Naung for their work on writing and sharing this material!</p>
 <h4><a name="5"></a> Ugrep Enhanced Grep</h4>
-<p>I use <code>grep</code> a lot in my everyday work, searching for text in text files.
-With <code>ugrep</code>, this workflow can be easily expanded to cover all kinds of file formats and directory structures,
-cf. <a href="https://ugrep.com">The ugrep file pattern searcher</a>, with
+<p>I use <code>grep</code> in my everyday work to search for text in text files.
+With <code>ugrep</code>, this workflow can be easily expanded to cover all kinds of other file formats and directory structures,
+cf. <a href="https://ugrep.com">the ugrep file pattern searcher</a>, with
 its <a href="https://github.com/Genivia/ugrep">ugrep GitHub repo</a>.</p>
 <p>For instance, PDF support can be obtained by specifying a filter like this:</p>
 <pre><code class="language-sh">ug --filter='pdf:pdftotext % -' -i searchtext *pdf</code></pre>
@@ -155,7 +155,8 @@ its <a href="https://github.com/Genivia/ugrep">ugrep GitHub repo</a>.</p>
 <pre><code class="language-sh">ug+ -Z -i searchtext *pdf</code></pre>
 
 <h4><a name="6"></a> AI Mesh Understanding</h4>
-<p>An overview of the MeshAnything project aiming to generate more effective meshing of 3D objects:</p>
+<p>AI and LLMs can be used with 3D objects, but often have trouble understanding and efficiently handling them.
+The MeshAnything project aims to generate more effective meshing of 3D objects:</p>
 <ul>
 <li>44-second video blurb: <a href="https://youtu.be/rQolOT4tuUY">AI just figured out Meshes</a></li>
 <li>Original paper on <a href="https://huggingface.co/papers/2406.10163">MeshAnything: Artist-Created Mesh Generation with Autoregressive Transformers</a></li>
@@ -164,17 +165,17 @@ its <a href="https://github.com/Genivia/ugrep">ugrep GitHub repo</a>.</p>
 <li>Huggingface <a href="https://huggingface.co/learn/ml-for-3d-course/unit0/introduction">Machine Learning for 3D Course</a></li>
 </ul>
 <h4><a name="7"></a> LLM Self-Reflection</h4>
-<p><a href="https://x.com/joshwhiton/">Josh Whiton</a> performed an interesting experiment on LLM self-reflection showing
+<p><a href="https://x.com/joshwhiton/">Josh Whiton</a> performed an experiment on LLM self-reflection showing
 that <a href="https://x.com/joshwhiton/status/1806000237728931910">Claude Sonnet 3.5 passes the AI mirror test</a>,
 ending with an LLM-generated poem on the topic:</p>
 <p><center>
 <img src="img/claude_sonnet_selfreflect.jpg" alt="Claude Sonnet Selfreflects" title="Claude Sonnet Selfreflects" width="500"/>
 </center></p>
 <h4><a name="8"></a> LLM Deep Stupidity</h4>
-<p>Mark Bishop wrote critical article stating
+<p>On the other hand, Mark Bishop shares a critical article stating
 that <a href="https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2020.513474/full">artificial intelligence is stupid and causal reasoning will not fix it</a>,
 also presented as a 90-minute video
 on <a href="https://youtu.be/sN-vsd7SVqs">deep stupidity, a provocation on the things LLMs can and cannot do</a>.</p>
 <h4><a name="9"></a> LLM AI Sans MatMul</h4>
-<p>This interesting research may affect both the enourmous resources consumed by AI and the chip maker stock prices:
+<p>This new research may affect both the enourmous resources consumed by AI and the chip maker stock prices:
 <a href="https://arstechnica.com/information-technology/2024/06/researchers-upend-ai-status-quo-by-eliminating-matrix-multiplication-in-llms/">Researchers upend AI status quo by eliminating matrix multiplication in LLMs</a>.</p>
