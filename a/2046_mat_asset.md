@@ -20,6 +20,17 @@
   Create a custom Material Asset
   https://forums.autodesk.com/t5/revit-api-forum/create-a-custom-material-asset/m-p/12700408#M78130
 
+- future of embedded browser functionality
+  Feedback Request &ndash; Upgrade to WebView2
+  We are excited to inform you that Revit has replaced CefSharp with WebView2 to provide a more robust and seamless web browsing experience within the software.
+  Why the change?
+  WebView2 is a web control provided by Microsoft Edge (Chromium) that allows developers to host web content in native applications. It offers better performance, compatibility, and support compared to the previously used CefSharp. This ensures consistent rendering across all Windows devices, improved security, and the ability to use the latest web technologies.
+  What does this mean for you?
+  The transition to WebView2 is designed to be as seamless as possible. However, as with any significant change, there may be minor adjustments. We kindly ask you to test if all the existing features work fine as usual.
+  How can you help?
+  Please spend some time using Revit as you normally would, and pay particular attention to any features that use web content. If you encounter any issues or notice any changes in functionality, we would greatly appreciate your feedback.
+  We thank you in advance for testing this enhancement!
+
 - Twentytwo
   a place for BIM Programming enthusiasts
   WRITTEN BY MIN.NAUNG
@@ -35,11 +46,6 @@
   on [Sort/Grouping field in schedule]
   https://forums.autodesk.com/t5/revit-api-forum/sort-grouping-field-in-schedule/m-p/12869665
 
-- Artificial Intelligence Is Stupid and Causal Reasoning Will Not Fix It
-  https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2020.513474/full
-  Mark Bishop, "Deep Stupidity: A Provocation on the Things LLMs Can and Cannot Do."
-  https://youtu.be/sN-vsd7SVqs
-
 - ugrep
   https://ugrep.com
   https://github.com/Genivia/ugrep
@@ -48,25 +54,6 @@
   built-in filters ug+ -i jeremy *pdf
   fuzzy search ug+ -Z -i jeremmy *pdf
 
-- future of embedded browser functionality
-  Feedback Request &ndash; Upgrade to WebView2
-  We are excited to inform you that Revit has replaced CefSharp with WebView2 to provide a more robust and seamless web browsing experience within the software.
-  Why the change?
-  WebView2 is a web control provided by Microsoft Edge (Chromium) that allows developers to host web content in native applications. It offers better performance, compatibility, and support compared to the previously used CefSharp. This ensures consistent rendering across all Windows devices, improved security, and the ability to use the latest web technologies.
-  What does this mean for you?
-  The transition to WebView2 is designed to be as seamless as possible. However, as with any significant change, there may be minor adjustments. We kindly ask you to test if all the existing features work fine as usual.
-  How can you help?
-  Please spend some time using Revit as you normally would, and pay particular attention to any features that use web content. If you encounter any issues or notice any changes in functionality, we would greatly appreciate your feedback.
-  We thank you in advance for testing this enhancement!
-
-- Claude Sonnet Selfreflects
-  Claude Sonnet 3.5 Passes the AI Mirror Test
-  https://x.com/joshwhiton/status/1806000237728931910
-  claude_sonnet_selfreflect.jpg
-
-- Researchers upend AI status quo by eliminating matrix multiplication in LLMs
-  https://arstechnica.com/information-technology/2024/06/researchers-upend-ai-status-quo-by-eliminating-matrix-multiplication-in-llms/
-
 - AI just figured out Meshes
   https://youtu.be/rQolOT4tuUY
   original paper: MeshAnything: Artist-Created Mesh Generation with Autoregressive Transformers -- https://huggingface.co/papers/2406.10163
@@ -74,6 +61,18 @@
   code: GitHub https://github.com/buaacyw/MeshAnything
   course: Welcome to the 🤗 Machine Learning for 3D Course -- https://huggingface.co/learn/ml-for-3d-course/unit0/introduction
 
+- Claude Sonnet Selfreflects
+  Claude Sonnet 3.5 Passes the AI Mirror Test
+  https://x.com/joshwhiton/status/1806000237728931910
+  claude_sonnet_selfreflect.jpg
+
+- Artificial Intelligence Is Stupid and Causal Reasoning Will Not Fix It
+  https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2020.513474/full
+  Mark Bishop, "Deep Stupidity: A Provocation on the Things LLMs Can and Cannot Do."
+  https://youtu.be/sN-vsd7SVqs
+
+- Researchers upend AI status quo by eliminating matrix multiplication in LLMs
+  https://arstechnica.com/information-technology/2024/06/researchers-upend-ai-status-quo-by-eliminating-matrix-multiplication-in-llms/
 
 twitter:
 
@@ -103,10 +102,96 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 **Answer:**
 
-<center>
-<img src="img/arc_length.png" alt="Arc length" title="Arc length" width="300"/>
-</center>
 
 
 
 Many thanks to ... of you for your thorough implementation, testing, discussion and documentation!
+
+
+####<a name="2"></a> jacob.small 'info' on what I think I know about material assets
+
+jacob.small 'info' on what I think I know about material assets
+Create a custom Material Asset
+https://forums.autodesk.com/t5/revit-api-forum/create-a-custom-material-asset/m-p/12700408#M78130
+
+####<a name="3"></a> future of embedded browser functionality
+
+future of embedded browser functionality
+Feedback Request &ndash; Upgrade to WebView2
+We are excited to inform you that Revit has replaced CefSharp with WebView2 to provide a more robust and seamless web browsing experience within the software.
+Why the change?
+WebView2 is a web control provided by Microsoft Edge (Chromium) that allows developers to host web content in native applications. It offers better performance, compatibility, and support compared to the previously used CefSharp. This ensures consistent rendering across all Windows devices, improved security, and the ability to use the latest web technologies.
+What does this mean for you?
+The transition to WebView2 is designed to be as seamless as possible. However, as with any significant change, there may be minor adjustments. We kindly ask you to test if all the existing features work fine as usual.
+How can you help?
+Please spend some time using Revit as you normally would, and pay particular attention to any features that use web content. If you encounter any issues or notice any changes in functionality, we would greatly appreciate your feedback.
+We thank you in advance for testing this enhancement!
+
+####<a name="4"></a> Twentytwo
+
+Twentytwo
+a place for BIM Programming enthusiasts
+WRITTEN BY MIN.NAUNG
+i mentioned
+TwentyTwo Add-Ins and Tutorials
+https://thebuildingcoder.typepad.com/blog/2022/10/element-level-and-ifc-properties-.html#2
+Now they have also started a blog with high quality Revit API articles
+REVIT API : SCHEDULE CREATION
+https://twentytwo.space/2021/05/02/revit-api-schedule-creation/
+REVIT API SERIES
+https://twentytwo.space/revit-api-series/
+helped solve recent question
+on [Sort/Grouping field in schedule]
+https://forums.autodesk.com/t5/revit-api-forum/sort-grouping-field-in-schedule/m-p/12869665
+
+####<a name="5"></a> Ugrep Enhanced Grep
+
+I use `grep` a lot in my everyday work, searching for text in text files.
+With `ugrep`, this workflow can be easily expanded to cover all kinds of file formats and directory structures,
+cf. [The ugrep file pattern searcher](https://ugrep.com), with
+its [ugrep GitHub repo](https://github.com/Genivia/ugrep).
+
+Forinstance, PDF support can be obtained by specifying a filter like this:
+
+<pre><code class="language-sh">ug --filter='pdf:pdftotext % -' -i searchtext  &asterisk;pdf</code></pre>
+
+The `ug+` command is the same as the `ug` command plus built-in filters to search PDFs, documents, and image metadata:
+
+<pre><code class="language-sh">ug+ -i searchtext &asterisk;pdf</code></pre>
+
+Fuzzy search is also supported, among otns of other features:
+
+<pre><code class="language-sh">ug+ -Z -i searchtext &asterisk;pdf</code></pre>
+
+####<a name="6"></a> AI Mesh Understanding
+
+An overview of the MeshAnything project aiming to generate more effective meshing of 3D objects:
+
+- 44-second video blurb [AI just figured out Meshes](https://youtu.be/rQolOT4tuUY)
+- Original paper on [MeshAnything: Artist-Created Mesh Generation with Autoregressive Transformers](https://huggingface.co/papers/2406.10163)
+- [MeshAnything demo](https://huggingface.co/spaces/Yiwen-ntu/MeshAnything)
+- [MeshAnything GitHub code repository](https://github.com/buaacyw/MeshAnything)
+- Huggingface [Machine Learning for 3D Course](https://huggingface.co/learn/ml-for-3d-course/unit0/introduction)
+
+####<a name="7"></a> LLM Self-Reflection
+
+[Josh Whiton](https://x.com/joshwhiton/) performed an interesting experiment on LLM self-reflection showing
+that [Claude Sonnet 3.5 passes the AI mirror test](https://x.com/joshwhiton/status/1806000237728931910),
+ending with an LLM-generated poem on the topic:
+
+<center>
+<img src="img/claude_sonnet_selfreflect.jpg" alt="Claude Sonnet Selfreflects" title="Claude Sonnet Selfreflects" width="300"/>
+</center>
+
+####<a name="8"></a> LLM Deep Stupidity
+
+Mark Bishop wrote critical article stating
+that [artificial intelligence is stupid and causal reasoning will not fix it](https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2020.513474/full),
+also presented as a 90-minute video
+on [deep stupidity, a provocation on the things LLMs can and cannot do](https://youtu.be/sN-vsd7SVqs).
+
+####<a name="9"></a> LLM AI Sans MatMul
+
+This interesting research may affect both the enourmous resources consumed by AI and the chip maker stock prices:
+[Researchers upend AI status quo by eliminating matrix multiplication in LLMs](https://arstechnica.com/information-technology/2024/06/researchers-upend-ai-status-quo-by-eliminating-matrix-multiplication-in-llms/).
+
