@@ -133,7 +133,7 @@ You could map a property from the identity tab (URL looks like an option) to an 
 
 It'd be a big lift but likely one which many beyond your company would benefit.
 
-Many thanks to Jacob for this halpful summary.
+Many thanks to Jacob for this helpful summary.
 
 ####<a name="3"></a> CefSharp versus WebView2 Embedded Browser
 
