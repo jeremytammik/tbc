@@ -114,35 +114,30 @@ jacob.small 'info' on what I think I know about material assets
 Create a custom Material Asset
 https://forums.autodesk.com/t5/revit-api-forum/create-a-custom-material-asset/m-p/12700408#M78130
 
-####<a name="3"></a> future of embedded browser functionality
+####<a name="3"></a> CefSharp versus WebView2 Embedded Browser
 
-future of embedded browser functionality
-Feedback Request &ndash; Upgrade to WebView2
-We are excited to inform you that Revit has replaced CefSharp with WebView2 to provide a more robust and seamless web browsing experience within the software.
-Why the change?
-WebView2 is a web control provided by Microsoft Edge (Chromium) that allows developers to host web content in native applications. It offers better performance, compatibility, and support compared to the previously used CefSharp. This ensures consistent rendering across all Windows devices, improved security, and the ability to use the latest web technologies.
-What does this mean for you?
-The transition to WebView2 is designed to be as seamless as possible. However, as with any significant change, there may be minor adjustments. We kindly ask you to test if all the existing features work fine as usual.
-How can you help?
-Please spend some time using Revit as you normally would, and pay particular attention to any features that use web content. If you encounter any issues or notice any changes in functionality, we would greatly appreciate your feedback.
-We thank you in advance for testing this enhancement!
+Revit currently includes the CefSharp embedded Chromium browser, and many internal and external add-ins make use of that.
+Another option for Chromium embedding is provided by WebView2, and some add-ins already use that instead.
+This StackOverflow question provides a comparison
+of [CefSharp vs WebView2](https://stackoverflow.com/questions/70360189/cefsharp-vs-webview2).
+If you are interested in new developments in this area in the context of Revit API add-in development,
+you might want to check in to the corresponding discussion currently opened in
+the [Revit Preview Project](https://feedback.autodesk.com/key/LHMJFVHGJK085G2M).
 
 ####<a name="4"></a> Twentytwo
 
-Twentytwo
-a place for BIM Programming enthusiasts
-WRITTEN BY MIN.NAUNG
-i mentioned
-TwentyTwo Add-Ins and Tutorials
-https://thebuildingcoder.typepad.com/blog/2022/10/element-level-and-ifc-properties-.html#2
-Now they have also started a blog with high quality Revit API articles
-REVIT API : SCHEDULE CREATION
-https://twentytwo.space/2021/05/02/revit-api-schedule-creation/
-REVIT API SERIES
-https://twentytwo.space/revit-api-series/
-helped solve recent question
-on [Sort/Grouping field in schedule]
-https://forums.autodesk.com/t5/revit-api-forum/sort-grouping-field-in-schedule/m-p/12869665
+[Twentytwo](https://twentytwo.space), written by Min Naung, provides a place and resources for BIM Programming enthusiasts.
+Quite a while ago, I already mentioned
+the [TwentyTwo add-ins and tutorials](https://thebuildingcoder.typepad.com/blog/2022/10/element-level-and-ifc-properties-.html#2).
+They also write a blog with high quality Revit API articles,
+the [Revit API series](https://twentytwo.space/revit-api-series/).
+
+One of them, for instance,
+on [schedule creation](https://twentytwo.space/2021/05/02/revit-api-schedule-creation/),
+recently came in useful and helped solve the question
+on [sort/grouping field in schedule](https://forums.autodesk.com/t5/revit-api-forum/sort-grouping-field-in-schedule/m-p/12869665).
+
+Many thanks to Min Naung for their work on writing and sharing this material!
 
 ####<a name="5"></a> Ugrep Enhanced Grep
 
