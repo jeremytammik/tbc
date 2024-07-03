@@ -113,7 +113,7 @@ to [create a custom material asset](https://forums.autodesk.com/t5/revit-api-for
 
 **Question:**
 I would like to know if it is possible to create a personalised material asset with personalised properties that can be displayed in the Material Browser. For example, a material asset called "Test" placed after "Thermal". And in "Test" put a property like "Address".
-If this isn't possible, is it possible to add the "Adress" property to an asset that already exists, for example "Identity"?
+If this isn't possible, is it possible to add the "Address" property to an asset that already exists, for example "Identity"?
 If so, can we then create a new section in the Identity asset as "Additional information"?
 
 **Answer:**
@@ -209,6 +209,6 @@ on [deep stupidity, a provocation on the things LLMs can and cannot do](https://
 
 ####<a name="9"></a> LLM AI Sans MatMul
 
-This new research may affect both the enourmous resources consumed by AI and the chip maker stock prices:
+This new research may affect both the enormous resources consumed by AI and the chip maker stock prices:
 [Researchers upend AI status quo by eliminating matrix multiplication in LLMs](https://arstechnica.com/information-technology/2024/06/researchers-upend-ai-status-quo-by-eliminating-matrix-multiplication-in-llms/).
 
