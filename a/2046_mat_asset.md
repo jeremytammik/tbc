@@ -78,7 +78,13 @@ twitter:
 
  @AutodeskRevit #RevitAPI #BIM @DynamoBIM
 
-&ndash; ...
+Material assets, built-in browser functionality, create schedules, search text and miscellaneous LLM-related news items
+&ndash; Personalised material asset properties
+&ndash; CefSharp versus WebView2 embedded browser
+&ndash; Twentytwo on schedule creation
+&ndash; Ugrep enhanced grep
+&ndash; AI mesh understanding
+&ndash; LLM self-reflection, deep stupidity, sans <code>MatMul</code>, and locally the easy way...
 
 linkedin:
 
@@ -93,7 +99,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Material Assets
+### Material Assets, Chromium and Sorting Schedules
 
 Today, we look at the Revit API to personalise material assets, access the built-in browser functionality, create schedules, search text and miscellaneous LLM-related news items:
 
@@ -105,6 +111,7 @@ Today, we look at the Revit API to personalise material assets, access the built
 - [LLM self-reflection](#7)
 - [LLM deep stupidity](#8)
 - [LLM AI sans `MatMul`](#9)
+- [Local LLM AI the easy way](#10)
 
 ####<a name="2"></a> Personalised Material Asset Properties
 
@@ -211,4 +218,13 @@ on [deep stupidity, a provocation on the things LLMs can and cannot do](https://
 
 This new research may affect both the enormous resources consumed by AI and the chip maker stock prices:
 [Researchers upend AI status quo by eliminating matrix multiplication in LLMs](https://arstechnica.com/information-technology/2024/06/researchers-upend-ai-status-quo-by-eliminating-matrix-multiplication-in-llms/).
+
+####<a name="10"></a> Local LLM AI the Easy Way
+
+For experimentation and learning,
+the [CodeProject.AI Server provides AI the easy way](https://www.codeproject.com/Articles/5322557/CodeProject-AI-Server-AI-the-easy-way):
+
+> CodeProject.AI Server is a locally installed, self-hosted, fast, free and open-source AI server for any platform, any language.
+No off-device or out of network data transfer, no messing around with dependencies, and able to be used from any platform, any language.
+Runs as a Windows Service or a Docker container.
 
