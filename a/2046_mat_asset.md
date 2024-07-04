@@ -204,7 +204,7 @@ that [Claude Sonnet 3.5 passes the AI mirror test](https://x.com/joshwhiton/stat
 ending with an LLM-generated poem on the topic:
 
 <center>
-<img src="img/claude_sonnet_selfreflect.jpg" alt="Claude Sonnet Selfreflects" title="Claude Sonnet Selfreflects" width="500"/>
+<img src="img/claude_sonnet_selfreflect.jpg" alt="Claude Sonnet selfreflects" title="Claude Sonnet selfreflects" width="400"/>
 </center>
 
 ####<a name="8"></a> LLM Deep Stupidity
