@@ -76,7 +76,7 @@
 
 twitter:
 
- @AutodeskRevit #RevitAPI #BIM @DynamoBIM https://autode.sk/materialassetprops
+Personalised material asset properties, CefSharp versus WebView2 embedded browser, creating and sorting schedules with the @AutodeskRevit #RevitAPI #BIM @DynamoBIM https://autode.sk/materialassetprops
 
 Material assets, built-in browser functionality, create schedules, search text and miscellaneous LLM-related news items
 &ndash; Personalised material asset properties
