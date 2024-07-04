@@ -88,6 +88,17 @@ Material assets, built-in browser functionality, create schedules, search text a
 
 linkedin:
 
+Personalised material asset properties, CefSharp versus WebView2 embedded browser, creating and sorting schedules with the #RevitAPI
+
+https://autode.sk/materialassetprops
+
+- Personalised material asset properties
+- CefSharp versus WebView2 embedded browser
+- Twentytwo on schedule creation
+- Ugrep enhanced grep
+- AI mesh understanding
+- LLM self-reflection, deep stupidity, sans <code>MatMul</code>, and locally the easy way...
+
 #BIM #DynamoBIM #AutodeskAPS #Revit #API #IFC #SDK #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
