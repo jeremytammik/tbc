@@ -16,6 +16,41 @@
 
 <!---
 
+- blog about barcelona accelerator:
+  Sergio Leon (he/him) to Everyone (11 Jul 2024, 11:22)
+  23-27 Sept BCN Accelerator
+  https://aps.autodesk.com/accelerator-program
+  SEPTEMBER 23 - 27
+  Developer Accelerator, Barcelona
+  Benefit from dedicated time to develop your Autodesk Platform Services application – with direct help and training from APS engineering experts in Barcelona, Spain.
+  Monday, September 23
+  Autodesk Platform Services Accelerator, Barcelona (September 23-27, 2024)
+  Benefit from dedicated time to develop your APS application – with direct help and training from APS engineering experts.
+  Location Autodesk SA, Carrer de Josep Pla, 2 Torre B2, Planta 6 08019 Barcelona Spain
+  Develop for the Cloud with Autodesk Platform Services (formerly Forge)
+  Autodesk Platform Services Accelerator is an opportunity to work intensively on a chosen project with help, support, and training from APS engineering experts.
+  The APS Accelerator is designed to help creative developers leverage Autodesk Platform Services Cloud APIs: https://aps.autodesk.com.
+  This event will be on-site in Barcelona, Spain. The deadline for submitting your proposal is Friday, September 13, 2024.
+  If you would like to participate in the accelerator online, please register here:
+  https://www.eventbrite.com/e/autodesk-platform-services-accelerator-virtual-august-21-25-2023-registration-669034659677?aff=oddtdtcreator
+  Autodesk APIs covered:
+  Viewer API
+  Design Automation API (for Revit, Inventor, AutoCAD, 3ds Max)
+  BIM 360 API
+  Autodesk Construction Cloud (ACC) API
+  Parameters API
+  Data Exchange API
+  Data Visualization API
+  Data Management API
+  Model Derivative API
+  Reality Capture API
+  Webhooks API
+  Premium Reporting API
+  Token Flex API
+  Authentication (OAuth) API
+  Forma API
+  https://aps.autodesk.com/accelerator-program
+
 - revisiting q4r4 with llm and rag
   Breaking up is hard to do: Chunking in RAG applications
   https://stackoverflow.blog/2024/06/06/breaking-up-is-hard-to-do-chunking-in-rag-applications/
@@ -43,6 +78,8 @@
   after that all was well, all 2046 blog posts processed and chunked
   /Users/jta/a/src/python/tbcchunk/
 
+- vacation
+
 twitter:
 
  with the @AutodeskRevit #RevitAPI #BIM @DynamoBIM
@@ -64,13 +101,44 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Q4R4 Chunk
 
-####<a name="2"></a>
+####<a name="2"></a> Developer Accelerator in Barcelona
+
+Registration is open for the next European face-to-face APS accelerator, scheduled to take place in the Autodesk offices on the beach in Barcelona September 23-27.
+
+Very attractive and popular, all of the items above: APS itself, the accelerators, the office, the beach, and the location Barcelona.
+Address and directions: [Autodesk SA, Carrer de Josep Pla 2, Torre B2, Planta 6, 08019 Barcelona, Spain](https://www.google.com/maps/dir//C/+Josep+Pla+2+Building+B2+Sant+Marti+08019+Barcelona+Spain)
+
+In the accelerator, you will benefit from dedicated time to develop your own chosen Autodesk Platform Services application with direct live help and training from my APS engineering expert colleagues to help creative developers leverage the [Autodesk Platform Services Cloud APIs](https://aps.autodesk.com), e.g., you choice of the following APS APIs:
+
+- Viewer
+- Design Automation (for Revit, Inventor, AutoCAD, 3ds Max)
+- BIM 360
+- Autodesk Construction Cloud (ACC)
+- Parameters
+- Data Exchange
+- Data Visualization
+- Data Management
+- Model Derivative
+- Reality Capture
+- Webhooks
+- Premium Reporting
+- Token Flex
+- Authentication (OAuth)
+- Forma
+
+
+The deadline for submitting your proposal is Friday, September 13, 2024.
+
+[Registration](https://www.eventbrite.com/e/autodesk-platform-services-accelerator-barcelona-september-23-27-2024-tickets-866126125557)
+
+
+https://aps.autodesk.com/accelerator-program
 
 **Question:**
 
 **Answer:**
 
-<pre><code class="language-sh">ug+ -i searchtext *pdf</code></pre>
+<pre><code class="language-cs"></code></pre>
 
 <center>
 <img src="img/.jpg" alt="" title="" width="100"/>
