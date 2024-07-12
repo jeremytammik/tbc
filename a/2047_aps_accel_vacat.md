@@ -49,7 +49,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### APS Accelerator and Q4R4 Chunking with Claude
 
-Vacation timer, accelerator time, and chunking TBC for LLM RAG:
+Vacation time, accelerator time, and chunking TBC for LLM RAG:
 
 - [APS accelerator Barcelona in September](#2)
 - [Q4R4 with LLM and RAG](#3)
@@ -88,6 +88,10 @@ The deadline for submitting your proposal is Friday, September 13, 2024:
 
 - [Registration](https://www.eventbrite.com/e/autodesk-platform-services-accelerator-barcelona-september-23-27-2024-tickets-866126125557)
 - [Other accelerators](https://aps.autodesk.com/accelerator-program)
+
+<center>
+<img src="img/aps_barca_2024.png" alt="APS accelerator Barcelona" title="APS accelerator Barcelona" width="400"/>
+</center>
 
 ####<a name="3"></a> Q4R4 with LLM and RAG
 
