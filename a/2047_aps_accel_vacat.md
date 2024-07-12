@@ -30,7 +30,7 @@
 
 twitter:
 
- with the @AutodeskRevit #RevitAPI #BIM @DynamoBIM
+APS accelerator in Barcelona and using AI to implement chunking of TBC blog posts for LLM RAG for the @AutodeskRevit #RevitAPI question answering system Q4R4 the  #BIM @DynamoBIM
 
 Vacation time, accelerator time, and chunking TBC for LLM RAG
 &ndash; APS accelerator Barcelona in September
