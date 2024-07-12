@@ -46,7 +46,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-<h3>APS Accelerator and Q4R4 Chunking with CLaude</h3>
+<h3>APS Accelerator and Q4R4 Chunking with Claude</h3>
 <p>Vacation timer, accelerator time, and chunking TBC for LLM RAG:</p>
 <ul>
 <li><a href="#2">APS accelerator Barcelona in September</a></li>
@@ -109,7 +109,7 @@ pondering <a href="https://thebuildingcoder.typepad.com/blog/r4q4/">Q4R4</a>,
 <li>how would you suggest chunking this markdown-formatted blog post, splitting it up into separate documents delineated by the <code>####</code> <code>h4</code> section headers?</li>
 <li>that sounds good. how would you handle the same task automatically for 2046 blog posts?</li>
 <li>could you suggest how to code this in Python, please?</li>
-<li>actually, please improve the script as follows: split the input MD files into chunks using all headers as separators, and store the output in JSON files. each JSON should contain the following fields: original filename, header text, local header href, and chunk text.</li>
+<li>actually, please improve the script as follows: split the input MD files into chunks using all headers as separators, and store the output in JSON files. each JSON should contain the following fields: original filename, header text, local header <code>href</code>, and chunk text.</li>
 <li>the script you provided misses many of the section headers, because they have a href html tag directly joined to the markup header hash characters, like this: <code>####&lt;a name="2"&gt;&lt;/a&gt; Personalised Material Asset Properties</code></li>
 </ul>
 <p>The script generated 696 json files, one for each blog posts from number 1351 to today's number 2046</p>
@@ -130,7 +130,7 @@ All I did was type in the input and output folder paths.</p>
 </li>
 </ul>
 <p>After that, all was well, all 2046 blog posts processed and chunked.</p>
-<p>If you are interesed in seeing the code produced by Claude and the blog post chunks generated, you can check it out in
+<p>If you are interested in seeing the code produced by Claude and the blog post chunks generated, you can check it out in
 my <a href="https://github.com/jeremytammik/tbcchunk">tbcchunk GitHub repository</a>.</p>
 <h4><a name="5"></a> Vacation</h4>
 <p>I am on vacation next week, on a bike tour (my first) in the Massiv Central in France.</p>

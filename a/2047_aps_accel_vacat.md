@@ -47,7 +47,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### APS Accelerator and Q4R4 Chunking with CLaude
+### APS Accelerator and Q4R4 Chunking with Claude
 
 Vacation timer, accelerator time, and chunking TBC for LLM RAG:
 
@@ -123,7 +123,7 @@ I asked [Claude](https://claude.ai/) to chunk The Building Coder blog posts for 
 - how would you suggest chunking this markdown-formatted blog post, splitting it up into separate documents delineated by the `####` `h4` section headers?
 - that sounds good. how would you handle the same task automatically for 2046 blog posts?
 - could you suggest how to code this in Python, please?
-- actually, please improve the script as follows: split the input MD files into chunks using all headers as separators, and store the output in JSON files. each JSON should contain the following fields: original filename, header text, local header href, and chunk text.
+- actually, please improve the script as follows: split the input MD files into chunks using all headers as separators, and store the output in JSON files. each JSON should contain the following fields: original filename, header text, local header `href`, and chunk text.
 - the script you provided misses many of the section headers, because they have a href html tag directly joined to the markup header hash characters, like this: `####<a name="2"></a> Personalised Material Asset Properties`
 
 The script generated 696 json files, one for each blog posts from number 1351 to today's number 2046
@@ -145,7 +145,7 @@ I went on to ask for a similar script to process earlier html-formatted blog pos
 
 After that, all was well, all 2046 blog posts processed and chunked.
 
-If you are interesed in seeing the code produced by Claude and the blog post chunks generated, you can check it out in
+If you are interested in seeing the code produced by Claude and the blog post chunks generated, you can check it out in
 my [tbcchunk GitHub repository](https://github.com/jeremytammik/tbcchunk).
 
 ####<a name="5"></a> Vacation
