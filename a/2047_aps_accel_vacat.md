@@ -32,7 +32,11 @@ twitter:
 
  with the @AutodeskRevit #RevitAPI #BIM @DynamoBIM
 
-&ndash; ...
+Vacation time, accelerator time, and chunking TBC for LLM RAG
+&ndash; APS accelerator Barcelona in September
+&ndash; Q4R4 with LLM and RAG
+&ndash; Claude.ai helped chunk TBC blog posts
+&ndash; Vacation...
 
 linkedin:
 
