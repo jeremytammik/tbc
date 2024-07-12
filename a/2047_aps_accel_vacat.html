@@ -1,0 +1,142 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css"></p>
+<!-- https://highlightjs.org/#usage
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+-->
+
+<!-- https://prismjs.com -->
+<p><link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css" rel="stylesheet" /></p>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+<style> code[class*=language-], pre[class*=language-] { font-size : 90%; } </style>
+<p></head></p>
+<!---
+
+- blog about barcelona accelerator:
+
+- revisiting q4r4 with llm and rag
+  Breaking up is hard to do: Chunking in RAG applications
+  https://stackoverflow.blog/2024/06/06/breaking-up-is-hard-to-do-chunking-in-rag-applications/
+
+- graphrag -- https://youtu.be/r09tJfON6kE
+
+- claude.ai helped chunk tbc blog posts
+
+- vacation
+
+twitter:
+
+ with the @AutodeskRevit #RevitAPI #BIM @DynamoBIM
+
+&ndash; ...
+
+linkedin:
+
+#BIM #DynamoBIM #AutodeskAPS #Revit #API #IFC #SDK #Autodesk #AEC #adsk
+
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+
+<center>
+<img src="img/" alt="" title="" width="600"/>
+<p style="font-size: 80%; font-style:italic"></p>
+</center>
+
+-->
+
+<h3>APS Accelerator and Q4R4 Chunking with CLaude</h3>
+<p>Vacation timer, accelerator time, and chunking TBC for LLM RAG:</p>
+<ul>
+<li><a href="#2">APS accelerator Barcelona in September</a></li>
+<li><a href="#3">Q4R4 with LLM and RAG</a></li>
+<li><a href="#4">Claude.ai helped chunk TBC blog posts</a></li>
+<li><a href="#5">Vacation</a></li>
+</ul>
+<h4><a name="2"></a> APS Accelerator Barcelona in September</h4>
+<p>Time to plan not just your summer vacation, but what follows after as well.</p>
+<p>Registration is open for the next European face-to-face APS accelerator, scheduled to take place in the Autodesk offices on the beach in Barcelona September 23-27.</p>
+<p>Very attractive and popular, all of the items above: APS itself, the accelerators, the office, the beach, and the location Barcelona.
+Address and directions: <a href="https://www.google.com/maps/dir//C/+Josep+Pla+2+Building+B2+Sant+Marti+08019+Barcelona+Spain">Autodesk SA, Carrer de Josep Pla 2, Torre B2, Planta 6, 08019 Barcelona, Spain</a></p>
+<p>In the accelerator, you will benefit from dedicated time to develop your own chosen Autodesk Platform Services application with direct live help and training from my APS engineering expert colleagues to help creative developers leverage the <a href="https://aps.autodesk.com">Autodesk Platform Services Cloud APIs</a>, i.e., your choice of the following APS APIs:</p>
+<ul>
+<li>Authentication (OAuth)</li>
+<li>Autodesk Construction Cloud (ACC)</li>
+<li>BIM 360</li>
+<li>Data Exchange</li>
+<li>Data Management</li>
+<li>Data Visualization</li>
+<li>Forma</li>
+<li>Model Derivative</li>
+<li>Parameters</li>
+<li>Premium Reporting</li>
+<li>Reality Capture</li>
+<li>Token Flex</li>
+<li>Viewer</li>
+<li>Webhooks</li>
+</ul>
+<p>Last but not least, of course, we cover the desktop .NET <em>Revit API</em> as well as the <em>APS Design Automation APIs</em> for 3ds Max, AutoCAD, Inventor and Revit.</p>
+<p>The deadline for submitting your proposal is Friday, September 13, 2024:</p>
+<ul>
+<li><a href="https://www.eventbrite.com/e/autodesk-platform-services-accelerator-barcelona-september-23-27-2024-tickets-866126125557">Registration</a></li>
+<li><a href="https://aps.autodesk.com/accelerator-program">Other accelerators</a></li>
+</ul>
+<h4><a name="3"></a> Q4R4 with LLM and RAG</h4>
+<p>I spent some time in 2017
+pondering <a href="https://thebuildingcoder.typepad.com/blog/r4q4/">Q4R4</a>,
+<em>Question Answering for Revit API</em>, a Revit API question answering system.</p>
+<p>That was before the advent and rapid advancement of LLMs in more recent years.</p>
+<p>Now, it is probably much simpler to achieve a better solution making use of the new technologies.</p>
+<p>Some useful sources for priming an LLM with Revit API knowledge might be:</p>
+<ul>
+<li>The Revit API help file, originally Windows CHM, available online at <a href="https://www.revitapidocs.com/">reviapidocs</a></li>
+<li>The Revit API developers guide, available online within the Revit help at <a href="https://help.autodesk.com/view/RVT/2025/ENU/?guid=Revit_API_Revit_API_Developers_Guide_html">Revit API developers guide</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/">The Building Coder blog; published version</a></li>
+<li>The Building Coder HTML and markdown source files on GitHub <a href="https://github.com/jeremytammik/tbc">tbc</a></li>
+<li><a href="https://forums.autodesk.com/t5/revit-api-forum/bd-p/160">The Revit API discussion forum</a></li>
+</ul>
+<p>Some of that material could be fed in directly from the sources; other parts might need scraping from the web.</p>
+<p>One useful approach to integrate this Revit API domain-specific data with a base LLM is <a href="https://duckduckgo.com/?q=rag+llm">RAG, retrieval-augmented generation</a>.</p>
+<p>So, for instance, I would like to prepare The Building Coder blog post sources for RAG, cf.:</p>
+<ul>
+<li><a href="https://stackoverflow.blog/2024/06/06/breaking-up-is-hard-to-do-chunking-in-rag-applications/">Breaking up is hard to do: chunking in RAG applications</a>.</li>
+<li><a href="https://youtu.be/r09tJfON6kE">Graphrag</a></li>
+</ul>
+<h4><a name="4"></a> Claude.ai Helped Chunk TBC Blog Posts</h4>
+<p>I asked <a href="https://claude.ai/">Claude</a> to chunk The Building Coder blog posts for LLM RAG with the following series of prompts:</p>
+<ul>
+<li>how would you suggest chunking this markdown-formatted blog post, splitting it up into separate documents delineated by the <code>####</code> <code>h4</code> section headers?</li>
+<li>that sounds good. how would you handle the same task automatically for 2046 blog posts?</li>
+<li>could you suggest how to code this in Python, please?</li>
+<li>actually, please improve the script as follows: split the input MD files into chunks using all headers as separators, and store the output in JSON files. each JSON should contain the following fields: original filename, header text, local header href, and chunk text.</li>
+<li>the script you provided misses many of the section headers, because they have a href html tag directly joined to the markup header hash characters, like this: <code>####&lt;a name="2"&gt;&lt;/a&gt; Personalised Material Asset Properties</code></li>
+</ul>
+<p>The script generated 696 json files, one for each blog posts from number 1351 to today's number 2046</p>
+<p>The earlier blog posts until number 1350 were written in HTML, so they require a different script for chunking.</p>
+<p>The result looks perfect.</p>
+<p>I corrected nothing whatsoever, didn't even look at the code generated.
+All I did was type in the input and output folder paths.</p>
+<p>I went on to ask for a similar script to process earlier html-formatted blog posts, using the following prompts:</p>
+<ul>
+<li>that worked very well, and the result looks good. i also have a collection of older blog posts that i wrote in html instead of markdown. could you please write a similar script to chunk up the html blog posts in a similar way to the same json format?</li>
+<li>that script worked fine for a few of the files, but then it produced the following error:<ul>
+<li>UnicodeDecodeError: 'utf-8' codec can't decode byte 0xe9 in position 4049: invalid continuation byte`</li>
+</ul>
+</li>
+<li>i'm afraid that made things worse. now it produces an error in the very first file, saying:<ul>
+<li>File "/Users/jta/a/src/python/tbcchunk/tbcchunk3.py", line 34, in chunk_html: <code>for elem in soup.body.children</code>: AttributeError: 'NoneType' object has no attribute 'children'</li>
+</ul>
+</li>
+</ul>
+<p>After that, all was well, all 2046 blog posts processed and chunked.</p>
+<p>If you are interesed in seeing the code produced by Claude and the blog post chunks generated, you can check it out in
+my <a href="https://github.com/jeremytammik/tbcchunk">tbcchunk GitHub repository</a>.</p>
+<h4><a name="5"></a> Vacation</h4>
+<p>I am on vacation next week, on a bike tour (my first) in the Massiv Central in France.</p>
+<p>So, you and
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> will
+be left to your own devices for a while.</p>
+<p><center>
+<img src="img/rags.png" alt="Rags" title="Rags" width="400"/>
+</center></p>
