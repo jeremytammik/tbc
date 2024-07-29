@@ -47,106 +47,121 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 
 
-####<a name="2"></a> stable representation voodoo for ceiling in linked file:
+####<a name="2"></a> Stable Representation Voodoo for Hatches
 
-stable representation voodoo for ceiling in linked file:
-FAIR59
-https://forums.autodesk.com/t5/revit-api-forum/dimension-on-hatch-pattern-slab/td-p/7063302
-% lb dimension-on-hatch-pattern-slab
-1565_dim_hatch.md:2
-lots of interest in using the stable representartion voodoo championed by Fair59 et al for obtaining references to hatch pattern lines fone slabs.
-chuog ho added a solutiuon to switch from the original solution for ceilings to floors:
-Recenlly, I'm tried find the pick first point intersect of pattern and then suscess, but when you change between Floor and Ceiling, you need to change the number step of pattern:
-Floor :
+Fair59 shared some powerful stable representation voodoo for obtaining references to hatch pattern lines on a floor slab
+to programmatically [dimension on hatch pattern](https://thebuildingcoder.typepad.com/blog/2017/06/hatch-line-dimensioning-voodoo.html#4) way
+back in 2017, in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) threads
+on [dimension on hatch pattern slab](https://forums.autodesk.com/t5/revit-api-forum/dimension-on-hatch-pattern-slab/td-p/7063302)
+and [use of align function to programatically change the alignment of tiles for floor](https://forums.autodesk.com/t5/revit-api-forum/use-of-align-function-programatically-to-change-the-alignment-of/m-p/6008184).
+
+Some further aspects have been added in the meantime:
+
+- [Dimensioning hatch pattern on ceiling](#3)
+
+
+lots of interest in using the stable representartion voodoo championed by Fair59 et al for
+
+####<a name="3"></a> Dimensioning Hatch Pattern on Ceiling
+
+[Chuong Ho](https://chuongmep.com/) added a solution to switch from the original solution for ceilings to floors:
+
+Recenlly, I tried to find the pick first point intersect of pattern and succeeded, but when you change between Floor and Ceiling, you need to change the number step of pattern:
+
+Floor:
 
 <pre><code class="language-cs">int index = 2 + (ip * _gridCount * 2);
-int index = 3 + (ip * _gridCount * 2);
+int index = 3 + (ip * _gridCount * 2);</code></pre>
 
-Ceiling :
+Ceiling:
 
 <pre><code class="language-cs">int index = 1 + (ip * _gridCount * 2);
-int index = 2 + (ip * _gridCount * 2);
+int index = 2 + (ip * _gridCount * 2);</code></pre>
 
 Example to find the first intersect of pattern :
 
 <pre><code class="language-cs">public XYZ? FindPlacePointPattern()
 {
-    using Autodesk.Revit.DB.Transaction tran = new Transaction(Doc, "Find Place Point Pattern");
-    tran.Start();
-    //check for model surfacepattern
-    var hostObject = this.HostObjectPart.HostObject;
-    Reference? top = HostObjectUtils.GetTopFaces(hostObject)
-        .FirstOrDefault();
-    PlanarFace? topFace = hostObject.GetGeometryObjectFromReference(
-        top) as PlanarFace;
-    Material mat = Doc.GetElement(
-        topFace.MaterialElementId) as Material;
-    ElementId foregroundPatternId = mat.SurfaceForegroundPatternId;
-    FillPatternElement? patterntype = Doc.GetElement(
-        foregroundPatternId) as FillPatternElement;
-    FillPattern pattern = patterntype.GetFillPattern();
-    if (pattern.IsSolidFill || pattern.Target == FillPatternTarget.Drafting) return null;
+  using Autodesk.Revit.DB.Transaction tran = new Transaction(Doc, "Find Place Point Pattern");
+  tran.Start();
+  //check for model surfacepattern
+  var hostObject = this.HostObjectPart.HostObject;
+  Reference? top = HostObjectUtils.GetTopFaces(hostObject)
+    .FirstOrDefault();
+  PlanarFace? topFace = hostObject.GetGeometryObjectFromReference(
+    top) as PlanarFace;
+  Material mat = Doc.GetElement(
+    topFace.MaterialElementId) as Material;
+  ElementId foregroundPatternId = mat.SurfaceForegroundPatternId;
+  FillPatternElement? patterntype = Doc.GetElement(
+    foregroundPatternId) as FillPatternElement;
+  FillPattern pattern = patterntype.GetFillPattern();
+  if (pattern.IsSolidFill || pattern.Target == FillPatternTarget.Drafting) return null;
 
-    // get number of gridLines in pattern
-    int _gridCount = pattern.GridCount;
-    //https://forums.autodesk.com/t5/revit-api-forum/dimension-on-hatch-pattern-slab/m-p/7078368#M22785
-    // construct StableRepresentations and find the Reference to HatchLines
-    string StableRef = top.ConvertToStableRepresentation(Doc);
-    ReferenceArray _resArr = new ReferenceArray();
-    for (int ip = 0; ip < 2; ip++)
-    {
-        int index = 2 + (ip * _gridCount * 2);
-        string StableHatchString = StableRef + $"/{index}";
-        var HatchRef = Reference.ParseFromStableRepresentation(Doc, StableHatchString);
-        _resArr.Append(HatchRef);
-    }
+  // get number of gridLines in pattern
+  int _gridCount = pattern.GridCount;
+  //https://forums.autodesk.com/t5/revit-api-forum/dimension-on-hatch-pattern-slab/m-p/7078368#M22785
+  // construct StableRepresentations and find the Reference to HatchLines
+  string StableRef = top.ConvertToStableRepresentation(Doc);
+  ReferenceArray _resArr = new ReferenceArray();
+  for (int ip = 0; ip &lt; 2; ip++)
+  {
+    int index = 2 + (ip * _gridCount * 2);
+    string StableHatchString = StableRef + $"/{index}";
+    var HatchRef = Reference.ParseFromStableRepresentation(Doc, StableHatchString);
+    _resArr.Append(HatchRef);
+  }
 
-    // 2 or moreReferences => create dimension
-    Dimension d1 = null;
-    if (_resArr.Size > 1)
-    {
-        d1 = Doc.Create.NewDimension(Doc.ActiveView,
-            Line.CreateBound(XYZ.Zero, new XYZ(1, 0, 0)), _resArr);
-        // move dimension a tiny amount to orient the dimension perpendicular to the hatchlines
-        // I can't say why it works, but it does.
-        ElementTransformUtils.MoveElement(Doc, d1.Id, new XYZ(.01, 0, 0));
-    }
+  // 2 or moreReferences =&gt; create dimension
+  Dimension d1 = null;
+  if (_resArr.Size &gt; 1)
+  {
+    d1 = Doc.Create.NewDimension(Doc.ActiveView,
+      Line.CreateBound(XYZ.Zero, new XYZ(1, 0, 0)), _resArr);
+    // move dimension a tiny amount to orient the dimension perpendicular to the hatchlines
+    // I can't say why it works, but it does.
+    ElementTransformUtils.MoveElement(Doc, d1.Id, new XYZ(.01, 0, 0));
+  }
 
-    _resArr.Clear();
-    for (int ip = 0; ip < 2; ip++)
-    {
-        int index = 3 + (ip * _gridCount * 2);
-        string StableHatchString = StableRef + $"/{index}";
-        var HatchRef = Reference.ParseFromStableRepresentation(Doc, StableHatchString);
-        _resArr.Append(HatchRef);
-    }
+  _resArr.Clear();
+  for (int ip = 0; ip &lt; 2; ip++)
+  {
+    int index = 3 + (ip * _gridCount * 2);
+    string StableHatchString = StableRef + $"/{index}";
+    var HatchRef = Reference.ParseFromStableRepresentation(Doc, StableHatchString);
+    _resArr.Append(HatchRef);
+  }
 
-    // 2 or more References => create dimension
-    Dimension? d2 = null;
-    if (_resArr.Size > 1)
-    {
-        d2 = Doc.Create.NewDimension(Doc.ActiveView,
-            Line.CreateBound(XYZ.Zero, new XYZ(0, 1, 0)), _resArr);
-        // move dimension a tiny amount to orient the dimension perpendicular to the hatchlines
-        // I can't say why it works, but it does.
-        ElementTransformUtils.MoveElement(Doc, d2.Id, new XYZ(0, .01, 0));
-    }
-    // create dimension between two dimensions
+  // 2 or more References =&gt; create dimension
+  Dimension? d2 = null;
+  if (_resArr.Size &gt; 1)
+  {
+    d2 = Doc.Create.NewDimension(Doc.ActiveView,
+      Line.CreateBound(XYZ.Zero, new XYZ(0, 1, 0)), _resArr);
+    // move dimension a tiny amount to orient the dimension perpendicular to the hatchlines
+    // I can't say why it works, but it does.
+    ElementTransformUtils.MoveElement(Doc, d2.Id, new XYZ(0, .01, 0));
+  }
+  // create dimension between two dimensions
 
 
-    // try get cross point of two dimensions
-    if (d1 != null && d2 != null)
-    {
-        XYZ? intersection = FindIntersectByTwoDirection(d1, d2);
-        return intersection;
-    }
+  // try get cross point of two dimensions
+  if (d1 != null && d2 != null)
+  {
+    XYZ? intersection = FindIntersectByTwoDirection(d1, d2);
+    return intersection;
+  }
 
-    tran.RollBack();
-    return null;
-}
+  tran.RollBack();
+  return null;
+}</code></pre>
 
-jorge_morente raised to issue for linked files:
-Many thanks to @Chuong.Ho  and especially to @FAIR59  for this very valuable information. I have used this code and it works perfectly for me. I managed to center elements in the ceiling grid when I have the ceiling and the element in the same model. What happens when the ceiling is in a linked model? I tried it and I have a problem.
+####<a name="3"></a> Dimensioning Hatch Pattern in Linked File
+
+Jorge Morente raised to issue for linked files:
+
+Many thanks to @Chuong.Ho and especially to @FAIR59  for this very valuable information. I have used this code and it works perfectly for me. I managed to center elements in the ceiling grid when I have the ceiling and the element in the same model. What happens when the ceiling is in a linked model? I tried it and I have a problem.
 What I do to get a point from the grid and from there 2 perpendicular lines is to get the origin of each dimension, add or subtract half the value of one of the grid cells, and I have the point positioned on the line. I create a line with the point and direction, and I have "the axes" of the grid. This worked perfectly in my initial case but not with the ceiling in a linked model.
 /Users/jta/a/doc/revit/tbc/git/a/img/dim_hatch_linked_model_ceiling.png
 As seen in the images, I have the 2 dimensions from which I can obtain any of the green lines and thus any of the 4 red points. But the point I get with the script is the origin of the pink lines. It is displaced and I don't know why.
@@ -158,7 +173,8 @@ The string StableRef = bottom.ConvertToStableRepresentation(linkedDocument); com
 f6c5042c-3953-4e47-afb0-42e0e62b1e73-00023f10:1:SURFACE
 Curiously, if I dimension the grid in the model where the ceiling is, the references are with the code f6c5042... which is the UniqueId of the ceiling. If I dimension it in the model with the linked ceiling, the dimension references are 33899bce.... It's as if Revit renames the references, and I have no way of obtaining them from the ceiling because they are not those.
 Any ideas?
-Fair59's answer is an image. Does it say more than a thousand words? It says enough, anyway:
+
+Fair59's new answer is an image. Does it say more than a thousand words? It says enough, anyway:
 /Users/jta/a/doc/revit/tbc/git/a/img/dim_hatch_linked_model_ceiling.png
 dim_hatch_linked_model_ceiling.png
 dim_hatch_linked_model_ceiling_stable_rep.png
