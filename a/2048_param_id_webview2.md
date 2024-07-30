@@ -16,8 +16,6 @@
 
 <!---
 
-
-
 twitter:
 
  @AutodeskRevit #RevitAPI #BIM @DynamoBIM
@@ -49,9 +47,9 @@ Embedded browser plans are maturing further, and what to use for stable paramete
 
 ####<a name="2"></a> Move from CefSharp to WebView2
 
-The heads-up that we shared in the beginning of July
-on [CefSharp versus WebView2 Embedded Browser](https://thebuildingcoder.typepad.com/blog/2024/07/material-assets-chromium-and-sorting-schedules.html#3) is
-stabilisingto the extens that the development team has decided to announce a plan to migrate CefSharp to WebView2 in the next major release:
+The heads-up on thoughts that we shared in the beginning of July
+on [CefSharp versus WebView2 embedded browser](https://thebuildingcoder.typepad.com/blog/2024/07/material-assets-chromium-and-sorting-schedules.html#3) is
+stabilising to the extent that the development team has decided to announce a plan to migrate CefSharp to WebView2 in the next major release:
 
 > Revit is removing all CefSharp binaries from its distribution package starting in the next major release.
 Revit add-ins can keep using CefSharp as a standard 3rd party component.
@@ -67,7 +65,7 @@ specifying [what is the internal identifier of a parameter, which is also used i
 I am developing an addin in which I can define my own formulas in the family editor, similar to the family type dialog.
 
 <center>
-<img src="img/param_id_in_formula_1.png" alt="Parameter identifier in formula" title="Parameter identifier in formula" width="100"/>
+<img src="img/param_id_in_formula_1.png" alt="Parameter identifier in formula" title="Parameter identifier in formula" width="500"/> <!-- Pixel Height: 413 Pixel Width: 551 -->
 </center>
 
 Let's assume the formula is:
@@ -95,13 +93,12 @@ I suspect that the parameter names are replaced by a unique identifier.
 But which one?
 
 <center>
-<img src="img/param_id_in_formula_2.png" alt="Parameter identifier in formula" title="Parameter identifier in formula" width="100"/>
+<img src="img/param_id_in_formula_2.png" alt="Parameter identifier in formula" title="Parameter identifier in formula" width="600"/> <!-- Pixel Height: 79 Pixel Width: 658 -->
 </center>
 
 **Answer:**
 I think [`InternalDefinition.Id`](https://www.revitapidocs.com/2024/6b71158a-443a-7220-8934-5e86271984ee.htm) is the proper stable id.
-`GetTypeId` is the Forge Parameter Schema typeId, and it changed in the past few versions.
-`Id` remained unchanged.
+`GetTypeId` is the Forge Parameter Schema typeId, and it changed in the past few versions, whereas `Id` remained unchanged.
 
 ####<a name="4"></a> CrowdStrike Outage
 
