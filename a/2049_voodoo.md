@@ -19,6 +19,9 @@
 - filter elements in linked files
   https://stackoverflow.com/questions/78825246/revit-api-how-to-filter-elements-from-revit-links/
 
+- RubberBand
+  https://forums.autodesk.com/t5/revit-api-forum/rubberband/td-p/12909052
+
 twitter:
 
  @AutodeskRevit #RevitAPI #BIM @DynamoBIM
@@ -42,13 +45,13 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 
 
-<center>
-<img src="img/.png" alt="" title="" width="100"/>
-</center>
+- [Stable representation voodoo for hatch dimensions](#2)
+- [Dimensioning hatch pattern on ceiling](#3)
+- [Dimensioning hatch pattern in linked file](#4)
+- [Filter elements in linked file](#5)
+- [RubberBand Jig](#6)
 
-
-
-####<a name="2"></a> Stable Representation Voodoo for Hatches
+####<a name="2"></a> Stable Representation Voodoo for Hatch Dimensions
 
 Fair59 shared some powerful stable representation voodoo for obtaining references to hatch pattern lines on a floor slab
 to programmatically [dimension on hatch pattern](https://thebuildingcoder.typepad.com/blog/2017/06/hatch-line-dimensioning-voodoo.html#4) way
@@ -158,31 +161,63 @@ Example to find the first intersect of pattern :
   return null;
 }</code></pre>
 
-####<a name="3"></a> Dimensioning Hatch Pattern in Linked File
+####<a name="4"></a> Dimensioning Hatch Pattern in Linked File
 
-Jorge Morente raised to issue for linked files:
+Jorge Morente took a look at the same issue working with linked files:
 
-Many thanks to @Chuong.Ho and especially to @FAIR59  for this very valuable information. I have used this code and it works perfectly for me. I managed to center elements in the ceiling grid when I have the ceiling and the element in the same model. What happens when the ceiling is in a linked model? I tried it and I have a problem.
-What I do to get a point from the grid and from there 2 perpendicular lines is to get the origin of each dimension, add or subtract half the value of one of the grid cells, and I have the point positioned on the line. I create a line with the point and direction, and I have "the axes" of the grid. This worked perfectly in my initial case but not with the ceiling in a linked model.
-/Users/jta/a/doc/revit/tbc/git/a/img/dim_hatch_linked_model_ceiling.png
-As seen in the images, I have the 2 dimensions from which I can obtain any of the green lines and thus any of the 4 red points. But the point I get with the script is the origin of the pink lines. It is displaced and I don't know why.
-At first, I thought it could be because the origin point of the linked model was offset, but no, I checked and it is at (0,0,0). I can't figure out what it could be. Any ideas???
-UPDATE 1: In the previous example, I had ceilings in both the model and the linked model, and it seems I was mixing things up that I shouldn't have.
-I've created a model from scratch where I only have one ceiling, and it's from a linked model, and I've detected the problem. The references we created by adding some indices at the end to create the dimensions are not valid because the references I need are of the type:
-33899bce-a21c-4067-af38-2260a13fa4e9-00023f0b:0:RVTLINK:147216:1/181
-The string StableRef = bottom.ConvertToStableRepresentation(linkedDocument); command is giving me the following value:
-f6c5042c-3953-4e47-afb0-42e0e62b1e73-00023f10:1:SURFACE
-Curiously, if I dimension the grid in the model where the ceiling is, the references are with the code f6c5042... which is the UniqueId of the ceiling. If I dimension it in the model with the linked ceiling, the dimension references are 33899bce.... It's as if Revit renames the references, and I have no way of obtaining them from the ceiling because they are not those.
-Any ideas?
+Many thanks to @Chuong.Ho and especially to @Fair59 for this very valuable information.
+I have used this code and it works perfectly for me.
+I managed to center elements in the ceiling grid when I have the ceiling and the element in the same model.
+What happens when the ceiling is in a linked model?
+I tried it and I have a problem.
 
+What I do to get a point from the grid and from there 2 perpendicular lines is to get the origin of each dimension, add or subtract half the value of one of the grid cells, and I have the point positioned on the line.
+I create a line with the point and direction, and I have "the axes" of the grid.
+This worked perfectly in my initial case, but not with the ceiling in a linked model:
+
+<center>
+<img src="img/dim_hatch_linked_model_ceiling.png" alt="Dimension hatch on ceiling" title="Dimension hatch on ceiling" width="500"/> <!-- Pixel Height: 546 Pixel Width: 736 -->
+</center>
+
+As seen in the image, I have the 2 dimensions from which I can obtain any of the green lines and thus any of the 4 red points.
+But the point I get with the script is the origin of the pink lines.
+It is displaced and I don't know why.
+
+At first, I thought it could be because the origin point of the linked model was offset, but no, I checked and it is at (0,0,0).
+I can't figure out what it could be.
+
+**Update 1:**
+In the previous example, I had ceilings in both the model and the linked model, and it seems I was mixing things up that I shouldn't have.
+
+I created a model from scratch where I only have one ceiling, and it's from a linked model, and I've detected the problem.
+The references we created by adding some indices at the end to create the dimensions are not valid because the references I need have this structure:
+
+- 33899bce-a21c-4067-af38-2260a13fa4e9-00023f0b:0:RVTLINK:147216:1/181
+
+I use this statement:
+
+<pre><code class="language-cs">StableRef = bottom.ConvertToStableRepresentation(linkedDocument);</code></pre>
+
+That returns the following value:
+
+- f6c5042c-3953-4e47-afb0-42e0e62b1e73-00023f10:1:SURFACE
+
+Curiously, if I dimension the grid in the model where the ceiling is, the references are with the code f6c5042... which is the UniqueId of the ceiling.
+If I dimension it in the model with the linked ceiling, the dimension references are 33899bce....
+It's as if Revit renames the references, and I have no way of obtaining them from the ceiling because they are not those.
+
+**Answer:**
 Fair59's new answer is an image. Does it say more than a thousand words? It says enough, anyway:
-/Users/jta/a/doc/revit/tbc/git/a/img/dim_hatch_linked_model_ceiling.png
-dim_hatch_linked_model_ceiling.png
-dim_hatch_linked_model_ceiling_stable_rep.png
 
-####<a name="4"></a> Filter Elements in Linked Files
+<center>
+<img src="img/dim_hatch_linked_model_ceiling_stable_rep.png" alt="Stable representation in lined file" title="Stable representation in lined file" width="800"/> <!-- Pixel Height: 511 Pixel Width: 1,036 -->
+</center>
 
-The filtered element collector provides a helpful constructor taking separate element ids for the view and the link instance to filter for elements in a linked file in a specific view in the main project file, as we (re-) discovered discussing in StackOverflow how
+Many thanks to Fair59 for the succinct solution.
+
+####<a name="5"></a> Filter Elements in Linked File
+
+Continuing with linked files, the filtered element collector provides a helpful constructor taking separate element ids for the view and the link instance to filter for elements in a linked file in a specific view in the main project file, as we (re-) discovered discussing in StackOverflow how
 to [filter elements in linked files](https://stackoverflow.com/questions/78825246/revit-api-how-to-filter-elements-from-revit-links/):
 
 **Question:**
@@ -228,3 +263,24 @@ The new overload was apparently introduced in Revit 2024, almost two years ago.
 To quote from Richard Thomas' answer: Prior to 2024 getting visibility of elements in link per view is non-existent I believe. You can approximate with some element filters transferred into the link document but they will not pick up if the element has been hidden in view in the document that hosts the link.
 
 One idea would be to transfer the view itself to the link document (transformed to correct position for link instance) and use the FilteredElementCollector on it there. I've not tried that myself but see no obvious reasons why it would not work. You will not get the elements from the host document that way but those can be added separately.
+
+####<a name="6"></a> RubberBand Jig
+
+Mauricio [@Speed_CAD](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/45203) Jorquera enhanced
+his [RubberBand](https://forums.autodesk.com/t5/revit-api-forum/rubberband/td-p/12909052) solution:
+
+> A while ago I created a method to emulate a RubberBand when selecting two points.
+I recently had time to separate the project and share it on my GitHub.
+The complete code is available in case anyone wants to improve it, and I hope that in the future Autodesk will release a native method for this. The link is as follows:
+> - [github.com/SpeedCAD/SCADtools.Revit.UI.RubberBand](https://github.com/SpeedCAD/SCADtools.Revit.UI.RubberBand)
+
+Many thanks to Mauricio for sharing this.
+
+More transient graphics and jig examples:
+
+- [DirectContext Rectangle Jig](https://thebuildingcoder.typepad.com/blog/2020/10/onbox-directcontext-jig-and-no-cdn.html#3)
+- [Transient Graphics](https://thebuildingcoder.typepad.com/blog/2021/01/transient-graphics-humane-ai-basic-income-and-lockdown.html#2)
+- [Line Angle and Direction Jig](https://thebuildingcoder.typepad.com/blog/2021/05/refreshment-cloud-model-path-angle-and-direction.html)
+- [Transient Elements for Jig](https://thebuildingcoder.typepad.com/blog/2023/03/lookup-ideas-jigs-and-acc-docs-access.html#3)
+- [Transient DirectShape Jig](https://thebuildingcoder.typepad.com/blog/2023/03/lookup-ideas-jigs-and-acc-docs-access.html#3.1)
+
