@@ -24,7 +24,7 @@
 
 twitter:
 
- @AutodeskRevit #RevitAPI #BIM @DynamoBIM
+Fresh looks at stable representations voodoo for dimensioning floor and ceiling hatch in linked files, accessing and filtering elements in linked files, and transient graphics for jigs with the @AutodeskRevit #RevitAPI #BIM @DynamoBIM https://autode.sk/hatch_dim_voodoo
 
 Fresh looks at dimensioning voodoo with stable representations, accessing and filtering elements in linked files, and transient graphics for jigs
 &ndash; Stable representation voodoo for hatch dimensions
