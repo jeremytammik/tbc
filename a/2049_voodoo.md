@@ -43,7 +43,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Voodoo for Links and Ceilings
 
-
+Fresh looks at dimensioning voodoo with stable representations, accessing and filtering elements in linked files, and transient graphics for jigs:
 
 - [Stable representation voodoo for hatch dimensions](#2)
 - [Dimensioning hatch pattern on ceiling](#3)
@@ -59,13 +59,7 @@ back in 2017, in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) threads
 on [dimension on hatch pattern slab](https://forums.autodesk.com/t5/revit-api-forum/dimension-on-hatch-pattern-slab/td-p/7063302)
 and [use of align function to programatically change the alignment of tiles for floor](https://forums.autodesk.com/t5/revit-api-forum/use-of-align-function-programatically-to-change-the-alignment-of/m-p/6008184).
-
-Some further aspects have been added in the meantime:
-
-- [Dimensioning hatch pattern on ceiling](#3)
-
-
-lots of interest in using the stable representartion voodoo championed by Fair59 et al for
+Some further aspects have been added in the meantime to handle floors as well as ceilings, and hatch atterns in linked files.
 
 ####<a name="3"></a> Dimensioning Hatch Pattern on Ceiling
 
@@ -223,19 +217,18 @@ to [filter elements in linked files](https://stackoverflow.com/questions/7882524
 **Question:**
 I'm using Python, pyRevit and Revit 2021.
 
-**Goal**
+**Goal:**
 I want to use the `FilteredElementCollector` in order to collect specific elements within Revit Links linked in my project.
 
-**Problem**
+**Problem:**
 My question is how do I collect only the elements that are in my current view and belongs to Revit Links?
 Im not sure about what I tried because I am working on a big file with multiple Revit Links and when I try to print the elements I get an endless list of elements inside every Link, which doesnt seem right given the fact that my current view is a section with not a lot of elements in it.
+`link_doc.ActiveView.Id` produces a `NoneType` error &ndash;
+but when not passing an active view I get that endless list of elements I mentioned.
 
-`link_doc.ActiveView.Id` gets a NoneType error…
-But when not passing an active view I get that endless list of elements I mentioned.
+**Script:**
 
-**Script**
-
-<pre><code class="language-cs">doc = __revit__.ActiveUIDocument.Document # type: Document
+<pre><code class="language-py">doc = __revit__.ActiveUIDocument.Document # type: Document
 uidoc = __revit__.ActiveUIDocument # type: UIDocument
 selection = uidoc.Selection # type: Selection
 
@@ -253,7 +246,7 @@ for link in revit_link_instances_collector:
 **Answer:**
 Yes, you need to keep careful track of which document owns the view and the elements you seek. The active view is in the current document `A`. The elements that you are looking for are in the linked document `B`. When you use the `FilteredElementCollector(Document doc, ElementId view_id)` constructor, it returns a new `FilteredElementCollector` that will search and filter the visible elements in `doc` in the specified view that also has to belong to `doc`. So, I do not believe you can use that functionality for the case you describe.
 
-Wow, researching this question a bit further, I discovered an answer in the Revit API discussion forum that solves this issue, on how to [Filter Visible Elements From Linked Revit Model](https://forums.autodesk.com/t5/revit-api-forum/filter-visible-elements-from-linked-revit-model/m-p/11892735).
+Wow, researching this question a bit further, I discovered an answer in the Revit API discussion forum that solves this issue, on how to [filter visible elements from linked Revit model](https://forums.autodesk.com/t5/revit-api-forum/filter-visible-elements-from-linked-revit-model/m-p/11892735).
 
 The solution is to use a new [`FilteredElementCollector` constructor overload taking two view element ids](https://www.revitapidocs.com/2024/a9599101-043e-ddbc-f50a-8e55cd615daf.htm): `FilteredElementCollector(Document, ElementId, ElementId)` constructs a new `FilteredElementCollector` that will search and filter the visible elements from a Revit link in a host document view.
 
@@ -272,15 +265,17 @@ his [RubberBand](https://forums.autodesk.com/t5/revit-api-forum/rubberband/td-p/
 > A while ago I created a method to emulate a RubberBand when selecting two points.
 I recently had time to separate the project and share it on my GitHub.
 The complete code is available in case anyone wants to improve it, and I hope that in the future Autodesk will release a native method for this. The link is as follows:
+
 > - [github.com/SpeedCAD/SCADtools.Revit.UI.RubberBand](https://github.com/SpeedCAD/SCADtools.Revit.UI.RubberBand)
 
 Many thanks to Mauricio for sharing this.
 
 More transient graphics and jig examples:
 
-- [DirectContext Rectangle Jig](https://thebuildingcoder.typepad.com/blog/2020/10/onbox-directcontext-jig-and-no-cdn.html#3)
-- [Transient Graphics](https://thebuildingcoder.typepad.com/blog/2021/01/transient-graphics-humane-ai-basic-income-and-lockdown.html#2)
-- [Line Angle and Direction Jig](https://thebuildingcoder.typepad.com/blog/2021/05/refreshment-cloud-model-path-angle-and-direction.html)
-- [Transient Elements for Jig](https://thebuildingcoder.typepad.com/blog/2023/03/lookup-ideas-jigs-and-acc-docs-access.html#3)
-- [Transient DirectShape Jig](https://thebuildingcoder.typepad.com/blog/2023/03/lookup-ideas-jigs-and-acc-docs-access.html#3.1)
+- [DirectContext rectangle jig](https://thebuildingcoder.typepad.com/blog/2020/10/onbox-directcontext-jig-and-no-cdn.html#3)
+- [Transient graphics](https://thebuildingcoder.typepad.com/blog/2021/01/transient-graphics-humane-ai-basic-income-and-lockdown.html#2)
+- [Line angle and direction jig](https://thebuildingcoder.typepad.com/blog/2021/05/refreshment-cloud-model-path-angle-and-direction.html)
+- [Transient elements for jig](https://thebuildingcoder.typepad.com/blog/2023/03/lookup-ideas-jigs-and-acc-docs-access.html#3)
+- [Transient `DirectShape` jig](https://thebuildingcoder.typepad.com/blog/2023/03/lookup-ideas-jigs-and-acc-docs-access.html#3.1)
+
 
