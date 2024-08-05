@@ -26,7 +26,12 @@ twitter:
 
  @AutodeskRevit #RevitAPI #BIM @DynamoBIM
 
-&ndash; ...
+Fresh looks at dimensioning voodoo with stable representations, accessing and filtering elements in linked files, and transient graphics for jigs
+&ndash; Stable representation voodoo for hatch dimensions
+&ndash; Dimensioning hatch pattern on ceiling
+&ndash; Dimensioning hatch pattern in linked file
+&ndash; Filter elements in linked file
+&ndash; RubberBand jig...
 
 linkedin:
 
@@ -41,7 +46,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Voodoo for Links and Ceilings
+### Link Filter, Ceiling and Link Hatch Dim Voodoo
 
 Fresh looks at dimensioning voodoo with stable representations, accessing and filtering elements in linked files, and transient graphics for jigs:
 
@@ -49,7 +54,7 @@ Fresh looks at dimensioning voodoo with stable representations, accessing and fi
 - [Dimensioning hatch pattern on ceiling](#3)
 - [Dimensioning hatch pattern in linked file](#4)
 - [Filter elements in linked file](#5)
-- [RubberBand Jig](#6)
+- [RubberBand jig](#6)
 
 ####<a name="2"></a> Stable Representation Voodoo for Hatch Dimensions
 
@@ -170,7 +175,7 @@ I create a line with the point and direction, and I have "the axes" of the grid.
 This worked perfectly in my initial case, but not with the ceiling in a linked model:
 
 <center>
-<img src="img/dim_hatch_linked_model_ceiling.png" alt="Dimension hatch on ceiling" title="Dimension hatch on ceiling" width="500"/> <!-- Pixel Height: 546 Pixel Width: 736 -->
+<img src="img/dim_hatch_linked_model_ceiling.png" alt="Dimension hatch on floor" title="Dimension hatch on floor" width="500"/> <!-- Pixel Height: 546 Pixel Width: 736 -->
 </center>
 
 As seen in the image, I have the 2 dimensions from which I can obtain any of the green lines and thus any of the 4 red points.
@@ -204,7 +209,7 @@ It's as if Revit renames the references, and I have no way of obtaining them fro
 Fair59's new answer is an image. Does it say more than a thousand words? It says enough, anyway:
 
 <center>
-<img src="img/dim_hatch_linked_model_ceiling_stable_rep.png" alt="Stable representation in lined file" title="Stable representation in lined file" width="800"/> <!-- Pixel Height: 511 Pixel Width: 1,036 -->
+<img src="img/dim_hatch_linked_model_ceiling_stable_rep.png" alt="Stable representation in linked file" title="Stable representation in linked file" width="800"/> <!-- Pixel Height: 511 Pixel Width: 1,036 -->
 </center>
 
 Many thanks to Fair59 for the succinct solution.
