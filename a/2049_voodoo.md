@@ -16,7 +16,8 @@
 
 <!---
 
-
+- filter elements in linked files
+  https://stackoverflow.com/questions/78825246/revit-api-how-to-filter-elements-from-revit-links/
 
 twitter:
 
@@ -178,4 +179,9 @@ Fair59's new answer is an image. Does it say more than a thousand words? It says
 /Users/jta/a/doc/revit/tbc/git/a/img/dim_hatch_linked_model_ceiling.png
 dim_hatch_linked_model_ceiling.png
 dim_hatch_linked_model_ceiling_stable_rep.png
+
+####<a name="4"></a> Filter Elements in Linked Files
+
+[filter elements in linked files](https://stackoverflow.com/questions/78825246/revit-api-how-to-filter-elements-from-revit-links/)
+
 
