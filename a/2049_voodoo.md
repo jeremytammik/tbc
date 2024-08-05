@@ -182,6 +182,50 @@ dim_hatch_linked_model_ceiling_stable_rep.png
 
 ####<a name="4"></a> Filter Elements in Linked Files
 
-[filter elements in linked files](https://stackoverflow.com/questions/78825246/revit-api-how-to-filter-elements-from-revit-links/)
+The filtered element collector provides a helpful constructor taking separate element ids for the view and the link instance to filter for elements in a linked file in a specific view in the main project file, as we (re-) discovered discussing in StackOverflow how
+to [filter elements in linked files](https://stackoverflow.com/questions/78825246/revit-api-how-to-filter-elements-from-revit-links/):
 
+**Question:**
+I'm using Python, pyRevit and Revit 2021
 
+**Main goal**
+
+I want to use the `FilteredElementCollector` in order to collect specific elements within Revit Links linked in my project.
+
+**My problem**
+
+My question is how do I collect only the elements that are in my current view and belongs to Revit Links?
+Im not sure about what I tried because I am working on a big file with multiple Revit Links and when I try to print the elements I get an endless list of elements inside every Link, which doesnt seem right given the fact that my current view is a section with not a lot of elements in it.
+
+`link_doc.ActiveView.Id` gets a NoneType error…
+But when not passing an active view I get that endless list of elements I mentioned.
+
+**My script**
+
+<pre><code class="language-cs">doc = __revit__.ActiveUIDocument.Document # type: Document
+uidoc = __revit__.ActiveUIDocument # type: UIDocument
+selection = uidoc.Selection # type: Selection
+
+# Collect all Revit Link instances
+revit_link_instances_collector = FilteredElementCollector(doc, active_view.Id).OfClass(RevitLinkInstance).ToElements()
+for link in revit_link_instances_collector:
+  # Get the doc for current Link
+  link_doc = link.GetLinkDocument()
+  if link_doc:
+    # collect all FamilyInstances
+    linked_elemens = FilteredElementCollector(link_doc, link_doc.ActiveView.Id).OfClass(FamilyInstance).WhereElementIsNotElementType().ToElements()
+    for element in linked_elemens:
+      print(element)</code></pre>
+
+**Answer:**
+Yes, you need to keep careful track of which document owns the view and the elements you seek. The active view is in the current document `A`. The elements that you are looking for are in the linked document `B`. When you use the `FilteredElementCollector(Document doc, ElementId view_id)` constructor, it returns a new `FilteredElementCollector` that will search and filter the visible elements in `doc` in the specified view that also has to belong to `doc`. So, I do not believe you can use that functionality for the case you describe.
+
+Wow, researching this question a bit further, I discovered an answer in the Revit API discussion forum that solves this issue, on how to [Filter Visible Elements From Linked Revit Model](https://forums.autodesk.com/t5/revit-api-forum/filter-visible-elements-from-linked-revit-model/m-p/11892735).
+
+The solution is to use a new [`FilteredElementCollector` constructor overload taking two view element ids](https://www.revitapidocs.com/2024/a9599101-043e-ddbc-f50a-8e55cd615daf.htm): `FilteredElementCollector(Document, ElementId, ElementId)` constructs a new `FilteredElementCollector` that will search and filter the visible elements from a Revit link in a host document view.
+
+Oh dear, I see that you mention Revit 2021. Well, that is a very old version indeed, no longer supported. I'm sorry to say that the new overload was apparently introduced in Revit 2024, almost two years ago.
+
+To quote from Richard Thomas' answer: Prior to 2024 getting visibility of elements in link per view is non-existent I believe. You can approximate with some element filters transferred into the link document but they will not pick up if the element has been hidden in view in the document that hosts the link.
+
+One idea would be to transfer the view itself to the link document (transformed to correct position for link instance) and use the FilteredElementCollector on it there. I've not tried that myself but see no obvious reasons why it would not work. You will not get the elements from the host document that way but those can be added separately.
