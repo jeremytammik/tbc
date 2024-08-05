@@ -186,21 +186,19 @@ The filtered element collector provides a helpful constructor taking separate el
 to [filter elements in linked files](https://stackoverflow.com/questions/78825246/revit-api-how-to-filter-elements-from-revit-links/):
 
 **Question:**
-I'm using Python, pyRevit and Revit 2021
+I'm using Python, pyRevit and Revit 2021.
 
-**Main goal**
-
+**Goal**
 I want to use the `FilteredElementCollector` in order to collect specific elements within Revit Links linked in my project.
 
-**My problem**
-
+**Problem**
 My question is how do I collect only the elements that are in my current view and belongs to Revit Links?
 Im not sure about what I tried because I am working on a big file with multiple Revit Links and when I try to print the elements I get an endless list of elements inside every Link, which doesnt seem right given the fact that my current view is a section with not a lot of elements in it.
 
 `link_doc.ActiveView.Id` gets a NoneType error…
 But when not passing an active view I get that endless list of elements I mentioned.
 
-**My script**
+**Script**
 
 <pre><code class="language-cs">doc = __revit__.ActiveUIDocument.Document # type: Document
 uidoc = __revit__.ActiveUIDocument # type: UIDocument
@@ -224,7 +222,8 @@ Wow, researching this question a bit further, I discovered an answer in the Revi
 
 The solution is to use a new [`FilteredElementCollector` constructor overload taking two view element ids](https://www.revitapidocs.com/2024/a9599101-043e-ddbc-f50a-8e55cd615daf.htm): `FilteredElementCollector(Document, ElementId, ElementId)` constructs a new `FilteredElementCollector` that will search and filter the visible elements from a Revit link in a host document view.
 
-Oh dear, I see that you mention Revit 2021. Well, that is a very old version indeed, no longer supported. I'm sorry to say that the new overload was apparently introduced in Revit 2024, almost two years ago.
+Oh dear, I see that you mention Revit 2021.
+The new overload was apparently introduced in Revit 2024, almost two years ago.
 
 To quote from Richard Thomas' answer: Prior to 2024 getting visibility of elements in link per view is non-existent I believe. You can approximate with some element filters transferred into the link document but they will not pick up if the element has been hidden in view in the document that hosts the link.
 
