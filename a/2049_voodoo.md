@@ -35,6 +35,16 @@ Fresh looks at dimensioning voodoo with stable representations, accessing and fi
 
 linkedin:
 
+Fresh looks at stable representations voodoo for dimensioning floor and ceiling hatch in linked files, accessing and filtering elements in linked files, and transient graphics for jigs with the #RevitAPI
+
+https://autode.sk/hatch_dim_voodoo
+
+- Stable representation voodoo for hatch dimensions
+- Dimensioning hatch pattern on ceiling
+- Dimensioning hatch pattern in linked file
+- Filter elements in linked file
+- RubberBand jig...
+
 #BIM #DynamoBIM #AutodeskAPS #Revit #API #IFC #SDK #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
