@@ -57,8 +57,13 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Modeless Add-In
 
+- [Simultaneous add-in and Revit interaction](#2)
+- [Limited PDF printing speed](#3)
+- [Family instance code samples](#4)
+- [Apple intelligence foundation language models](#5)
+- [LLM arena](#6)
 
-####<a name="2"></a> Simultaneous Add-In and Revit Interacxtion
+####<a name="2"></a> Simultaneous Add-In and Revit Interaction
 
 A nice opportunity to reiteraste some basic facts and consequences of the fundamental Revit add-in architecture is provided by
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
@@ -164,7 +169,7 @@ We highlight our focus on Responsible AI and how the principles are applied thro
 
 ####<a name="6"></a> LLM Arena
 
-Are yoiu interested in comparing results from various different LLMs?
+Are you interested in comparing results from various different LLMs?
 
 The [LMSYS Chatbot Arena](https://arena.lmsys.org/) supports benchmarking LLMs and VLMs in the wild and provides a chatbot arena leaderboard:
 
