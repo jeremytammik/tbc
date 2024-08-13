@@ -57,6 +57,8 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Modeless Add-In
 
+Today, I summarise a couple of topics discussed in the past week:
+
 - [Simultaneous add-in and Revit interaction](#2)
 - [Limited PDF printing speed](#3)
 - [Family instance code samples](#4)
@@ -82,21 +84,18 @@ The most important differentiation in this context is between modal and modeless
 
 Please be aware that the Revit API is single-threaded and only runs within a valid Revit API context:
 
-- [Modeless Door Lister Flaws](http://thebuildingcoder.typepad.com/blog/2011/01/modeless-door-lister-flaws.html)
-- [No Multithreading in Revit](http://thebuildingcoder.typepad.com/blog/2011/06/no-multithreading-in-revit.html)
-- [New Revit 2013 SDK Samples](http://thebuildingcoder.typepad.com/blog/2012/03/new-revit-2013-sdk-samples.html)
+- [Modeless door lister flaws](http://thebuildingcoder.typepad.com/blog/2011/01/modeless-door-lister-flaws.html)
+- [No multithreading in Revit](http://thebuildingcoder.typepad.com/blog/2011/06/no-multithreading-in-revit.html)
+- [Modeless Revit SDK Samples](http://thebuildingcoder.typepad.com/blog/2012/03/new-revit-2013-sdk-samples.html)
 - [What's New in the Revit 2014 API](http://thebuildingcoder.typepad.com/blog/2013/04/whats-new-in-the-revit-2014-api.html)
+  &rarr; API validation &ndash; No transactions from outside threads
 - [Replacing an Idling Event Handler by an External Event](http://thebuildingcoder.typepad.com/blog/2013/12/replacing-an-idling-event-handler-by-an-external-event.html)
-- [Multithreading Throws Exceptions in Revit 2015](http://thebuildingcoder.typepad.com/blog/2014/05/multithreading-throws-exceptions-in-revit-2015.html)
-- [The Revit API is Never Ever Thread Safe](http://thebuildingcoder.typepad.com/blog/2014/11/the-revit-api-is-never-ever-thread-safe.html)
-- [Happy New Year and New Beginnings!](http://thebuildingcoder.typepad.com/blog/2015/01/happy-new-year-and-new-beginnings.html)
-- [PickPoint with WPF and No Threads](http://thebuildingcoder.typepad.com/blog/2015/11/pickpoint-with-wpf-and-no-threads.html)
-- [Implementing the TrackChangesCloud External Event](http://thebuildingcoder.typepad.com/blog/2016/03/implementing-the-trackchangescloud-external-event.html)
-- [Multi-Threading Family Instance Placement Monitor](https://thebuildingcoder.typepad.com/blog/2020/02/multi-threading-family-instance-placement-monitor.html)
-- [Selection in Link, Cancel in Export, Multithreading](https://thebuildingcoder.typepad.com/blog/2020/07/selection-link-support-cancel-custom-export-multithreading.html)
-- [Selection in Link, Cancel in Export, Multithreading](https://thebuildingcoder.typepad.com/blog/2020/07/selection-link-support-cancel-custom-export-multithreading.html)
-- [Add-In Threads and Geometry Comparison](https://thebuildingcoder.typepad.com/blog/2023/09/add-in-threads-and-geometry-comparison.html)
-- [Add-In Threads and Geometry Comparison](https://thebuildingcoder.typepad.com/blog/2023/09/add-in-threads-and-geometry-comparison.html)
+- [Multithreading throws exceptions in Revit 2015](http://thebuildingcoder.typepad.com/blog/2014/05/multithreading-throws-exceptions-in-revit-2015.html)
+- [The Revit API is never ever thread safe](http://thebuildingcoder.typepad.com/blog/2014/11/the-revit-api-is-never-ever-thread-safe.html)
+- [PickPoint with WPF and no threads attached](http://thebuildingcoder.typepad.com/blog/2015/11/pickpoint-with-wpf-and-no-threads.html)
+- [Multi-threading family instance placement monitor](https://thebuildingcoder.typepad.com/blog/2020/02/multi-threading-family-instance-placement-monitor.html)
+- [Multi-threading with the single-threaded Revit API](https://thebuildingcoder.typepad.com/blog/2020/07/selection-link-support-cancel-custom-export-multithreading.html#5)
+- [Add-in threads](https://thebuildingcoder.typepad.com/blog/2023/09/add-in-threads-and-geometry-comparison.html)
 
 A valid Revit API context is only provided by Revit in one of the numerous event handlers defined by the API and runs in the main thread of Revit.
 This blocks the UI, just as you say.
@@ -126,6 +125,8 @@ As said and also stated in the samples Readme, in modeless variant you have to u
 You don't need to use MVVM if you are just learning, but it is a good practice and should be considered for commercial plugin development.
 
 ####<a name="3"></a> Limited PDF Printing Speed
+
+Colleagues share insights on PDF print time performance:
 
 **Question:**
 I'm working on a Revit DA project to do sheet to PDF printing.
