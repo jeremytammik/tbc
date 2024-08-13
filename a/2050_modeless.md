@@ -40,7 +40,12 @@ twitter:
 
  with the @AutodeskRevit #RevitAPI #BIM @DynamoBIM
 
-&ndash; ...
+Topics discussed in the past week
+&ndash; Simultaneous add-in and Revit interaction
+&ndash; Limited PDF printing speed
+&ndash; Family instance code samples
+&ndash; Apple intelligence foundation language models
+&ndash; LLM arena...
 
 linkedin:
 
@@ -55,7 +60,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Modeless Add-In
+### Modeless Add-Ins and PDF Printing Speed
 
 Today, I summarise a couple of topics discussed in the past week:
 
@@ -67,7 +72,7 @@ Today, I summarise a couple of topics discussed in the past week:
 
 ####<a name="2"></a> Simultaneous Add-In and Revit Interaction
 
-A nice opportunity to reiteraste some basic facts and consequences of the fundamental Revit add-in architecture is provided by
+A nice opportunity to reiterate some basic facts and consequences of the fundamental Revit add-in architecture is provided by
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [Revit Addin without blocking Revit UI](https://forums.autodesk.com/t5/revit-api-forum/revit-addin-without-blocking-revit-ui/m-p/12951089):
 
@@ -88,7 +93,7 @@ Please be aware that the Revit API is single-threaded and only runs within a val
 - [No multithreading in Revit](http://thebuildingcoder.typepad.com/blog/2011/06/no-multithreading-in-revit.html)
 - [Modeless Revit SDK Samples](http://thebuildingcoder.typepad.com/blog/2012/03/new-revit-2013-sdk-samples.html)
 - [What's New in the Revit 2014 API](http://thebuildingcoder.typepad.com/blog/2013/04/whats-new-in-the-revit-2014-api.html)
-  &rarr; API validation &ndash; No transactions from outside threads
+  &rarr; API validation &ndash; no transactions from outside threads
 - [Replacing an Idling Event Handler by an External Event](http://thebuildingcoder.typepad.com/blog/2013/12/replacing-an-idling-event-handler-by-an-external-event.html)
 - [Multithreading throws exceptions in Revit 2015](http://thebuildingcoder.typepad.com/blog/2014/05/multithreading-throws-exceptions-in-revit-2015.html)
 - [The Revit API is never ever thread safe](http://thebuildingcoder.typepad.com/blog/2014/11/the-revit-api-is-never-ever-thread-safe.html)
@@ -181,6 +186,4 @@ The [LMSYS Chatbot Arena](https://arena.lmsys.org/) supports benchmarking LLMs a
 <center>
 <img src="img/arena.png" alt="Arena" title="Arena" width="600"/>
 </center>
-
-
 
