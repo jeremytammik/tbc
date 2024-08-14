@@ -38,7 +38,7 @@
 
 twitter:
 
- with the @AutodeskRevit #RevitAPI #BIM @DynamoBIM
+Simultaneous interaction with both add-in and @AutodeskRevit UI, limited PDF printing speed and #RevitAPI family instance code samples #BIM @DynamoBIM https://autode.sk/modelessaddin
 
 Topics discussed in the past week
 &ndash; Simultaneous add-in and Revit interaction
