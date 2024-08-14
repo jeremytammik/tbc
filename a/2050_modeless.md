@@ -49,6 +49,16 @@ Topics discussed in the past week
 
 linkedin:
 
+Simultaneous interaction with both add-in and Revit UI, limited PDF printing speed and #RevitAPI family instance code samples
+
+https://autode.sk/modelessaddin
+
+- Simultaneous add-in and Revit interaction
+- Limited PDF printing speed
+- Family instance code samples
+- Apple intelligence foundation language models
+- LLM arena...
+
 #BIM #DynamoBIM #AutodeskAPS #Revit #API #IFC #SDK #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
