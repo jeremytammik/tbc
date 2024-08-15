@@ -224,6 +224,77 @@ Fair59's new answer is an image. Does it say more than a thousand words? It says
 
 Many thanks to Fair59 for the succinct solution.
 
+####<a name="4.2"></a> Final Solution
+
+Jorge shared the complete final code, saying:
+
+It works perfectly for simple patterns, both in the model and in links:
+
+<pre><code class="language-cs">int gridCount = pattern.GridCount;
+
+for (int i = 1; i &lt; 3; i++)
+{
+  for (int ip = 0; ip &lt; 2; ip++)
+  {
+    int index = i + (ip * gridCount *2);
+
+    string StableHatchString = null;
+    if (isLinked)
+    {
+      var uniqueId = revitLinkInstance.UniqueId;
+      string indexSurface = StableRef.Length &gt;= 10 ?
+      StableRef.Substring(StableRef.Length - 10) : StableRef;
+      StableHatchString = $"{uniqueId}:0:RVTLINK:{ceilingInstance.Id}
+                         {indexSurface}/{index}";
+    }
+    else
+    {
+      StableHatchString = StableRef + $"/{index}";
+    }
+
+    Reference HatchRef = null;
+    HatchRef = Reference.ParseFromStableRepresentation(document,
+               StableHatchString);
+
+    if (HatchRef == null)
+    {
+      continue;
+    }
+
+    _resArr.Append(HatchRef);
+  }
+
+  // 2 or more References =&gt; create dimension
+  Dimension dimension = null;
+  if (_resArr.Size &gt; 1)
+  {
+    dimension = document.Create.NewDimension(document.ActiveView,
+          Line.CreateBound(XYZ.Zero, new XYZ(1, 0, 0)), _resArr);
+    ElementTransformUtils.MoveElement(document, dimension.Id,
+                                        new XYZ(.01, 0, 0));
+  }
+
+  dimensions.Add(dimension);
+  _resArr.Clear();
+}</code></pre>
+
+I tested it with a ceiling that has a more complex pattern, with a gridCount of 6, 2 horizontally and 4 vertically, and had to change the `index` formula because it was giving me the same dimension:
+
+<pre><code class="language-cs">int index = i + 2 + (ip * gridCount * 2);</code></pre>
+
+No guarantee that it will work in other cases where the `gridCount` is not equal to 2.
+This is the pattern:
+
+<center>
+<img src="img/dim_hatch_linked_model_final.png.png" alt="Stable representation in linked file" title="Stable representation in linked file" width="800"/> <!-- Pixel Height: 511 Pixel Width: 1,036 -->
+</center>
+
+I managed to place the element in the center of the pattern, represented by the yellow dot.
+The goal was to place it at one of the intersections of the green lines.
+I think it's very complicated when the patterns aren't simple, and it's not worth the effort.
+
+Thanks to everyone who helped solve this problem.
+
 ####<a name="5"></a> Filter Elements in Linked File
 
 Continuing with linked files, the filtered element collector provides a helpful constructor taking separate element ids for the view and the link instance to filter for elements in a linked file in a specific view in the main project file, as we (re-) discovered discussing in StackOverflow how
