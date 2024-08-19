@@ -63,6 +63,7 @@ Fresh looks at dimensioning voodoo with stable representations, accessing and fi
 - [Stable representation voodoo for hatch dimensions](#2)
 - [Dimensioning hatch pattern on ceiling](#3)
 - [Dimensioning hatch pattern in linked file](#4)
+- [Final solution code](#4.2)
 - [Filter elements in linked file](#5)
 - [RubberBand jig](#6)
 
@@ -286,12 +287,12 @@ No guarantee that it will work in other cases where the `gridCount` is not equal
 This is the pattern:
 
 <center>
-<img src="img/dim_hatch_linked_model_final.png.png" alt="Stable representation in linked file" title="Stable representation in linked file" width="800"/> <!-- Pixel Height: 511 Pixel Width: 1,036 -->
+<img src="img/dim_hatch_linked_model_final.png" alt="Stable representation in linked file" title="Stable representation in linked file" width="540"/> <!-- Pixel Height: 252 Pixel Width: 540 -->
 </center>
 
 I managed to place the element in the center of the pattern, represented by the yellow dot.
 The goal was to place it at one of the intersections of the green lines.
-I think it's very complicated when the patterns aren't simple, and it's not worth the effort.
+I think it's very complicated when the patterns aren't simple, and not worth the effort.
 
 Thanks to everyone who helped solve this problem.
 
