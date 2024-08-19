@@ -145,14 +145,12 @@ I asked [Claude](https://claude.ai/) to chunk The Building Coder blog posts for 
 
 The script generated 696 json files, one for each blog posts from number 1351 to today's number 2046
 
-The earlier blog posts until number 1350 were written in HTML, so they require a different script for chunking.
-
 The result looks perfect.
-
 I corrected nothing whatsoever, didn't even look at the code generated.
 All I did was type in the input and output folder paths.
 
-I went on to ask for a similar script to process earlier html-formatted blog posts, using the following prompts:
+The earlier blog posts until number 1350 were written in HTML, so they require a different script for chunking.
+I went on to ask how to process those using the following prompts:
 
 - that worked very well, and the result looks good. i also have a collection of older blog posts that i wrote in html instead of markdown. could you please write a similar script to chunk up the html blog posts in a similar way to the same json format?
 - that script worked fine for a few of the files, but then it produced the following error:
