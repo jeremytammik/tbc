@@ -225,7 +225,7 @@ Fair59's new answer is an image. Does it say more than a thousand words? It says
 
 Many thanks to Fair59 for the succinct solution.
 
-####<a name="4.2"></a> Final Solution
+####<a name="4.2"></a> Final Solution Code
 
 Jorge shared the complete final code, saying:
 
@@ -287,7 +287,7 @@ No guarantee that it will work in other cases where the `gridCount` is not equal
 This is the pattern:
 
 <center>
-<img src="img/dim_hatch_linked_model_final.png" alt="Stable representation in linked file" title="Stable representation in linked file" width="540"/> <!-- Pixel Height: 252 Pixel Width: 540 -->
+<img src="img/dim_hatch_linked_model_final.png" alt="Final solution code" title="Final solution code" width="540"/> <!-- Pixel Height: 252 Pixel Width: 540 -->
 </center>
 
 I managed to place the element in the center of the pattern, represented by the yellow dot.
