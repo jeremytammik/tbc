@@ -120,7 +120,7 @@ I disagree.
 The Building Coder has discussed related issues with great frequency, and they have also come up a lot in previous discussions here in the forum; a background process is basically a modeless context, so the interaction between those and the BIM are covered by the discussions
 on [Idling and external events for modeless access and driving Revit from outside](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.28).
 
-####<a name="2"></a> cdiggins
+####<a name="3"></a> Revit Background Processor
 
 Christopher Diggins of [Ara 3D](https://ara3d.com/) is looking for feedback on [performing long running background computations using `Idling` event](https://forums.autodesk.com/t5/revit-api-forum/performing-long-running-background-computations-using-idling/td-p/12963194):
 
@@ -175,18 +175,18 @@ https://www.linkedin.com/feed/update/urn:li:ugcPost:7230208897385467904?commentU
 https://forums.autodesk.com/t5/revit-api-forum/performing-long-running-background-computations-using-idling/m-p/12963194/highlight/false#M80855
 -->
 
-####<a name="3"></a> Effective Revit API Context Predicate
+####<a name="4"></a> Effective Revit API Context Predicate
 
 https://forums.autodesk.com/t5/revit-api-forum/how-to-know-if-revit-api-is-in-context/m-p/12964099#M80866n
 
 https://github.com/Nice3point/RevitToolkit?tab=readme-ov-file#context
 
-####<a name="4"></a>  PostCommand Requires a Valid API Context
+####<a name="5"></a>  PostCommand Requires Valid API Context
 
 API queue command "CommandId" cannot be invoked in this context
 https://forums.autodesk.com/t5/revit-api-forum/api-queue-command-quot-commandid-quot-cannot-be-invoked-in-this/m-p/12971672
 
-####<a name="5"></a> Protect Creativity With No AI
+####<a name="6"></a> Protect Creativity With No AI
 
 [Procreate](https://procreate.com/) provides creative tools under the motto *Art is for everyone*.
 They go against the current mainstream with an unequivocally clear statement that they do not plan to support the use of AI in their tools:
@@ -197,14 +197,14 @@ They go against the current mainstream with an unequivocally clear statement tha
   <br/><i>Creativity is made, not generated.</i></p>
 </center>
 
-####<a name="6"></a> AI Act is Here
+####<a name="7"></a> European Union AI Act
 
 On the other hand,
 the [AI act is here](https://alvaromontoro.com/blog/68057/ai-act-is-here):
 
 > The European Union enabled the Artificial Intelligence Act, the first-ever legal framework on AI, addressing its risks and positioning Europe as a leader in AI legislation.
 
-####<a name="7"></a> The Sakana AI Scientist
+####<a name="8"></a> The Sakana AI Scientist
 
 On the other end of the scale, making full unfettered use of it,
 [Sakana.ai](https://sakana.ai/ai-scientist/#example-papers-generated-by-the-ai-scientist) is working on creating
@@ -222,9 +222,9 @@ This led to the script endlessly calling itself.
 In another case, its experiments took too long to complete, hitting our timeout limit.
 Instead of making its code run faster, it simply tried to modify its own code to extend the timeout period...
 
-####<a name="8"></a> Plasma in High School Nuclear Fusion Reactor
+####<a name="9"></a> Plasma in High School Nuclear Fusion Reactor
 
-In a completely different field of science,
+Movin to a completely different field of science unrelated to AI and computing,
 [Cesare Mencarini of Cardiff Sixth Form College](https://www.linkedin.com/in/cesare-mencarini-624449249/) built
 a [nuclear fusion reactor capable of achieving plasma](https://www.linkedin.com/posts/cesare-mencarini-624449249_nuclear-fusion-reactor-phase-1-complete-activity-7110388091592306688-LGC8?utm_source=share&utm_medium=member_desktop):
 
@@ -238,12 +238,4 @@ Also, the linkedin comment explaining the (low) funding is very impressive!
 <center>
 <img src="img/cm_plasma.jpg" alt="High school nuclear fusion reactor" title="High school nuclear fusion reactor" width="450"/> <!-- Pixel Height: 369 Pixel Width: 450 -->
 </center>
-
-
-
-**Question:**
-
-**Answer:**
-
-**Response:**
 
