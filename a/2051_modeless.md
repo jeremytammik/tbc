@@ -262,7 +262,6 @@ They go against the current mainstream with an unequivocally clear statement tha
 - <a href="https://procreate.com/ai">AI is not our future</a>
   &ndash; <i>Creativity is made, not generated.</i>
 
-
 ####<a name="7"></a> European Union AI Act
 
 On the other hand,
