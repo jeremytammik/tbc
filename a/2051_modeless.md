@@ -213,22 +213,21 @@ Throwing an exception costs quite a bit of time, and creating an additional empt
 
 RevitToolkit now provides the property `Context.IsRevitInApiMode` that determines whether Revit is in API mode or not without throwing an exception.
 
-Here are benchamark medians results in nanoseconds comparing 1000 iterations using the old approach versus the new method:
+Here are benchmark median results in nanoseconds comparing 1000 iterations using the old approach versus the new method:
 
 <center>
 <table>
-<tr><th>API Context</th><th>Exception</th><th>`IsRevitInApiMode`</th></tr>
-<tr><th>Inside</th><th>24122</th><th>413</th></tr>
-<tr><th>Outside</th><th>9522531</th><th>550</th></tr>
+<tr><th>API Context</th><th>Exception</th><th>New Method</th></tr>
+<tr><td>Inside</td><td>24122</td><td>413</td></tr>
+<tr><td>Outside</td><td>9522531</td><td>550</td></tr>
 </table>
 </center>
 
 The difference in speed is 58 times in context, and 17313 outside.
 
-Here is the full description
-of [RevitToolkit.Context](https://github.com/Nice3point/RevitToolkit?tab=readme-ov-file#context)
+Here is the [RevitToolkit.Context documentation](https://github.com/Nice3point/RevitToolkit?tab=readme-ov-file#context)
 
-Many thanks to Roman for discovering ahnd sharing this huge improvement.
+Many thanks to Roman for discovering and sharing this huge improvement.
 
 ####<a name="5"></a>  PostCommand Context and View Focus
 
@@ -237,7 +236,7 @@ Mauricio [@Speed_CAD](https://forums.autodesk.com/t5/user/viewprofilepage/user-i
 provide a solution to
 why [API queue command "CommandId" cannot be invoked in this context](https://forums.autodesk.com/t5/revit-api-forum/api-queue-command-quot-commandid-quot-cannot-be-invoked-in-this/m-p/12971672)
 
-Basically, certain built-in Revit commands require a valid actuve view plus the view must have focus.
+Basically, certain built-in Revit commands require a valid active view and the view must have focus.
 
 Therefore, in order to use `PostCommand` to launch a built-in commend such as "Select by ID" with the command id `ID_SELECT_BY_ID`, you first need to ensure that a graphic view has focus.
 
@@ -281,7 +280,7 @@ Instead of making its code run faster, it simply tried to modify its own code to
 
 ####<a name="9"></a> Plasma in High School Nuclear Fusion Reactor
 
-Movin to a completely different field of science unrelated to AI and computing,
+Moving to a different field of science unrelated to AI and computing,
 [Cesare Mencarini of Cardiff Sixth Form College](https://www.linkedin.com/in/cesare-mencarini-624449249/) built
 a [nuclear fusion reactor capable of achieving plasma](https://www.linkedin.com/posts/cesare-mencarini-624449249_nuclear-fusion-reactor-phase-1-complete-activity-7110388091592306688-LGC8?utm_source=share&utm_medium=member_desktop):
 
@@ -290,7 +289,7 @@ This is an Inertial Electrostatic Confinement Fusor which will be capable of ach
 For more information, check out the fusor.net thread
 on [plasma achieved!](https://fusor.net/board/viewtopic.php?t=14933).
 
-Also, the linkedin comment explaining the (low) funding is very impressive!
+Don't miss reading the very impressive LinkedIn comment explaining the low project funding.
 
 <center>
 <img src="img/cm_plasma.jpg" alt="High school nuclear fusion reactor" title="High school nuclear fusion reactor" width="450"/> <!-- Pixel Height: 369 Pixel Width: 450 -->

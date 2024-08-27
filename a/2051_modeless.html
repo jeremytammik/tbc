@@ -189,24 +189,23 @@ of <a href="https://github.com/Nice3point/RevitToolkit">RevitToolkit</a> provide
 a new way to do this more efficiently without throwing an exception.</p>
 <p>Throwing an exception costs quite a bit of time, and creating an additional empty <code>EventHandler&lt;IdlingEventArgs&gt;</code> for it increases memory allocation.</p>
 <p>RevitToolkit now provides the property <code>Context.IsRevitInApiMode</code> that determines whether Revit is in API mode or not without throwing an exception.</p>
-<p>Here are benchamark medians results in nanoseconds comparing 1000 iterations using the old approach versus the new method:</p>
+<p>Here are benchmark median results in nanoseconds comparing 1000 iterations using the old approach versus the new method:</p>
 <p><center></p>
 <table>
-<tr><th>API Context</th><th>Exception</th><th>`IsRevitInApiMode`</th></tr>
-<tr><th>Inside</th><th>24122</th><th>413</th></tr>
-<tr><th>Outside</th><th>9522531</th><th>550</th></tr>
+<tr><th>API Context</th><th>Exception</th><th>New Method</th></tr>
+<tr><td>Inside</td><td>24122</td><td>413</td></tr>
+<tr><td>Outside</td><td>9522531</td><td>550</td></tr>
 </table>
 <p></center></p>
 <p>The difference in speed is 58 times in context, and 17313 outside.</p>
-<p>Here is the full description
-of <a href="https://github.com/Nice3point/RevitToolkit?tab=readme-ov-file#context">RevitToolkit.Context</a></p>
-<p>Many thanks to Roman for discovering ahnd sharing this huge improvement.</p>
+<p>Here is the <a href="https://github.com/Nice3point/RevitToolkit?tab=readme-ov-file#context">RevitToolkit.Context documentation</a></p>
+<p>Many thanks to Roman for discovering and sharing this huge improvement.</p>
 <h4><a name="5"></a>  PostCommand Context and View Focus</h4>
 <p>Luiz Henrique <a href="https://ricaun.com/">@ricaun</a> Cassettari and
 Mauricio <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/45203">@Speed_CAD</a> Jorquera
 provide a solution to
 why <a href="https://forums.autodesk.com/t5/revit-api-forum/api-queue-command-quot-commandid-quot-cannot-be-invoked-in-this/m-p/12971672">API queue command "CommandId" cannot be invoked in this context</a></p>
-<p>Basically, certain built-in Revit commands require a valid actuve view plus the view must have focus.</p>
+<p>Basically, certain built-in Revit commands require a valid active view and the view must have focus.</p>
 <p>Therefore, in order to use <code>PostCommand</code> to launch a built-in commend such as "Select by ID" with the command id <code>ID_SELECT_BY_ID</code>, you first need to ensure that a graphic view has focus.</p>
 <p>Many thanks to Ricaun and Mauricio for all the research they put into this!</p>
 <h4><a name="6"></a> Protect Creativity With No AI</h4>
@@ -242,7 +241,7 @@ In another case, its experiments took too long to complete, hitting our timeout 
 Instead of making its code run faster, it simply tried to modify its own code to extend the timeout period...</p>
 </blockquote>
 <h4><a name="9"></a> Plasma in High School Nuclear Fusion Reactor</h4>
-<p>Movin to a completely different field of science unrelated to AI and computing,
+<p>Moving to a different field of science unrelated to AI and computing,
 <a href="https://www.linkedin.com/in/cesare-mencarini-624449249/">Cesare Mencarini of Cardiff Sixth Form College</a> built
 a <a href="https://www.linkedin.com/posts/cesare-mencarini-624449249_nuclear-fusion-reactor-phase-1-complete-activity-7110388091592306688-LGC8?utm_source=share&amp;utm_medium=member_desktop">nuclear fusion reactor capable of achieving plasma</a>:</p>
 <blockquote>
@@ -251,7 +250,7 @@ This is an Inertial Electrostatic Confinement Fusor which will be capable of ach
 For more information, check out the fusor.net thread
 on <a href="https://fusor.net/board/viewtopic.php?t=14933">plasma achieved!</a>.</p>
 </blockquote>
-<p>Also, the linkedin comment explaining the (low) funding is very impressive!</p>
+<p>Don't miss reading the very impressive LinkedIn comment explaining the low project funding.</p>
 <p><center>
 <img src="img/cm_plasma.jpg" alt="High school nuclear fusion reactor" title="High school nuclear fusion reactor" width="450"/> <!-- Pixel Height: 369 Pixel Width: 450 -->
 </center></p>
