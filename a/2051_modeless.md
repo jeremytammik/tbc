@@ -75,7 +75,15 @@ twitter:
 
  @AutodeskRevit  #RevitAPI  #BIM @DynamoBIM
 
-&ndash; ...
+More aspects of the Revit API from a modeless context
+&ndash; Background process and Revit API
+&ndash; Revit background processor
+&ndash; Effective Revit API context predicate
+&ndash; PostCommand context and view focus
+&ndash; Protect creativity with no AI
+&ndash; European Union AI Act
+&ndash; The Sakana AI Scientist
+&ndash; Plasma in high school nuclear fusion reactor...
 
 linkedin:
 
@@ -90,7 +98,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Detect API Context and More Modeless Add-Ins
+### API Context, Background Process, PostCommand
 
 We recently addressed aspects of interacting with
 the [Revit API from a modeless context](https://thebuildingcoder.typepad.com/blog/2024/08/modeless-add-ins-and-pdf-printing-speed.html).
@@ -249,9 +257,11 @@ They go against the current mainstream with an unequivocally clear statement tha
 
 <center>
   <img src="img/anti_ai.png" alt="Anti AI" title="Anti AI" width="450"/>
-  <p><a href="https://procreate.com/ai">AI is not our future</a>
-  <br/><i>Creativity is made, not generated.</i></p>
 </center>
+
+- <a href="https://procreate.com/ai">AI is not our future</a>
+  &ndash; <i>Creativity is made, not generated.</i>
+
 
 ####<a name="7"></a> European Union AI Act
 
