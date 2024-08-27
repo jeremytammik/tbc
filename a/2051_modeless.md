@@ -223,8 +223,16 @@ Many thanks to Roman for discovering ahnd sharing this huge improvement.
 
 ####<a name="5"></a>  PostCommand Requires Valid API Context
 
-API queue command "CommandId" cannot be invoked in this context
-https://forums.autodesk.com/t5/revit-api-forum/api-queue-command-quot-commandid-quot-cannot-be-invoked-in-this/m-p/12971672
+Luiz Henrique [@ricaun](https://ricaun.com/) Cassettari and
+Mauricio [@Speed_CAD](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/45203) Jorquera
+provide a solution to
+why [API queue command "CommandId" cannot be invoked in this context](https://forums.autodesk.com/t5/revit-api-forum/api-queue-command-quot-commandid-quot-cannot-be-invoked-in-this/m-p/12971672)
+
+Basically, certain built-in Revit commands require a valid actuve view plus the view must have focus.
+
+Therefore, in order to use `PostCommand` to launch a built-in commend such as "Select by ID" with the command id `ID_SELECT_BY_ID`, you first need to ensure that a graphic view has focus.
+
+Many thanks to Ricaun and Mauricio for all the research they put into this!
 
 ####<a name="6"></a> Protect Creativity With No AI
 
