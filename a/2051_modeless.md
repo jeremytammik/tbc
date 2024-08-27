@@ -96,6 +96,15 @@ We recently addressed aspects of interacting with
 the [Revit API from a modeless context](https://thebuildingcoder.typepad.com/blog/2024/08/modeless-add-ins-and-pdf-printing-speed.html).
 Let's continue in the same vein, and also look at AI and nuclear power news bites:
 
+- [Background process and Revit API](#2)
+- [Revit background processor](#3)
+- [Effective Revit API context predicate](#4)
+- [PostCommand context and view focus](#5)
+- [Protect creativity with no AI](#6)
+- [European Union AI Act](#7)
+- [The Sakana AI Scientist](#8)
+- [Plasma in high school nuclear fusion reactor](#9)
+
 ####<a name="2"></a> Background Process and Revit API
 
 Modeless context is basically synonymous with a background process, as explained in
@@ -221,7 +230,7 @@ of [RevitToolkit.Context](https://github.com/Nice3point/RevitToolkit?tab=readme-
 
 Many thanks to Roman for discovering ahnd sharing this huge improvement.
 
-####<a name="5"></a>  PostCommand Requires Valid API Context
+####<a name="5"></a>  PostCommand Context and View Focus
 
 Luiz Henrique [@ricaun](https://ricaun.com/) Cassettari and
 Mauricio [@Speed_CAD](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/45203) Jorquera
