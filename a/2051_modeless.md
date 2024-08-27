@@ -12,6 +12,19 @@
 <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
 <style> code[class*=language-], pre[class*=language-] { font-size : 90%; } </style>
+
+<style>
+table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+th, td {
+  padding-left: 1em;
+  padding-right: 1em;
+  text-align:right;
+}
+</style>
+
 </head>
 
 <!---
@@ -177,9 +190,36 @@ https://forums.autodesk.com/t5/revit-api-forum/performing-long-running-backgroun
 
 ####<a name="4"></a> Effective Revit API Context Predicate
 
-https://forums.autodesk.com/t5/revit-api-forum/how-to-know-if-revit-api-is-in-context/m-p/12964099#M80866n
+Roman [@Nice3point](https://t.me/nice3point) Karpovich, aka Роман Карпович, shared a new effective solution
+on [how to know if Revit API is in context](https://forums.autodesk.com/t5/revit-api-forum/how-to-know-if-revit-api-is-in-context/m-p/12964099#M80866n):
 
-https://github.com/Nice3point/RevitToolkit?tab=readme-ov-file#context
+The previously suggested solutions
+for [determining Revit API context](https://thebuildingcoder.typepad.com/blog/2024/03/api-context-aps-toolkit-and-da4r-debugging.html#2) throw an exception when the API context is not available.
+
+The preview version
+of [RevitToolkit](https://github.com/Nice3point/RevitToolkit) provides
+a new way to do this more efficiently without throwing an exception.
+
+Throwing an exception costs quite a bit of time, and creating an additional empty `EventHandler<IdlingEventArgs>` for it increases memory allocation.
+
+RevitToolkit now provides the property `Context.IsRevitInApiMode` that determines whether Revit is in API mode or not without throwing an exception.
+
+Here are benchamark medians results in nanoseconds comparing 1000 iterations using the old approach versus the new method:
+
+<center>
+<table>
+<tr><th>API Context</th><th>Exception</th><th>`IsRevitInApiMode`</th></tr>
+<tr><th>Inside</th><th>24122</th><th>413</th></tr>
+<tr><th>Outside</th><th>9522531</th><th>550</th></tr>
+</table>
+</center>
+
+The difference in speed is 58 times in context, and 17313 outside.
+
+Here is the full description
+of [RevitToolkit.Context](https://github.com/Nice3point/RevitToolkit?tab=readme-ov-file#context)
+
+Many thanks to Roman for discovering ahnd sharing this huge improvement.
 
 ####<a name="5"></a>  PostCommand Requires Valid API Context
 
