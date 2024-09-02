@@ -158,9 +158,16 @@ Add a .addin file to your project for both versions (MyAddin2024.addin and MyAdd
 
 Build both configurations
 Open Revit 2024:
-SamBerk_0-1724709688908.png
+
+<center>
+  <img src="img/multiversion_2024.png" alt="Multi-verxsion add-in" title="" width="450"/>
+</center>
+
 Open Revit 2025:
-SamBerk_1-1724709739994.png
+
+<center>
+  <img src="img/multiversion_2025.png" alt="Multi-verxsion add-in" title="" width="450"/>
+</center>
 
 For debugging, add to the project file:
 
@@ -177,7 +184,7 @@ For debugging, add to the project file:
 
 
 
-Thank you all
+Thank you all!
 
 
 
@@ -189,6 +196,3 @@ an [optimal add-in code base approach to target multiple Revit releases](https:/
 
 **Answer:**
 
-<center>
-  <img src="img/.png" alt="" title="" width="100"/>
-</center>
