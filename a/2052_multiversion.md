@@ -19,6 +19,9 @@
 
 <!---
 
+- multi-version
+  https://forums.autodesk.com/t5/revit-api-forum/optimal-add-in-code-base-approach-to-target-multiple-revit/m-p/12982599#M81063
+
 twitter:
 
  the @AutodeskRevit #RevitAPI #BIM @DynamoBIM
@@ -70,33 +73,33 @@ Here is step by step:
  - Create configurations `2024Debug` and `2025Debug` (or release)
  - Edit the project file and put the `TargetFramework` and the `Reference` in a condition:
 
+<pre><code class="language-xml">
+ &lt;PropertyGroup Condition="'$(Configuration)' == '2024Debug'"&gt;
+   &lt;TargetFramework&gt;net481&lt;/TargetFramework&gt;
+ &lt;/PropertyGroup&gt;
+ &lt;PropertyGroup Condition="'$(Configuration)' == '2025Debug'"&gt;
+   &lt;TargetFramework&gt;net8.0&lt;/TargetFramework&gt;
+ &lt;/PropertyGroup&gt;
 
- <PropertyGroup Condition="'$(Configuration)' == '2024Debug'">
-   <TargetFramework>net481</TargetFramework>
- </PropertyGroup>
- <PropertyGroup Condition="'$(Configuration)' == '2025Debug'">
-   <TargetFramework>net8.0</TargetFramework>
- </PropertyGroup>
-
- <ItemGroup>
-    <Reference Include="RevitAPI" Condition="'$(Configuration)' == '2024Debug'">
-     <HintPath>..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2024\RevitAPI.dll</HintPath>
-     <Private>False</Private>
-   </Reference>
-   <Reference Include="RevitAPIUI" Condition="'$(Configuration)' == '2024Debug'">
-     <HintPath>..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2024\RevitAPIUI.dll</HintPath>
-     <Private>False</Private>
-   </Reference>
-   <Reference Include="RevitAPI" Condition="'$(Configuration)' == '2025Debug'">
-     <HintPath>..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2025\RevitAPI.dll</HintPath>
-     <Private>False</Private>
-   </Reference>
-   <Reference Include="RevitAPIUI" Condition="'$(Configuration)' == '2025Debug'">
-     <HintPath>..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2025\RevitAPIUI.dll</HintPath>
-     <Private>False</Private>
-   </Reference>
- </ItemGroup>
-
+ &lt;ItemGroup&gt;
+    &lt;Reference Include="RevitAPI" Condition="'$(Configuration)' == '2024Debug'"&gt;
+     &lt;HintPath&gt;..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2024\RevitAPI.dll&lt;/HintPath&gt;
+     &lt;Private&gt;False&lt;/Private&gt;
+   &lt;/Reference&gt;
+   &lt;Reference Include="RevitAPIUI" Condition="'$(Configuration)' == '2024Debug'"&gt;
+     &lt;HintPath&gt;..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2024\RevitAPIUI.dll&lt;/HintPath&gt;
+     &lt;Private&gt;False&lt;/Private&gt;
+   &lt;/Reference&gt;
+   &lt;Reference Include="RevitAPI" Condition="'$(Configuration)' == '2025Debug'"&gt;
+     &lt;HintPath&gt;..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2025\RevitAPI.dll&lt;/HintPath&gt;
+     &lt;Private&gt;False&lt;/Private&gt;
+   &lt;/Reference&gt;
+   &lt;Reference Include="RevitAPIUI" Condition="'$(Configuration)' == '2025Debug'"&gt;
+     &lt;HintPath&gt;..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2025\RevitAPIUI.dll&lt;/HintPath&gt;
+     &lt;Private&gt;False&lt;/Private&gt;
+   &lt;/Reference&gt;
+ &lt;/ItemGroup&gt;
+</code></pre>
 
  Create an App.cs file and implement IExternalApplication
 
@@ -116,27 +119,26 @@ Here is step by step:
   }
 }</code></pre>
 
-
 Create an output folder for both versions ('c:\...\output\2024' and 'c:\...\output\2025')
 Add a .addin file to your project for both versions (MyAddin2024.addin and MyAddin2025.addin)
 
+<pre><code class="language-xml">
+&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;RevitAddIns&gt;
+  &lt;AddIn Type="Application"&gt;
+    &lt;Name&gt;MyAddin&lt;/Name&gt;
+    &lt;Assembly&gt;C:\...\output\2024\MyAddin.dll&lt;/Assembly&gt; (or 2025)
+    &lt;FullClassName&gt;MyAddin.App&lt;/FullClassName&gt;
+    &lt;ClientId&gt;{client id}&lt;/ClientId&gt;
+    &lt;VendorId&gt;{vendor id}&lt;/VendorId&gt;
+    &lt;VendorDescription&gt;{vendor description}&lt;/VendorDescription&gt;
+  &lt;/AddIn&gt;
+&lt;/RevitAddIns&gt;
+</code></pre>
 
-<?xml version="1.0" encoding="utf-8"?>
-<RevitAddIns>
-  <AddIn Type="Application">
-    <Name>MyAddin</Name>
-    <Assembly>C:\...\output\2024\MyAddin.dll</Assembly> (or 2025)
-    <FullClassName>MyAddin.App</FullClassName>
-    <ClientId>{client id}</ClientId>
-    <VendorId>{vendor id}</VendorId>
-    <VendorDescription>{vendor description}</VendorDescription>
-  </AddIn>
-</RevitAddIns>
+Post-build events:
 
-
- Post-build events:
-
-
+<pre><code class="language-cs">
       echo Configuration: $(Configuration)
       if $(Configuration) == 2024Debug goto 2024
       if $(Configuration) == 2025Debug goto 2025
@@ -154,9 +156,10 @@ Add a .addin file to your project for both versions (MyAddin2024.addin and MyAdd
       goto exit
 
       :exit
+</code></pre>
 
+Build both configurations.
 
-Build both configurations
 Open Revit 2024:
 
 <center>
@@ -171,29 +174,19 @@ Open Revit 2025:
 
 For debugging, add to the project file:
 
+<pre><code class="language-xml">
+  &lt;PropertyGroup Condition="'$(Configuration)' == '2024Debug'"&gt;
+    &lt;StartProgram&gt;C:\Program Files\Autodesk\Revit 2024\Revit.exe&lt;/StartProgram&gt;
+    &lt;StartAction&gt;Program&lt;/StartAction&gt;
+  &lt;/PropertyGroup&gt;
 
-  <PropertyGroup Condition="'$(Configuration)' == '2024Debug'">
-    <StartProgram>C:\Program Files\Autodesk\Revit 2024\Revit.exe</StartProgram>
-    <StartAction>Program</StartAction>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)' == '2025Debug'">
-    <StartProgram>C:\Program Files\Autodesk\Revit 2025\Revit.exe</StartProgram>
-    <StartAction>Program</StartAction>
-  </PropertyGroup>
-
-
+  &lt;PropertyGroup Condition="'$(Configuration)' == '2025Debug'"&gt;
+    &lt;StartProgram&gt;C:\Program Files\Autodesk\Revit 2025\Revit.exe&lt;/StartProgram&gt;
+    &lt;StartAction&gt;Program&lt;/StartAction&gt;
+  &lt;/PropertyGroup&gt;
+</code></pre>
 
 Thank you all!
-
-
-
-
-
-an [optimal add-in code base approach to target multiple Revit releases](https://forums.autodesk.com/t5/revit-api-forum/optimal-add-in-code-base-approach-to-target-multiple-revit/m-p/12982599#M81063)
-
-
-
 
 ####<a name="3"></a> UIView Zoom Corner Element Visibility
 
