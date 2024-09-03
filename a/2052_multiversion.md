@@ -160,13 +160,13 @@ Build both configurations
 Open Revit 2024:
 
 <center>
-  <img src="img/multiversion_2024.png" alt="Multi-verxsion add-in" title="" width="450"/>
+  <img src="img/multiversion_2024.png" alt="Multi-verxsion add-in" title="Multi-verxsion add-in" width="450"/>
 </center>
 
 Open Revit 2025:
 
 <center>
-  <img src="img/multiversion_2025.png" alt="Multi-verxsion add-in" title="" width="450"/>
+  <img src="img/multiversion_2025.png" alt="Multi-verxsion add-in" title="Multi-verxsion add-in" width="450"/>
 </center>
 
 For debugging, add to the project file:
@@ -192,7 +192,132 @@ Thank you all!
 
 an [optimal add-in code base approach to target multiple Revit releases](https://forums.autodesk.com/t5/revit-api-forum/optimal-add-in-code-base-approach-to-target-multiple-revit/m-p/12982599#M81063)
 
+
+
+
+####<a name="3"></a> UIView Zoom Corner Element Visibility
+
+Fabio Loretti [@floretti](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/5076730) Oliveira
+
+[select all UI visible family instances](https://forums.autodesk.com/t5/revit-api-forum/select-all-quot-ui-visible-quot-instances/td-p/12995081)
+
 **Question:**
+One of my users came up with an interesting question of whether or not it's possible to create a "Select All Instances > Visible in View" command taking into consideration the view's zoom level, meaning that everything outside the user's field of view is "not visible" and it wouldn't be part of the selection.
+
+I've tried to find references in the API and online articles on the below topics and ran some UI tests and compared values via the Revit Lookup but no success.
+
+- Active view zoom level
+- Active view window size
+- Bounding boxes XYZ and UV and whether they change under different zoom levels
 
 **Answer:**
+Well, the first thing to try out is
+the [filtered element collector taking a view element id](https://www.revitapidocs.com/2024/6359776d-915e-f8a2-4147-b31024671ee1.htm).
+
+The description says, *Constructs a new FilteredElementCollector that will search and filter the visible elements in a view*, which exactly matches your query. I would be surprised if the two exactly matching descriptions really mean exactly the same thing, but who knows, you may be in luck.
+
+**Response:**
+Unfortunately, that overload of the FilteredElementCollector doesn't do what I'm after.
+The definition of "visible" to the API is different to the definition of what a user considers visible.
+The example below shows what I mean.
+
+View B shows 8x wall elements.
+If I decrease the size of a view/window or simply zoom in or pan I won't be able to see all the 8x walls anymore like shown on View A.
+Regardless of whether or not I use the `FilteredElementCollector` and pass the view Id as a 2nd parameter or use the UI command *Select All Instances* &gt; *Visible in View*, Revit will select all 8x wall instances.
+
+<center>
+  <img src="img/elem_visible_1.png" alt="Elements visible in view" title="Elements visible in view" width="500"/>
+</center>
+
+**Answer:**
+Yup, that is what I thought.
+Does the article
+on [retrieving elements visible in view](https://thebuildingcoder.typepad.com/blog/2017/05/retrieving-elements-visible-in-view.html) help?
+
+**Response:**
+I tested that approach and these are the results.
+
+This is View A showing all 8x wall instances and its `ViewPlan.CropBox` values underneath as recommended by the article:
+
+<center>
+  <img src="img/elem_visible_2.png" alt="Elements visible in view" title="Elements visible in view" width="500"/>
+</center>
+
+I then panned across View A so only 4x wall instances are shown in the UI and again the `ViewPlan.CropBox` values underneath.
+
+<center>
+  <img src="img/elem_visible_3.png" alt="Elements visible in view" title="Elements visible in view" width="500"/>
+</center>
+
+Notice that the values didn't change; based on that, I do not expect the outcome to be different if I turn this into code. I noticed that the API has two Boolean properties to indicate whether the `CropBox` is either active and visible; in my case, neither of them are true.
+Based on that, my assumption is that the recommended approach in the article you shared can only work via the cropbox use and not by zooming in/out and panning across a view.
+
+<center>
+  <img src="img/elem_visible_4.png" alt="Elements visible in view" title="Elements visible in view" width="500"/>
+</center>
+
+**Answer:**
+OK, I see that the crop box approach does not help in this case.
+Searching the forum, I found these two specific solutions for other situations:
+
+- [How to list only elements that are "Visible" in a view](https://forums.autodesk.com/t5/revit-api-forum/how-to-list-only-elements-that-are-quot-visible-quot-in-a-view/m-p/10663861)
+- [Selection filter for only what is visible from camera](https://forums.autodesk.com/t5/revit-api-forum/selection-filter-for-only-what-is-visible-from-camera/m-p/12534209)
+
+In your case, maybe
+the [`UIView`](https://www.revitapidocs.com/2024/2a070256-00f0-5cab-1412-bee5bbfcfc5e.htm) can help:
+
+The `View` element is part of the document and lives in the database.
+It maybe does not know how it is currently being "looked at".
+The `UIView` may know that and provides the current zoom corners from which you can determine wihether an element is currently within them or not.
+However, for non-planar views, you will have some intersting calculations to perform.
+
+I used the `UIView` to implement
+a [tooltip that detects which elements are visible under the cursor](https://thebuildingcoder.typepad.com/blog/2012/10/uiview-windows-coordinates-referenceintersector-and-my-own-tooltip.html).
+It also uses the `ReferenceIntersector`, like one of the solutions I pointed out above.
+
+**Response:**
+Amazing, thanks Jeremy.
+The `GetZoomCorners` method is exactly what I need.
+Much appreciated.
+:-)
+
+Just giving back, here is the solution I implemented.
+
+Note this only works with family instances and it won't work with system families:
+
+<pre><code class="language-cs">// Get active view's zoom
+var zoomCorners = new List<XYZ>();
+
+var openUIviews = uidoc.GetOpenUIViews();
+foreach (var uiView in openUIviews)
+{
+  if(uiView.ViewId == doc.ActiveView.Id) zoomCorners = uiView.GetZoomCorners().ToList();
+}
+
+// Get selection and expand it
+var selIds = uidoc.Selection.GetElementIds();
+var finalSelectionIds = new List<ElementId>();
+
+foreach (ElementId id in selIds)
+{
+  Outline viewExtents = new Outline(new XYZ(zoomCorners.First().X, zoomCorners.First().Y, -1000),
+                    new XYZ(zoomCorners.Last().X, zoomCorners.Last().Y, 1000));
+  var filter = new BoundingBoxIntersectsFilter(viewExtents);
+
+  var famInst = doc.GetElement(id) as FamilyInstance;
+  var allFamInst = new FilteredElementCollector(doc, doc.ActiveView.Id)
+            .WherePasses(filter)
+            .OfClass(typeof(FamilyInstance))
+            .Cast<FamilyInstance>()
+            .Where(x => x.Symbol.Family.Name.Equals(famInst.Symbol.Family.Name)) // family
+            .Where(x => x.Name.Equals(famInst.Name)); // family type
+
+  foreach (FamilyInstance item in allFamInst)
+  {
+    finalSelectionIds.Add(item.Id);
+  }
+}
+
+uidoc.Selection.SetElementIds(finalSelectionIds);
+
 
