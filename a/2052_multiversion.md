@@ -263,8 +263,8 @@ the [`UIView`](https://www.revitapidocs.com/2024/2a070256-00f0-5cab-1412-bee5bbf
 
 The `View` element is part of the document and lives in the database.
 It maybe does not know how it is currently being "looked at".
-The `UIView` may know that and provides the current zoom corners from which you can determine wihether an element is currently within them or not.
-However, for non-planar views, you will have some intersting calculations to perform.
+The `UIView` may know that and provides the current zoom corners from which you can determine whether an element is currently within them or not.
+However, for non-planar views, you will have some interesting calculations to perform.
 
 I used the `UIView` to implement
 a [tooltip that detects which elements are visible under the cursor](https://thebuildingcoder.typepad.com/blog/2012/10/uiview-windows-coordinates-referenceintersector-and-my-own-tooltip.html).
