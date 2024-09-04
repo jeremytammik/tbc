@@ -43,6 +43,11 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Multi-Version Add-In Code Base
 
+Let's look at two current and recurring topics from
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160):
+
+- [Multi-version add-in code base](#2)
+- [UIView for element visibility](#3)
 
 ####<a name="2"></a> Multi-Version Add-In Code Base
 
