@@ -119,8 +119,8 @@ Here is step by step:
   }
 }</code></pre>
 
-Create an output folder for both versions ('c:\...\output\2024' and 'c:\...\output\2025')
-Add a .addin file to your project for both versions (MyAddin2024.addin and MyAddin2025.addin)
+- Create an output folder for both versions (*C:/.../output/2024* and *C:/.../output/2025*)
+- Add a `.addin` file to your project for both versions (`MyAddin2024.addin` and `MyAddin2025.addin`)
 
 <pre><code class="language-xml">
 &lt;?xml version="1.0" encoding="utf-8"?&gt;
@@ -136,7 +136,7 @@ Add a .addin file to your project for both versions (MyAddin2024.addin and MyAdd
 &lt;/RevitAddIns&gt;
 </code></pre>
 
-Post-build events:
+- Post-build events:
 
 <pre><code class="language-cs">
       echo Configuration: $(Configuration)
@@ -158,21 +158,20 @@ Post-build events:
       :exit
 </code></pre>
 
-Build both configurations.
-
-Open Revit 2024:
+- Build both configurations
+- Open Revit 2024:
 
 <center>
   <img src="img/multiversion_2024.png" alt="Multi-verxsion add-in" title="Multi-verxsion add-in" width="450"/>
 </center>
 
-Open Revit 2025:
+- Open Revit 2025:
 
 <center>
   <img src="img/multiversion_2025.png" alt="Multi-verxsion add-in" title="Multi-verxsion add-in" width="450"/>
 </center>
 
-For debugging, add to the project file:
+- For debugging, add to the project file:
 
 <pre><code class="language-xml">
   &lt;PropertyGroup Condition="'$(Configuration)' == '2024Debug'"&gt;
@@ -188,11 +187,10 @@ For debugging, add to the project file:
 
 Thank you all!
 
-####<a name="3"></a> UIView Zoom Corner Element Visibility
+####<a name="3"></a> UIView for Element Visibility
 
 Fabio Loretti [@floretti](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/5076730) Oliveira
-
-[select all UI visible family instances](https://forums.autodesk.com/t5/revit-api-forum/select-all-quot-ui-visible-quot-instances/td-p/12995081)
+determined how to [select all UI visible family instances](https://forums.autodesk.com/t5/revit-api-forum/select-all-quot-ui-visible-quot-instances/td-p/12995081):
 
 **Question:**
 One of my users came up with an interesting question of whether or not it's possible to create a "Select All Instances > Visible in View" command taking into consideration the view's zoom level, meaning that everything outside the user's field of view is "not visible" and it wouldn't be part of the selection.
@@ -204,7 +202,7 @@ I've tried to find references in the API and online articles on the below topics
 - Bounding boxes XYZ and UV and whether they change under different zoom levels
 
 **Answer:**
-Well, the first thing to try out is
+The first thing to try out is
 the [filtered element collector taking a view element id](https://www.revitapidocs.com/2024/6359776d-915e-f8a2-4147-b31024671ee1.htm).
 
 The description says, *Constructs a new FilteredElementCollector that will search and filter the visible elements in a view*, which exactly matches your query. I would be surprised if the two exactly matching descriptions really mean exactly the same thing, but who knows, you may be in luck.
@@ -223,7 +221,6 @@ Regardless of whether or not I use the `FilteredElementCollector` and pass the v
 </center>
 
 **Answer:**
-Yup, that is what I thought.
 Does the article
 on [retrieving elements visible in view](https://thebuildingcoder.typepad.com/blog/2017/05/retrieving-elements-visible-in-view.html) help?
 
@@ -276,34 +273,38 @@ Much appreciated.
 
 Just giving back, here is the solution I implemented.
 
-Note this only works with family instances and it won't work with system families:
+Note this code searches for a specific `familyName` and `familyType`, so it works with family instances and it won't work with system families:
 
-<pre><code class="language-cs">// Get active view's zoom
-var zoomCorners = new List<XYZ>();
+<pre><code class="language-cs">// Get active view's zoom corners
+var zc = new List&lt;XYZ&gt;();
 
 var openUIviews = uidoc.GetOpenUIViews();
 foreach (var uiView in openUIviews)
 {
-  if(uiView.ViewId == doc.ActiveView.Id) zoomCorners = uiView.GetZoomCorners().ToList();
+  if(uiView.ViewId == doc.ActiveView.Id)
+    zc = uiView.GetZoomCorners().ToList();
 }
 
 // Get selection and expand it
 var selIds = uidoc.Selection.GetElementIds();
-var finalSelectionIds = new List<ElementId>();
+var finalSelectionIds = new List&lt;ElementId&gt;();
 
 foreach (ElementId id in selIds)
 {
-  Outline viewExtents = new Outline(new XYZ(zoomCorners.First().X, zoomCorners.First().Y, -1000),
-                    new XYZ(zoomCorners.Last().X, zoomCorners.Last().Y, 1000));
+  Outline viewExtents = new Outline(
+    new XYZ(zc.First().X, zc.First().Y, -1000),
+    new XYZ(zc.Last().X, zc.Last().Y, 1000));
+
   var filter = new BoundingBoxIntersectsFilter(viewExtents);
 
   var famInst = doc.GetElement(id) as FamilyInstance;
-  var allFamInst = new FilteredElementCollector(doc, doc.ActiveView.Id)
-            .WherePasses(filter)
-            .OfClass(typeof(FamilyInstance))
-            .Cast<FamilyInstance>()
-            .Where(x => x.Symbol.Family.Name.Equals(famInst.Symbol.Family.Name)) // family
-            .Where(x => x.Name.Equals(famInst.Name)); // family type
+  var allFamInst
+    = new FilteredElementCollector(doc, doc.ActiveView.Id)
+      .WherePasses(filter)
+      .OfClass(typeof(FamilyInstance))
+      .Cast&lt;FamilyInstance&gt;()
+      .Where(x =&gt; x.Symbol.Family.Name.Equals(familyName)) // family
+      .Where(x =&gt; x.Name.Equals(familyType)); // family type
 
   foreach (FamilyInstance item in allFamInst)
   {
@@ -312,5 +313,6 @@ foreach (ElementId id in selIds)
 }
 
 uidoc.Selection.SetElementIds(finalSelectionIds);
+</code></pre>
 
-
+Many thanks to Fabio for testing, confirming and sharing this solution.
