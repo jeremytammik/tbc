@@ -70,8 +70,7 @@ Here is step by step:</p>
 <li>Create configurations <code>2024Debug</code> and <code>2025Debug</code> (or release)</li>
 <li>Edit the project file and put the <code>TargetFramework</code> and the <code>Reference</code> in a condition:</li>
 </ul>
-<pre><code class="language-xml">
- &lt;PropertyGroup Condition="'$(Configuration)' == '2024Debug'"&gt;
+<pre><code class="language-xml"> &lt;PropertyGroup Condition="'$(Configuration)' == '2024Debug'"&gt;
    &lt;TargetFramework&gt;net481&lt;/TargetFramework&gt;
  &lt;/PropertyGroup&gt;
  &lt;PropertyGroup Condition="'$(Configuration)' == '2025Debug'"&gt;
@@ -95,8 +94,7 @@ Here is step by step:</p>
      &lt;HintPath&gt;..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2025\RevitAPIUI.dll&lt;/HintPath&gt;
      &lt;Private&gt;False&lt;/Private&gt;
    &lt;/Reference&gt;
- &lt;/ItemGroup&gt;
-</code></pre>
+ &lt;/ItemGroup&gt;</code></pre>
 
 <p>Create an App.cs file and implement IExternalApplication</p>
 <pre><code class="language-cs">public class App : IExternalApplication
@@ -119,8 +117,7 @@ Here is step by step:</p>
 <li>Create an output folder for both versions (<em>C:/.../output/2024</em> and <em>C:/.../output/2025</em>)</li>
 <li>Add a <code>.addin</code> file to your project for both versions (<code>MyAddin2024.addin</code> and <code>MyAddin2025.addin</code>)</li>
 </ul>
-<pre><code class="language-xml">
-&lt;?xml version="1.0" encoding="utf-8"?&gt;
+<pre><code class="language-xml">&lt;?xml version="1.0" encoding="utf-8"?&gt;
 &lt;RevitAddIns&gt;
   &lt;AddIn Type="Application"&gt;
     &lt;Name&gt;MyAddin&lt;/Name&gt;
@@ -130,14 +127,12 @@ Here is step by step:</p>
     &lt;VendorId&gt;{vendor id}&lt;/VendorId&gt;
     &lt;VendorDescription&gt;{vendor description}&lt;/VendorDescription&gt;
   &lt;/AddIn&gt;
-&lt;/RevitAddIns&gt;
-</code></pre>
+&lt;/RevitAddIns&gt;</code></pre>
 
 <ul>
 <li>Post-build events:</li>
 </ul>
-<pre><code class="language-cs">
-      echo Configuration: $(Configuration)
+<pre><code class="language-cs">      echo Configuration: $(Configuration)
       if $(Configuration) == 2024Debug goto 2024
       if $(Configuration) == 2025Debug goto 2025
 
@@ -153,8 +148,7 @@ Here is step by step:</p>
       copy "$(ProjectDir)bin\$(Configuration)\net8.0\*.dll" "C:\...\output\2025"
       goto exit
 
-      :exit
-</code></pre>
+      :exit</code></pre>
 
 <ul>
 <li>Build both configurations</li>
@@ -172,8 +166,7 @@ Here is step by step:</p>
 <ul>
 <li>For debugging, add to the project file:</li>
 </ul>
-<pre><code class="language-xml">
-  &lt;PropertyGroup Condition="'$(Configuration)' == '2024Debug'"&gt;
+<pre><code class="language-xml">  &lt;PropertyGroup Condition="'$(Configuration)' == '2024Debug'"&gt;
     &lt;StartProgram&gt;C:\Program Files\Autodesk\Revit 2024\Revit.exe&lt;/StartProgram&gt;
     &lt;StartAction&gt;Program&lt;/StartAction&gt;
   &lt;/PropertyGroup&gt;
@@ -181,8 +174,7 @@ Here is step by step:</p>
   &lt;PropertyGroup Condition="'$(Configuration)' == '2025Debug'"&gt;
     &lt;StartProgram&gt;C:\Program Files\Autodesk\Revit 2025\Revit.exe&lt;/StartProgram&gt;
     &lt;StartAction&gt;Program&lt;/StartAction&gt;
-  &lt;/PropertyGroup&gt;
-</code></pre>
+  &lt;/PropertyGroup&gt;</code></pre>
 
 <p>Thank you all!</p>
 <h4><a name="3"></a> UIView for Element Visibility</h4>
@@ -288,7 +280,6 @@ foreach (ElementId id in selIds)
   }
 }
 
-uidoc.Selection.SetElementIds(finalSelectionIds);
-</code></pre>
+uidoc.Selection.SetElementIds(finalSelectionIds);</code></pre>
 
 <p>Many thanks to Fabio for testing, confirming and sharing this solution.</p>
