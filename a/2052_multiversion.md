@@ -22,47 +22,22 @@
 - multi-version
   https://forums.autodesk.com/t5/revit-api-forum/optimal-add-in-code-base-approach-to-target-multiple-revit/m-p/12982599#M81063
 
-https://www.linkedin.com/posts/anthony-sertorio_constructiondata-autodeskconstructioncloud-activity-7236893852156977152-RFi1?utm_source=share&utm_medium=member_desktop
+- https://www.linkedin.com/posts/anthony-sertorio_constructiondata-autodeskconstructioncloud-activity-7236893852156977152-RFi1?utm_source=share&utm_medium=member_desktop
 
-
-Anthony Sertorio
-https://www.linkedin.com/in/anthony-sertorio/
-Technical Solutions Executive at Autodesk
-
-Using OpenAI's custom GPTs🤖 with Autodesk Construction Cloud to automate capturing issues from project documents💯
-
-What's great about this is the ability to process several documents at once while identifying multiple issues to raise within each individual document.
-
-I could also see a method like this being used to analyse and extract insights from more general project documents like drawings and specifications.
-
-Getting this to work was a real challenge, especially since the GPT builder can be very temperamental😖 Some of the hardest things to work out were the OpenAPI spec needed to communicate with Autodesk's API's, and the Authentication procedure.
-
-If you're interested in the technical setup, feel free to reach out—I’d be happy to share more!
-
-I'm interested to see how future improvements in GPTs might allow for more complicated integrations, for instance with Autodesk's AEC data model API https://lnkd.in/g4q3WEeq
-
-🔹 Check out my previous post on creating issues in ACC with ACC Connect https://lnkd.in/gMMVgGhD
-🔹 Autodesk Construction Cloud APIs https://lnkd.in/gbtZEBYC
-🔹 OpenAI Custom GPTs https://lnkd.in/gZ28fEHY
-
-
-
-My kids used to argue with me about what is green and what is blue. My perception differed from theirs.
-
-Here is an interesting test to take:
-
-https://ismy.blue/
-
-About This Website
-People have different names for the colors they see. Language can affect how we memorize and name colors. This is a color naming test designed to measure your personal blue-green boundary.
-
-
-Your boundary is at hue 169, greener than 80% of the population. For you, turquoise  is blue.
-
+- https://ismy.blue/
 
 twitter:
 
  the @AutodeskRevit #RevitAPI #BIM @DynamoBIM
+
+Let's look at two current and recurring topics from
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160),
+an LLM and a cultural colour topic:
+
+&ndash; Multi-version add-in code base
+&ndash; UIView for element visibility
+&ndash; GPT reads PDF + generates ACC issues
+&ndash; My blue vs. green]($6)
 
 &ndash; ...
 
@@ -79,13 +54,16 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Multi-Version Add-In Code Base
+### Element Visibility and Multi-Version Add-In Code Base
 
 Let's look at two current and recurring topics from
-the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160):
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160),
+an LLM and a cultural colour topic:
 
 - [Multi-version add-in code base](#2)
 - [UIView for element visibility](#3)
+- [GPT reads PDF + generates ACC issues](#4)
+- [My blue vs. green](#5)
 
 ####<a name="2"></a> Multi-Version Add-In Code Base
 
@@ -353,39 +331,36 @@ Many thanks to Fabio for testing, confirming and sharing this solution.
 
 ####<a name="4"></a> GPT Reads PDF + Generates ACC Issues
 
-My colleague [Anthony Sertorio](https://www.linkedin.com/in/anthony-sertorio/)
+My colleague [Anthony Sertorio](https://www.linkedin.com/in/anthony-sertorio/) shared
+a [post on LinkedIn](https://www.linkedin.com/posts/anthony-sertorio_constructiondata-autodeskconstructioncloud-activity-7236893852156977152-RFi1) on
+using an LLM to read and analyse documentation and email text to automatically generate and submit issues to ACC:
 
-https://www.linkedin.com/posts/anthony-sertorio_constructiondata-autodeskconstructioncloud-activity-7236893852156977152-RFi1?utm_source=share&utm_medium=member_desktop
+> Using OpenAI's custom GPTs with Autodesk Construction Cloud to automate capturing issues from project documents...
+... the ability to process several documents at once while identifying multiple issues to raise within each individual document
+... used to analyse and extract insights from more general project documents like drawings and specifications.
 
+> Getting this to work was a real challenge, especially since the GPT builder can be very temperamental.
+Some of the hardest things to work out were the OpenAPI spec needed to communicate with Autodesk's API's, and the Authentication procedure.
 
-Using OpenAI's custom GPTs🤖 with Autodesk Construction Cloud to automate capturing issues from project documents💯
+> - Check out my previous post on creating issues in ACC with ACC Connect
+- [Autodesk Construction Cloud APIs](https://aps.autodesk.com/autodesk-construction-cloud-apis-integrations)
+- [OpenAI Custom GPTs](https://openai.com/index/introducing-gpts/)
 
-What's great about this is the ability to process several documents at once while identifying multiple issues to raise within each individual document.
+####<a name="5"></a> My Blue vs. Green
 
-I could also see a method like this being used to analyse and extract insights from more general project documents like drawings and specifications.
+Unrelated to BIM and CAD, my kids used to argue with me about what is green and what is blue.
+My perception differed from theirs.
+So, I was interested to take
+the [Is My Blue test](https://ismy.blue/):
 
-Getting this to work was a real challenge, especially since the GPT builder can be very temperamental😖 Some of the hardest things to work out were the OpenAPI spec needed to communicate with Autodesk's API's, and the Authentication procedure.
+> People have different names for the colors they see.
+Language can affect how we memorize and name colors.
+This is a color naming test designed to measure your personal blue-green boundary.
 
-If you're interested in the technical setup, feel free to reach out—I’d be happy to share more!
+My personal result:
+my boundary is at hue 169, greener than 80% of the population.
+So, I tend to classify turquoise as blue.
 
-I'm interested to see how future improvements in GPTs might allow for more complicated integrations, for instance with Autodesk's AEC data model API https://lnkd.in/g4q3WEeq
-
-🔹 Check out my previous post on creating issues in ACC with ACC Connect https://lnkd.in/gMMVgGhD
-🔹 Autodesk Construction Cloud APIs https://lnkd.in/gbtZEBYC
-🔹 OpenAI Custom GPTs https://lnkd.in/gZ28fEHY
-
-
-####<a name="5"></a> My Blue
-
-My kids used to argue with me about what is green and what is blue. My perception differed from theirs.
-
-Here is an interesting test to take:
-
-https://ismy.blue/
-
-About This Website
-People have different names for the colors they see. Language can affect how we memorize and name colors. This is a color naming test designed to measure your personal blue-green boundary.
-
-
-Your boundary is at hue 169, greener than 80% of the population. For you, turquoise  is blue.
-
+<center>
+  <img src="img/ismyblue.png" alt="Is my blue" title="Is my blue" width="500"/>
+</center>

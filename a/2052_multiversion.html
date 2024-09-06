@@ -20,9 +20,22 @@
 - multi-version
   https://forums.autodesk.com/t5/revit-api-forum/optimal-add-in-code-base-approach-to-target-multiple-revit/m-p/12982599#M81063
 
+- https://www.linkedin.com/posts/anthony-sertorio_constructiondata-autodeskconstructioncloud-activity-7236893852156977152-RFi1?utm_source=share&utm_medium=member_desktop
+
+- https://ismy.blue/
+
 twitter:
 
  the @AutodeskRevit #RevitAPI #BIM @DynamoBIM
+
+Let's look at two current and recurring topics from
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160),
+an LLM and a cultural colour topic:
+
+&ndash; Multi-version add-in code base
+&ndash; UIView for element visibility
+&ndash; GPT reads PDF + generates ACC issues
+&ndash; My blue vs. green]($6)
 
 &ndash; ...
 
@@ -39,12 +52,15 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-<h3>Multi-Version Add-In Code Base</h3>
+<h3>Element Visibility and Multi-Version Add-In Code Base</h3>
 <p>Let's look at two current and recurring topics from
-the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a>:</p>
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a>,
+an LLM and a cultural colour topic:</p>
 <ul>
 <li><a href="#2">Multi-version add-in code base</a></li>
 <li><a href="#3">UIView for element visibility</a></li>
+<li><a href="#4">GPT reads PDF + generates ACC issues</a></li>
+<li><a href="#5">My blue vs. green</a></li>
 </ul>
 <h4><a name="2"></a> Multi-Version Add-In Code Base</h4>
 <p>Managing an add-in code base to support multiple releases of the Revit API is a recurring and constantly evolving issue.
@@ -283,3 +299,35 @@ foreach (ElementId id in selIds)
 uidoc.Selection.SetElementIds(finalSelectionIds);</code></pre>
 
 <p>Many thanks to Fabio for testing, confirming and sharing this solution.</p>
+<h4><a name="4"></a> GPT Reads PDF + Generates ACC Issues</h4>
+<p>My colleague <a href="https://www.linkedin.com/in/anthony-sertorio/">Anthony Sertorio</a> shared
+a <a href="https://www.linkedin.com/posts/anthony-sertorio_constructiondata-autodeskconstructioncloud-activity-7236893852156977152-RFi1">post on LinkedIn</a> on
+using an LLM to read and analyse documentation and email text to automatically generate and submit issues to ACC:</p>
+<blockquote>
+<p>Using OpenAI's custom GPTs with Autodesk Construction Cloud to automate capturing issues from project documents...
+... the ability to process several documents at once while identifying multiple issues to raise within each individual document
+... used to analyse and extract insights from more general project documents like drawings and specifications.</p>
+<p>Getting this to work was a real challenge, especially since the GPT builder can be very temperamental.
+Some of the hardest things to work out were the OpenAPI spec needed to communicate with Autodesk's API's, and the Authentication procedure.</p>
+<ul>
+<li>Check out my previous post on creating issues in ACC with ACC Connect</li>
+<li><a href="https://aps.autodesk.com/autodesk-construction-cloud-apis-integrations">Autodesk Construction Cloud APIs</a></li>
+<li><a href="https://openai.com/index/introducing-gpts/">OpenAI Custom GPTs</a></li>
+</ul>
+</blockquote>
+<h4><a name="5"></a> My Blue vs. Green</h4>
+<p>Unrelated to BIM and CAD, my kids used to argue with me about what is green and what is blue.
+My perception differed from theirs.
+So, I was interested to take
+the <a href="https://ismy.blue/">Is My Blue test</a>:</p>
+<blockquote>
+<p>People have different names for the colors they see.
+Language can affect how we memorize and name colors.
+This is a color naming test designed to measure your personal blue-green boundary.</p>
+</blockquote>
+<p>My personal result:
+my boundary is at hue 169, greener than 80% of the population.
+So, I tend to classify turquoise as blue.</p>
+<p><center>
+  <img src="img/ismyblue.png" alt="Is my blue" title="Is my blue" width="500"/>
+</center></p>
