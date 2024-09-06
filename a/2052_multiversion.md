@@ -30,16 +30,11 @@ twitter:
 
  the @AutodeskRevit #RevitAPI #BIM @DynamoBIM
 
-Let's look at two current and recurring topics from
-the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160),
-an LLM and a cultural colour topic:
-
+Current and recurring topics from the Revit API discussion forum, an LLM and a cultural colour topic
 &ndash; Multi-version add-in code base
 &ndash; UIView for element visibility
 &ndash; GPT reads PDF + generates ACC issues
-&ndash; My blue vs. green]($6)
-
-&ndash; ...
+&ndash; My blue vs. green ...
 
 linkedin:
 
@@ -89,10 +84,10 @@ Sam's simpler approach provides less coverage, saying:
 I found that the *simplest* solution to maintain the same code base for 2025 and earlier is to put the `TargetFramework` in a condition.
 Here is step by step:
 
- - Create a dotnet 8 class library project
- - Reference the Revit 2025 API DLL's RevitAPI.dll and RevitAPIUI.dll, set `Copy Local` to `No`
- - Create configurations `2024Debug` and `2025Debug` (or release)
- - Edit the project file and put the `TargetFramework` and the `Reference` in a condition:
+- Create a dotnet 8 class library project
+- Reference the Revit 2025 API DLL's RevitAPI.dll and RevitAPIUI.dll, set `Copy Local` to `No`
+- Create configurations `2024Debug` and `2025Debug` (or release)
+- Edit the project file and put the `TargetFramework` and the `Reference` in a condition:
 
 <pre><code class="language-xml"> &lt;PropertyGroup Condition="'$(Configuration)' == '2024Debug'"&gt;
    &lt;TargetFramework&gt;net481&lt;/TargetFramework&gt;
@@ -120,7 +115,7 @@ Here is step by step:
    &lt;/Reference&gt;
  &lt;/ItemGroup&gt;</code></pre>
 
- Create an App.cs file and implement IExternalApplication
+- Create an App.cs file and implement IExternalApplication
 
 <pre><code class="language-cs">public class App : IExternalApplication
 {
