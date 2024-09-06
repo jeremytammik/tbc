@@ -26,7 +26,7 @@
 
 twitter:
 
- the @AutodeskRevit #RevitAPI #BIM @DynamoBIM
+Multi-version @AutodeskRevit #RevitAPI add-in code base, using UIView zoom corners to determine element visibility, GPT LLM to read PDF and emails for fully automated generation of ACC issues #BIM @DynamoBIM https://autode.sk/multiversionrvtaddin
 
 Current and recurring topics from the Revit API discussion forum, an LLM and a cultural colour topic
 &ndash; Multi-version add-in code base
@@ -82,30 +82,30 @@ Here is step by step:</p>
 <li>Edit the project file and put the <code>TargetFramework</code> and the <code>Reference</code> in a condition:</li>
 </ul>
 <pre><code class="language-xml"> &lt;PropertyGroup Condition="'$(Configuration)' == '2024Debug'"&gt;
-   &lt;TargetFramework&gt;net481&lt;/TargetFramework&gt;
- &lt;/PropertyGroup&gt;
- &lt;PropertyGroup Condition="'$(Configuration)' == '2025Debug'"&gt;
-   &lt;TargetFramework&gt;net8.0&lt;/TargetFramework&gt;
- &lt;/PropertyGroup&gt;
+  &lt;TargetFramework&gt;net481&lt;/TargetFramework&gt;
+&lt;/PropertyGroup&gt;
+&lt;PropertyGroup Condition="'$(Configuration)' == '2025Debug'"&gt;
+  &lt;TargetFramework&gt;net8.0&lt;/TargetFramework&gt;
+&lt;/PropertyGroup&gt;
 
- &lt;ItemGroup&gt;
-    &lt;Reference Include="RevitAPI" Condition="'$(Configuration)' == '2024Debug'"&gt;
-     &lt;HintPath&gt;..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2024\RevitAPI.dll&lt;/HintPath&gt;
-     &lt;Private&gt;False&lt;/Private&gt;
-   &lt;/Reference&gt;
-   &lt;Reference Include="RevitAPIUI" Condition="'$(Configuration)' == '2024Debug'"&gt;
-     &lt;HintPath&gt;..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2024\RevitAPIUI.dll&lt;/HintPath&gt;
-     &lt;Private&gt;False&lt;/Private&gt;
-   &lt;/Reference&gt;
-   &lt;Reference Include="RevitAPI" Condition="'$(Configuration)' == '2025Debug'"&gt;
-     &lt;HintPath&gt;..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2025\RevitAPI.dll&lt;/HintPath&gt;
-     &lt;Private&gt;False&lt;/Private&gt;
-   &lt;/Reference&gt;
-   &lt;Reference Include="RevitAPIUI" Condition="'$(Configuration)' == '2025Debug'"&gt;
-     &lt;HintPath&gt;..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2025\RevitAPIUI.dll&lt;/HintPath&gt;
-     &lt;Private&gt;False&lt;/Private&gt;
-   &lt;/Reference&gt;
- &lt;/ItemGroup&gt;</code></pre>
+&lt;ItemGroup&gt;
+   &lt;Reference Include="RevitAPI" Condition="'$(Configuration)' == '2024Debug'"&gt;
+    &lt;HintPath&gt;..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2024\RevitAPI.dll&lt;/HintPath&gt;
+    &lt;Private&gt;False&lt;/Private&gt;
+  &lt;/Reference&gt;
+  &lt;Reference Include="RevitAPIUI" Condition="'$(Configuration)' == '2024Debug'"&gt;
+    &lt;HintPath&gt;..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2024\RevitAPIUI.dll&lt;/HintPath&gt;
+    &lt;Private&gt;False&lt;/Private&gt;
+  &lt;/Reference&gt;
+  &lt;Reference Include="RevitAPI" Condition="'$(Configuration)' == '2025Debug'"&gt;
+    &lt;HintPath&gt;..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2025\RevitAPI.dll&lt;/HintPath&gt;
+    &lt;Private&gt;False&lt;/Private&gt;
+  &lt;/Reference&gt;
+  &lt;Reference Include="RevitAPIUI" Condition="'$(Configuration)' == '2025Debug'"&gt;
+    &lt;HintPath&gt;..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2025\RevitAPIUI.dll&lt;/HintPath&gt;
+    &lt;Private&gt;False&lt;/Private&gt;
+  &lt;/Reference&gt;
+&lt;/ItemGroup&gt;</code></pre>
 
 <ul>
 <li>Create an App.cs file and implement IExternalApplication</li>
