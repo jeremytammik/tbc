@@ -34,9 +34,18 @@ Current and recurring topics from the Revit API discussion forum, an LLM and a c
 &ndash; Multi-version add-in code base
 &ndash; UIView for element visibility
 &ndash; GPT reads PDF + generates ACC issues
-&ndash; My blue vs. green ...
+&ndash; My blue vs. green...
 
 linkedin:
+
+Multi-version #RevitAPI add-in code base, using UIView zoom corners to determine element visibility, GPT LLM to read PDF and emails for fully automated generation of ACC issues
+
+https://autode.sk/multiversionrvtaddin
+
+- Multi-version add-in code base
+- UIView for element visibility
+- GPT reads PDF + generates ACC issues
+- My blue vs. green...
 
 #BIM #DynamoBIM #AutodeskAPS #Revit #API #IFC #SDK #Autodesk #AEC #adsk
 
