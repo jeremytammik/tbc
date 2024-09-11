@@ -49,8 +49,328 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ####<a name="2"></a> Cable Tray Bend Radius
 
-- Get BendRadius center of Cable Tray Fittings
+Pierre NAVARRA
+SONA-Architecture.
+http://www.sona-architecture.com
+https://fr.linkedin.com/in/pierre-navarra-62032a107
+
+with lots of help from Moustafa Khalil from [SharpBIM coding](https://sharpbim.hashnode.dev/) and Mohamed Arshad K
+
+Get BendRadius center of Cable Tray Fittings
 https://forums.autodesk.com/t5/revit-api-forum/get-bendradius-center-of-cable-tray-fittings/m-p/12757167
+
+**Question:**
+I need to get the lenght of a cable tray fittings.
+I could get lenght betwen connector A and B but this is not a correct method.
+I'd like to get length of an arc between passing by A and B with center of BendRadius...
+But how to get the center with API?
+
+<center>
+  <img src="img/cabletraybend01.png" alt="Cable tray bend radius" title="Cable tray bend radius" width="300"/> <!-- Pixel Height: 675 Pixel Width: 993 -->
+  <br/>
+  <img src="img/cabletraybend02.png" alt="Cable tray bend radius" title="Cable tray bend radius" width="300"/> <!-- Pixel Height: 675 Pixel Width: 993 -->
+</center>
+
+**Answer:**
+This may be somewhat tricky due to the fact that every content creator is free to set up the elbow fitting family definition as she pleases. So, it is hard to know what parameters are available and what they might mean. My off-hand suggestion to approach this would be the following:
+
+- Determine the two connector origins and orientations for C1 and C2
+- They will give you the two connection points P1 and P2, and the connection orientation vectors Z1 and Z2 pointing into the fitting at C1 and C2
+- From these four points and vectors, you can calculate an arc that implements a fillet between the two neighbouring conduit straight line segments
+
+That is the best approximation I can think of offhand. If you have the bend width, radius, straight line extensions at the two ends of the bend, and/or other additional data, you can improve the calculation taking those into account.
+
+**Response:**
+Indeed, I think the idea would be to find the center of a circle from the two connectors. I'd need to get the vectors at these points and take the perpendicular to these vectors. Then I could find their intersection and draw an arc between the two connectors.
+But how do I get the vectors? By using the Transform object and then BasisXYZ?
+
+<center>
+<img src="img/cabletraybend03.png" alt="Cable tray bend radius" title="Cable tray bend radius" width="300"/> <!-- Pixel Height: 675 Pixel Width: 993 -->
+</center>
+
+**Answer:**
+Yes, exactly.
+In the [`Connector` `CoordinateSystem` property](https://www.revitapidocs.com/2024/cb6d725d-654a-f6f3-fed0-96cc618a42f1.htm),
+the coordinate system origin is the location of the connector and the Z-axis is normal to the connector, and thus also to the fitting face hosting it, and thus also collinear with the neighbouring conduit location line.
+
+**Response:**
+I found this [post from Cyril Poupin in Python](https://voltadynabim.blogspot.com/2022/06/dynamo-python-courbe-d-raccord-en-arc.html) with the following code:
+
+<pre><code class="language-py">pair_sys_origin = [[con.CoordinateSystem, con.Origin] for con in conSet]
+  pta = pair_sys_origin[0][1].ToPoint()
+  ptb = pair_sys_origin[1][1].ToPoint()
+  vector = pair_sys_origin[0][0].BasisZ.Negate().ToVector()
+  arc = DS.Arc.ByStartPointEndPointStartTangent(pta, ptb, vector)
+  return arc, arc.Length</code></pre>
+
+I tried to translate it in C#, but the Dynamo API provides a function called `ByStartPointEndPointStartTangent`, and I must create my own .... mmm ... this is a geometric problem.
+
+<pre><code class="language-cs">// méthode à partir de deux connecteurs
+if (connectors.Size == 2)
+{
+  // Transforme le Set en liste
+  var castConnectors = connectors.Cast&lt;Connector&gt;();
+  List&lt;Connector&gt; connectorList = castConnectors.ToList();
+  // get first point
+  Transform transformPtA = connectorList[0].CoordinateSystem;
+  XYZ originPtA = transformPtA.Origin;
+
+  // get Vector from this point
+  XYZ vector = transformPtA.BasisZ.Negate();
+  // get second point
+  Transform transformPtB = connectorList[1].CoordinateSystem;
+  XYZ originPtB = transformPtB.Origin;
+
+  // Get arc from those points
+  Arc arc = Arc.Create(originPtA, originPtB, vector);
+
+  length = arc.Length;
+}</code></pre>
+
+**Answer:**
+I think you need to do it manually but but of course programmatically  &nbsp; :-)
+I mean there is no direct way to get it.
+So, you need to identify the two connectors for which you want to determine the outer radius.
+From these 2 connectors we extract the origin points.
+The points are crucial for finding the center point of the arc.
+
+Getting the center point can be reached by drawing a perpendicular line to the cable tray curve direction and projecting the second point onto this line, by which we can locate the center.
+
+Next, draw an arc connecting the two points with the radius. The radius can be measured by getting the distance between any of the connectors to the center point we evaluated.  This approach will establish the centerline connection between the two MEP curves. Finally, by using the CreateOffset function with a distance equal to half the cable tray width, we can achieve our desired outcome.
+
+Below is a sample code that summarizes the process, you need to take care of the angles needed to draw the arc. The start angle has to be less than the end angle. Another thing I noticed in most of MEP Fittings, specially the elbow kind, the path that is used to sweep the profile, is composed of two lines and one arc. the two lines gives a smooth connection like when used. so you need also to take care of the such thing, in order to get an accurate result.
+
+Finally, I quickly written the sample below for the 90 degrees case. I think in the other angle cases, you need to take care of the projection of the second point. probably you need to create another perpendicular line and find the intersection between the two lines.
+
+<pre><code class="language-cs">// assuming you already have the two connectors.
+// we get the curves lines from its owner.
+var horizontalLine = ((LocationCurve)connectorA.Owner.Location).Curve as Line;
+var verticalLine = ((LocationCurve)connectorB.Owner.Location).Curve as Line;
+
+// catch the distance and location of the 2 connectors and the distance between
+var originA = connectorA.Origin;
+var originB = connectorB.Origin;
+var diagonalDistance = originA.DistanceTo(originB);
+
+// get the sketchplan used to draw such cable trays
+var sketchPlan = SketchPlane.Create(Doc, ((MEPCurve)connectorA.Owner).ReferenceLevel.Id).GetPlane();
+
+// now we need draw a perpendicular line to any of the mep curves.
+var perDirection = horizontalLine.Direction.CrossProduct(sketchPlan.Normal);
+var perpL1 = Line.CreateBound(originA - perDirection * diagonalDistance, originA + perDirection * diagonalDistance);
+
+// then project the second point over this perpendicular curve to get the center point
+var centerPoint = perpL1.Project(originB).XYZPoint;
+
+// arc requires 2 angles start and end
+double angleX = sketchPlan.XVec.AngleTo((originA - centerPoint).Normalize());
+double angleY = sketchPlan.XVec.AngleTo((originB - centerPoint).Normalize());
+
+// draw the arc <= this is in the zero position "sketchplan origin point"
+Curve arc = Arc.Create(sketchPlan, originB.DistanceTo(centerPoint), angleX, angleY);
+
+// move the arc to the center point
+arc = arc.CreateTransformed(Transform.CreateTranslation(centerPoint));
+
+// create the offset needed to get the outer Radius
+arc = arc.CreateOffset(((MEPCurve)connectorA.Owner).Width / 2, sketchPlan.Normal);
+</code></pre>
+
+Pipe elbow fittings often have a straight segment on each side before the arc begins, for connecting them to the neighbour parts.
+Do the conduit elbows always connect immediately to the arc, with no straight segment before and after?
+
+**Response:**
+I determined the center of my arc.
+However, I'm stuck on creating the arc.
+My bend doesn't always go in the right direction and it doesn't go between my two connector points...
+
+<pre><code class="language-cs">//Transforme le Set en liste
+var castConnectors = connectors.Cast&lt;Connector&gt;();
+List&lt;Connector&gt; connectorList = castConnectors.ToList();
+
+Connector connectorA = connectorList[0];
+Connector connectorB = connectorList[1];
+
+#region connectorA_Perpendicular
+//get Transform
+Transform transformPtA = connectorA.CoordinateSystem;
+//get origin
+XYZ originPtA = transformPtA.Origin;
+//get direction
+XYZ directionA = (connectorA.Owner.Location as LocationPoint).Point;
+//set line between origin and direction of owner
+Line lineA = Line.CreateBound(originPtA, directionA);
+
+//get perpendicular
+XYZ normalA = lineA.Direction.Normalize();
+XYZ dirA = new XYZ(0, 0, 1);
+XYZ crossA = normalA.CrossProduct(dirA);
+XYZ endA = originPtA + crossA.Multiply(4);
+XYZ endAMirror = originPtA + crossA.Multiply(-4);
+Line linePerpendicularA = Line.CreateBound(endA, endAMirror);
+
+#endregion
+
+#region connectorB_Perpendicular
+//get Transform
+Transform transformPtB = connectorB.CoordinateSystem;
+//get origin
+XYZ originPtB = transformPtB.Origin;
+//get direction
+XYZ directionB = (connectorB.Owner.Location as LocationPoint).Point;
+//set line between origin and direction of owner
+Line lineB = Line.CreateBound(originPtB, directionB);
+
+//get perpendicular
+XYZ normalB = lineB.Direction.Normalize();
+XYZ dirB = new XYZ(0, 0, 1);
+XYZ crossB = normalB.CrossProduct(dirB);
+XYZ endB = originPtB + crossB.Multiply(4);
+XYZ endBMirror = originPtB + crossB.Multiply(-4);
+Line linePerpendicularB = Line.CreateBound(endB, endBMirror);
+
+#endregion
+
+//get intersection between perpendiculars
+XYZ centerOfArc = null;
+IntersectionResultArray intersectionResults = new IntersectionResultArray();
+SetComparisonResult setCR = linePerpendicularA.Intersect(linePerpendicularB, out intersectionResults);
+
+if (setCR == SetComparisonResult.Overlap)
+{
+    if (intersectionResults != null && intersectionResults.Size == 1)
+    {
+        //there is one point interesction
+        IntersectionResult iResult = intersectionResults.get_Item(0);
+        centerOfArc = iResult.XYZPoint;
+        _geometries.Add(Point.Create(centerOfArc));
+    }
+}
+
+if (centerOfArc != null)
+{
+    //Set arc from point A and B
+    double radius = centerOfArc.DistanceTo(originPtA);
+
+    XYZ xAxis = new XYZ(1, 0, 0);   // The x axis to define the arc plane. Must be normalized
+    XYZ yAxis = new XYZ(0, 1, 0);   // The y axis to define the arc plane. Must be normalized
+    Arc arc = Arc.Create(centerOfArc, radius, 0, Math.PI / 2.0, xAxis, yAxis);
+    _geometries.Add(arc);
+}</code></pre>
+
+<center>
+<img src="img/cabletraybend04.png" alt="Cable tray bend radius" title="Cable tray bend radius" width="300"/> <!-- Pixel Height: 675 Pixel Width: 993 -->
+</center>
+
+And what about Cable Tray Fittings which are vertical or visible in section like this?
+
+<center>
+<img src="img/cabletraybend05.png" alt="Cable tray bend radius" title="Cable tray bend radius" width="300"/> <!-- Pixel Height: 675 Pixel Width: 993 -->
+</center>
+
+**Answer:**
+I found a new approach to get the center curve of the duct and use the Revit API library to create an Arc to represent it:
+
+<pre><code class="language-cs">  ElementId id = uidoc.Selection.PickObject(
+    Autodesk.Revit.UI.Selection.ObjectType.Element).ElementId;
+
+  FamilyInstance inst = doc.GetElement(id) as FamilyInstance;
+
+  Options opt = new Options();
+  opt.ComputeReferences = true;
+  opt.DetailLevel = ViewDetailLevel.Coarse;
+
+  GeometryElement geoElement = inst.get_Geometry(opt);
+
+  using (Transaction createArc = new Transaction(doc, "Create Arc"))
+  {
+    createArc.Start();
+
+    foreach (GeometryInstance geoInst in geoElement)
+    {
+      if(geoInst != null)
+      {
+        foreach (GeometryObject obj in geoInst.GetInstanceGeometry())
+        {
+          if (obj is Arc)
+          {
+            doc.Create.NewModelCurve(obj as Curve,
+              SketchPlane.Create(
+                doc,
+                Plane.CreateByNormalAndOrigin((obj as Arc).Normal,
+                (obj as Arc).GetEndPoint(0))));
+          }
+        }
+      }
+    }
+    createArc.Commit();
+  }</code></pre>
+
+<center>
+<img src="img/cabletraybend06.gif" alt="Cable tray bend radius" title="Cable tray bend radius" width="300"/> <!-- Pixel Height: 675 Pixel Width: 993 -->
+</center>
+
+**Response:**
+YouHou!!! It works!!
+So yes, depending on the level of view detail, the instances returned by `GetInstanceGeometry` are not the same.
+Secret is changing the `ViewDetailLevel` to `Coarse`!
+The good surprise is that `Arc` and `Line` have an `ApproximateLength` property, so I don't have to run a transaction.
+
+<center>
+<img src="img/cabletraybend07.png" alt="Cable tray bend radius" title="Cable tray bend radius" width="300"/> <!-- Pixel Height: 675 Pixel Width: 993 -->
+<br/>
+<img src="img/cabletraybend08.png" alt="Cable tray bend radius" title="Cable tray bend radius" width="300"/> <!-- Pixel Height: 675 Pixel Width: 993 -->
+<br/>
+<img src="img/cabletraybend09.png" alt="Cable tray bend radius" title="Cable tray bend radius" width="300"/> <!-- Pixel Height: 675 Pixel Width: 993 -->
+</center>
+
+The code looks like this:
+
+<pre><code class="language-cs">  Options opt = new Options();
+  opt.ComputeReferences = true;
+  opt.DetailLevel = ViewDetailLevel.Coarse;
+
+  foreach (ElementId elemId in _uidoc.Selection.GetElementIds())
+  {
+    // normalement, un seul
+    Element element = _uidoc.Document.GetElement(elemId);
+
+    if (element.GetType() == typeof(FamilyInstance))
+    {
+      double approximateLength = 0;
+      FamilyInstance famInst = element as FamilyInstance;
+
+      GeometryElement geoElement = famInst.get_Geometry(opt);
+
+      foreach (GeometryInstance geoInst in geoElement)
+      {
+        if (geoInst != null)
+        {
+          foreach(GeometryObject geoObj in geoInst.GetInstanceGeometry())
+          {
+            if (geoObj is Arc)
+            {
+              Arc arc = geoObj as Arc;
+              approximateLength += arc.ApproximateLength;
+            }
+            if (geoObj is Line)
+            {
+              Line line = geoObj as Line;
+              approximateLength += line.ApproximateLength;
+            }
+          }
+        }
+      }
+      TaskDialog.Show("Message from dev",
+        "Approximate length of instance is "
+        + UnitUtils.ConvertFromInternalUnits(
+          approximateLength,
+          UnitTypeId.Centimeters));
+
+    }
+  }</code></pre>
+
+Thanks to all for your help, and to Mariyan for his [tutos about vectors](https://youtu.be/FrFSPTRO9wY)!
 
 ####<a name="3"></a> MEP Tee Branch Identification
 
