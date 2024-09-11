@@ -60,8 +60,8 @@ to [get `BendRadius` center of cable tray fittings](https://forums.autodesk.com/
 with lots of valuable help from Moustafa Khalil from [SharpBIM coding](https://sharpbim.hashnode.dev/) and Mohamed Arshad K:
 
 **Question:**
-I need to get the lenght of a cable tray fittings.
-I could get lenght betwen connector A and B but this is not a correct method.
+I need to get the length of a cable tray fitting.
+I could get length between connector A and B but this is not a correct method.
 I'd like to get length of an arc between passing by A and B with center of BendRadius...
 But how to get the center with API?
 
@@ -128,19 +128,25 @@ if (connectors.Size == 2)
 }</code></pre>
 
 **Answer:**
-I think you need to do it manually but but of course programmatically  &nbsp; :-)
-I mean there is no direct way to get it.
-So, you need to identify the two connectors for which you want to determine the outer radius.
-From these 2 connectors we extract the origin points.
-The points are crucial for finding the center point of the arc.
+I think there is no direct way to get it.
+You need to identify the two connectors for which you want to determine the outer radius.
+From these 2 connectors, extract the origin points.
+These points are crucial for finding the center point of the arc.
+Getting the center point can be achieved by drawing a perpendicular line to the cable tray curve direction and projecting the second point onto this line, by which we can locate the center.
+Next, draw an arc connecting the two points with the radius.
+The radius can be measured by getting the distance between any of the connectors to the center point we evaluated.
+This approach will establish the centerline connection between the two MEP curves.
+Finally, by using the `CreateOffset` function with a distance equal to half the cable tray width, we can achieve our desired outcome.
 
-Getting the center point can be reached by drawing a perpendicular line to the cable tray curve direction and projecting the second point onto this line, by which we can locate the center.
+Below is sample code that summarizes the process; you need to take care of the angles needed to draw the arc.
+The start angle has to be less than the end angle.
+Another thing I noticed in most of MEP Fittings, especially the elbow kind, the path that is used to sweep the profile, is composed of two lines and one arc.
+The two lines give a smooth connection when used.
+So, you need also to take care of such things in order to get an accurate result.
 
-Next, draw an arc connecting the two points with the radius. The radius can be measured by getting the distance between any of the connectors to the center point we evaluated.  This approach will establish the centerline connection between the two MEP curves. Finally, by using the CreateOffset function with a distance equal to half the cable tray width, we can achieve our desired outcome.
-
-Below is a sample code that summarizes the process, you need to take care of the angles needed to draw the arc. The start angle has to be less than the end angle. Another thing I noticed in most of MEP Fittings, specially the elbow kind, the path that is used to sweep the profile, is composed of two lines and one arc. the two lines gives a smooth connection like when used. so you need also to take care of the such thing, in order to get an accurate result.
-
-Finally, I quickly written the sample below for the 90 degrees case. I think in the other angle cases, you need to take care of the projection of the second point. probably you need to create another perpendicular line and find the intersection between the two lines.
+I wrote the sample below for the 90 degrees case.
+I think in the other angle cases, you need to take care of the projection of the second point.
+Probably, you need to create another perpendicular line and find the intersection between the two lines.
 
 <pre><code class="language-cs">// assuming you already have the two connectors.
 // we get the curves lines from its owner.
