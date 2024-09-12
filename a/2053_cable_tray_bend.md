@@ -13,8 +13,6 @@
 <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
 <style> code[class*=language-], pre[class*=language-] { font-size : 90%; } </style>
 
-</style>
-
 </head>
 
 <!---
@@ -30,7 +28,9 @@ twitter:
 
  @AutodeskRevit #RevitAPI #BIM @DynamoBIM
 
-&ndash; ...
+A quick dive into the geometric analysis of various MEP fittings
+&ndash; Cable tray bend radius
+&ndash; Tee branch identification...
 
 linkedin:
 
@@ -45,7 +45,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Cable Tray Bend and Tee Analysis
+### MEP Cable Tray Bend and Tee Analysis
 
 A quick dive into the geometric analysis of various MEP fittings:
 
