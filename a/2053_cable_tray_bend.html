@@ -44,14 +44,14 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 -->
 
 <h3>Cable Tray Bend and Tee Analysis</h3>
-<p>A quick dive into some geometric analysis of MEP fittings:</p>
+<p>A quick dive into the geometric analysis of various MEP fittings:</p>
 <ul>
 <li><a href="#2">Cable tray bend radius</a></li>
 <li><a href="#3">Tee branch identification</a></li>
 </ul>
 <h4><a name="2"></a> Cable Tray Bend Radius</h4>
 <p><a href="https://fr.linkedin.com/in/pierre-navarra-62032a107">Pierre Navarra</a> of <a href="http://www.sona-architecture.com">Sona-Architecture</a>
-solved hot
+solved how
 to <a href="https://forums.autodesk.com/t5/revit-api-forum/get-bendradius-center-of-cable-tray-fittings/m-p/12757167">get <code>BendRadius</code> center of cable tray fittings</a>
 with lots of valuable help from Moustafa Khalil from <a href="https://sharpbim.hashnode.dev/">SharpBIM coding</a> and Mohamed Arshad K:</p>
 <p><strong>Question:</strong>
@@ -84,7 +84,7 @@ In the <a href="https://www.revitapidocs.com/2024/cb6d725d-654a-f6f3-fed0-96cc61
 the coordinate system origin is the location of the connector and the Z-axis is normal to the connector, and thus also to the fitting face hosting it, and thus also collinear with the neighbouring conduit location line.</p>
 <p><strong>Response:</strong>
 I found this <a href="https://voltadynabim.blogspot.com/2022/06/dynamo-python-courbe-d-raccord-en-arc.html">post from Cyril Poupin in Python</a> with the following code:</p>
-<pre><code class="language-py">pair_sys_origin = [[con.CoordinateSystem, con.Origin] for con in conSet]
+<pre><code class="language-py">  pair_sys_origin = [[con.CoordinateSystem, con.Origin] for con in conSet]
   pta = pair_sys_origin[0][1].ToPoint()
   ptb = pair_sys_origin[1][1].ToPoint()
   vector = pair_sys_origin[0][0].BasisZ.Negate().ToVector()
