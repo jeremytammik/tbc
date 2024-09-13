@@ -57,7 +57,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 A quick dive into the geometric analysis of various MEP fittings:
 
 - [Cable tray bend radius](#2)
-- [Using the Sagitta formula](#2.1)
+- [Using the sagitta formula](#2.1)
 - [Tee branch identification](#3)
 
 ####<a name="2"></a> Cable Tray Bend Radius
