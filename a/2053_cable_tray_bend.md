@@ -34,6 +34,13 @@ A quick dive into the geometric analysis of various MEP fittings
 
 linkedin:
 
+A quick dive into the geometric analysis of various MEP fittings to determine cable tray bend radius and  tee branch identification in the  #RevitAPI
+
+https://autode.sk/cabletraybend
+
+- Cable tray bend radius
+- Tee branch identification...
+
 #BIM #DynamoBIM #AutodeskAPS #Revit #API #IFC #SDK #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
