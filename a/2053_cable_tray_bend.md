@@ -57,6 +57,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 A quick dive into the geometric analysis of various MEP fittings:
 
 - [Cable tray bend radius](#2)
+- [Using the Sagitta formula](#2.1)
 - [Tee branch identification](#3)
 
 ####<a name="2"></a> Cable Tray Bend Radius
@@ -384,6 +385,80 @@ The code looks like this:
   }</code></pre>
 
 Thanks to all for your help, and to Mariyan for his [tutos about vectors](https://youtu.be/FrFSPTRO9wY)!
+
+####<a name="2.1"></a> Using the Sagitta Formula
+
+[Cyril Poupin](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/5889003) adds:
+
+This discussion inspired me to dive back into this problem;
+here's a solution using the [sagitta formula](https://en.wikipedia.org/wiki/Sagitta_(geometry)) (without using the ProtoGeometry API):
+
+<center>
+<img src="img/cabletraybend10.png" alt="Cable tray bend radius" title="Cable tray bend radius" width="300"/> <!-- Pixel Height: 675 Pixel Width: 993 -->
+</center>
+
+The Python code is for IronPython3, but easily transposable to C#:
+
+<pre><code class="language-cs">import clr
+import sys
+import System
+from System import Math
+
+#import Revit API
+clr.AddReference('RevitAPI')
+import Autodesk
+from Autodesk.Revit.DB import *
+import Autodesk.Revit.DB as DB
+
+clr.AddReference('RevitNodes')
+import Revit
+clr.ImportExtensions(Revit.GeometryConversion)
+
+#import transactionManager and DocumentManager (RevitServices is specific to Dynamo)
+clr.AddReference('RevitServices')
+import RevitServices
+from RevitServices.Persistence import DocumentManager
+doc = DocumentManager.Instance.CurrentDBDocument
+
+def get_curve_fitting2(elem):
+    """
+    return the arc geometry
+    """
+    if hasattr(elem, "MEPModel"):
+        conSet = elem.MEPModel.ConnectorManager.Connectors
+        if conSet.Size == 2:
+            pair_sys_origin = [[con.CoordinateSystem, con.Origin] for con in conSet]
+            ptA = pair_sys_origin[0][1]
+            ptB = pair_sys_origin[1][1]
+            normalA = pair_sys_origin[0][0].BasisX
+            normalB = pair_sys_origin[1][0].BasisX
+            # create Unbound lines
+            lineBoundA = Line.CreateUnbound(ptA, normalA)
+            lineBoundB = Line.CreateUnbound(ptB, normalB)
+            # compute intersection -> center
+            out_IntersectionResultArray = clr.Reference[IntersectionResultArray]()
+            result = lineBoundA.Intersect(lineBoundB, out_IntersectionResultArray)
+            if result == SetComparisonResult.Overlap:
+                center = out_IntersectionResultArray.Value[0].XYZPoint
+                radius = ptA.DistanceTo(center)
+                # compute the chord and the middle of chord
+                chord = Line.CreateBound(ptA, ptB)
+                mid_chord = (ptA + ptB) / 2.0
+                distance = ptA.DistanceTo(ptB)
+                # compute sagitta
+                sagitta = radius - Math.Sqrt(radius**2 - (distance / 2)**2)
+                # translate the middle point on the chord with sagitta
+                vector_sagitta = (mid_chord  - center).Normalize().Multiply(sagitta)
+                pointOnArc = mid_chord + vector_sagitta
+                return  Arc.Create(ptA, ptB, pointOnArc)
+    return None
+
+fitting = UnwrapElement(IN[0])
+db_Arc = get_curve_fitting2(fitting)
+ds_Arc_for_check = db_Arc.ToProtoType()
+OUT = db_Arc, ds_Arc_for_check</code></pre>
+
+Many thanks to Cyril for this addition!
 
 ####<a name="3"></a> MEP Tee Branch Identification
 

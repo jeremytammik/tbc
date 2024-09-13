@@ -55,6 +55,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 <p>A quick dive into the geometric analysis of various MEP fittings:</p>
 <ul>
 <li><a href="#2">Cable tray bend radius</a></li>
+<li><a href="#2.1">Using the Sagitta formula</a></li>
 <li><a href="#3">Tee branch identification</a></li>
 </ul>
 <h4><a name="2"></a> Cable Tray Bend Radius</h4>
@@ -359,6 +360,74 @@ The good surprise is that <code>Arc</code> and <code>Line</code> have an <code>A
   }</code></pre>
 
 <p>Thanks to all for your help, and to Mariyan for his <a href="https://youtu.be/FrFSPTRO9wY">tutos about vectors</a>!</p>
+<h4><a name="2.1"></a> Using the Sagitta Formula</h4>
+<p><a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/5889003">Cyril Poupin</a> adds:</p>
+<p>This discussion inspired me to dive back into this problem;
+here's a solution using the <a href="https://en.wikipedia.org/wiki/Sagitta_(geometry)">sagitta formula</a> (without using the ProtoGeometry API):</p>
+<p><center>
+<img src="img/cabletraybend10.png" alt="Cable tray bend radius" title="Cable tray bend radius" width="300"/> <!-- Pixel Height: 675 Pixel Width: 993 -->
+</center></p>
+<p>The Python code is for IronPython3, but easily transposable to C#:</p>
+<pre><code class="language-cs">import clr
+import sys
+import System
+from System import Math
+
+#import Revit API
+clr.AddReference('RevitAPI')
+import Autodesk
+from Autodesk.Revit.DB import *
+import Autodesk.Revit.DB as DB
+
+clr.AddReference('RevitNodes')
+import Revit
+clr.ImportExtensions(Revit.GeometryConversion)
+
+#import transactionManager and DocumentManager (RevitServices is specific to Dynamo)
+clr.AddReference('RevitServices')
+import RevitServices
+from RevitServices.Persistence import DocumentManager
+doc = DocumentManager.Instance.CurrentDBDocument
+
+def get_curve_fitting2(elem):
+    """
+    return the arc geometry
+    """
+    if hasattr(elem, "MEPModel"):
+        conSet = elem.MEPModel.ConnectorManager.Connectors
+        if conSet.Size == 2:
+            pair_sys_origin = [[con.CoordinateSystem, con.Origin] for con in conSet]
+            ptA = pair_sys_origin[0][1]
+            ptB = pair_sys_origin[1][1]
+            normalA = pair_sys_origin[0][0].BasisX
+            normalB = pair_sys_origin[1][0].BasisX
+            # create Unbound lines
+            lineBoundA = Line.CreateUnbound(ptA, normalA)
+            lineBoundB = Line.CreateUnbound(ptB, normalB)
+            # compute intersection -> center
+            out_IntersectionResultArray = clr.Reference[IntersectionResultArray]()
+            result = lineBoundA.Intersect(lineBoundB, out_IntersectionResultArray)
+            if result == SetComparisonResult.Overlap:
+                center = out_IntersectionResultArray.Value[0].XYZPoint
+                radius = ptA.DistanceTo(center)
+                # compute the chord and the middle of chord
+                chord = Line.CreateBound(ptA, ptB)
+                mid_chord = (ptA + ptB) / 2.0
+                distance = ptA.DistanceTo(ptB)
+                # compute sagitta
+                sagitta = radius - Math.Sqrt(radius**2 - (distance / 2)**2)
+                # translate the middle point on the chord with sagitta
+                vector_sagitta = (mid_chord  - center).Normalize().Multiply(sagitta)
+                pointOnArc = mid_chord + vector_sagitta
+                return  Arc.Create(ptA, ptB, pointOnArc)
+    return None
+
+fitting = UnwrapElement(IN[0])
+db_Arc = get_curve_fitting2(fitting)
+ds_Arc_for_check = db_Arc.ToProtoType()
+OUT = db_Arc, ds_Arc_for_check</code></pre>
+
+<p>Many thanks to Cyril for this addition!</p>
 <h4><a name="3"></a> MEP Tee Branch Identification</h4>
 <p>Andrej Licanin of <a href="https://bimexperts.com/">bimexperts</a> brought up a question and shared his MEP tee fitting identification and analysis solution in
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
