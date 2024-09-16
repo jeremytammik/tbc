@@ -57,7 +57,8 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 A quick dive into the geometric analysis of various MEP fittings:
 
 - [Cable tray bend radius](#2)
-- [Using the sagitta formula](#2.1)
+    - [Using the sagitta formula](#2.1)
+    - [Using the insertion point](#2.2)
 - [Tee branch identification](#3)
 
 ####<a name="2"></a> Cable Tray Bend Radius
@@ -459,6 +460,24 @@ ds_Arc_for_check = db_Arc.ToProtoType()
 OUT = db_Arc, ds_Arc_for_check</code></pre>
 
 Many thanks to Cyril for this addition!
+
+####<a name="2.2"></a> Using the Insertion Point
+
+Rather belatedly, a (so far) final contribution to this topic from
+Roman [@Nice3point](https://t.me/nice3point) Karpovich, aka Роман Карпович,
+sharing a solution from Vadim Muratov:
+
+> The arc centre of any elbow will always coincide with the inset point of the family, so you can get the insert point, the origin for the connectors and the angle between the connectors; from here you can draw the arc.
+To get the length, it is enough to know the radius of the arc and the angle between the connectors:
+nice3point_0-1726481428723.png
+
+<center>
+<img src="img/cabletraybend11.png" alt="Cable tray bend radius" title="Cable tray bend radius" width="300"/>
+</center>
+
+> This way, you can solve the problem much simpler, and without a massive code size.
+
+Many thanks to Roman for this simple and efficient solution!
 
 ####<a name="3"></a> MEP Tee Branch Identification
 
