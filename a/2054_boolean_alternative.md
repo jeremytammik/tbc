@@ -65,9 +65,13 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 ####<a name="2"></a>
 
 Andrey [@ankofl](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/11836042) Kolesov
-shared
+shareda solution using
+the [Computational Geometry Algorithms Library CGAL](https://en.wikipedia.org/wiki/CGAL) and
+the [OFF file format](https://en.wikipedia.org/wiki/OFF_(file_format)) to
+perform Boolean operations on solids, presented in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on [how to execute Boolean operations on Revit solid by AutoCAD](https://forums.autodesk.com/t5/revit-api-forum/how-to-execute-booleanoperations-on-revit-solid-by-autocad/m-p/13005223):
 
-[how to execute Boolean operations on Revit solid by AutoCAD](https://forums.autodesk.com/t5/revit-api-forum/how-to-execute-booleanoperations-on-revit-solid-by-autocad/m-p/13005223)
 
 We are all familiar with the problems with Boolean operations on solid objects. A lot of exceptions occur during the operations of union, intersection and subtraction. In one of the branches, it was proposed to export Revit-Solid to Cascad-Colid, perform painful and other operations in it, and upload back only the result of such calculations, or transfer Cascad-Solid back to Revit-Solid.
 SIX years after the beginning of this branch, the developers from Autodesk have not provided us with a working solution to this problem.
