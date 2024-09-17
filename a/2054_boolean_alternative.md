@@ -406,17 +406,16 @@ bool save_to(const std::string path, Mesh input) {
 
 
 Then you can upload the .off file back to revit, or do other manipulations with it. However, as far as I know, API Revit does not allow you to create a full-fledged Solid object, but only a triangular grid, i.e. you can upload the grid obtained through CGAL to Revit for viewing, but you will not be able to perform further operations on solid with it, but only view its geometry through DirectShape
-Tags (0)
-Add tags
-Report
-MESSAGE 15 OF 15
+
 jeremy_tammik
-  Autodesk jeremy_tammik  in reply to: ankofl
-‎2024-09-08 01:12 PM
 
 Wow! Congratulations! That looks like a brilliant solution. Thank you for sharing it. Regarding your final sentences, I believe you can in fact generate solid shapes in your DirectShape object by using the BRepBuilder class; it allows direct construction of geometry objects including solids, closed and open shells, etc.:
 
 https://www.revitapidocs.com/2024/94c1fef4-2933-ce67-9c2d-361cbf8a42b4.htm
+
+I am very glad to hear about it.
+I looked into the very powerful [LEDA Library of Efficient Data types and Algorithms](https://en.wikipedia.org/wiki/Library_of_Efficient_Data_types_and_Algorithms) a
+long time ago, before it was merged into CGAL.
 
 
 **Question:**
