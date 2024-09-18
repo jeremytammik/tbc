@@ -65,23 +65,29 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 ####<a name="2"></a>
 
 Andrey [@ankofl](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/11836042) Kolesov
-shareda solution using
+shared a solution using
 the [Computational Geometry Algorithms Library CGAL](https://en.wikipedia.org/wiki/CGAL) and
 the [OFF file format](https://en.wikipedia.org/wiki/OFF_(file_format)) to
 perform Boolean operations on solids, presented in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [how to execute Boolean operations on Revit solid by AutoCAD](https://forums.autodesk.com/t5/revit-api-forum/how-to-execute-booleanoperations-on-revit-solid-by-autocad/m-p/13005223):
 
+One
 
-We are all familiar with the problems with Boolean operations on solid objects. A lot of exceptions occur during the operations of union, intersection and subtraction. In one of the branches, it was proposed to export Revit-Solid to Cascad-Colid, perform painful and other operations in it, and upload back only the result of such calculations, or transfer Cascad-Solid back to Revit-Solid.
-SIX years after the beginning of this branch, the developers from Autodesk have not provided us with a working solution to this problem.
+Initially, one thought was to translate back and forth between Revit and AutoCAD solids
 
-In my opinion, this is too complicated and time-consuming task to translate from Revit to Cascada, and it may be better to export Solid not to Cascad, but to AutoCAD, or rather use the loaded libraries to work with AutoCAD, but perform all operations in the Revit process. The already established export from DWG to RWT speaks in favor of this decision. Maybe it is possible to export Revit-Solid to AutoCAD-Solid and perform Boolean operations already there?
+We are all familiar with the problems with Boolean operations on solid objects.
+A lot of exceptions can occur during the operations of union, intersection and subtraction.
+In one of the branches, it was proposed to export Revit solids to OpenCascade, perform painful and other operations in them there, and upload back only the result of such calculations, or translate the Cascade solids back into Revit solids.
 
-RPTHOMAS108
-  Mentor RPTHOMAS108  in reply to: ankofl
-‎2023-08-10 04:18 AM
-I've manually carried out boolean operations in AutoCad in the past (quite a while ago however) and I think you would likely get the same issues there unless they've updated what AutoCad uses since. People have noted that such operations are more stable in Dynamo since it uses a slightly different system so my focus would be more on that. It did occur to me that the reason could be the unit system. Since Revit uses ft and not a smaller unit such as inches or mm you have smaller number on the LHS of the decimal place and so the floating point errors also shift over. Or to put it another way the decimal part has errors that occur through operations that the integer part doesn't and by using ft you are relying on more decimal places for accuracy of the same real world sized object (around 3 more) than you would be for mm.
+SIX years after the beginning of this thread, the developers from Autodesk have not provided a working solution to this problem.
+
+In my opinion, this is too complicated and time-consuming task to translate from Revit to OpenCascade; it may be better to export solid to AutoCAD instead, or rather use the loaded libraries to work with AutoCAD, but performing all such operations in the Revit process.
+The already established export from DWG to RVT speaks in favor of this decision.
+Maybe it is possible to export Revit-Solid to AutoCAD-Solid and perform Boolean operations already there?
+
+**Answer:**
+I've manually carried out Boolean operations in AutoCad in the past (quite a while ago, however) and I think you would likely get the same issues there unless they've updated what AutoCad uses since. People have noted that such operations are more stable in Dynamo, since it uses a slightly different system, so my focus would be more on that. It did occur to me that the reason could be the unit system. Since Revit uses feet and not a smaller unit such as inches or mm, you have smaller number on the LHS of the decimal place and so the floating point errors also shift over. Or, to put it another way, the decimal part has errors that occur through operations that the integer part doesn't, and by using feet, you are relying on more decimal places for accuracy of the same real world sized object (around 3 more) than you would be for mm.
 
 All the units in Dynamo are converted to 'Dynamo Units' before such processing it seems. Would be interesting to test if you get more stability carrying out the operations after scaling the solids up SolidUtils.CreateTransformed (transform with uniform scale). You would likely have an issue if you then scale it back down (an edge too short) but it depends on the purpose of your operation i.e. calculating volume area vs needing to use in geometry. Perhaps I'm just clutching at straws since Dynamo uses it's own library also.
 
