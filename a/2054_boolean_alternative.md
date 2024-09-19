@@ -62,7 +62,35 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 ### Boolean Alternatives
 
 
-####<a name="2"></a>
+####<a name="2"></a> Revit and OpenCascade
+
+BooleanOperationsUtils.ExecuteBooleanOperation InvalidOperationException Casue
+https://forums.autodesk.com/t5/revit-api-forum/booleanoperationsutils-executebooleanoperation/m-p/12971195
+
+**Question:**
+`BooleanOperationsUtils.ExecuteBooleanOperation`: When I use this method, I often get an `InvalidOperationException`.
+I would like to know if there are specific criteria for causing that error.
+For example, it occurs when elements intersect at an angle below a certain angle, etc.
+I hope there are rules for this or some documentation I can refer to.
+
+**Answer:**
+Sorry about that.
+It has been mentioned before that `ExecuteBooleanOperation` can run into issues.
+Unfortunately, afaik, there is no list of the exact criteria which might cause a problem.
+Various ways of handling the situation and some possible workarounds have been discussed here in the past.
+You can search
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160)
+for [ExecuteBooleanOperation](https://forums.autodesk.com/t5/forums/searchpage/tab/message?advanced=false&allow_punctuation=false&filter=location&location=forum-board:160&q=ExecuteBooleanOperation) or
+just [Boolean](https://forums.autodesk.com/t5/forums/searchpage/tab/message?filter=location&q=Boolean&noSynonym=false&location=forum-board:160&collapse_discussion=true) to
+find some of them.
+
+The development team are aware of these issues.
+[Boolean operation fail](https://forums.autodesk.com/t5/revit-api-forum/boolean-operation-fail/m-p/12839281) is
+an exhaustive discussions on the topic, ongoing ever since 2017, including a suggestion
+by Tommy [@tommy.stromhaug](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/4635064) Strømhaug
+for a non-trivial workaround using [OpenCascade](https://dev.opencascade.org/).
+
+####<a name="3"></a> CGAL Solids
 
 Andrey [@ankofl](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/11836042) Kolesov
 shared a solution using
