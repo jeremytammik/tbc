@@ -115,7 +115,7 @@ Well, it seems I'm finally close to a solution that suits me:
 
 Create `.off` file from Revit solid:
 
-<pre><code class="language-cs">public static bool WriteOff(this Solid solid, out List<string> listString)
+<pre><code class="language-cs">public static bool WriteOff(this Solid solid, out List&lt;string&gt; listString)
     {
       listString = ["OFF"];
 
@@ -137,11 +137,11 @@ Create `.off` file from Revit solid:
         return true;
       }
       return false;
-    }
+    }</code></pre>
 
 And this:
 
-<pre><code class="language-cs">public static bool CreateMesh(this Solid solid, out List<XYZ> listVectors, out List<Tri> listTri)
+<pre><code class="language-cs">public static bool CreateMesh(this Solid solid, out List&lt;XYZ&gt; listVectors, out List&lt;Tri&gt; listTri)
     {
       double k = UnitUtils.ConvertFromInternalUnits(1, UnitTypeId.Meters);
       listVectors = [];
@@ -155,13 +155,13 @@ And this:
         if (face is PlanarFace pFace)
         {
           Mesh mesh = pFace.Triangulate();
-          for (int tN = 0; tN < mesh.NumTriangles; tN++)
+          for (int tN = 0; tN &lt; mesh.NumTriangles; tN++)
           {
             var tri = mesh.get_Triangle(tN);
 
             var pT = new int[3];
 
-            for (int vN = 0; vN < 3; vN++)
+            for (int vN = 0; vN &lt; 3; vN++)
             {
               var p = tri.get_Vertex(vN) * k;
 
@@ -187,7 +187,7 @@ And this:
       }
 
       return allPlanar;
-    }
+    }</code></pre>
 
 Load `.off` file
 
@@ -200,13 +200,13 @@ bool load_from(const char* path, Mesh& output) {
     if (!input) {
         return false;
     }
-    else if (!(input >> output)) {
+    else if (!(input &gt;&gt; output)) {
         return false;
     }
 
     input.close();
     return true;
-}
+}</code>></pre>
 
 Execute boolean
 
@@ -223,19 +223,19 @@ bool boolean_simple(Mesh m1, Mesh m2, b_t type, Mesh& out) {
     }
     if (type == b_t::join) {
         if (!PMP::corefine_and_compute_union(m1, m2, out)){
-            std::cout << "fail_join ";
+            std::cout &lt;&lt; "fail_join ";
             return false;
         }
     }
     else if (type == b_t::inter) {
         if (!PMP::corefine_and_compute_intersection(m1, m2, out)){
-            std::cout << "fail_inter ";
+            std::cout &lt;&lt; "fail_inter ";
             return false;
         }
     }
     else if (type == b_t::dif) {
         if (!PMP::corefine_and_compute_difference(m1, m2, out)) {
-            std::cout << "fail_dif ";
+            std::cout &lt;&lt; "fail_dif ";
             return false;
         }
     }
@@ -243,12 +243,12 @@ bool boolean_simple(Mesh m1, Mesh m2, b_t type, Mesh& out) {
         throw;
     }
     return true;
-}
+}</code></pre>
 
 Save .off file:
 
 <pre><code class="language-cs">#pragma once
-#include <CGAL/Polygon_mesh_processing/IO/polygon_mesh_io.h>
+#include &lt;CGAL/Polygon_mesh_processing/IO/polygon_mesh_io.h&gt;
 
 bool save_to(const std::string path, Mesh input) {
     if (!CGAL::is_valid_polygon_mesh(input)) {
@@ -263,10 +263,10 @@ bool save_to(const std::string path, Mesh input) {
         }
     }
     catch (const std::exception& e) {
-        std::cout << "save_to: exception!" << std::endl;
+        std::cout &lt;&lt; "save_to: exception!" &lt;&lt; std::endl;
     }
     return false;
-}
+}</code></pre>
 
 Then you can upload the .off file back to revit, or do other manipulations with it. However, as far as I know, API Revit does not allow you to create a full-fledged Solid object, but only a triangular grid, i.e. you can upload the grid obtained through CGAL to Revit for viewing, but you will not be able to perform further operations on solid with it, but only view its geometry through DirectShape.
 
