@@ -84,6 +84,8 @@ for [ExecuteBooleanOperation](https://forums.autodesk.com/t5/forums/searchpage/t
 just [Boolean](https://forums.autodesk.com/t5/forums/searchpage/tab/message?filter=location&q=Boolean&noSynonym=false&location=forum-board:160&collapse_discussion=true) to
 find some of them.
 
+In Revit, one also encounters situations like this:
+
 <center>
 <img src="img/boolean_fail_1.png" alt="Red object to subtract from white object" title="Red object to subtract from white object" width="300"/>
 <p style="font-size: 80%; font-style:italic">Red object to subtract from white object</p>
