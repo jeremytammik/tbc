@@ -84,6 +84,13 @@ for [ExecuteBooleanOperation](https://forums.autodesk.com/t5/forums/searchpage/t
 just [Boolean](https://forums.autodesk.com/t5/forums/searchpage/tab/message?filter=location&q=Boolean&noSynonym=false&location=forum-board:160&collapse_discussion=true) to
 find some of them.
 
+<center>
+<img src="img/boolean_fail_1.png" alt="Red object to subtract from white object" title="Red object to subtract from white object" width="300"/>
+<p style="font-size: 80%; font-style:italic">Red object to subtract from white object</p>
+<img src="img/boolean_fail_2.png" alt="Zoom to the corner" title="Zoom to the corner" width="300"/>
+<p style="font-size: 80%; font-style:italic">Zoom to the corner</p>
+</center>
+
 The development team are aware of these issues.
 [Boolean operation fail](https://forums.autodesk.com/t5/revit-api-forum/boolean-operation-fail/m-p/12839281) is
 an exhaustive discussions on the topic, ongoing ever since 2017, including a suggestion
@@ -100,180 +107,13 @@ perform Boolean operations on solids, presented in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [how to execute Boolean operations on Revit solid by AutoCAD](https://forums.autodesk.com/t5/revit-api-forum/how-to-execute-booleanoperations-on-revit-solid-by-autocad/m-p/13005223):
 
-One
+After extensive discussions and some in-depth research on transferring the solids to OpenCascade (check out the original discussion for that), Andray opted for a different solution, saying:
 
-Initially, one thought was to translate back and forth between Revit and AutoCAD solids
+Well, it seems I'm finally close to a solution that suits me:
 
-We are all familiar with the problems with Boolean operations on solid objects.
-A lot of exceptions can occur during the operations of union, intersection and subtraction.
-In one of the branches, it was proposed to export Revit solids to OpenCascade, perform painful and other operations in them there, and upload back only the result of such calculations, or translate the Cascade solids back into Revit solids.
+Create `.off` file from Revit solid:
 
-SIX years after the beginning of this thread, the developers from Autodesk have not provided a working solution to this problem.
-
-In my opinion, this is too complicated and time-consuming task to translate from Revit to OpenCascade; it may be better to export solid to AutoCAD instead, or rather use the loaded libraries to work with AutoCAD, but performing all such operations in the Revit process.
-The already established export from DWG to RVT speaks in favor of this decision.
-Maybe it is possible to export Revit-Solid to AutoCAD-Solid and perform Boolean operations already there?
-
-**Answer:**
-I've manually carried out Boolean operations in AutoCad in the past (quite a while ago, however) and I think you would likely get the same issues there unless they've updated what AutoCad uses since. People have noted that such operations are more stable in Dynamo, since it uses a slightly different system, so my focus would be more on that. It did occur to me that the reason could be the unit system. Since Revit uses feet and not a smaller unit such as inches or mm, you have smaller number on the LHS of the decimal place and so the floating point errors also shift over. Or, to put it another way, the decimal part has errors that occur through operations that the integer part doesn't, and by using feet, you are relying on more decimal places for accuracy of the same real world sized object (around 3 more) than you would be for mm.
-
-All the units in Dynamo are converted to 'Dynamo Units' before such processing it seems. Would be interesting to test if you get more stability carrying out the operations after scaling the solids up SolidUtils.CreateTransformed (transform with uniform scale). You would likely have an issue if you then scale it back down (an edge too short) but it depends on the purpose of your operation i.e. calculating volume area vs needing to use in geometry. Perhaps I'm just clutching at straws since Dynamo uses it's own library also.
-
-The other issue is that Revit doesn't appear to support all the forms of geometry that AutoCad does so you could end up after such operations in AutoCad having geometry that can't be brought back or is partial.
-
-I think there is already a process in place for the connections which uses Advanced steel. When I looked at that previously it was working with dwgs in the background. Obviously you can Document.Export a dwg/sat use AutoCAD as a com server from the Revit process and Document.Import it back to access the geometry in Revit.
-
-Tags (0)
-Add tags
-Report
-MESSAGE 3 OF 15
-ankofl
-  Advocate ankofl  in reply to: RPTHOMAS108
-‎2023-08-14 05:54 AM
-Dear RPTHOMAS108, the fact is that in AutoCAD it is impossible to pass a Solid object in the form of dots, triangles, or directly Solid itself. You can only create a Solid in AutoCAD itself using standard tools: extrusion, shift, etc. and then apply Boolean operations on them, such as addition, subtraction and intersection. If I am wrong, and any of the AutoCAD libraries makes it possible to upload Solid to it from Revit, or create Solid based on surfaces or triangles from Revit, I will be glad if you let me know. Otherwise, you will have to create many different methods to export different types of geometry to AutoCAD, which would then perform Boolean and other operations on them!
-Thanks!
-Tags (0)
-Add tags
-Report
-MESSAGE 4 OF 15
-RPTHOMAS108
-  Mentor RPTHOMAS108  in reply to: ankofl
-‎2023-08-14 04:25 PM
-
-Not sure about the AutoCAD API not used it for a while but you can open a dwg for sure and export a dwg from Revit also.
-
-I think I would look for methods relating to SATs. e.g. Document.Import
-
-Although generally I would probably leave AutoCAD out of the process.
-AutoCAD 2022 Developer and ObjectARX Help | Boolean Method (ActiveX) | Autodesk
-
-Most (if not all) of what you do via ActiveX/VBA can be accessed via COM, although VBA examples are VB6 but would be easy to convert to VB.Net and therefore C#. Then instead of using ThisDrawing/ThisApplication you would be creating a reference to such via COM. So I don't think it is imposable just wouldn't be the first direction I take with this.
-
-I would try and look more closely at what Dynamo is doing since those components now come with Revit and AutoCAD doesn't. Even if they do have access to AutoCAD it doesn't mean they've installed it along with Revit.
-
-Also as noted I've got a lot of 3d modelling experience as a user of AutoCad and like in Revit API Boolean operations either work or they don't (you need a good overlap of volume for certain operations to work). I think it comes down to if the faces become degenerate due to vertices merging (some libraries are better at cleaning up such things).
-Tags (0)
-Add tags
-Report
-MESSAGE 5 OF 15
-ankofl
-  Advocate ankofl  in reply to: RPTHOMAS108
-‎2023-08-15 07:46 AM
-Thanks for the information.
-To be honest, I don't quite understand how to transfer Boolean operations from Revit to Dynamo, and even more so how this will solve the problem, since they both rely on the same mechanisms.
-In another branch, there was an idea about transferring Revit geometry to OpenCascade geometry, and performing further Boolean operations already in the OpenCascade system. It looks like I'll have to stop at this option
-Tags (0)
-Add tags
-Report
-MESSAGE 6 OF 15
-RPTHOMAS108
-  Mentor RPTHOMAS108  in reply to: ankofl
-‎2023-08-16 02:19 AM
-
-I think Dynamo is using a different library it has the whole proto geometry thing with you having to convert between Dynamo geometry and Revit API geometry.
-
-There are also more functions for manipulating geometry. The Revit API just exposes what Revit uses internally and those things often have their quirks.
-
-Revit to ProtoSolid
-
-If we were able to pick out every single bit like this or just the bits we needed for a task then we could perhaps utilise the library in the API without Dynamo. Instead of this people focus their efforts in trying to load all the other dependencies of Dynamo just so they can do with the API what they do with Dynamo. They start with Dynamo 'oh this is so easy' they progress to the API then comes the repeated question 'how do I do this that I am doing in Dynamo with the API?' What can be said, nothing other than 'Dynamo is more end user orientated and if you want to solve the same problem as a developer you have to go back to first principles.' It is a frustration that Dynamo geometry operations are so easy in comparison.
-
-C:\Program Files\Autodesk\Revit 2024\AddIns\DynamoForRevit\libg_229_0_0
-C:\Program Files\Autodesk\Revit 2024\AddIns\DynamoForRevit\LibG.Interface.dll
-C:\Program Files\Autodesk\Revit 2024\AddIns\DynamoForRevit\ProtoGeometry.dll
-Tags (0)
-Add tags
-Report
-MESSAGE 7 OF 15
-ankofl
-  Advocate ankofl  in reply to: ankofl
-‎2023-08-23 05:45 AM
-
-I sincerely hope that the correction of Boolean operations on solids in the Revit Api will happen in the near future, because at the moment the development of our own solution transferring Boolean operations from C# Revit to C++ OpenCascade looks excessively forced.Снимок экрана 2023-08-23 153911.jpg
-Tags (0)
-Add tags
-Report
-MESSAGE 8 OF 15
-jeremy_tammik
-  Autodesk jeremy_tammik  in reply to: ankofl
-‎2023-08-23 05:53 AM
-
-Yup, valid concern, and sorry about the slow progress. I asked the development team for an update for you.
-
-Jeremy Tammik  Developer Advocacy and Support + The Building Coder + Autodesk Developer Network + ADN Open
-Tags (0)
-Add tags
-Report
-MESSAGE 9 OF 15
-jeremy_tammik
-  Autodesk jeremy_tammik  in reply to: ankofl
-‎2023-08-24 05:28 AM
-They say: Unfortunately, we haven't had a chance to make progress on the front but are definitely aware of the issues. We have also had quite a few recent problem reports elsewhere related to failed Boolean operations.
-
-By the way, a data set of issues with Booleans in the Revit API context might be nice to have.
-
-Bringing the geometry into Dynamo and doing the operations there would be my recommendation, as it allows the user to see the intermediate steps when there is any kind of failure, which would make things easier to troubleshoot. They would want to learn the Dynamo intricacies, and of course running in the context of Dynamo means they aren't developing an add-in anymore but a Dynamo graph (in which they can call the Revit API).
-
-Jeremy Tammik  Developer Advocacy and Support + The Building Coder + Autodesk Developer Network + ADN Open
-Tags (0)
-Add tags
-Report
-MESSAGE 10 OF 15
-ankofl
-  Advocate ankofl  in reply to: ankofl
-‎2023-08-24 06:16 AM
-
-Well, after a few days of development.. My decision to transfer Boolean operations from Revit C# to OpenCascade C++ is starting to bring results!
-Of course, there are still problems with data transformation and backward compatibility (there is still a lot of work to be done on this), but in general, the solution has the right to life.
-Here I want to address the question of how soon it will be possible to solve the problem with Boolean operations in Revit? If it's not a matter of two weeks, apparently I will have to perform further operations in geometry based on OpenCascade
-Снимок экрана 2023-08-24 160728.jpg
- 
-Tags (0)
-Add tags
-Report
-MESSAGE 11 OF 15
-ankofl
-  Advocate ankofl  in reply to: ankofl
-‎2023-10-26 04:26 AM
-Воз и ныне там...
-Tags (0)
-Add tags
-Report
-MESSAGE 12 OF 15
-ankofl
-  Advocate ankofl  in reply to: josephjsherman97
-‎2024-02-19 11:02 PM
-Is this a response from ChatGPT to raise the reputation of the participant? If not, can you describe in more detail the conversion of Solid objects from Revit to AutoCAD and the result back?
-Tags (0)
-Add tags
-Report
-MESSAGE 13 OF 15
-jeremy_tammik
-  Autodesk jeremy_tammik  in reply to: ankofl
-‎2024-02-19 11:39 PM
-My sentiments exactly. Where is the Unlike button?
-
-By the way, congratulations on your success with OpenCascade! The  timeframe for progress on development of improvements to the built-in Boolean solid operations is probably a lot larger than two weeks, so your path is definitely worth pursuing if you need an immediate solution. I would love to share the technical details of your approach on the blog, if you are interested in that. Good luck and have fun!
-
-Jeremy Tammik  Developer Advocacy and Support + The Building Coder + Autodesk Developer Network + ADN Open
-Tags (0)
-Add tags
-Report
-MESSAGE 14 OF 15
-ankofl
-  Advocate ankofl  in reply to: jeremy_tammik
-‎2024-09-06 08:47 AM
-
-Dear @jeremy_tammik
-
-Well, it seems I'm finally close to a solution that suits me
-
-UPD 08.09.2024:
-
-Create .off file from revit-solid:
-
-
-public static bool WriteOff(this Solid solid, out List<string> listString)
+<pre><code class="language-cs">public static bool WriteOff(this Solid solid, out List<string> listString)
     {
       listString = ["OFF"];
 
@@ -297,11 +137,9 @@ public static bool WriteOff(this Solid solid, out List<string> listString)
       return false;
     }
 
+And this:
 
-and this:
-
-
-public static bool CreateMesh(this Solid solid, out List<XYZ> listVectors, out List<Tri> listTri)
+<pre><code class="language-cs">public static bool CreateMesh(this Solid solid, out List<XYZ> listVectors, out List<Tri> listTri)
     {
       double k = UnitUtils.ConvertFromInternalUnits(1, UnitTypeId.Meters);
       listVectors = [];
@@ -349,13 +187,9 @@ public static bool CreateMesh(this Solid solid, out List<XYZ> listVectors, out L
       return allPlanar;
     }
 
+Load `.off` file
 
-
-
-Load .off file
-
-
-#pragma once
+<pre><code class="language-cs">#pragma once
 
 bool load_from(const char* path, Mesh& output) {
     output.clear();
@@ -372,11 +206,9 @@ bool load_from(const char* path, Mesh& output) {
     return true;
 }
 
-
 Execute boolean
 
-
-#pragma once
+<pre><code class="language-cs">#pragma once
 
 bool boolean_simple(Mesh m1, Mesh m2, b_t type, Mesh& out) {
     out.clear();
@@ -411,12 +243,9 @@ bool boolean_simple(Mesh m1, Mesh m2, b_t type, Mesh& out) {
     return true;
 }
 
-
-
 Save .off file:
 
-
-#pragma once
+<pre><code class="language-cs">#pragma once
 #include <CGAL/Polygon_mesh_processing/IO/polygon_mesh_io.h>
 
 bool save_to(const std::string path, Mesh input) {
@@ -437,30 +266,9 @@ bool save_to(const std::string path, Mesh input) {
     return false;
 }
 
+Then you can upload the .off file back to revit, or do other manipulations with it. However, as far as I know, API Revit does not allow you to create a full-fledged Solid object, but only a triangular grid, i.e. you can upload the grid obtained through CGAL to Revit for viewing, but you will not be able to perform further operations on solid with it, but only view its geometry through DirectShape.
 
+Many thanks to Andrey for sharing this solution that might help many other struggling with problematic solid Boolean operation.
 
-Then you can upload the .off file back to revit, or do other manipulations with it. However, as far as I know, API Revit does not allow you to create a full-fledged Solid object, but only a triangular grid, i.e. you can upload the grid obtained through CGAL to Revit for viewing, but you will not be able to perform further operations on solid with it, but only view its geometry through DirectShape
-
-jeremy_tammik
-
-Wow! Congratulations! That looks like a brilliant solution. Thank you for sharing it. Regarding your final sentences, I believe you can in fact generate solid shapes in your DirectShape object by using the BRepBuilder class; it allows direct construction of geometry objects including solids, closed and open shells, etc.:
-
-https://www.revitapidocs.com/2024/94c1fef4-2933-ce67-9c2d-361cbf8a42b4.htm
-
-I am very glad to hear about it.
-I looked into the very powerful [LEDA Library of Efficient Data types and Algorithms](https://en.wikipedia.org/wiki/Library_of_Efficient_Data_types_and_Algorithms) a
-long time ago, before it was merged into CGAL.
-
-
-**Question:**
-
-<center>
-<img src="img/.png" alt="" title="" width="100"/> <!--  -->
-</center>
-
-**Answer:**
-
-**Response:**
-
-<pre><code class="language-cs"></code></pre>
+I read that CGAL also includes the very powerful [LEDA Library of Efficient Data types and Algorithms](https://en.wikipedia.org/wiki/Library_of_Efficient_Data_types_and_Algorithms) that I looked into myself a long time ago, before it was merged into CGAL.
 
