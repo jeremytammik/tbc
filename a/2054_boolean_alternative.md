@@ -103,7 +103,7 @@ In Revit, one also encounters situations like this:
 
 The development team are aware of these issues.
 [Boolean operation fail](https://forums.autodesk.com/t5/revit-api-forum/boolean-operation-fail/m-p/12839281) is
-an exhaustive and long-ongoing discussions on the topic including a suggestion
+an exhaustive and long-ongoing discussion of the topic including a suggestion
 by Tommy [@tommy.stromhaug](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/4635064) Strømhaug
 for a non-trivial workaround using [OpenCascade](https://dev.opencascade.org/).
 
@@ -117,7 +117,7 @@ perform Boolean operations on solids, presented in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
 on [how to execute Boolean operations on Revit solid by AutoCAD](https://forums.autodesk.com/t5/revit-api-forum/how-to-execute-booleanoperations-on-revit-solid-by-autocad/m-p/13005223):
 
-After extensive discussions and some in-depth research on transferring the solids to OpenCascade (check out the discussion threads mentioned above for that), Andray opted for a different solution, saying:
+After extensive discussion and in-depth research on transferring the solids to AutoCAD, OpenCascade, or some other library (check out the discussion threads mentioned above for that), Andrey opted for a different solution, saying:
 
 Well, it seems I'm finally close to a solution that suits me:
 
@@ -285,7 +285,7 @@ bool save_to(const std::string path, Mesh input) {
 
 Then you can upload the `.off` file back to Revit, or do other manipulations with it. However, as far as I know, API Revit does not allow you to create a full-fledged Solid object, but only a triangular grid, i.e. you can upload the grid obtained through CGAL to Revit for viewing, but you will not be able to perform further operations on solid with it, but only view its geometry through DirectShape.
 
-Many thanks to Andrey for sharing this solution that will hopefully help many other struggling with problematic solid Boolean operations.
+Many thanks to Andrey for sharing this solution that will hopefully help many others struggling with problematic solid Boolean operations.
 
 Looking at the history of [CGAL](https://en.wikipedia.org/wiki/CGAL), I see that it also includes the very powerful [LEDA Library of Efficient Data types and Algorithms](https://en.wikipedia.org/wiki/Library_of_Efficient_Data_types_and_Algorithms) that I looked into myself a long time ago, before it was merged into CGAL. LEDA is very impressive in itself, so CGAL must be quite something.
 

@@ -95,7 +95,7 @@ find some of them.</p>
 <p></center></p>
 <p>The development team are aware of these issues.
 <a href="https://forums.autodesk.com/t5/revit-api-forum/boolean-operation-fail/m-p/12839281">Boolean operation fail</a> is
-an exhaustive and long-ongoing discussions on the topic including a suggestion
+an exhaustive and long-ongoing discussion of the topic including a suggestion
 by Tommy <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/4635064">@tommy.stromhaug</a> Strømhaug
 for a non-trivial workaround using <a href="https://dev.opencascade.org/">OpenCascade</a>.</p>
 <h4><a name="3"></a> CGAL Solid Booleans</h4>
@@ -106,7 +106,7 @@ the <a href="https://en.wikipedia.org/wiki/OFF_(file_format)">OFF file format</a
 perform Boolean operations on solids, presented in
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/how-to-execute-booleanoperations-on-revit-solid-by-autocad/m-p/13005223">how to execute Boolean operations on Revit solid by AutoCAD</a>:</p>
-<p>After extensive discussions and some in-depth research on transferring the solids to OpenCascade (check out the discussion threads mentioned above for that), Andray opted for a different solution, saying:</p>
+<p>After extensive discussion and in-depth research on transferring the solids to AutoCAD, OpenCascade, or some other library (check out the discussion threads mentioned above for that), Andrey opted for a different solution, saying:</p>
 <p>Well, it seems I'm finally close to a solution that suits me:</p>
 <p>Create <code>.off</code> file from Revit solid:</p>
 <pre><code class="language-cs">public static bool WriteOff(
@@ -266,5 +266,5 @@ bool save_to(const std::string path, Mesh input) {
 }</code></pre>
 
 <p>Then you can upload the <code>.off</code> file back to Revit, or do other manipulations with it. However, as far as I know, API Revit does not allow you to create a full-fledged Solid object, but only a triangular grid, i.e. you can upload the grid obtained through CGAL to Revit for viewing, but you will not be able to perform further operations on solid with it, but only view its geometry through DirectShape.</p>
-<p>Many thanks to Andrey for sharing this solution that will hopefully help many other struggling with problematic solid Boolean operations.</p>
+<p>Many thanks to Andrey for sharing this solution that will hopefully help many others struggling with problematic solid Boolean operations.</p>
 <p>Looking at the history of <a href="https://en.wikipedia.org/wiki/CGAL">CGAL</a>, I see that it also includes the very powerful <a href="https://en.wikipedia.org/wiki/Library_of_Efficient_Data_types_and_Algorithms">LEDA Library of Efficient Data types and Algorithms</a> that I looked into myself a long time ago, before it was merged into CGAL. LEDA is very impressive in itself, so CGAL must be quite something.</p>
