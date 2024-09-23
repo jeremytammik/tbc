@@ -285,6 +285,13 @@ bool save_to(const std::string path, Mesh input) {
 
 Then you can upload the `.off` file back to Revit, or do other manipulations with it. However, as far as I know, API Revit does not allow you to create a full-fledged Solid object, but only a triangular grid, i.e. you can upload the grid obtained through CGAL to Revit for viewing, but you will not be able to perform further operations on solid with it, but only view its geometry through DirectShape.
 
+My main task is to create an energy model of a building and calculate heat loss, the required amount of energy to maintain the internal temperature in rooms at a given temperature outside, taking into account the thermal resistance to heat transfer of building structures.
+I implemented the intersection of 3D surfaces in 2D and converting the result back to 3D to determin the intersection of indoor surfaces with outdoor space:
+
+<center>
+<img src="img/ak_cgal_booleans.png" alt="Intersection of indoor surfaces with outdoor space" title="Intersection of indoor surfaces with outdoor space" width="400"/>
+</center>
+
 Many thanks to Andrey for sharing this solution that will hopefully help many others struggling with problematic solid Boolean operations.
 
 Looking at the history of [CGAL](https://en.wikipedia.org/wiki/CGAL), I see that it also includes the very powerful [LEDA Library of Efficient Data types and Algorithms](https://en.wikipedia.org/wiki/Library_of_Efficient_Data_types_and_Algorithms) that I looked into myself a long time ago, before it was merged into CGAL. LEDA is very impressive in itself, so CGAL must be quite something.
