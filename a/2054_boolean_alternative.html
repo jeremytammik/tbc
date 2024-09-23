@@ -1,6 +1,6 @@
-<head>
+<p><head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<link rel="stylesheet" type="text/css" href="bc.css">
+<link rel="stylesheet" type="text/css" href="bc.css"></p>
 <!-- https://highlightjs.org/#usage
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
@@ -8,13 +8,12 @@
 -->
 
 <!-- https://prismjs.com -->
-<link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css" rel="stylesheet" />
+<p><link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css" rel="stylesheet" /></p>
 <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
 <style> code[class*=language-], pre[class*=language-] { font-size : 90%; } </style>
 
-</head>
-
+<p></head></p>
 <!---
 
 - perform boolean in CGAL:
@@ -59,68 +58,55 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Boolean Alternatives
-
-A recurring topic in
-the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) concerns
-problems with solid Boolean operations:
-
-- [Revit Booleans and OpenCascade](#2)
-- [CGAL solid Booleans](#3)
-
-####<a name="2"></a> Revit Booleans and OpenCascade
-
-BooleanOperationsUtils.ExecuteBooleanOperation InvalidOperationException Casue
-https://forums.autodesk.com/t5/revit-api-forum/booleanoperationsutils-executebooleanoperation/m-p/12971195
-
-**Question:**
-`BooleanOperationsUtils.ExecuteBooleanOperation`: When I use this method, I often get an `InvalidOperationException`.
+<h3>Boolean Alternatives</h3>
+<p>A recurring topic in
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> concerns
+problems with solid Boolean operations:</p>
+<ul>
+<li><a href="#2">Revit Booleans and OpenCascade</a></li>
+<li><a href="#3">CGAL solid Booleans</a></li>
+</ul>
+<h4><a name="2"></a> Revit Booleans and OpenCascade</h4>
+<p>BooleanOperationsUtils.ExecuteBooleanOperation InvalidOperationException Casue
+https://forums.autodesk.com/t5/revit-api-forum/booleanoperationsutils-executebooleanoperation/m-p/12971195</p>
+<p><strong>Question:</strong>
+<code>BooleanOperationsUtils.ExecuteBooleanOperation</code>: When I use this method, I often get an <code>InvalidOperationException</code>.
 I would like to know if there are specific criteria for causing that error.
 For example, it occurs when elements intersect at an angle below a certain angle, etc.
-I hope there are rules for this or some documentation I can refer to.
-
-**Answer:**
+I hope there are rules for this or some documentation I can refer to.</p>
+<p><strong>Answer:</strong>
 Sorry about that.
-It has been mentioned before that `ExecuteBooleanOperation` can run into issues.
+It has been mentioned before that <code>ExecuteBooleanOperation</code> can run into issues.
 Unfortunately, afaik, there is no list of the exact criteria which might cause a problem.
 Various ways of handling the situation and some possible workarounds have been discussed here in the past.
 You can search
-the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160)
-for [ExecuteBooleanOperation](https://forums.autodesk.com/t5/forums/searchpage/tab/message?advanced=false&allow_punctuation=false&filter=location&location=forum-board:160&q=ExecuteBooleanOperation) or
-just [Boolean](https://forums.autodesk.com/t5/forums/searchpage/tab/message?filter=location&q=Boolean&noSynonym=false&location=forum-board:160&collapse_discussion=true) to
-find some of them.
-
-In Revit, one also encounters situations like this:
-
-<center>
-<img src="img/boolean_fail_1.png" alt="Red object to subtract from white object" title="Red object to subtract from white object" width="300"/>
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a>
+for <a href="https://forums.autodesk.com/t5/forums/searchpage/tab/message?advanced=false&amp;allow_punctuation=false&amp;filter=location&amp;location=forum-board:160&amp;q=ExecuteBooleanOperation">ExecuteBooleanOperation</a> or
+just <a href="https://forums.autodesk.com/t5/forums/searchpage/tab/message?filter=location&amp;q=Boolean&amp;noSynonym=false&amp;location=forum-board:160&amp;collapse_discussion=true">Boolean</a> to
+find some of them.</p>
+<p>In Revit, one also encounters situations like this:</p>
+<p><center>
+<img src="img/boolean_fail_1.png" alt="Red object to subtract from white object" title="Red object to subtract from white object" width="300"/></p>
 <p style="font-size: 80%; font-style:italic">Red object to subtract from white object</p>
-<img src="img/boolean_fail_2.png" alt="Zoom to the corner" title="Zoom to the corner" width="300"/>
+<p><img src="img/boolean_fail_2.png" alt="Zoom to the corner" title="Zoom to the corner" width="300"/></p>
 <p style="font-size: 80%; font-style:italic">Zoom to the corner</p>
-</center>
-
-The development team are aware of these issues.
-[Boolean operation fail](https://forums.autodesk.com/t5/revit-api-forum/boolean-operation-fail/m-p/12839281) is
+<p></center></p>
+<p>The development team are aware of these issues.
+<a href="https://forums.autodesk.com/t5/revit-api-forum/boolean-operation-fail/m-p/12839281">Boolean operation fail</a> is
 an exhaustive discussions on the topic, ongoing ever since 2017, including a suggestion
-by Tommy [@tommy.stromhaug](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/4635064) Strømhaug
-for a non-trivial workaround using [OpenCascade](https://dev.opencascade.org/).
-
-####<a name="3"></a> CGAL Solid Booleans
-
-Andrey [@ankofl](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/11836042) Kolesov
+by Tommy <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/4635064">@tommy.stromhaug</a> Strømhaug
+for a non-trivial workaround using <a href="https://dev.opencascade.org/">OpenCascade</a>.</p>
+<h4><a name="3"></a> CGAL Solid Booleans</h4>
+<p>Andrey <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/11836042">@ankofl</a> Kolesov
 shared a solution using
-the [Computational Geometry Algorithms Library CGAL](https://en.wikipedia.org/wiki/CGAL) and
-the [OFF file format](https://en.wikipedia.org/wiki/OFF_(file_format)) to
+the <a href="https://en.wikipedia.org/wiki/CGAL">Computational Geometry Algorithms Library CGAL</a> and
+the <a href="https://en.wikipedia.org/wiki/OFF_(file_format)">OFF file format</a> to
 perform Boolean operations on solids, presented in
-the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
-on [how to execute Boolean operations on Revit solid by AutoCAD](https://forums.autodesk.com/t5/revit-api-forum/how-to-execute-booleanoperations-on-revit-solid-by-autocad/m-p/13005223):
-
-After extensive discussions and some in-depth research on transferring the solids to OpenCascade (check out the original discussion for that), Andray opted for a different solution, saying:
-
-Well, it seems I'm finally close to a solution that suits me:
-
-Create `.off` file from Revit solid:
-
+the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/how-to-execute-booleanoperations-on-revit-solid-by-autocad/m-p/13005223">how to execute Boolean operations on Revit solid by AutoCAD</a>:</p>
+<p>After extensive discussions and some in-depth research on transferring the solids to OpenCascade (check out the original discussion for that), Andray opted for a different solution, saying:</p>
+<p>Well, it seems I'm finally close to a solution that suits me:</p>
+<p>Create <code>.off</code> file from Revit solid:</p>
 <pre><code class="language-cs">public static bool WriteOff(
     this Solid solid, out List&lt;string&gt; listString)
     {
@@ -146,8 +132,7 @@ Create `.off` file from Revit solid:
       return false;
     }</code></pre>
 
-And this:
-
+<p>And this:</p>
 <pre><code class="language-cs">public static bool CreateMesh(this Solid solid, out List&lt;XYZ&gt; listVectors, out List&lt;Tri&gt; listTri)
     {
       double k = UnitUtils.ConvertFromInternalUnits(1, UnitTypeId.Meters);
@@ -196,8 +181,7 @@ And this:
       return allPlanar;
     }</code></pre>
 
-Load `.off` file
-
+<p>Load <code>.off</code> file</p>
 <pre><code class="language-cs">#pragma once
 
 bool load_from(const char* path, Mesh& output) {
@@ -215,8 +199,7 @@ bool load_from(const char* path, Mesh& output) {
     return true;
 }</code>></pre>
 
-Execute boolean
-
+<p>Execute boolean</p>
 <pre><code class="language-cs">#pragma once
 
 bool boolean_simple(Mesh m1, Mesh m2, b_t type, Mesh& out) {
@@ -252,8 +235,7 @@ bool boolean_simple(Mesh m1, Mesh m2, b_t type, Mesh& out) {
     return true;
 }</code></pre>
 
-Save .off file:
-
+<p>Save .off file:</p>
 <pre><code class="language-cs">#pragma once
 #include &lt;CGAL/Polygon_mesh_processing/IO/polygon_mesh_io.h&gt;
 
@@ -275,9 +257,6 @@ bool save_to(const std::string path, Mesh input) {
     return false;
 }</code></pre>
 
-Then you can upload the .off file back to Revit, or do other manipulations with it. However, as far as I know, API Revit does not allow you to create a full-fledged Solid object, but only a triangular grid, i.e. you can upload the grid obtained through CGAL to Revit for viewing, but you will not be able to perform further operations on solid with it, but only view its geometry through DirectShape.
-
-Many thanks to Andrey for sharing this solution that will hopefully help many other struggling with problematic solid Boolean operations.
-
-Looking at the history of [CGAL](https://en.wikipedia.org/wiki/CGAL), I see that it also includes the very powerful [LEDA Library of Efficient Data types and Algorithms](https://en.wikipedia.org/wiki/Library_of_Efficient_Data_types_and_Algorithms) that I looked into myself a long time ago, before it was merged into CGAL. LEDA is very impressive in itself, so CGAL must be quite something.
-
+<p>Then you can upload the .off file back to Revit, or do other manipulations with it. However, as far as I know, API Revit does not allow you to create a full-fledged Solid object, but only a triangular grid, i.e. you can upload the grid obtained through CGAL to Revit for viewing, but you will not be able to perform further operations on solid with it, but only view its geometry through DirectShape.</p>
+<p>Many thanks to Andrey for sharing this solution that will hopefully help many other struggling with problematic solid Boolean operations.</p>
+<p>Looking at the history of <a href="https://en.wikipedia.org/wiki/CGAL">CGAL</a>, I see that it also includes the very powerful <a href="https://en.wikipedia.org/wiki/Library_of_Efficient_Data_types_and_Algorithms">LEDA Library of Efficient Data types and Algorithms</a> that I looked into myself a long time ago, before it was merged into CGAL. LEDA is very impressive in itself, so CGAL must be quite something.</p>
