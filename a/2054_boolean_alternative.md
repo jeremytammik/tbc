@@ -42,7 +42,7 @@
 
 twitter:
 
- @AutodeskRevit #RevitAPI #BIM @DynamoBIM
+How to handle problems with solid Boolean operations in the @AutodeskRevit #RevitAPI? @open_cascade versus CGAL for #BIM @DynamoBIM https://autode.sk/booleanops
 
 How to handle problems with solid Boolean operations?
 &ndash; Revit Booleans and OpenCascade
