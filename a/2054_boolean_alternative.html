@@ -43,7 +43,9 @@ twitter:
 
  @AutodeskRevit #RevitAPI #BIM @DynamoBIM
 
-&ndash; ...
+How to handle problems with solid Boolean operations?
+&ndash; Revit Booleans and OpenCascade
+&ndash; CGAL solid Booleans...
 
 linkedin:
 
@@ -58,7 +60,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-<h3>Boolean Alternatives</h3>
+<h3>Solid Boolean Operation Alternatives</h3>
 <p>A recurring topic in
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> concerns
 problems with solid Boolean operations:</p>
@@ -67,8 +69,8 @@ problems with solid Boolean operations:</p>
 <li><a href="#3">CGAL solid Booleans</a></li>
 </ul>
 <h4><a name="2"></a> Revit Booleans and OpenCascade</h4>
-<p>BooleanOperationsUtils.ExecuteBooleanOperation InvalidOperationException Casue
-https://forums.autodesk.com/t5/revit-api-forum/booleanoperationsutils-executebooleanoperation/m-p/12971195</p>
+<p>The question came up once again recently in the query
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/booleanoperationsutils-executebooleanoperation/m-p/12971195"><code>BooleanOperationsUtils</code> <code>ExecuteBooleanOperation</code> <code>InvalidOperationException</code> cause</a>:</p>
 <p><strong>Question:</strong>
 <code>BooleanOperationsUtils.ExecuteBooleanOperation</code>: When I use this method, I often get an <code>InvalidOperationException</code>.
 I would like to know if there are specific criteria for causing that error.
@@ -93,170 +95,176 @@ find some of them.</p>
 <p></center></p>
 <p>The development team are aware of these issues.
 <a href="https://forums.autodesk.com/t5/revit-api-forum/boolean-operation-fail/m-p/12839281">Boolean operation fail</a> is
-an exhaustive discussions on the topic, ongoing ever since 2017, including a suggestion
+an exhaustive and long-ongoing discussions on the topic including a suggestion
 by Tommy <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/4635064">@tommy.stromhaug</a> Strømhaug
 for a non-trivial workaround using <a href="https://dev.opencascade.org/">OpenCascade</a>.</p>
 <h4><a name="3"></a> CGAL Solid Booleans</h4>
 <p>Andrey <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/11836042">@ankofl</a> Kolesov
-shared a solution using
+recently shared a solution using
 the <a href="https://en.wikipedia.org/wiki/CGAL">Computational Geometry Algorithms Library CGAL</a> and
 the <a href="https://en.wikipedia.org/wiki/OFF_(file_format)">OFF file format</a> to
 perform Boolean operations on solids, presented in
 the <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API discussion forum</a> thread
 on <a href="https://forums.autodesk.com/t5/revit-api-forum/how-to-execute-booleanoperations-on-revit-solid-by-autocad/m-p/13005223">how to execute Boolean operations on Revit solid by AutoCAD</a>:</p>
-<p>After extensive discussions and some in-depth research on transferring the solids to OpenCascade (check out the original discussion for that), Andray opted for a different solution, saying:</p>
+<p>After extensive discussions and some in-depth research on transferring the solids to OpenCascade (check out the discussion threads mentioned above for that), Andray opted for a different solution, saying:</p>
 <p>Well, it seems I'm finally close to a solution that suits me:</p>
 <p>Create <code>.off</code> file from Revit solid:</p>
 <pre><code class="language-cs">public static bool WriteOff(
-    this Solid solid, out List&lt;string&gt; listString)
+  this Solid solid,
+  out List&lt;string&gt; listString)
+  {
+    listString = ["OFF"];
+
+    if(solid.CreateMesh(out var listVectors, out var listTri))
     {
-      listString = ["OFF"];
+      listString.Add($"{listVectors.Count} {listTri.Count} 0");
+      listString.Add($"");
 
-      if(solid.CreateMesh(out var listVectors, out var listTri))
+      foreach (var p in listVectors)
       {
-        listString.Add($"{listVectors.Count} {listTri.Count} 0");
-        listString.Add($"");
-
-        foreach (var p in listVectors)
-        {
-          listString.Add(p.Write());
-        }
-
-        foreach (var v in listTri)
-        {
-          listString.Add($"3  {v.iA} {v.iB} {v.iC}");
-        }
-
-        return true;
+        listString.Add(p.Write());
       }
-      return false;
-    }</code></pre>
+
+      foreach (var v in listTri)
+      {
+        listString.Add($"3  {v.iA} {v.iB} {v.iC}");
+      }
+
+      return true;
+    }
+    return false;
+  }</code></pre>
 
 <p>And this:</p>
-<pre><code class="language-cs">public static bool CreateMesh(this Solid solid, out List&lt;XYZ&gt; listVectors, out List&lt;Tri&gt; listTri)
+<pre><code class="language-cs">public static bool CreateMesh(
+  this Solid solid,
+  out List&lt;XYZ&gt; listVectors,
+  out List&lt;Tri&gt; listTri)
+  {
+    double k = UnitUtils.ConvertFromInternalUnits(1, UnitTypeId.Meters);
+    listVectors = [];
+    listTri = [];
+
+    bool allPlanar = true;
+
+    int indV = 0;
+    foreach (Face face in solid.Faces)
     {
-      double k = UnitUtils.ConvertFromInternalUnits(1, UnitTypeId.Meters);
-      listVectors = [];
-      listTri = [];
-
-      bool allPlanar = true;
-
-      int indV = 0;
-      foreach (Face face in solid.Faces)
+      if (face is PlanarFace pFace)
       {
-        if (face is PlanarFace pFace)
+        Mesh mesh = pFace.Triangulate();
+        for (int tN = 0; tN &lt; mesh.NumTriangles; tN++)
         {
-          Mesh mesh = pFace.Triangulate();
-          for (int tN = 0; tN &lt; mesh.NumTriangles; tN++)
+          var tri = mesh.get_Triangle(tN);
+
+          var pT = new int[3];
+
+          for (int vN = 0; vN &lt; 3; vN++)
           {
-            var tri = mesh.get_Triangle(tN);
+            var p = tri.get_Vertex(vN) * k;
 
-            var pT = new int[3];
-
-            for (int vN = 0; vN &lt; 3; vN++)
+            if (p.Contain(listVectors, out XYZ pF, out int index))
             {
-              var p = tri.get_Vertex(vN) * k;
-
-              if (p.Contain(listVectors, out XYZ pF, out int index))
-              {
-                pT[vN] = index;
-              }
-              else
-              {
-                pT[vN] = indV;
-                listVectors.Add(p);
-                indV++;
-              }
+              pT[vN] = index;
             }
-
-            listTri.Add(new(pT[2], pT[1], pT[0]));
+            else
+            {
+              pT[vN] = indV;
+              listVectors.Add(p);
+              indV++;
+            }
           }
-        }
-        else
-        {
-          allPlanar = false;
+
+          listTri.Add(new(pT[2], pT[1], pT[0]));
         }
       }
+      else
+      {
+        allPlanar = false;
+      }
+    }
 
-      return allPlanar;
-    }</code></pre>
+    return allPlanar;
+  }</code></pre>
 
 <p>Load <code>.off</code> file</p>
 <pre><code class="language-cs">#pragma once
 
 bool load_from(const char* path, Mesh& output) {
-    output.clear();
-    std::ifstream input;
-    input.open(path);
-    if (!input) {
-        return false;
-    }
-    else if (!(input &gt;&gt; output)) {
-        return false;
-    }
+  output.clear();
+  std::ifstream input;
+  input.open(path);
+  if (!input) {
+      return false;
+  }
+  else if (!(input &gt;&gt; output)) {
+      return false;
+  }
 
-    input.close();
-    return true;
+  input.close();
+  return true;
 }</code>></pre>
 
-<p>Execute boolean</p>
+<p>Execute Boolean</p>
 <pre><code class="language-cs">#pragma once
 
 bool boolean_simple(Mesh m1, Mesh m2, b_t type, Mesh& out) {
-    out.clear();
-    int code = 0;
-    if (!CGAL::is_triangle_mesh(m1)) {
-        PMP::triangulate_faces(m1);
+  out.clear();
+  int code = 0;
+  if (!CGAL::is_triangle_mesh(m1)) {
+    PMP::triangulate_faces(m1);
+  }
+  if (!CGAL::is_triangle_mesh(m2)) {
+    PMP::triangulate_faces(m2);
+  }
+  if (type == b_t::join) {
+    if (!PMP::corefine_and_compute_union(m1, m2, out)){
+      std::cout &lt;&lt; "fail_join ";
+      return false;
     }
-    if (!CGAL::is_triangle_mesh(m2)) {
-        PMP::triangulate_faces(m2);
+  }
+  else if (type == b_t::inter) {
+    if (!PMP::corefine_and_compute_intersection(m1, m2, out)){
+      std::cout &lt;&lt; "fail_inter ";
+      return false;
     }
-    if (type == b_t::join) {
-        if (!PMP::corefine_and_compute_union(m1, m2, out)){
-            std::cout &lt;&lt; "fail_join ";
-            return false;
-        }
+  }
+  else if (type == b_t::dif) {
+    if (!PMP::corefine_and_compute_difference(m1, m2, out)) {
+      std::cout &lt;&lt; "fail_dif ";
+      return false;
     }
-    else if (type == b_t::inter) {
-        if (!PMP::corefine_and_compute_intersection(m1, m2, out)){
-            std::cout &lt;&lt; "fail_inter ";
-            return false;
-        }
-    }
-    else if (type == b_t::dif) {
-        if (!PMP::corefine_and_compute_difference(m1, m2, out)) {
-            std::cout &lt;&lt; "fail_dif ";
-            return false;
-        }
-    }
-    else {
-        throw;
-    }
-    return true;
+  }
+  else {
+    throw;
+  }
+  return true;
 }</code></pre>
 
-<p>Save .off file:</p>
+<p>Save <code>.off</code> file:</p>
 <pre><code class="language-cs">#pragma once
 #include &lt;CGAL/Polygon_mesh_processing/IO/polygon_mesh_io.h&gt;
 
 bool save_to(const std::string path, Mesh input) {
-    if (!CGAL::is_valid_polygon_mesh(input)) {
-        return false;
-    }
-    try {
-        if (CGAL::IO::write_polygon_mesh(path + ".off", input, CGAL::parameters::stream_precision(17))) {
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
-    catch (const std::exception& e) {
-        std::cout &lt;&lt; "save_to: exception!" &lt;&lt; std::endl;
-    }
+  if (!CGAL::is_valid_polygon_mesh(input)) {
     return false;
+  }
+  try {
+    if (CGAL::IO::write_polygon_mesh(path + ".off", input,
+      CGAL::parameters::stream_precision(17)))
+    {
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
+  catch (const std::exception& e) {
+    std::cout &lt;&lt; "save_to: exception!" &lt;&lt; std::endl;
+  }
+  return false;
 }</code></pre>
 
-<p>Then you can upload the .off file back to Revit, or do other manipulations with it. However, as far as I know, API Revit does not allow you to create a full-fledged Solid object, but only a triangular grid, i.e. you can upload the grid obtained through CGAL to Revit for viewing, but you will not be able to perform further operations on solid with it, but only view its geometry through DirectShape.</p>
+<p>Then you can upload the <code>.off</code> file back to Revit, or do other manipulations with it. However, as far as I know, API Revit does not allow you to create a full-fledged Solid object, but only a triangular grid, i.e. you can upload the grid obtained through CGAL to Revit for viewing, but you will not be able to perform further operations on solid with it, but only view its geometry through DirectShape.</p>
 <p>Many thanks to Andrey for sharing this solution that will hopefully help many other struggling with problematic solid Boolean operations.</p>
 <p>Looking at the history of <a href="https://en.wikipedia.org/wiki/CGAL">CGAL</a>, I see that it also includes the very powerful <a href="https://en.wikipedia.org/wiki/Library_of_Efficient_Data_types_and_Algorithms">LEDA Library of Efficient Data types and Algorithms</a> that I looked into myself a long time ago, before it was merged into CGAL. LEDA is very impressive in itself, so CGAL must be quite something.</p>
