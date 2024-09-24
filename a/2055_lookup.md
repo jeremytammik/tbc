@@ -96,13 +96,15 @@ Check out the [Public RevitLookup Roadmap](https://github.com/users/jeremytammik
 
 ![image](https://github.com/user-attachments/assets/14c3479d-871a-4f32-a933-a4b365e566bc)
 
-####<a name="2.4"></a> Improvements
+####<a name="2.4"></a> Other Improvements
 
 **New extensions**:
 
-| Type        | Extension                       | Description                                                       | Author                                                                  |
-|:------------|---------------------------------|-------------------------------------------------------------------|:------------------------------------------------------------------------|
-| Pipe        | HasOpenConnector                | Checks if there is open piping connector for the pipe.            | https://github.com/jeremytammik/RevitLookup/pull/261 by @SergeyNefyodov |
+By @SergeyNefyodov:L
+
+- Type &ndash; Extension name &ndash; Description
+
+| Pipe        | HasOpenConnector                | Checks if there is open piping connector for the pipe.            | https://github.com/jeremytammik/RevitLookup/pull/261  |
 | Family      | FamilyCanConvertToFaceHostBased | Indicates whether the family can be converted to face host based. | https://github.com/jeremytammik/RevitLookup/pull/263 by @SergeyNefyodov |
 | Family      | GetProfileSymbols               | Gets the profile Family Symbols.                                  | https://github.com/jeremytammik/RevitLookup/pull/263 by @SergeyNefyodov |
 | Document    | GetLightFamily                  | Creates a light family object from the family document.           | https://github.com/jeremytammik/RevitLookup/pull/266 by @SergeyNefyodov |
@@ -113,11 +115,11 @@ Check out the [Public RevitLookup Roadmap](https://github.com/users/jeremytammik
 
 **New API support**:
 
-- **CylindricalFace** class support https://github.com/jeremytammik/RevitLookup/issues/264:
+- [**CylindricalFace** class support](https://github.com/jeremytammik/RevitLookup/issues/264):
     - Radius property support
-- **StructuralSettings** class support https://github.com/jeremytammik/RevitLookup/pull/282 by @SergeyNefyodov:
+- [**StructuralSettings** class support](https://github.com/jeremytammik/RevitLookup/pull/282) by @SergeyNefyodov:
     - GetStructuralSettings method support
-- **StructuralSettings** class support https://github.com/jeremytammik/RevitLookup/pull/283 by @SergeyNefyodov:
+- [**StructuralSettings** class support](https://github.com/jeremytammik/RevitLookup/pull/283) by @SergeyNefyodov:
     - GetActiveSunAndShadowSettings method support
     - GetSunrise method support
     - GetSunset method support
@@ -125,11 +127,11 @@ Check out the [Public RevitLookup Roadmap](https://github.com/users/jeremytammik
     - IsTimeIntervalValid method support
     - IsAfterStartDateAndTime method support
     - IsBeforeEndDateAndTime method support
-- **RevisionNumberingSequence** class support https://github.com/jeremytammik/RevitLookup/pull/289 by @SergeyNefyodov:
+- [**RevisionNumberingSequence** class support](https://github.com/jeremytammik/RevitLookup/pull/289) by @SergeyNefyodov:
     - GetAllRevisionNumberingSequences method support
-- **AnalyticalLinkType** class support https://github.com/jeremytammik/RevitLookup/pull/288 by @SergeyNefyodov:
+- [**AnalyticalLinkType** class support](https://github.com/jeremytammik/RevitLookup/pull/288) by @SergeyNefyodov:
     - IsValidAnalyticalFixityState method support
-- **AreaVolumeSettings** class support https://github.com/jeremytammik/RevitLookup/pull/287 by @SergeyNefyodov:
+- [**AreaVolumeSettings** class support](https://github.com/jeremytammik/RevitLookup/pull/287) by @SergeyNefyodov:
     - GetAreaVolumeSettings method support
     - GetSpatialElementBoundaryLocation method support
 
@@ -139,18 +141,17 @@ Check out the [Public RevitLookup Roadmap](https://github.com/users/jeremytammik
 - `Show Events` enabled by default
 - `Show Extensions` enabled by default
 
-## Bugs
+**Bugs**
 
-- Fixed missing quick access icon https://github.com/jeremytammik/RevitLookup/issues/267
-- Fixed DataGrid accent color https://github.com/jeremytammik/RevitLookup/issues/273
+- [Fixed missing quick access icon](https://github.com/jeremytammik/RevitLookup/issues/267)
+- [Fixed DataGrid accent color](https://github.com/jeremytammik/RevitLookup/issues/273)
 
-## Misc
+**Miscellaneous**
 
 - Updated **Contributing** guide.
 - Added a new GitHub **issue templates**.
-
-Full changelog: https://github.com/jeremytammik/RevitLookup/compare/2025.0.8...2025.0.9
-RevitLookup versioning: https://github.com/jeremytammik/RevitLookup/wiki/Versions
+- [Full changelog](https://github.com/jeremytammik/RevitLookup/compare/2025.0.8...2025.0.9)
+- [RevitLookup versioning](https://github.com/jeremytammik/RevitLookup/wiki/Versions)
 
 
 
