@@ -46,8 +46,8 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 Roman [@Nice3point](https://t.me/nice3point) Karpovich, aka Роман Карпович,
 published [RevitLookup] (https://github.com/jeremytammik/RevitLookup)
-[releases 2025.0.9](https://github.com/jeremytammik/RevitLookup/releases/tag/2025.0.9)
-with exciting new enhancements by himself,
+[release 2025.0.9](https://github.com/jeremytammik/RevitLookup/releases/tag/2025.0.9)
+with important enhancements by himself,
 [RichardPinka](https://github.com/RichardPinka) and [SergeyNefyodov](https://github.com/SergeyNefyodov):
 
 - [Revit.ini file editor](#2.1)
@@ -59,33 +59,40 @@ with exciting new enhancements by himself,
 The **Revit.ini** file is a key configuration file in Revit that stores settings related to user preferences, system behavior, and project defaults.
 
 The **Revit.ini File Editor** provides a simple and efficient way to manage these settings without the need for manual editing.
-With this tool, users can quickly adjust Revit’s configurations to match project needs or personal preferences, making it an essential utility for both professionals and teams
-working with Revit.
+With this tool, users can quickly adjust Revit’s configurations to match project needs or personal preferences, making it an essential utility for both professionals and teams working with Revit.
+
+/Users/jta/a/doc/revit/tbc/git/a/img/revitlookup_2025_0_9_1.png
 
 ![image](https://github.com/user-attachments/assets/701a0a97-1906-419d-950b-b70f9b852966)
 
 This is our first public version, and we are excited for you to try it out for yourself!
 Make sure to file issues you encounter on our GitHub so we can continue to improve it.
+For more details, please refer to the:
 
-Documentation: https://github.com/jeremytammik/RevitLookup/wiki/Revit.ini-File-Editor
+- [Revit.ini file editor documentation](https://github.com/jeremytammik/RevitLookup/wiki/Revit.ini-File-Editor)
 
 ####<a name="2.2"></a> Dependency Conflict Static Analyzer
 
-Some users experience issues launching RevitLookup, often caused by conflicts with third-party plugins (see issue https://github.com/jeremytammik/RevitLookup/issues/269).
+Some users experience issues launching RevitLookup, often caused by conflicts with third-party plugins, cf., [issue 269](https://github.com/jeremytammik/RevitLookup/issues/269).
 
-To help resolve these issues, we've introduced new tools that allow you to analyze, identify and upgrade problematic plugins causing crashes.
+To help resolve these issues, we've introduced new dependency reporting tools that allow you to analyze, identify and upgrade problematic plugins causing crashes:
+
+/Users/jta/a/doc/revit/tbc/git/a/img/revitlookup_2025_0_9_2.png
 
 ![image](https://github.com/user-attachments/assets/a5f94bd8-7eca-4998-91c7-99d7b079fa47)
 
-Download: https://github.com/jeremytammik/RevitLookup/issues/269#issuecomment-2323309590
+- [Download DependenciesReport tool](https://github.com/jeremytammik/RevitLookup/issues/269#issuecomment-2323309590)
 
-Many thanks to @RichardPinka for testing tools in the discussion: https://github.com/jeremytammik/RevitLookup/issues/281
+Many thanks to @RichardPinka for testing tools in the discussion of [issue 281](https://github.com/jeremytammik/RevitLookup/issues/281).
 
 ####<a name="2.3"></a> Public RevitLookup Roadmap
 
-Curious about what’s next? Stay updated on the latest developments for RevitLookup and share your feedback.
+Curious about what’s next?
+Stay updated on the latest developments for RevitLookup and share your feedback.
 
-Check out our Public Roadmap to see what’s coming up in future releases.: https://github.com/users/jeremytammik/projects/1
+Check out the [Public RevitLookup Roadmap](https://github.com/users/jeremytammik/projects/1) to see what’s coming up in future releases.
+
+/Users/jta/a/doc/revit/tbc/git/a/img/revitlookup_2025_0_9_3.png
 
 ![image](https://github.com/user-attachments/assets/14c3479d-871a-4f32-a933-a4b365e566bc)
 
@@ -137,7 +144,7 @@ Check out our Public Roadmap to see what’s coming up in future releases.: http
 - Fixed missing quick access icon https://github.com/jeremytammik/RevitLookup/issues/267
 - Fixed DataGrid accent color https://github.com/jeremytammik/RevitLookup/issues/273
 
-## Mics
+## Misc
 
 - Updated **Contributing** guide.
 - Added a new GitHub **issue templates**.

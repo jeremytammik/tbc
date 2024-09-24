@@ -50,6 +50,13 @@ How to handle problems with solid Boolean operations?
 
 linkedin:
 
+How to handle problems with solid Boolean operations in the #RevitAPI?
+
+https://autode.sk/booleanops
+
+- Revit Booleans and OpenCascade
+- CGAL solid Booleans...
+
 #BIM #DynamoBIM #AutodeskAPS #Revit #API #IFC #SDK #Autodesk #AEC #adsk
 
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
@@ -285,8 +292,8 @@ bool save_to(const std::string path, Mesh input) {
 
 Then you can upload the `.off` file back to Revit, or do other manipulations with it. However, as far as I know, API Revit does not allow you to create a full-fledged Solid object, but only a triangular grid, i.e. you can upload the grid obtained through CGAL to Revit for viewing, but you will not be able to perform further operations on solid with it, but only view its geometry through DirectShape.
 
-My main task is to create an energy model of a building and calculate heat loss, the required amount of energy to maintain the internal temperature in rooms at a given temperature outside, taking into account the thermal resistance to heat transfer of building structures.
-I implemented the intersection of 3D surfaces in 2D and converting the result back to 3D to determin the intersection of indoor surfaces with outdoor space:
+Currently, my main task is creating an energy model of a building and calculating heat loss, the energy required to maintain the internal temperature in rooms at a given temperature outside, taking into account the thermal resistance to heat transfer of building structures.
+I implemented the intersection of 3D surfaces in 2D and converting the result back to 3D to determine the intersection of indoor surfaces with outdoor space:
 
 <center>
 <img src="img/ak_cgal_booleans.png" alt="Intersection of indoor surfaces with outdoor space" title="Intersection of indoor surfaces with outdoor space" width="400"/>
