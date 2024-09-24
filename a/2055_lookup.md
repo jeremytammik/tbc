@@ -104,14 +104,14 @@ By @SergeyNefyodov:L
 
 - Type &ndash; Extension name &ndash; Description
 
-| Pipe        | HasOpenConnector                | Checks if there is open piping connector for the pipe.            | https://github.com/jeremytammik/RevitLookup/pull/261  |
-| Family      | FamilyCanConvertToFaceHostBased | Indicates whether the family can be converted to face host based. | https://github.com/jeremytammik/RevitLookup/pull/263 by @SergeyNefyodov |
-| Family      | GetProfileSymbols               | Gets the profile Family Symbols.                                  | https://github.com/jeremytammik/RevitLookup/pull/263 by @SergeyNefyodov |
-| Document    | GetLightFamily                  | Creates a light family object from the family document.           | https://github.com/jeremytammik/RevitLookup/pull/266 by @SergeyNefyodov |
-| LightFamily | GetLightTypeName                | Return the name for the light type.                               | https://github.com/jeremytammik/RevitLookup/pull/266 by @SergeyNefyodov |
-| LightFamily | GetLightType                    | Return a LightType object for the light type.                     | https://github.com/jeremytammik/RevitLookup/pull/266 by @SergeyNefyodov |
-| Application | GetMacroManager                 | Gets the Macro manager from the application.                      | https://github.com/jeremytammik/RevitLookup/pull/268 by @SergeyNefyodov |
-| Document    | GetMacroManager                 | Gets the Macro manager from the document.                         | https://github.com/jeremytammik/RevitLookup/pull/268 by @SergeyNefyodov |
+| Pipe        | HasOpenConnector                | Checks if there is open piping connector for the pipe.            | https://github.com/jeremytammik/RevitLookup/pull/261
+| Family      | FamilyCanConvertToFaceHostBased | Indicates whether the family can be converted to face host based. | https://github.com/jeremytammik/RevitLookup/pull/263
+| Family      | GetProfileSymbols               | Gets the profile Family Symbols.                                  | https://github.com/jeremytammik/RevitLookup/pull/263
+| Document    | GetLightFamily                  | Creates a light family object from the family document.           | https://github.com/jeremytammik/RevitLookup/pull/266
+| LightFamily | GetLightTypeName                | Return the name for the light type.                               | https://github.com/jeremytammik/RevitLookup/pull/266
+| LightFamily | GetLightType                    | Return a LightType object for the light type.                     | https://github.com/jeremytammik/RevitLookup/pull/266
+| Application | GetMacroManager                 | Gets the Macro manager from the application.                      | https://github.com/jeremytammik/RevitLookup/pull/268
+| Document    | GetMacroManager                 | Gets the Macro manager from the document.                         | https://github.com/jeremytammik/RevitLookup/pull/268
 
 **New API support**:
 
