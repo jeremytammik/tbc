@@ -17,6 +17,12 @@
 
 <!---
 
+- LLM is influencing human academic language
+  The Impact of Large Language Models in Academia: from Writing to Speaking
+  https://www.alphaxiv.org/abs/2409.13686
+  Less scientifically precise, a similar topic os also raised in the El Pais article on
+  Excessive use of words like ‘commendable’ and ‘meticulous’ suggests ChatGPT has been used in thousands of scientific studies
+  https://english.elpais.com/science-tech/2024-04-25/excessive-use-of-words-like-commendable-and-meticulous-suggest-chatgpt-has-been-used-in-thousands-of-scientific-studies.html
 
 twitter:
 
@@ -241,17 +247,12 @@ Added a new GitHub issue templates.
 Full changelog: 2025.0.8...2025.0.9
 RevitLookup versioning: https://github.com/jeremytammik/RevitLookup/wiki/Versions
 
+####<a name="3"></a> LLM Influences Human Academic Language
 
-**Question:**
-
-
-**Answer:**
-
-
-<center>
-<img src="img/.png" alt="" title="" width="300"/>
-</center>
-
+According to scientific studies, LLM is influencing human academic language,
+cf., [The Impact of Large Language Models in Academia: from Writing to Speaking](https://www.alphaxiv.org/abs/2409.13686).
+Less scientifically rigorous, similar results are also raised in the El Pais article stating
+that [excessive use of words like ‘commendable’ and ‘meticulous’ suggests ChatGPT has been used in thousands of scientific studies](https://english.elpais.com/science-tech/2024-04-25/excessive-use-of-words-like-commendable-and-meticulous-suggest-chatgpt-has-been-used-in-thousands-of-scientific-studies.html).
 
 <pre><code class="language-cs"></code></pre>
 
