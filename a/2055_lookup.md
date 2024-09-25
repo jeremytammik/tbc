@@ -98,20 +98,18 @@ Check out the [Public RevitLookup Roadmap](https://github.com/users/jeremytammik
 
 ####<a name="2.4"></a> Other Improvements
 
-**New extensions**:
-
-By @SergeyNefyodov:L
+**New extensions** by @SergeyNefyodov:
 
 - Type &ndash; Extension name &ndash; Description
 
-| Pipe        | HasOpenConnector                | Checks if there is open piping connector for the pipe.            | https://github.com/jeremytammik/RevitLookup/pull/261
-| Family      | FamilyCanConvertToFaceHostBased | Indicates whether the family can be converted to face host based. | https://github.com/jeremytammik/RevitLookup/pull/263
-| Family      | GetProfileSymbols               | Gets the profile Family Symbols.                                  | https://github.com/jeremytammik/RevitLookup/pull/263
-| Document    | GetLightFamily                  | Creates a light family object from the family document.           | https://github.com/jeremytammik/RevitLookup/pull/266
-| LightFamily | GetLightTypeName                | Return the name for the light type.                               | https://github.com/jeremytammik/RevitLookup/pull/266
-| LightFamily | GetLightType                    | Return a LightType object for the light type.                     | https://github.com/jeremytammik/RevitLookup/pull/266
-| Application | GetMacroManager                 | Gets the Macro manager from the application.                      | https://github.com/jeremytammik/RevitLookup/pull/268
-| Document    | GetMacroManager                 | Gets the Macro manager from the document.                         | https://github.com/jeremytammik/RevitLookup/pull/268
+- Pipe   &ndash; [HasOpenConnector](https://github.com/jeremytammik/RevitLookup/pull/261) &ndash; Checks if there is open piping connector for the pipe
+- Family &ndash; [FamilyCanConvertToFaceHostBased](https://github.com/jeremytammik/RevitLookup/pull/263) &ndash; Indicates whether the family can be converted to face host based
+- Family &ndash; [GetProfileSymbols](https://github.com/jeremytammik/RevitLookup/pull/263) &ndash; Gets the profile Family Symbols
+- Document &ndash; [GetLightFamily](https://github.com/jeremytammik/RevitLookup/pull/266) &ndash; Creates a light family object from the family document
+- LightFamily &ndash; [GetLightTypeName](https://github.com/jeremytammik/RevitLookup/pull/266) &ndash; Return the name for the light type
+- LightFamily &ndash; [GetLightType](https://github.com/jeremytammik/RevitLookup/pull/266) &ndash; Return a LightType object for the light type
+- Application &ndash; [GetMacroManager](https://github.com/jeremytammik/RevitLookup/pull/268) &ndash; Gets the Macro manager from the application
+- Document &ndash; [GetMacroManager](https://github.com/jeremytammik/RevitLookup/pull/268) &ndash; Gets the Macro manager from the document
 
 **New API support**:
 
@@ -148,8 +146,8 @@ By @SergeyNefyodov:L
 
 **Miscellaneous**
 
-- Updated **Contributing** guide.
-- Added a new GitHub **issue templates**.
+- Updated **Contributing** guide
+- Added a new GitHub **issue templates**
 - [Full changelog](https://github.com/jeremytammik/RevitLookup/compare/2025.0.8...2025.0.9)
 - [RevitLookup versioning](https://github.com/jeremytammik/RevitLookup/wiki/Versions)
 
