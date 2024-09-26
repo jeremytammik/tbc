@@ -100,7 +100,7 @@ Many thanks to @RichardPinka for testing tools in the discussion of [issue 281](
 ####<a name="2.3"></a> Public RevitLookup Roadmap
 
 Curious about what’s next?
-Kepp up to date on the latest developments for RevitLookup and share your feedback.
+Keep up to date on the latest developments for RevitLookup and share your feedback.
 
 Check out the [Public RevitLookup Roadmap](https://github.com/users/jeremytammik/projects/1) to see what’s coming up in future releases.
 
