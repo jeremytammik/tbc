@@ -73,9 +73,9 @@ The **Revit.ini** file is a key configuration file in Revit that stores settings
 The **Revit.ini File Editor** provides a simple and efficient way to manage these settings without the need for manual editing.
 With this tool, users can quickly adjust Revit’s configurations to match project needs or personal preferences, making it an essential utility for both professionals and teams working with Revit.
 
-/Users/jta/a/doc/revit/tbc/git/a/img/revitlookup_2025_0_9_1.png
-
-![image](https://github.com/user-attachments/assets/701a0a97-1906-419d-950b-b70f9b852966)
+<center>
+<img src="img/revitlookup_2025_0_9_1.png" alt="Revit.ini file editor" title="Revit.ini file editor" width="600"/>
+</center>
 
 This is our first public version, and we are excited for you to try it out for yourself!
 Make sure to file issues you encounter on our GitHub so we can continue to improve it.
@@ -89,9 +89,9 @@ Some users experience issues launching RevitLookup, often caused by conflicts wi
 
 To help resolve these issues, we've introduced new dependency reporting tools that allow you to analyze, identify and upgrade problematic plugins causing crashes:
 
-/Users/jta/a/doc/revit/tbc/git/a/img/revitlookup_2025_0_9_2.png
-
-![image](https://github.com/user-attachments/assets/a5f94bd8-7eca-4998-91c7-99d7b079fa47)
+<center>
+<img src="img/revitlookup_2025_0_9_2.png" alt="Dependency conflict static analyzer" title="Dependency conflict static analyzer" width="600"/>
+</center>
 
 - [Download DependenciesReport tool](https://github.com/jeremytammik/RevitLookup/issues/269#issuecomment-2323309590)
 
@@ -104,9 +104,9 @@ Stay updated on the latest developments for RevitLookup and share your feedback.
 
 Check out the [Public RevitLookup Roadmap](https://github.com/users/jeremytammik/projects/1) to see what’s coming up in future releases.
 
-/Users/jta/a/doc/revit/tbc/git/a/img/revitlookup_2025_0_9_3.png
-
-![image](https://github.com/user-attachments/assets/14c3479d-871a-4f32-a933-a4b365e566bc)
+<center>
+<img src="img/revitlookup_2025_0_9_3.png" alt="Public RevitLookup roadmap" title="Public RevitLookup roadmap" width="600"/>
+</center>
 
 ####<a name="2.4"></a> Other Improvements
 
@@ -169,7 +169,4 @@ According to scientific studies, LLM is influencing human academic language,
 cf., [The Impact of Large Language Models in Academia: from Writing to Speaking](https://www.alphaxiv.org/abs/2409.13686).
 Less scientifically rigorous, similar results are also raised in the El Pais article stating
 that [excessive use of words like ‘commendable’ and ‘meticulous’ suggests ChatGPT has been used in thousands of scientific studies](https://english.elpais.com/science-tech/2024-04-25/excessive-use-of-words-like-commendable-and-meticulous-suggest-chatgpt-has-been-used-in-thousands-of-scientific-studies.html).
-
-<pre><code class="language-cs"></code></pre>
-
 
