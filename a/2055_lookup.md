@@ -28,9 +28,13 @@ twitter:
 
  @AutodeskRevit #RevitAPI #BIM @DynamoBIM
 
-How to handle problems with solid Boolean operations?
-&ndash; Revit Booleans and OpenCascade
-&ndash; CGAL solid Booleans...
+A new version of RevitLookup is available, and AI influence observable
+&ndash; RevitLookup 2025.0.9
+&ndash; Revit.ini file editor
+&ndash; Dependency conflict static analyzer
+&ndash; Public RevitLookup roadmap
+&ndash; Other improvements
+&ndash; LLMs influence academic language...
 
 linkedin:
 
@@ -46,6 +50,8 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 -->
 
 ### RevitLookup 2025.0.9
+
+A new version of RevitLookup is available, and AI influence observable:
 
 - [RevitLookup 2025.0.9](#2)
     - [Revit.ini file editor](#2.1)
