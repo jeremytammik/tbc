@@ -47,6 +47,12 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### RevitLookup 2025.0.9
 
+- [RevitLookup 2025.0.9](#2)
+    - [Revit.ini file editor](#2.1)
+    - [Dependency conflict static analyzer](#2.2)
+    - [Public RevitLookup roadmap](#2.3)
+    - [Other improvements](#2.4)
+- [LLM influences academic language](#3)
 
 ####<a name="2"></a> RevitLookup 2025.0.9
 
@@ -117,7 +123,7 @@ Check out the [Public RevitLookup Roadmap](https://github.com/users/jeremytammik
 - Application &ndash; [GetMacroManager](https://github.com/jeremytammik/RevitLookup/pull/268) &ndash; Gets the Macro manager from the application
 - Document &ndash; [GetMacroManager](https://github.com/jeremytammik/RevitLookup/pull/268) &ndash; Gets the Macro manager from the document
 
-**New API support**:
+**New API support:**
 
 - [**CylindricalFace** class support](https://github.com/jeremytammik/RevitLookup/issues/264):
     - Radius property support
@@ -145,109 +151,19 @@ Check out the [Public RevitLookup Roadmap](https://github.com/users/jeremytammik
 - `Show Events` enabled by default
 - `Show Extensions` enabled by default
 
-**Bugs**
+**Bugs:**
 
 - [Fixed missing quick access icon](https://github.com/jeremytammik/RevitLookup/issues/267)
 - [Fixed DataGrid accent color](https://github.com/jeremytammik/RevitLookup/issues/273)
 
-**Miscellaneous**
+**Miscellaneous:**
 
 - Updated **Contributing** guide
-- Added a new GitHub **issue templates**
+- Added new GitHub **issue templates**
 - [Full changelog](https://github.com/jeremytammik/RevitLookup/compare/2025.0.8...2025.0.9)
 - [RevitLookup versioning](https://github.com/jeremytammik/RevitLookup/wiki/Versions)
 
-
-
-
-
-
-Revit.ini File Editor
-
-The Revit.ini file is a key configuration file in Revit that stores settings related to user preferences, system behavior, and project defaults.
-
-The Revit.ini File Editor provides a simple and efficient way to manage these settings without the need for manual editing.
-With this tool, users can quickly adjust Revit’s configurations to match project needs or personal preferences, making it an essential utility for both professionals and teams
-working with Revit.
-
-default.png (view on web)
-
-This is our first public version, and we are excited for you to try it out for yourself!
-Make sure to file issues you encounter on our GitHub so we can continue to improve it.
-
-Documentation: https://github.com/jeremytammik/RevitLookup/wiki/Revit.ini-File-Editor
-
-Static dependency conflict analyzer
-
-Some users experience issues launching RevitLookup, often caused by conflicts with third-party plugins (see issue #269).
-
-To help resolve these issues, we've introduced new tools that allow you to analyze, identify and upgrade problematic plugins causing crashes.
-
-default.png (view on web)
-
-Download: #269 (comment)
-
-Many thanks to @RichardPinka for testing tools in the discussion: #281
-
-Public RevitLookup roadmap
-
-Curious about what’s next? Stay updated on the latest developments for RevitLookup and share your feedback.
-
-Check out our Public Roadmap to see what’s coming up in future releases.: https://github.com/users/jeremytammik/projects/1
-
-default.png (view on web)
-
-Improvements
-
-New extensions:
-
-Type  Extension Description Author
-Pipe  HasOpenConnector  Checks if there is open piping connector for the pipe.  #261 by @SergeyNefyodov
-Family  FamilyCanConvertToFaceHostBased Indicates whether the family can be converted to face host based. #263 by @SergeyNefyodov
-Family  GetProfileSymbols Gets the profile Family Symbols.  #263 by @SergeyFyodorov
-Document  GetLightFamily  Creates a light family object from the family document. #266 by @SergeyNefyodov
-LightFamily GetLightTypeName  Return the name for the light type. #266 by @SergeyNefyodov
-LightFamily GetLightType  Return a LightType object for the light type. #266 by @SergeyNefyodov
-Application GetMacroManager Gets the Macro manager from the application.  #268 by @SergeyNefyodov
-Document  GetMacroManager Gets the Macro manager from the document. #268 by @SergeyNefyodov
-New API support:
-
-CylindricalFace class support #264:
-Radius property support
-StructuralSettings class support #282 by @SergeyNefyodov:
-GetStructuralSettings method support
-StructuralSettings class support #283 by @SergeyNefyodov:
-GetActiveSunAndShadowSettings method support
-GetSunrise method support
-GetSunset method support
-GetSunset method support
-IsTimeIntervalValid method support
-IsAfterStartDateAndTime method support
-IsBeforeEndDateAndTime method support
-RevisionNumberingSequence class support #289 by @SergeyNefyodov:
-GetAllRevisionNumberingSequences method support
-AnalyticalLinkType class support #288 by @SergeyNefyodov:
-IsValidAnalyticalFixityState method support
-AreaVolumeSettings class support #287 by @SergeyNefyodov:
-GetAreaVolumeSettings method support
-GetSpatialElementBoundaryLocation method support
-New default settings:
-
-Show Static members enabled by default
-Show Events enabled by default
-Show Extensions enabled by default
-Bugs
-
-Fixed missing quick access icon #267
-Fixed DataGrid accent color #273
-Mics
-
-Updated Contributing guide.
-Added a new GitHub issue templates.
-Full changelog: 2025.0.8...2025.0.9
-RevitLookup versioning: https://github.com/jeremytammik/RevitLookup/wiki/Versions
-
-####<a name="3"></a> LLM Influences Human Academic Language
+####<a name="3"></a> LLM Influences Academic Language
 
 According to scientific studies, LLM is influencing human academic language,
 cf., [The Impact of Large Language Models in Academia: from Writing to Speaking](https://www.alphaxiv.org/abs/2409.13686).
