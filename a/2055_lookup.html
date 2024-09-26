@@ -1,0 +1,167 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css"></p>
+<!-- https://highlightjs.org/#usage
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+-->
+
+<!-- https://prismjs.com -->
+<p><link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css" rel="stylesheet" /></p>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+<style> code[class*=language-], pre[class*=language-] { font-size : 90%; } </style>
+
+<p></head></p>
+<!---
+
+- LLM is influencing human academic language
+  The Impact of Large Language Models in Academia: from Writing to Speaking
+  https://www.alphaxiv.org/abs/2409.13686
+  Less scientifically precise, a similar topic os also raised in the El Pais article on
+  Excessive use of words like ‘commendable’ and ‘meticulous’ suggests ChatGPT has been used in thousands of scientific studies
+  https://english.elpais.com/science-tech/2024-04-25/excessive-use-of-words-like-commendable-and-meticulous-suggest-chatgpt-has-been-used-in-thousands-of-scientific-studies.html
+
+twitter:
+
+ @AutodeskRevit #RevitAPI #BIM @DynamoBIM
+
+How to handle problems with solid Boolean operations?
+&ndash; Revit Booleans and OpenCascade
+&ndash; CGAL solid Booleans...
+
+linkedin:
+
+#BIM #DynamoBIM #AutodeskAPS #Revit #API #IFC #SDK #Autodesk #AEC #adsk
+
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+
+<center>
+<img src="img/" alt="" title="" width="600"/>
+<p style="font-size: 80%; font-style:italic"></p>
+</center>
+
+-->
+
+<h3>RevitLookup 2025.0.9</h3>
+<ul>
+<li><a href="#2">RevitLookup 2025.0.9</a><ul>
+<li><a href="#2.1">Revit.ini file editor</a></li>
+<li><a href="#2.2">Dependency conflict static analyzer</a></li>
+<li><a href="#2.3">Public RevitLookup roadmap</a></li>
+<li><a href="#2.4">Other improvements</a></li>
+</ul>
+</li>
+<li><a href="#3">LLMs influence academic language</a></li>
+</ul>
+<h4><a name="2"></a> RevitLookup 2025.0.9</h4>
+<p>Roman <a href="https://t.me/nice3point">@Nice3point</a> Karpovich, aka Роман Карпович,
+published <a href="https://github.com/jeremytammik/RevitLookup">RevitLookup</a>
+<a href="https://github.com/jeremytammik/RevitLookup/releases/tag/2025.0.9">release 2025.0.9</a>
+with important enhancements by himself,
+<a href="https://github.com/RichardPinka">RichardPinka</a> and <a href="https://github.com/SergeyNefyodov">SergeyNefyodov</a>:</p>
+<ul>
+<li><a href="#2.1">Revit.ini file editor</a></li>
+<li><a href="#2.2">Dependency conflict static analyzer</a></li>
+<li><a href="#2.3">Public RevitLookup roadmap</a></li>
+</ul>
+<h4><a name="2.1"></a> Revit.ini File Editor</h4>
+<p>The <strong>Revit.ini</strong> file is a key configuration file in Revit that stores settings related to user preferences, system behavior, and project defaults.</p>
+<p>The <strong>Revit.ini File Editor</strong> provides a simple and efficient way to manage these settings without the need for manual editing.
+With this tool, users can quickly adjust Revit’s configurations to match project needs or personal preferences, making it an essential utility for both professionals and teams working with Revit.</p>
+<p><center>
+<img src="img/revitlookup_2025_0_9_1.png" alt="Revit.ini file editor" title="Revit.ini file editor" width="600"/>
+</center></p>
+<p>This is our first public version, and we are excited for you to try it out for yourself!
+Make sure to file issues you encounter on our GitHub so we can continue to improve it.
+For more details, please refer to the:</p>
+<ul>
+<li><a href="https://github.com/jeremytammik/RevitLookup/wiki/Revit.ini-File-Editor">Revit.ini file editor documentation</a></li>
+</ul>
+<h4><a name="2.2"></a> Dependency Conflict Static Analyzer</h4>
+<p>Some users experience issues launching RevitLookup, often caused by conflicts with third-party plugins, cf., <a href="https://github.com/jeremytammik/RevitLookup/issues/269">issue 269</a>.</p>
+<p>To help resolve these issues, we introduced new dependency reporting tools that allow you to analyze, identify and upgrade problematic plugins causing crashes:</p>
+<p><center>
+<img src="img/revitlookup_2025_0_9_2.png" alt="Dependency conflict static analyzer" title="Dependency conflict static analyzer" width="600"/>
+</center></p>
+<ul>
+<li><a href="https://github.com/jeremytammik/RevitLookup/issues/269#issuecomment-2323309590">Download DependenciesReport tool</a></li>
+</ul>
+<p>Many thanks to @RichardPinka for testing tools in the discussion of <a href="https://github.com/jeremytammik/RevitLookup/issues/281">issue 281</a>.</p>
+<h4><a name="2.3"></a> Public RevitLookup Roadmap</h4>
+<p>Curious about what’s next?
+Kepp up to date on the latest developments for RevitLookup and share your feedback.</p>
+<p>Check out the <a href="https://github.com/users/jeremytammik/projects/1">Public RevitLookup Roadmap</a> to see what’s coming up in future releases.</p>
+<p><center>
+<img src="img/revitlookup_2025_0_9_3.png" alt="Public RevitLookup roadmap" title="Public RevitLookup roadmap" width="600"/>
+</center></p>
+<h4><a name="2.4"></a> Other Improvements</h4>
+<p><strong>New extensions</strong> by @SergeyNefyodov; type, name and short description:</p>
+<ul>
+<li>Pipe   &ndash; <a href="https://github.com/jeremytammik/RevitLookup/pull/261">HasOpenConnector</a> &ndash; Checks if there is open piping connector for the pipe</li>
+<li>Family &ndash; <a href="https://github.com/jeremytammik/RevitLookup/pull/263">FamilyCanConvertToFaceHostBased</a> &ndash; Indicates whether the family can be converted to face host based</li>
+<li>Family &ndash; <a href="https://github.com/jeremytammik/RevitLookup/pull/263">GetProfileSymbols</a> &ndash; Gets the profile Family Symbols</li>
+<li>Document &ndash; <a href="https://github.com/jeremytammik/RevitLookup/pull/266">GetLightFamily</a> &ndash; Creates a light family object from the family document</li>
+<li>LightFamily &ndash; <a href="https://github.com/jeremytammik/RevitLookup/pull/266">GetLightTypeName</a> &ndash; Return the name for the light type</li>
+<li>LightFamily &ndash; <a href="https://github.com/jeremytammik/RevitLookup/pull/266">GetLightType</a> &ndash; Return a LightType object for the light type</li>
+<li>Application &ndash; <a href="https://github.com/jeremytammik/RevitLookup/pull/268">GetMacroManager</a> &ndash; Gets the Macro manager from the application</li>
+<li>Document &ndash; <a href="https://github.com/jeremytammik/RevitLookup/pull/268">GetMacroManager</a> &ndash; Gets the Macro manager from the document</li>
+</ul>
+<p><strong>New API support:</strong></p>
+<ul>
+<li><a href="https://github.com/jeremytammik/RevitLookup/issues/264"><strong>CylindricalFace</strong> class support</a>:<ul>
+<li>Radius property support</li>
+</ul>
+</li>
+<li><a href="https://github.com/jeremytammik/RevitLookup/pull/282"><strong>StructuralSettings</strong> class support</a> by @SergeyNefyodov:<ul>
+<li>GetStructuralSettings method support</li>
+</ul>
+</li>
+<li><a href="https://github.com/jeremytammik/RevitLookup/pull/283"><strong>StructuralSettings</strong> class support</a> by @SergeyNefyodov:<ul>
+<li>GetActiveSunAndShadowSettings method support</li>
+<li>GetSunrise method support</li>
+<li>GetSunset method support</li>
+<li>GetSunset method support</li>
+<li>IsTimeIntervalValid method support</li>
+<li>IsAfterStartDateAndTime method support</li>
+<li>IsBeforeEndDateAndTime method support</li>
+</ul>
+</li>
+<li><a href="https://github.com/jeremytammik/RevitLookup/pull/289"><strong>RevisionNumberingSequence</strong> class support</a> by @SergeyNefyodov:<ul>
+<li>GetAllRevisionNumberingSequences method support</li>
+</ul>
+</li>
+<li><a href="https://github.com/jeremytammik/RevitLookup/pull/288"><strong>AnalyticalLinkType</strong> class support</a> by @SergeyNefyodov:<ul>
+<li>IsValidAnalyticalFixityState method support</li>
+</ul>
+</li>
+<li><a href="https://github.com/jeremytammik/RevitLookup/pull/287"><strong>AreaVolumeSettings</strong> class support</a> by @SergeyNefyodov:<ul>
+<li>GetAreaVolumeSettings method support</li>
+<li>GetSpatialElementBoundaryLocation method support</li>
+</ul>
+</li>
+</ul>
+<p><strong>New default settings:</strong></p>
+<ul>
+<li><code>Show Static</code> members enabled by default</li>
+<li><code>Show Events</code> enabled by default</li>
+<li><code>Show Extensions</code> enabled by default</li>
+</ul>
+<p><strong>Bugs:</strong></p>
+<ul>
+<li><a href="https://github.com/jeremytammik/RevitLookup/issues/267">Fixed missing quick access icon</a></li>
+<li><a href="https://github.com/jeremytammik/RevitLookup/issues/273">Fixed DataGrid accent color</a></li>
+</ul>
+<p><strong>Miscellaneous:</strong></p>
+<ul>
+<li>Updated <strong>Contributing</strong> guide</li>
+<li>Added new GitHub <strong>issue templates</strong></li>
+<li><a href="https://github.com/jeremytammik/RevitLookup/compare/2025.0.8...2025.0.9">Full changelog</a></li>
+<li><a href="https://github.com/jeremytammik/RevitLookup/wiki/Versions">RevitLookup versioning</a></li>
+</ul>
+<h4><a name="3"></a> LLMs Influence Academic Language</h4>
+<p>In a different vein, looking at AI-related news, according to scientific studies, LLMs are already influencing human academic language,
+cf., <a href="https://www.alphaxiv.org/abs/2409.13686">The Impact of Large Language Models in Academia: from Writing to Speaking</a>.
+Less scientifically rigorous, similar results are also raised in the El Pais article stating
+that <a href="https://english.elpais.com/science-tech/2024-04-25/excessive-use-of-words-like-commendable-and-meticulous-suggest-chatgpt-has-been-used-in-thousands-of-scientific-studies.html">excessive use of words like ‘commendable’ and ‘meticulous’ suggests ChatGPT has been used in thousands of scientific studies</a>.</p>

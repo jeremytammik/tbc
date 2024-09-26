@@ -52,12 +52,12 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
     - [Dependency conflict static analyzer](#2.2)
     - [Public RevitLookup roadmap](#2.3)
     - [Other improvements](#2.4)
-- [LLM influences academic language](#3)
+- [LLMs influence academic language](#3)
 
 ####<a name="2"></a> RevitLookup 2025.0.9
 
 Roman [@Nice3point](https://t.me/nice3point) Karpovich, aka Роман Карпович,
-published [RevitLookup] (https://github.com/jeremytammik/RevitLookup)
+published [RevitLookup](https://github.com/jeremytammik/RevitLookup)
 [release 2025.0.9](https://github.com/jeremytammik/RevitLookup/releases/tag/2025.0.9)
 with important enhancements by himself,
 [RichardPinka](https://github.com/RichardPinka) and [SergeyNefyodov](https://github.com/SergeyNefyodov):
@@ -87,7 +87,7 @@ For more details, please refer to the:
 
 Some users experience issues launching RevitLookup, often caused by conflicts with third-party plugins, cf., [issue 269](https://github.com/jeremytammik/RevitLookup/issues/269).
 
-To help resolve these issues, we've introduced new dependency reporting tools that allow you to analyze, identify and upgrade problematic plugins causing crashes:
+To help resolve these issues, we introduced new dependency reporting tools that allow you to analyze, identify and upgrade problematic plugins causing crashes:
 
 <center>
 <img src="img/revitlookup_2025_0_9_2.png" alt="Dependency conflict static analyzer" title="Dependency conflict static analyzer" width="600"/>
@@ -100,7 +100,7 @@ Many thanks to @RichardPinka for testing tools in the discussion of [issue 281](
 ####<a name="2.3"></a> Public RevitLookup Roadmap
 
 Curious about what’s next?
-Stay updated on the latest developments for RevitLookup and share your feedback.
+Kepp up to date on the latest developments for RevitLookup and share your feedback.
 
 Check out the [Public RevitLookup Roadmap](https://github.com/users/jeremytammik/projects/1) to see what’s coming up in future releases.
 
@@ -110,9 +110,7 @@ Check out the [Public RevitLookup Roadmap](https://github.com/users/jeremytammik
 
 ####<a name="2.4"></a> Other Improvements
 
-**New extensions** by @SergeyNefyodov:
-
-- Type &ndash; Extension name &ndash; Description
+**New extensions** by @SergeyNefyodov; type, name and short description:
 
 - Pipe   &ndash; [HasOpenConnector](https://github.com/jeremytammik/RevitLookup/pull/261) &ndash; Checks if there is open piping connector for the pipe
 - Family &ndash; [FamilyCanConvertToFaceHostBased](https://github.com/jeremytammik/RevitLookup/pull/263) &ndash; Indicates whether the family can be converted to face host based
@@ -163,9 +161,9 @@ Check out the [Public RevitLookup Roadmap](https://github.com/users/jeremytammik
 - [Full changelog](https://github.com/jeremytammik/RevitLookup/compare/2025.0.8...2025.0.9)
 - [RevitLookup versioning](https://github.com/jeremytammik/RevitLookup/wiki/Versions)
 
-####<a name="3"></a> LLM Influences Academic Language
+####<a name="3"></a> LLMs Influence Academic Language
 
-According to scientific studies, LLM is influencing human academic language,
+In a different vein, looking at AI-related news, according to scientific studies, LLMs are already influencing human academic language,
 cf., [The Impact of Large Language Models in Academia: from Writing to Speaking](https://www.alphaxiv.org/abs/2409.13686).
 Less scientifically rigorous, similar results are also raised in the El Pais article stating
 that [excessive use of words like ‘commendable’ and ‘meticulous’ suggests ChatGPT has been used in thousands of scientific studies](https://english.elpais.com/science-tech/2024-04-25/excessive-use-of-words-like-commendable-and-meticulous-suggest-chatgpt-has-been-used-in-thousands-of-scientific-studies.html).
