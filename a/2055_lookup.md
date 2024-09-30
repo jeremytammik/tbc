@@ -17,6 +17,16 @@
 
 <!---
 
+- RevitLookup 2025.0.10
+  https://github.com/jeremytammik/RevitLookup/releases/tag/2025.0.10
+  - [Fixed placeholder for the Dark theme](https://github.com/jeremytammik/RevitLookup/issues/291)
+  - Fixed the Revit.ini editor filter button name
+  - Fixed the Revit.ini editor filter placeholder
+  - [Disabled the Visual.Enter() method](https://github.com/jeremytammik/RevitLookup/issues/292)
+  - [Suppressed GenericHost startup messages](https://github.com/jeremytammik/RevitLookup/pull/294) by @Nefarion
+  - [Full changelog](https://github.com/jeremytammik/RevitLookup/compare/2025.0.9...2025.0.10)
+  - [RevitLookup versioning](https://github.com/jeremytammik/RevitLookup/wiki/Versions)
+
 - LLM is influencing human academic language
   The Impact of Large Language Models in Academia: from Writing to Speaking
   https://www.alphaxiv.org/abs/2409.13686
@@ -26,14 +36,15 @@
 
 twitter:
 
- @AutodeskRevit #RevitAPI #BIM @DynamoBIM
+RevitLookup updates 2025.0.9 and 2025.0.10 with Revit.ini file editor, static dependency conflict analyser, public RevitLookup roadmap and numeros other improvements @AutodeskRevit #RevitAPI #BIM @DynamoBIM https://autode.sk/revitlookup2025_0_10
 
-A new version of RevitLookup is available, and AI influence observable
+New versions of RevitLookup are available, and AI influence observable
 &ndash; RevitLookup 2025.0.9
 &ndash; Revit.ini file editor
 &ndash; Dependency conflict static analyzer
 &ndash; Public RevitLookup roadmap
 &ndash; Other improvements
+&ndash; RevitLookup 2025.0.10
 &ndash; LLMs influence academic language...
 
 linkedin:
@@ -58,6 +69,7 @@ A new version of RevitLookup is available, and AI influence observable:
     - [Dependency conflict static analyzer](#2.2)
     - [Public RevitLookup roadmap](#2.3)
     - [Other improvements](#2.4)
+- [RevitLookup 2025.0.10](#2.5)
 - [LLMs influence academic language](#3)
 
 ####<a name="2"></a> RevitLookup 2025.0.9
@@ -165,6 +177,18 @@ Check out the [Public RevitLookup Roadmap](https://github.com/users/jeremytammik
 - Updated **Contributing** guide
 - Added new GitHub **issue templates**
 - [Full changelog](https://github.com/jeremytammik/RevitLookup/compare/2025.0.8...2025.0.9)
+- [RevitLookup versioning](https://github.com/jeremytammik/RevitLookup/wiki/Versions)
+
+####<a name="2.5"></a> RevitLookup 2025.0.10
+
+Shortly after, Roman went on to publish [RevitLookup 2025.0.10](https://github.com/jeremytammik/RevitLookup/releases/tag/2025.0.10):
+
+- [Fixed placeholder for the dark theme](https://github.com/jeremytammik/RevitLookup/issues/291)
+- Fixed the Revit.ini editor filter button name
+- Fixed the Revit.ini editor filter placeholder
+- [Disabled the `Visual.Enter` method](https://github.com/jeremytammik/RevitLookup/issues/292)
+- [Suppressed `GenericHost` startup messages](https://github.com/jeremytammik/RevitLookup/pull/294) by @Nefarion
+- [Full changelog](https://github.com/jeremytammik/RevitLookup/compare/2025.0.9...2025.0.10)
 - [RevitLookup versioning](https://github.com/jeremytammik/RevitLookup/wiki/Versions)
 
 ####<a name="3"></a> LLMs Influence Academic Language
