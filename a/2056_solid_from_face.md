@@ -22,6 +22,9 @@
   Creating Solid with one PlanarFace using BRepBuilder based on slab sketch
   https://ricaun.com/
 
+- Join between 3 beams
+  https://forums.autodesk.com/t5/revit-api-forum/join-between-3-beams/m-p/13029976
+
 twitter:
 
  @AutodeskRevit #RevitAPI #BIM @DynamoBIM
@@ -70,7 +73,6 @@ Here is a full sample to copy a Face to Solid.
 <center>
 <img src="img/ricaun_facetosolid.gif" alt="Face to solid" title="Face to solid" width="300"/> <!-- Pixel Height: 300 Pixel Width: 300 -->
 </center>
-
 
 <pre><code class="language-cs">using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
@@ -149,4 +151,66 @@ namespace RevitAddin.Forum.Revit.Commands
 
 Many thanks to Ricaun for the nice sample and explanation.
 
+####<a name="3"></a> Join Between Three Beams
 
+Dayanand Rakte raised and solved another issue, to apply
+a [join between 3 beams](https://forums.autodesk.com/t5/revit-api-forum/join-between-3-beams/m-p/13029976):
+
+**Question:** I am struggling with join/connection between 3 beams.
+The current result looks like this:
+
+<center>
+<img src="img/join3beam_resultpng" alt="Join three beams" title="Join three beams" width="450"/> <!-- Pixel Height: 376 Pixel Width: 693 -->
+</center>
+
+The point highlighted with orange color is the endpoint location of Beam2 and Beam1, and the same point is start point location for Beam3.
+I want to connect these beams to achieve the following expected outcome:
+
+<center>
+<img src="img/join3beam_goal.png" alt="Join three beams" title="Join three beams" width="450"/> <!-- Pixel Height: 403 Pixel Width: 634 -->
+</center>
+
+It will be ok if there is no join between these three beams, but they should be place as expected.
+I tried the following approaches:
+
+- First: I have not used JoinGeometry API and directly placed beams as per their location.
+  In this approach I am getting random results, any of the the beam is extending which I don't have control.
+- Second: I used the join geometry API as shown below.
+  It generates the situation in the first image.
+
+<pre><code class="language-cs">private void JoinGeometryBeam1ToBeam2Beam3(
+  Document activeDoc,
+  FamilyInstance Beam1)
+{
+  XYZ minPt = primaryBeam.get_BoundingBox(activeDoc.ActiveView).Min;
+  XYZ maxPt = primaryBeam.get_BoundingBox(activeDoc.ActiveView).Max;
+  Outline outLine = new Outline(minPt, maxPt);
+  outLine.Scale(1.5);
+  BoundingBoxIntersectsFilter filter = new BoundingBoxIntersectsFilter(outLine);
+  List&lt;FamilyInstance&gt; connectedBeams
+    = new FilteredElementCollector(activeDoc)
+      .WherePasses(filter)
+      .OfCategory(BuiltInCategory.OST_StructuralFraming)
+      .OfClass(typeof(FamilyInstance))
+      .Cast&lt;FamilyInstance&gt;()
+      .ToList();
+
+  foreach (FamilyInstance beam in connectedBeams)
+  {
+    JoinGeometryUtils.JoinGeometry(this.ActiveDoc, beam, Beam1);
+  }
+}</code></pre>
+
+How can the desired result be achieved?
+
+**Solution:**
+It is working for me now.
+I disallowed join for Beam2 and Beam3 and Beam1 kept as it is.
+To disallow join, I use the followimng API call:
+
+<pre><code class="language-cs">StructuralFramingUtils.DisallowJoinAtEnd(girderInstance, 0);</code></pre>
+
+I make sure that always Beam2 and Beam3 are inserted before Beam1.
+It is working for join between 3 beams.
+
+Many thanks to Dayanand Rakte for sharing this solution.
