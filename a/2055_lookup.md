@@ -142,6 +142,13 @@ Check out the [Public RevitLookup Roadmap](https://github.com/users/jeremytammik
 
 **New extensions** by @SergeyNefyodov; type, name and short description:
 
+<!--
+https://www.linkedin.com/in/sergei-nefedov/
+Sergei Nefedov
+atomatiq
+Belgrade
+-->
+
 - Pipe   &ndash; [HasOpenConnector](https://github.com/jeremytammik/RevitLookup/pull/261) &ndash; Checks if there is open piping connector for the pipe
 - Family &ndash; [FamilyCanConvertToFaceHostBased](https://github.com/jeremytammik/RevitLookup/pull/263) &ndash; Indicates whether the family can be converted to face host based
 - Family &ndash; [GetProfileSymbols](https://github.com/jeremytammik/RevitLookup/pull/263) &ndash; Gets the profile Family Symbols

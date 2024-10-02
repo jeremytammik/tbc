@@ -1,6 +1,6 @@
-<head>
+<p><head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<link rel="stylesheet" type="text/css" href="bc.css">
+<link rel="stylesheet" type="text/css" href="bc.css"></p>
 <!-- https://highlightjs.org/#usage
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
@@ -8,13 +8,12 @@
 -->
 
 <!-- https://prismjs.com -->
-<link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css" rel="stylesheet" />
+<p><link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css" rel="stylesheet" /></p>
 <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
 <style> code[class*=language-], pre[class*=language-] { font-size : 90%; } </style>
 
-</head>
-
+<p></head></p>
 <!---
 
 - ricaun full sample to use brepbuilder to build open shell
@@ -46,40 +45,32 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Solid from Face
-
-Let's look at creating a solid extrusion from a face and defining a precise join between structural beams:
-
-- [`DirectShape` solid from planar face](#2)
-- [Join between three beams](#3)
-
-####<a name="2"></a> DirectShape Solid from Planar Face
-
-Luiz Henrique [@ricaun](https://ricaun.com/) Cassettari explains how to create a DirectShape with only an open shell, with zero volume.
+<h3>Solid from Face</h3>
+<p>Let's look at creating a solid extrusion from a face and defining a precise join between structural beams:</p>
+<ul>
+<li><a href="#2"><code>DirectShape</code> solid from planar face</a></li>
+<li><a href="#3">Join between three beams</a></li>
+</ul>
+<h4><a name="2"></a> DirectShape Solid from Planar Face</h4>
+<p>Luiz Henrique <a href="https://ricaun.com/">@ricaun</a> Cassettari explains how to create a DirectShape with only an open shell, with zero volume.
 He also shared a nice sample demonstrating how
-to [create a solid from a PlanarFace using BRepBuilder based on slab sketch](https://forums.autodesk.com/t5/revit-api-forum/creating-solid-with-one-planarface-using-brepbuilder-based-on/m-p/13031540#M81609):
-
-**Question:**
-I need to create a Solid with a single `PlanarFace` using `BRepBuilder`.
-The `PlanarFace` edges are based on a curves from sketch of a slab.
-
-**Answer:**
-To start with, you can Look at the [BRepBuilderExample Revit SDK sample](https://thebuildingcoder.typepad.com/blog/2017/05/revit-2017-and-2018-sdk-samples.html#4.4).
+to <a href="https://forums.autodesk.com/t5/revit-api-forum/creating-solid-with-one-planarface-using-brepbuilder-based-on/m-p/13031540#M81609">create a solid from a PlanarFace using BRepBuilder based on slab sketch</a>:</p>
+<p><strong>Question:</strong>
+I need to create a Solid with a single <code>PlanarFace</code> using <code>BRepBuilder</code>.
+The <code>PlanarFace</code> edges are based on a curves from sketch of a slab.</p>
+<p><strong>Answer:</strong>
+To start with, you can Look at the <a href="https://thebuildingcoder.typepad.com/blog/2017/05/revit-2017-and-2018-sdk-samples.html#4.4">BRepBuilderExample Revit SDK sample</a>.
 It includes a creation of a non-planar face, with no solid.
-The [BRepBuilder class API documentation](https://www.revitapidocs.com/2024/94c1fef4-2933-ce67-9c2d-361cbf8a42b4.htm) demonstrates in detail the creation of faces, edges, coedges, including arcs.
-Additional background information is provided by The Building Coder discussing [BRepBuilder organisation](https://thebuildingcoder.typepad.com/blog/2023/06/brepbuilder-and-toposurface-interior.html#2).
-
-BRepBuilder can still be tricky to work with.
-In your case, to create an open shell, you need to set the target `BRepType` in the constructor to `BRepType.OpenShell` to allow the builder to return a solid without a volume.
+The <a href="https://www.revitapidocs.com/2024/94c1fef4-2933-ce67-9c2d-361cbf8a42b4.htm">BRepBuilder class API documentation</a> demonstrates in detail the creation of faces, edges, coedges, including arcs.
+Additional background information is provided by The Building Coder discussing <a href="https://thebuildingcoder.typepad.com/blog/2023/06/brepbuilder-and-toposurface-interior.html#2">BRepBuilder organisation</a>.</p>
+<p>BRepBuilder can still be tricky to work with.
+In your case, to create an open shell, you need to set the target <code>BRepType</code> in the constructor to <code>BRepType.OpenShell</code> to allow the builder to return a solid without a volume.
 Then, the code you share should work.
-Sometimes, the orientation matters; especially in `BRepType.Solid` and `BRepType.Void`, you need to make sure all edges is registered in the correct orientation.
-
-Finally, here is a full sample to create a solid from a planar face:
-
-<center>
+Sometimes, the orientation matters; especially in <code>BRepType.Solid</code> and <code>BRepType.Void</code>, you need to make sure all edges is registered in the correct orientation.</p>
+<p>Finally, here is a full sample to create a solid from a planar face:</p>
+<p><center>
 <img src="img/ricaun_facetosolid.gif" alt="Face to solid" title="Face to solid" width="300"/> <!-- Pixel Height: 300 Pixel Width: 300 -->
-</center>
-
+</center></p>
 <pre><code class="language-cs">using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
@@ -155,35 +146,28 @@ namespace RevitAddin.Forum.Revit.Commands
   }
 }</code></pre>
 
-Many thanks to Ricaun for the nice sample and explanation.
-
-####<a name="3"></a> Join Between Three Beams
-
-Dayanand Rakte raised and solved another issue, to apply
-a [join between 3 beams](https://forums.autodesk.com/t5/revit-api-forum/join-between-3-beams/m-p/13029976):
-
-**Question:** I am struggling with join/connection between 3 beams.
-The current result looks like this:
-
-<center>
+<p>Many thanks to Ricaun for the nice sample and explanation.</p>
+<h4><a name="3"></a> Join Between Three Beams</h4>
+<p>Dayanand Rakte raised and solved another issue, to apply
+a <a href="https://forums.autodesk.com/t5/revit-api-forum/join-between-3-beams/m-p/13029976">join between 3 beams</a>:</p>
+<p><strong>Question:</strong> I am struggling with join/connection between 3 beams.
+The current result looks like this:</p>
+<p><center>
 <img src="img/join3beam_result.png" alt="Join three beams" title="Join three beams" width="450"/> <!-- Pixel Height: 376 Pixel Width: 693 -->
-</center>
-
-The point highlighted with orange color is the endpoint location of Beam2 and Beam1, and the same point is start point location for Beam3.
-I want to connect these beams to achieve the following expected outcome:
-
-<center>
+</center></p>
+<p>The point highlighted with orange color is the endpoint location of Beam2 and Beam1, and the same point is start point location for Beam3.
+I want to connect these beams to achieve the following expected outcome:</p>
+<p><center>
 <img src="img/join3beam_goal.png" alt="Join three beams" title="Join three beams" width="450"/> <!-- Pixel Height: 403 Pixel Width: 634 -->
-</center>
-
-It will be ok if there is no join between these three beams, but they should be place as expected.
-I tried the following approaches:
-
-- First: I have not used JoinGeometry API and directly placed beams as per their location.
-  In this approach I am getting random results, any of the the beam is extending which I don't have control.
-- Second: I used the join geometry API as shown below.
-  It generates the situation in the first image.
-
+</center></p>
+<p>It will be ok if there is no join between these three beams, but they should be place as expected.
+I tried the following approaches:</p>
+<ul>
+<li>First: I have not used JoinGeometry API and directly placed beams as per their location.
+  In this approach I am getting random results, any of the the beam is extending which I don't have control.</li>
+<li>Second: I used the join geometry API as shown below.
+  It generates the situation in the first image.</li>
+</ul>
 <pre><code class="language-cs">private void JoinGeometryBeam1ToBeam2Beam3(
   Document activeDoc,
   FamilyInstance Beam1)
@@ -207,17 +191,13 @@ I tried the following approaches:
   }
 }</code></pre>
 
-How can the desired result be achieved?
-
-**Solution:**
+<p>How can the desired result be achieved?</p>
+<p><strong>Solution:</strong>
 It is working for me now.
 I disallowed join for Beam2 and Beam3 and Beam1 kept as it is.
-To disallow the join, I use the following API call:
-
+To disallow the join, I use the following API call:</p>
 <pre><code class="language-cs">StructuralFramingUtils.DisallowJoinAtEnd(girderInstance, 0);</code></pre>
 
-I make sure that Beam2 and Beam3 are inserted before Beam1.
-Then, the join between 3 beams works as expected.
-
-Many thanks to Dayanand Rakte for sharing this solution.
-
+<p>I make sure that Beam2 and Beam3 are inserted before Beam1.
+Then, the join between 3 beams works as expected.</p>
+<p>Many thanks to Dayanand Rakte for sharing this solution.</p>
