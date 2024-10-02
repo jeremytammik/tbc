@@ -29,7 +29,9 @@ twitter:
 
  @AutodeskRevit #RevitAPI #BIM @DynamoBIM
 
-&ndash; ...
+Creating an open shell, a solid extrusion from a face and defining a precise join between structural beams
+&ndash; DirectShape solid from planar face
+&ndash; Join between three beams...
 
 linkedin:
 
@@ -79,6 +81,7 @@ Finally, here is a full sample to create a solid from a planar face:
 <center>
 <img src="img/ricaun_facetosolid.png" alt="Face to solid" title="Face to solid" width="300"/> <!-- Pixel Height: 300 Pixel Width: 300 -->
 <a href="img/ricaun_facetosolid.gif"><p style="font-size: 80%; font-style:italic">Click for animation</p></a>
+<!-- https://thebuildingcoder.typepad.com/img/ricaun_facetosolid.gif -->
 </center>
 
 <pre><code class="language-cs">using Autodesk.Revit.Attributes;
