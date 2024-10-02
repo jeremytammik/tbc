@@ -46,9 +46,9 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Solid from Face
+### Join Beams and Solid from Face
 
-Let's look at creating a solid extrusion from a face and defining a precise join between structural beams:
+Let's look at creating an open shell, a solid extrusion from a face and defining a precise join between structural beams:
 
 - [`DirectShape` solid from planar face](#2)
 - [Join between three beams](#3)
@@ -77,7 +77,8 @@ Sometimes, the orientation matters; especially in `BRepType.Solid` and `BRepType
 Finally, here is a full sample to create a solid from a planar face:
 
 <center>
-<img src="img/ricaun_facetosolid.gif" alt="Face to solid" title="Face to solid" width="300"/> <!-- Pixel Height: 300 Pixel Width: 300 -->
+<img src="img/ricaun_facetosolid.png" alt="Face to solid" title="Face to solid" width="300"/> <!-- Pixel Height: 300 Pixel Width: 300 -->
+<a href="img/ricaun_facetosolid.gif"><p style="font-size: 80%; font-style:italic">Click for animation</p></a>
 </center>
 
 <pre><code class="language-cs">using Autodesk.Revit.Attributes;
