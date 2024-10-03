@@ -27,7 +27,7 @@
 
 twitter:
 
- @AutodeskRevit #RevitAPI #BIM @DynamoBIM
+Creating a DirectShape open shell, a solid extrusion from a face and defining a precise join between three structural beams in the @AutodeskRevit #RevitAPI #BIM @DynamoBIM https://autode.sk/solidfromface
 
 Creating an open shell, a solid extrusion from a face and defining a precise join between structural beams
 &ndash; DirectShape solid from planar face
