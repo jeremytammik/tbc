@@ -50,6 +50,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 <center>
 <img src="img/" alt="" title="" width="600"/>
 <p style="font-size: 80%; font-style:italic"></p>
+<a href="img/.gif"><p style="font-size: 80%; font-style:italic">Click for animation</p></a>
 </center>
 
 -->
@@ -58,14 +59,46 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ####<a name="2"></a>
 
-**Question:**
+Sometimes, the BIM element that you need to access is hard to identify and filter out.
+Some elements are not simply identifiable by category or class.
+[Sean Page](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/3064449) shares
+an interesting approach and an effective approach to filter for such an element in the thread
+on [deleting unpurgeable viewport types through API](https://forums.autodesk.com/t5/revit-api-forum/deleting-unpurgeable-viewport-types-through-api/m-p/12741221):
+
+**Question:** When you copy views (including schedules) from one project to another, it brings in the default viewport type of that project.
+That viewport type becomes unpurgeable.
+So if you do this with enough files, you get a whole bunch of unpurgeable viewport types in your project.
+
+We have a few of these unpurgeable viewport types in our template and I'm looking for a way to clean this up without being forced to recreate the template, which would take me weeks.
+
+Anyone any ideas on how I could achieve this through the API (if possible at all)?
 
 **Answer:**
+Here is what I use to get Viewport Types.
+It uses a parameter filter to return all element types whose SYMBOL_FAMILY_NAME_PARAM equals "Viewport".
+It may not be super language stable, but it works great for me:
 
-<center>
-<img src="img/ricaun_facetosolid.png" alt="Face to solid" title="Face to solid" width="300"/> <!-- Pixel Height: 300 Pixel Width: 300 -->
-<a href="img/ricaun_facetosolid.gif"><p style="font-size: 80%; font-style:italic">Click for animation</p></a>
-</center>
+<pre><code class="language-cs">  FilterRule rule
+    = ParameterFilterRuleFactory.CreateEqualsRule(
+      new ElementId( (Int64)
+        BuiltInParameter.SYMBOL_FAMILY_NAME_PARAM),
+      "Viewport");
 
-<pre><code class="language-cs"></code></pre>
+  ElementParameterFilter filter = new ElementParameterFilter(rule);
+  IList&lt;ElementType&gt; viewportTypes;
+
+  using( FilteredElementCollector fec
+    = new FilteredElementCollector(doc)
+      .OfClass( typeof(ElementType) )
+      .WherePasses(filter) )
+  {
+    viewportTypes = fec.Cast&lt;ElementType&gt;().ToList();
+  }
+  return viewportTypes;</code></pre>
+
+Many thanks to Sean for the nice and effective solution.
+
+
+
+</code></pre>
 
