@@ -25,6 +25,9 @@
   Is it possible to delete Arrowhead types?
   https://forums.autodesk.com/t5/revit-api-forum/is-it-possible-to-delete-arrowhead-types/td-p/13025122
 
+- Getting Coordination Models fileName and Path in active document
+  https://stackoverflow.com/questions/79055736/getting-coordination-models-filename-and-path-in-active-document
+
 - unload links with transmission data
   How to open Revit model with unload Revit links option
   https://forums.autodesk.com/t5/revit-api-forum/how-to-open-revit-model-with-unload-revit-links-option/m-p/13009038
@@ -158,7 +161,55 @@ Many thanks to [Mohamed Arshad](https://forums.autodesk.com/t5/user/viewprofilep
 and [Naveen Kumar Thalaivirichan](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/5661631)
 for this clarification.
 
-####<a name="4"></a> Unload Links with Transmission Data
+####<a name="4"></a> Determine Coordination Model Filepath
+
+Adressing another filtering and data access task,
+[Leandro Arns Gonzales](https://stackoverflow.com/users/13294294/leandro-arns-gonzales) shares a solution
+for [getting coordination models fileName and Path in active document](https://stackoverflow.com/questions/79055736/getting-coordination-models-filename-and-path-in-active-document):
+
+**Question:**
+I am trying to get the coordination model filenames and paths in my active document.
+I tried using `RevitLinkInstance` elements, but it is not a Revit link, so returns a empty list.
+I tried using `OfCategory(OST_Coordination_Model)`, but it still gives me zero elements.
+I finally found it using `OfClass(typeof(DirectShapeType))`.
+I am able to retrieve its name, but I am tstill struggling to get the file location.
+
+**Answer:**
+I managed to find a way.
+The path os stored in the built-in parameter `DIRECTCONTEXT3D_SOURCE_ID`.
+This is how i ended up getting my coordination model file name and location:
+
+<pre><code class="language-cs">  FilteredElementCollector collectorTwo
+    = new FilteredElementCollector(doc);
+
+  ICollection&lt;Element&gt; revitLinksShape
+    = collectorTwo.OfClass(typeof(DirectShapeType))
+      .ToElements();
+
+  // Itera por todas as referências externas
+  // para buscar modelos de coordenação
+
+  foreach (var fileRef in revitLinksShape)
+  {
+    var directShapeType = fileRef as DirectShapeType;
+
+    if(directShapeType != null)
+    {
+      Parameter coordModelPathParam = directShapeType.get_Parameter(BuiltInParameter.DIRECTCONTEXT3D_SOURCE_ID);
+      if (coordModelPathParam != null)
+      {
+        // Get the file path from the parameter
+        string filePath = coordModelPathParam.AsString();
+
+        // Display the file path
+        TaskDialog.Show("Coordination Model Path", $"File Path: {filePath}");
+      }
+    }
+  }</code></pre>
+
+Many thanks to Leandro for raising this and sharing their solution.
+
+####<a name="5"></a> Unload Links with Transmission Data
 
 Let's wrap up with a solution
 showing [how to open Revit model with unload Revit links option](https://forums.autodesk.com/t5/revit-api-forum/how-to-open-revit-model-with-unload-revit-links-option/m-p/13009038):
@@ -243,4 +294,5 @@ Here is my code showing how you can unload Revit Links as well as CAD links:
   }
 }</code></pre>
 
-Many thanks to [Archana Sapkal](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/11948904) for raising the issue and dsharing their solution.
+Many thanks to [Archana Sapkal](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/11948904) for raising the issue and sharing their solution.
+
