@@ -25,6 +25,10 @@
   Is it possible to delete Arrowhead types?
   https://forums.autodesk.com/t5/revit-api-forum/is-it-possible-to-delete-arrowhead-types/td-p/13025122
 
+- unload links with transmission data
+  How to open Revit model with unload Revit links option
+  https://forums.autodesk.com/t5/revit-api-forum/how-to-open-revit-model-with-unload-revit-links-option/m-p/13009038
+
 twitter:
 
  the @AutodeskRevit #RevitAPI #BIM @DynamoBIM
@@ -90,7 +94,7 @@ It may not be super language stable, but it works great for me:
 
 Many thanks to Sean for the nice and effective solution.
 
-####<a name="2"></a> Cannot Delete Type in Use
+####<a name="3"></a> Cannot Delete Type in Use
 
 A very similar filter comes up in the discussion
 [is it possible to delete Arrowhead types?](https://forums.autodesk.com/t5/revit-api-forum/is-it-possible-to-delete-arrowhead-types/td-p/13025122), but using post-processing on the `FamilyName` property instead of the more efficient parameter filter:
@@ -154,3 +158,89 @@ Many thanks to [Mohamed Arshad](https://forums.autodesk.com/t5/user/viewprofilep
 and [Naveen Kumar Thalaivirichan](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/5661631)
 for this clarification.
 
+####<a name="4"></a> Unload Links with Transmission Data
+
+Let's wrap up with a solution
+showing [how to open Revit model with unload Revit links option](https://forums.autodesk.com/t5/revit-api-forum/how-to-open-revit-model-with-unload-revit-links-option/m-p/13009038):
+
+**Question:**
+How can I open a Revit model with Revit links unloaded using
+the [`OpenDocumentFile` method](https://www.revitapidocs.com/2024/5716f206-98ee-0490-4c6c-f0cdd6644190.htm)?
+
+**Answer:**
+You can achieve this using the transmission data:
+
+- [List Linked Files and TransmissionData](http://thebuildingcoder.typepad.com/blog/2011/05/list-linked-files-and-transmissiondata.html)
+- [Using the WriteTransmissionData Method](http://thebuildingcoder.typepad.com/blog/2011/10/using-the-writetransmissiondata-method.html)
+- [Standalone BasicFileInfo and ExtractPartAtom](http://thebuildingcoder.typepad.com/blog/2018/04/standalone-basicfileinfo-and-extractpartatom-method.html)
+
+Here are some old notes from another case on closing worksets and unloading links when opening model:
+
+Q: Can worksets be closed or links unloaded programmatically without actually opening the RVT model?
+A developer asks: System memory is hitting the limit. My Add-in does not need the Revit Links to be loaded to be able to function. Can I somehow open the RVT file with
+(1) all worksets closed or
+(2) all RVT links unloaded
+to save system memory? Is there a way to achieve this in the APS design automation activity command line?
+
+A: I have two samples demonstrating how to open a RVT file with worksets closed / RVT links unloaded, but I haven’t migrated them to DA4R.
+
+Q: Just to confirm - you change this on the fly, you do not need to save the file for not loading those on next load? by mean if you need to load the file to change the settings for the next load, that does not help. So is it for next time, or does it disable loading on the fly? I ask, because the comment says 'next time': This method will set all Revit links to be unloaded the next time the document at the given location is opened.
+
+A: the command to open the model with worksets closed just sets a property in the OpenOptions SetOpenWorksetsConfiguration. it then calls OpenAndActivateDocument to open the model with worksets closed. so, this is only valid for the lifetime of the OpenOptions and the open call needs to be executed immediately. The command to not load links is different: for that, an option is set and stored in the model transmission data using TransmissionData.WriteTransmissionData. In that case, the option will be remembered and applied next time an open is performed. in the sample command, an open follows immediately. however, it could also be executed later, and the setting would be retained. So, the two methods can both be used to disable loading on the fly, provided the caller does the opening. I hardly think the workset config option can be controlled in this manner by the default design automation environment. However, in DA, the file to open could be passed in as payload, and the DA add-in could implement the call to open the file itself, couldn't it?
+
+... I spent some time to verify if the changes remain in the file after closing Revit. As said, TransmissionData.WriteTransmissionData will store the link unload state in the RVT file. But, if a customer wants to keep workset state, they must call Document#SaveAs to save the changes made.
+
+**Response:**
+Here is my code showing how you can unload Revit Links as well as CAD links:
+
+<pre><code class="language-cs">public static Result UnloadRevitLinks(string filePath)
+{
+  FilePath location = new FilePath(filePath);
+  TransmissionData transData = TransmissionData
+    .ReadTransmissionData(location);
+  try
+  {
+    if (transData != null)
+    {
+      ICollection&lt;ElementId&gt; externalReferences
+        = transData.GetAllExternalFileReferenceIds();
+
+      MessageBox.Show("externalReferences" + externalReferences);
+      foreach (ElementId refId in externalReferences)
+      {
+        MessageBox.Show("refId" + refId);
+        ExternalFileReference extRef = transData
+          .GetLastSavedReferenceData(refId);
+
+        MessageBox.Show("extRef" + extRef);
+        if (extRef.ExternalFileReferenceType
+            == ExternalFileReferenceType.RevitLink
+          || extRef.ExternalFileReferenceType
+            == ExternalFileReferenceType.CADLink)
+        {
+          MessageBox.Show("Deleteting revit links");
+          transData.SetDesiredReferenceData(refId,
+            extRef.GetPath(), extRef.PathType, false);
+          MessageBox.Show("All revit links are deleted");
+        }
+      }
+      transData.IsTransmitted = true;
+      TransmissionData.WriteTransmissionData(location,
+        transData);
+      return Result.Succeeded;
+    }
+    else
+    {
+      TaskDialog.Show("Unload Revit Links",
+        "The document does not have any transmission data.");
+      return Result.Failed;
+    }
+  }
+  catch (Exception ex)
+  {
+    MessageBox.Show("ex" + ex);
+    throw;
+  }
+}</code></pre>
+
+Many thanks to [Archana Sapkal](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/11948904) for raising the issue and dsharing their solution.
