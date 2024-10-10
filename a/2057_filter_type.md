@@ -58,17 +58,17 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 Today, we look at some standard filtering question and a typical use of transmission data:
 
-- [Parameter filter for type name](#2)
+- [Parameter filter to delete viewport type](#2)
 - [Cannot delete type in use](#3)
 - [Determine coordination model filepath](#4)
 - [Unload links with transmission data](#5)
 
-####<a name="2"></a> Parameter Filter for Type Name
+####<a name="2"></a> Parameter Filter to Delete Viewport Type
 
 Sometimes, the BIM element that you need to access is hard to identify and filter out.
 Some elements are not simply identifiable by category or class.
 [Sean Page](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/3064449) shares
-an interesting approach and an effective approach to filter for such an element in the thread
+an effective approach to filter for such an element in the thread
 on [deleting unpurgeable viewport types through API](https://forums.autodesk.com/t5/revit-api-forum/deleting-unpurgeable-viewport-types-through-api/m-p/12741221):
 
 **Question:** When you copy views (including schedules) from one project to another, it brings in the default viewport type of that project.
@@ -106,8 +106,9 @@ Many thanks to Sean for the nice and effective solution.
 
 ####<a name="3"></a> Cannot Delete Type in Use
 
-A very similar filter comes up in the discussion
-[is it possible to delete Arrowhead types?](https://forums.autodesk.com/t5/revit-api-forum/is-it-possible-to-delete-arrowhead-types/td-p/13025122), but using post-processing on the `FamilyName` property instead of the more efficient parameter filter:
+A similar filter comes up in the discussion
+[is it possible to delete arrowhead types?](https://forums.autodesk.com/t5/revit-api-forum/is-it-possible-to-delete-arrowhead-types/td-p/13025122)
+It uses post-processing on the `FamilyName` property instead of the more efficient parameter filter, so Sean's solution above could be used to further improve it:
 
 **Question:** This code throws and exception and crashes:
 
@@ -134,12 +135,12 @@ It throws an `Autodesk.Revit.Exceptions.InternalException` saying *An internal e
 Maybe the type is in use.
 You can't delete system types, only purge them, cf.:
 
-- [Purge Unused via API](https://forums.autodesk.com/t5/revit-api-forum/purge-unused-via-the-api/td-p/6431564)
-- [Purge and PostCommand](https://thebuildingcoder.typepad.com/blog/2017/11/purge-and-detecting-an-empty-view.html#2)
-- [Purge Unused with eTransmit](https://thebuildingcoder.typepad.com/blog/2022/03/purge-unused-and-the-autodesk-camel.html)
+- [Purge unused via API](https://forums.autodesk.com/t5/revit-api-forum/purge-unused-via-the-api/td-p/6431564)
+- [Purge and `PostCommand`](https://thebuildingcoder.typepad.com/blog/2017/11/purge-and-detecting-an-empty-view.html#2)
+- [Purge unused with `eTransmit`](https://thebuildingcoder.typepad.com/blog/2022/03/purge-unused-and-the-autodesk-camel.html)
 
 <center>
-<img src="img/arrowhead_purge.png" alt="Purge unused" title="Purge unused" width="600"/> <!-- Pixel Height: 600 Pixel Width: 458 -->
+<img src="img/arrowhead_purge.png" alt="Purge unused" title="Purge unused" width="458"/> <!-- Pixel Height: 600 Pixel Width: 458 -->
 </center>
 
 You can determine whether the Arrowhead type is deletable or not by using the [`CanBeDeleted` property](https://www.revitapidocs.com/2015/5efe8253-d555-00c2-8db6-9114e328fcc7.htm).
@@ -172,19 +173,19 @@ for this clarification.
 
 Adressing another filtering and data access task,
 [Leandro Arns Gonzales](https://stackoverflow.com/users/13294294/leandro-arns-gonzales) shares a solution
-for [getting coordination models fileName and Path in active document](https://stackoverflow.com/questions/79055736/getting-coordination-models-filename-and-path-in-active-document):
+for [getting coordination model filename and path in active document](https://stackoverflow.com/questions/79055736/getting-coordination-models-filename-and-path-in-active-document):
 
 **Question:**
 I am trying to get the coordination model filenames and paths in my active document.
-I tried using `RevitLinkInstance` elements, but it is not a Revit link, so returns a empty list.
+I tried using `RevitLinkInstance` elements, but it is not a Revit link, so returns an empty list.
 I tried using `OfCategory(OST_Coordination_Model)`, but it still gives me zero elements.
 I finally found it using `OfClass(typeof(DirectShapeType))`.
-I am able to retrieve its name, but I am tstill struggling to get the file location.
+I am able to retrieve its name, but I am still struggling to get the file location.
 
 **Answer:**
 I managed to find a way.
-The path os stored in the built-in parameter `DIRECTCONTEXT3D_SOURCE_ID`.
-This is how i ended up getting my coordination model file name and location:
+The path is stored in the built-in parameter `DIRECTCONTEXT3D_SOURCE_ID`.
+This is how I ended up getting my coordination model file name and location:
 
 <pre><code class="language-cs">  FilteredElementCollector collectorTwo
     = new FilteredElementCollector(doc);
@@ -235,21 +236,35 @@ You can achieve this using the transmission data:
 Here are some old notes from another case on closing worksets and unloading links when opening model:
 
 Q: Can worksets be closed or links unloaded programmatically without actually opening the RVT model?
-A developer asks: System memory is hitting the limit. My Add-in does not need the Revit Links to be loaded to be able to function. Can I somehow open the RVT file with
+A developer asks: System memory is hitting the limit.
+My add-in does not need the Revit links to be loaded to be able to function.
+Can I somehow open the RVT file with
 (1) all worksets closed or
 (2) all RVT links unloaded
-to save system memory? Is there a way to achieve this in the APS design automation activity command line?
+to save system memory?
+Is there a way to achieve this in the APS design automation activity command line?
 
 A: I have two samples demonstrating how to open a RVT file with worksets closed / RVT links unloaded, but I haven’t migrated them to DA4R.
 
-Q: Just to confirm - you change this on the fly, you do not need to save the file for not loading those on next load? by mean if you need to load the file to change the settings for the next load, that does not help. So is it for next time, or does it disable loading on the fly? I ask, because the comment says 'next time': This method will set all Revit links to be unloaded the next time the document at the given location is opened.
+Q: Just to confirm &ndash; if you change this in the transmission data, you do not need to save the RVT file in Revit in order to not load links next time it is opened?
 
-A: the command to open the model with worksets closed just sets a property in the OpenOptions SetOpenWorksetsConfiguration. it then calls OpenAndActivateDocument to open the model with worksets closed. so, this is only valid for the lifetime of the OpenOptions and the open call needs to be executed immediately. The command to not load links is different: for that, an option is set and stored in the model transmission data using TransmissionData.WriteTransmissionData. In that case, the option will be remembered and applied next time an open is performed. in the sample command, an open follows immediately. however, it could also be executed later, and the setting would be retained. So, the two methods can both be used to disable loading on the fly, provided the caller does the opening. I hardly think the workset config option can be controlled in this manner by the default design automation environment. However, in DA, the file to open could be passed in as payload, and the DA add-in could implement the call to open the file itself, couldn't it?
+A: The command to open the model with worksets closed just sets a property in the `OpenOptions`, `SetOpenWorksetsConfiguration`.
+It then calls `OpenAndActivateDocument` to open the model with worksets closed.
+So, this is only valid for the lifetime of the `OpenOptions` and the open call needs to be executed immediately.
+The command to not load links is different: for that, an option is set and stored in the model transmission data using `TransmissionData.WriteTransmissionData`.
+In that case, the option will be remembered and applied next time an open is performed.
+In the sample command, an open follows immediately.
+However, it could also be executed later, and the setting would be retained.
+So, the two methods can both be used to disable loading on the fly, provided the caller does the opening.
+I hardly think the workset config option can be controlled in this manner by the default design automation environment.
+However, in DA, the file to open could be passed in as payload, and the DA add-in could implement the call to open the file itself, couldn't it?
 
-... I spent some time to verify if the changes remain in the file after closing Revit. As said, TransmissionData.WriteTransmissionData will store the link unload state in the RVT file. But, if a customer wants to keep workset state, they must call Document#SaveAs to save the changes made.
+... I spent some time to verify if the changes remain in the file after closing Revit.
+As said, `WriteTransmissionData` will store the link unload state in the RVT file.
+But, if a customer wants to keep workset state, they must call `Document.SaveAs` to save the changes made.
 
 **Response:**
-Here is my code showing how you can unload Revit Links as well as CAD links:
+Here is my code showing how you can unload Revit links as well as CAD links:
 
 <pre><code class="language-cs">public static Result UnloadRevitLinks(string filePath)
 {
@@ -283,8 +298,8 @@ Here is my code showing how you can unload Revit Links as well as CAD links:
         }
       }
       transData.IsTransmitted = true;
-      TransmissionData.WriteTransmissionData(location,
-        transData);
+      TransmissionData.WriteTransmissionData(
+        location, transData);
       return Result.Succeeded;
     }
     else

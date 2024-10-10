@@ -1,0 +1,283 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css"></p>
+<!-- https://highlightjs.org/#usage
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+-->
+
+<!-- https://prismjs.com -->
+<p><link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css" rel="stylesheet" /></p>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+<style> code[class*=language-], pre[class*=language-] { font-size : 90%; } </style>
+
+<p></head></p>
+<!---
+
+- approach and effective filtering for unknown class
+  Deleting unpurgeable viewport types through API
+  https://forums.autodesk.com/t5/revit-api-forum/deleting-unpurgeable-viewport-types-through-api/m-p/12741221
+
+- cannot delete specific type due to protected usage
+  Is it possible to delete Arrowhead types?
+  https://forums.autodesk.com/t5/revit-api-forum/is-it-possible-to-delete-arrowhead-types/td-p/13025122
+
+- Getting Coordination Models fileName and Path in active document
+  https://stackoverflow.com/questions/79055736/getting-coordination-models-filename-and-path-in-active-document
+
+- unload links with transmission data
+  How to open Revit model with unload Revit links option
+  https://forums.autodesk.com/t5/revit-api-forum/how-to-open-revit-model-with-unload-revit-links-option/m-p/13009038
+
+twitter:
+
+ the @AutodeskRevit #RevitAPI #BIM @DynamoBIM
+
+&ndash; ...
+
+linkedin:
+
+
+
+#BIM #DynamoBIM #AutodeskAPS #Revit #API #IFC #SDK #Autodesk #AEC #adsk
+
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+
+<center>
+<img src="img/" alt="" title="" width="600"/>
+<p style="font-size: 80%; font-style:italic"></p>
+<a href="img/.gif"><p style="font-size: 80%; font-style:italic">Click for animation</p></a>
+</center>
+
+-->
+
+<h3>Filter for Anonymous Type</h3>
+<p>Today, we look at some standard filtering question and a typical use of transmission data:</p>
+<ul>
+<li><a href="#2">Parameter filter to delete viewport type</a></li>
+<li><a href="#3">Cannot delete type in use</a></li>
+<li><a href="#4">Determine coordination model filepath</a></li>
+<li><a href="#5">Unload links with transmission data</a></li>
+</ul>
+<h4><a name="2"></a> Parameter Filter to Delete Viewport Type</h4>
+<p>Sometimes, the BIM element that you need to access is hard to identify and filter out.
+Some elements are not simply identifiable by category or class.
+<a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/3064449">Sean Page</a> shares
+an effective approach to filter for such an element in the thread
+on <a href="https://forums.autodesk.com/t5/revit-api-forum/deleting-unpurgeable-viewport-types-through-api/m-p/12741221">deleting unpurgeable viewport types through API</a>:</p>
+<p><strong>Question:</strong> When you copy views (including schedules) from one project to another, it brings in the default viewport type of that project.
+That viewport type becomes unpurgeable.
+So if you do this with enough files, you get a whole bunch of unpurgeable viewport types in your project.</p>
+<p>We have a few of these unpurgeable viewport types in our template and I'm looking for a way to clean this up without being forced to recreate the template, which would take me weeks.</p>
+<p>Anyone any ideas on how I could achieve this through the API (if possible at all)?</p>
+<p><strong>Answer:</strong>
+Here is what I use to get Viewport Types.
+It uses a parameter filter to return all element types whose SYMBOL_FAMILY_NAME_PARAM equals "Viewport".
+It may not be super language stable, but it works great for me:</p>
+<pre><code class="language-cs">  FilterRule rule
+    = ParameterFilterRuleFactory.CreateEqualsRule(
+      new ElementId( (Int64)
+        BuiltInParameter.SYMBOL_FAMILY_NAME_PARAM),
+      "Viewport");
+
+  ElementParameterFilter filter = new ElementParameterFilter(rule);
+  IList&lt;ElementType&gt; viewportTypes;
+
+  using( FilteredElementCollector fec
+    = new FilteredElementCollector(doc)
+      .OfClass( typeof(ElementType) )
+      .WherePasses(filter) )
+  {
+    viewportTypes = fec.Cast&lt;ElementType&gt;().ToList();
+  }
+  return viewportTypes;</code></pre>
+
+<p>Many thanks to Sean for the nice and effective solution.</p>
+<h4><a name="3"></a> Cannot Delete Type in Use</h4>
+<p>A similar filter comes up in the discussion
+<a href="https://forums.autodesk.com/t5/revit-api-forum/is-it-possible-to-delete-arrowhead-types/td-p/13025122">is it possible to delete arrowhead types?</a>
+It uses post-processing on the <code>FamilyName</code> property instead of the more efficient parameter filter, so Sean's solution above could be used to further improve it:</p>
+<p><strong>Question:</strong> This code throws and exception and crashes:</p>
+<pre><code class="language-cs">var arrowHeads = new FilteredElementCollector(doc)
+  .WhereElementIsElementType()
+  .Cast&lt;ElementType&gt;()
+    .Where(t => t.FamilyName == "Arrowhead")
+    .ToList();
+
+using (Transaction trans = new Transaction(doc,
+  "Remove Arrowhead"))
+{
+  trans.Start();
+  foreach (var arrowHead in arrowHeads)
+  {
+    doc.Delete(arrowHead.Id);
+  }
+  trans.Commit();
+}</code></pre>
+
+<p>It throws an <code>Autodesk.Revit.Exceptions.InternalException</code> saying <em>An internal error has occurred</em> and then terminates Revit.</p>
+<p><strong>Answer:</strong>
+Maybe the type is in use.
+You can't delete system types, only purge them, cf.:</p>
+<ul>
+<li><a href="https://forums.autodesk.com/t5/revit-api-forum/purge-unused-via-the-api/td-p/6431564">Purge unused via API</a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2017/11/purge-and-detecting-an-empty-view.html#2">Purge and <code>PostCommand</code></a></li>
+<li><a href="https://thebuildingcoder.typepad.com/blog/2022/03/purge-unused-and-the-autodesk-camel.html">Purge unused with <code>eTransmit</code></a></li>
+</ul>
+<p><center>
+<img src="img/arrowhead_purge.png" alt="Purge unused" title="Purge unused" width="458"/> <!-- Pixel Height: 600 Pixel Width: 458 -->
+</center></p>
+<p>You can determine whether the Arrowhead type is deletable or not by using the <a href="https://www.revitapidocs.com/2015/5efe8253-d555-00c2-8db6-9114e328fcc7.htm"><code>CanBeDeleted</code> property</a>.
+This will help prevent Revit from crashing.</p>
+<p><strong>Response:</strong>
+<code>CanBeDeleted</code> returns true for all elements.</p>
+<p><strong>Answer:</strong>
+Try to use <code>IFailurePreProcessor</code> to handle Revit based errors.
+If a serious error occurs, you can skip the process without crashing Revit.</p>
+<p>I tested deleting all arrowhead types and was able to remove all except "Arrow Open 90 Degree 1.25mm".
+Each attempt to delete this specific arrowhead type causes an exception and crash.
+Could you please verify if the same arrowhead type is causing the issue on your end?</p>
+<p><strong>Response:</strong>
+Yes. It is.</p>
+<p><strong>Answer:</strong>
+The "Arrow Open 90 Degree 1.25mm" arrowhead type is being used by a component.
+Upon reviewing the journal file, I discovered that that it is internally utilised by <code>StairsPathType</code>, <code>setArrowheadTypeId</code>.
+This explains why Revit throws an exception when attempting to delete it.</p>
+<p>Many thanks to <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/8461394">Mohamed Arshad</a>
+and <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/5661631">Naveen Kumar Thalaivirichan</a>
+for this clarification.</p>
+<h4><a name="4"></a> Determine Coordination Model Filepath</h4>
+<p>Adressing another filtering and data access task,
+<a href="https://stackoverflow.com/users/13294294/leandro-arns-gonzales">Leandro Arns Gonzales</a> shares a solution
+for <a href="https://stackoverflow.com/questions/79055736/getting-coordination-models-filename-and-path-in-active-document">getting coordination model filename and path in active document</a>:</p>
+<p><strong>Question:</strong>
+I am trying to get the coordination model filenames and paths in my active document.
+I tried using <code>RevitLinkInstance</code> elements, but it is not a Revit link, so returns an empty list.
+I tried using <code>OfCategory(OST_Coordination_Model)</code>, but it still gives me zero elements.
+I finally found it using <code>OfClass(typeof(DirectShapeType))</code>.
+I am able to retrieve its name, but I am still struggling to get the file location.</p>
+<p><strong>Answer:</strong>
+I managed to find a way.
+The path is stored in the built-in parameter <code>DIRECTCONTEXT3D_SOURCE_ID</code>.
+This is how I ended up getting my coordination model file name and location:</p>
+<pre><code class="language-cs">  FilteredElementCollector collectorTwo
+    = new FilteredElementCollector(doc);
+
+  ICollection&lt;Element&gt; revitLinksShape
+    = collectorTwo.OfClass(typeof(DirectShapeType))
+      .ToElements();
+
+  // Itera por todas as referências externas
+  // para buscar modelos de coordenação
+
+  foreach (var fileRef in revitLinksShape)
+  {
+    var directShapeType = fileRef as DirectShapeType;
+
+    if(directShapeType != null)
+    {
+      Parameter coordModelPathParam = directShapeType.get_Parameter(BuiltInParameter.DIRECTCONTEXT3D_SOURCE_ID);
+      if (coordModelPathParam != null)
+      {
+        // Get the file path from the parameter
+        string filePath = coordModelPathParam.AsString();
+
+        // Display the file path
+        TaskDialog.Show("Coordination Model Path", $"File Path: {filePath}");
+      }
+    }
+  }</code></pre>
+
+<p>Many thanks to Leandro for raising this and sharing their solution.</p>
+<h4><a name="5"></a> Unload Links with Transmission Data</h4>
+<p>Let's wrap up with a solution
+showing <a href="https://forums.autodesk.com/t5/revit-api-forum/how-to-open-revit-model-with-unload-revit-links-option/m-p/13009038">how to open Revit model with unload Revit links option</a>:</p>
+<p><strong>Question:</strong>
+How can I open a Revit model with Revit links unloaded using
+the <a href="https://www.revitapidocs.com/2024/5716f206-98ee-0490-4c6c-f0cdd6644190.htm"><code>OpenDocumentFile</code> method</a>?</p>
+<p><strong>Answer:</strong>
+You can achieve this using the transmission data:</p>
+<ul>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/05/list-linked-files-and-transmissiondata.html">List Linked Files and TransmissionData</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2011/10/using-the-writetransmissiondata-method.html">Using the WriteTransmissionData Method</a></li>
+<li><a href="http://thebuildingcoder.typepad.com/blog/2018/04/standalone-basicfileinfo-and-extractpartatom-method.html">Standalone BasicFileInfo and ExtractPartAtom</a></li>
+</ul>
+<p>Here are some old notes from another case on closing worksets and unloading links when opening model:</p>
+<p>Q: Can worksets be closed or links unloaded programmatically without actually opening the RVT model?
+A developer asks: System memory is hitting the limit.
+My add-in does not need the Revit links to be loaded to be able to function.
+Can I somehow open the RVT file with
+(1) all worksets closed or
+(2) all RVT links unloaded
+to save system memory?
+Is there a way to achieve this in the APS design automation activity command line?</p>
+<p>A: I have two samples demonstrating how to open a RVT file with worksets closed / RVT links unloaded, but I haven’t migrated them to DA4R.</p>
+<p>Q: Just to confirm &ndash; if you change this in the transmission data, you do not need to save the RVT file in Revit in order to not load links next time it is opened?</p>
+<p>A: The command to open the model with worksets closed just sets a property in the <code>OpenOptions</code>, <code>SetOpenWorksetsConfiguration</code>.
+It then calls <code>OpenAndActivateDocument</code> to open the model with worksets closed.
+So, this is only valid for the lifetime of the <code>OpenOptions</code> and the open call needs to be executed immediately.
+The command to not load links is different: for that, an option is set and stored in the model transmission data using <code>TransmissionData.WriteTransmissionData</code>.
+In that case, the option will be remembered and applied next time an open is performed.
+In the sample command, an open follows immediately.
+However, it could also be executed later, and the setting would be retained.
+So, the two methods can both be used to disable loading on the fly, provided the caller does the opening.
+I hardly think the workset config option can be controlled in this manner by the default design automation environment.
+However, in DA, the file to open could be passed in as payload, and the DA add-in could implement the call to open the file itself, couldn't it?</p>
+<p>... I spent some time to verify if the changes remain in the file after closing Revit.
+As said, <code>WriteTransmissionData</code> will store the link unload state in the RVT file.
+But, if a customer wants to keep workset state, they must call <code>Document.SaveAs</code> to save the changes made.</p>
+<p><strong>Response:</strong>
+Here is my code showing how you can unload Revit links as well as CAD links:</p>
+<pre><code class="language-cs">public static Result UnloadRevitLinks(string filePath)
+{
+  FilePath location = new FilePath(filePath);
+  TransmissionData transData = TransmissionData
+    .ReadTransmissionData(location);
+  try
+  {
+    if (transData != null)
+    {
+      ICollection&lt;ElementId&gt; externalReferences
+        = transData.GetAllExternalFileReferenceIds();
+
+      MessageBox.Show("externalReferences" + externalReferences);
+      foreach (ElementId refId in externalReferences)
+      {
+        MessageBox.Show("refId" + refId);
+        ExternalFileReference extRef = transData
+          .GetLastSavedReferenceData(refId);
+
+        MessageBox.Show("extRef" + extRef);
+        if (extRef.ExternalFileReferenceType
+            == ExternalFileReferenceType.RevitLink
+          || extRef.ExternalFileReferenceType
+            == ExternalFileReferenceType.CADLink)
+        {
+          MessageBox.Show("Deleteting revit links");
+          transData.SetDesiredReferenceData(refId,
+            extRef.GetPath(), extRef.PathType, false);
+          MessageBox.Show("All revit links are deleted");
+        }
+      }
+      transData.IsTransmitted = true;
+      TransmissionData.WriteTransmissionData(
+        location, transData);
+      return Result.Succeeded;
+    }
+    else
+    {
+      TaskDialog.Show("Unload Revit Links",
+        "The document does not have any transmission data.");
+      return Result.Failed;
+    }
+  }
+  catch (Exception ex)
+  {
+    MessageBox.Show("ex" + ex);
+    throw;
+  }
+}</code></pre>
+
+<p>Many thanks to <a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/11948904">Archana Sapkal</a> for raising the issue and sharing their solution.</p>
