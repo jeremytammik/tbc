@@ -56,6 +56,13 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Filter for Anonymous Type
 
+Today, we look at some standard filtering question and a typical use of transmission data:
+
+- [Parameter filter for type name](#2)
+- [Cannot delete type in use](#3)
+- [Determine coordination model filepath](#4)
+- [Unload links with transmission data](#5)
+
 ####<a name="2"></a> Parameter Filter for Type Name
 
 Sometimes, the BIM element that you need to access is hard to identify and filter out.
