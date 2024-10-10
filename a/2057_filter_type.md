@@ -34,7 +34,7 @@
 
 twitter:
 
- the @AutodeskRevit #RevitAPI #BIM @DynamoBIM
+ the @AutodeskRevit #RevitAPI #BIM @DynamoBIM https://autode.sk/typefilter
 
 Standard filtering questions and a typical use of transmission data
 &ndash; Parameter filter to delete viewport type
