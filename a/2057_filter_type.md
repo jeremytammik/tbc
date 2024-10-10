@@ -36,7 +36,11 @@ twitter:
 
  the @AutodeskRevit #RevitAPI #BIM @DynamoBIM
 
-&ndash; ...
+Standard filtering questions and a typical use of transmission data
+&ndash; Parameter filter to delete viewport type
+&ndash; Cannot delete type in use
+&ndash; Determine coordination model filepath
+&ndash; Unload links with transmission data...
 
 linkedin:
 
@@ -54,9 +58,9 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Filter for Anonymous Type
+### Unload Links Offline and Filter for Types
 
-Today, we look at some standard filtering question and a typical use of transmission data:
+Let's look at some standard filtering questions and a typical use of transmission data:
 
 - [Parameter filter to delete viewport type](#2)
 - [Cannot delete type in use](#3)
