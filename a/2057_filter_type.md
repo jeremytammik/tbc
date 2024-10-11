@@ -44,7 +44,14 @@ Standard filtering questions and a typical use of transmission data
 
 linkedin:
 
+Standard filtering questions, for arrowhead types, a parameter filter to delete viewport types, determining coordination model filepath and unloading links with transmission data in the #RevitAPI
 
+https://autode.sk/typefilter
+
+- Parameter filter to delete viewport type
+- Cannot delete type in use
+- Determine coordination model filepath
+- Unload links with transmission data...
 
 #BIM #DynamoBIM #AutodeskAPS #Revit #API #IFC #SDK #Autodesk #AEC #adsk
 
