@@ -34,7 +34,7 @@
 
 twitter:
 
- the @AutodeskRevit #RevitAPI #BIM @DynamoBIM https://autode.sk/typefilter
+Standard filtering questions, for arrowhead types, a parameter filter to delete viewport types, determining coordination model filepath and unloading links with transmission data in the @AutodeskRevit #RevitAPI #BIM @DynamoBIM https://autode.sk/typefilter
 
 Standard filtering questions and a typical use of transmission data
 &ndash; Parameter filter to delete viewport type
