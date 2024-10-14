@@ -12,3 +12,37 @@ I have a lot of mass elements and want to create walls from their faces. I can d
 How can I add new parameters to all rooms in a project?
 I'm coding up some structural rebar in C# and could use some advice on how to get solid geometry of rebar.
 How to rotate face based family instances? My code automatically adds hangers to ducts. The code works fine when the duct is horizontal; in these cases, all the hangers are placed properly. However, when the ducts are sloped, the hangers also become aligned. I need help ensuring that the hangers are placed vertically even when the ducts are not perfectly horizontal.
+
+2024-10-11 jeremyGpt
+
+Q1: Does the button "Add to all elements in the selected categories" in the parameter properties dialogue have a Revit API documentation?
+
+A1: No answer is found. The data source provided does not contain any information about the Revit API documentation for the "Add to all elements in the selected categories" button in the parameter properties dialogue.
+Generating an answer based on what I know...
+Based on my knowledge, the "Add to all elements in the selected categories" button in the parameter properties dialog in Revit does have API documentation. This functionality is typically part of the Revit API's parameter management capabilities. However, to provide the most accurate and up-to-date information, I would recommend checking the official Autodesk Revit API documentation or the Revit Developer Center for specific details on how to interact with this feature programmatically. The exact implementation and methods may vary depending on the version of Revit you're working with.
+
+> Bad answer. Better would be: I don't know, and I guess not.
+
+Q2: How can I access the Revit API?
+
+A2: Here is the answer to the question "How can I access the Revit API?":
+The Autodesk Revit API is automatically installed with the default installation of the Autodesk Revit based product. Any .NET based application will reference the RevitAPI.dll and the RevitAPIUI.dll located in the Revit Program directory. The RevitAPI.dll contains methods used to access Revit's application, documents, elements and parameters at the database level. The RevitAPIUI.dll contains the interfaces related to manipulation and customization of the Revit user interface. [1]
+However, the Revit API is single-threaded and only runs within a valid Revit API context, which is only provided by Revit in one of the numerous event handlers defined by the API and runs in the main thread of Revit. This blocks the UI. [2]
+To avoid blocking the UI, you can execute parts of your add-in in a separate modeless thread. The modeless part can release the main thread, allow Revit to continue doing other stuff, and both Revit and the add-in can continue interacting with the user. However, this modeless part of the add-in has no access to the Revit API. [2] [3]
+The preferred (and almost only) way for the modeless part of your add-in to interact with the Revit API and gain access to a valid Revit API context is to implement an external event. The external event can be raised from the modeless part of the add-in, and Revit will then call the corresponding event handler and provide it with a valid Revit API context. [2] [3]
+This approach of using external events for modeless access to the Revit API is discussed in great depth and with many examples by The Building Coder. [2]
+
+> good answer.
+
+Q3: How can I drive Revit automatically though a command line script?
+
+A3: The server stopped responding.
+
+> Hmm. From now on, all questions report this same state.
+
+Thanks. I tried one question that it I did not expect it to know, and it guessed an answer, and that was bad.
+Question 2 it answered OK.
+On question 3, it reported "The server stopped responding."
+No more question were possible, it just kept repeating "The server stopped responding."
+Not very convincing so far.
+Can this be improved?
