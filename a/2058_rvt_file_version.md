@@ -72,6 +72,9 @@
   Ali Atabey
   Thank you both for the information. I'll pass it on to the customer. As I mentioned earlier, they are architects who are new to this process and learning as they go. This information will be very valuable to them.
 
+- Set DataStorage Entity from external application
+  https://forums.autodesk.com/t5/revit-api-forum/set-datastorage-entity-from-external-application/td-p/13085263
+
 - Tesla's 'We, Robot' Event: Everything Revealed in 8 Minutes
   https://youtu.be/Mu-eK72ioDk
   > At Tesla's 'We, Robot' event in Los Angeles, CEO Elon Musk unveils Robotaxi,  a fully autonomous car for less than $30,000, Robovan, a 20 passenger vehicle, and new updates to its humanoid robot, Optimus, for less than the cost of a car.
@@ -113,26 +116,11 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 ### Determine RVT Version
 
 
-####<a name="2"></a>
-
-**Question:**
-
-**Answer:**
-
-
-<pre><code class="language-cs"></code></pre>
 
 <center>
 <img src="img/.png" alt="" title="" width="458"/> <!-- Pixel Height: 600 Pixel Width: 458 -->
 </center>
 
-
-**Response:**
-
-
-Many thanks to
-
-for raising the issue and sharing their solution.
 
 
 ####<a name="2"></a> Determine RVT Version
@@ -152,25 +140,27 @@ Or they want to Determining the RVT File version without Revit, either without u
 wrote, but I am not sure if it applies with latest Revit version.
 https://jeremytammik.github.io/tbc/a/0887_rvt_file_version.htm
 model-info.json
-{
-"Document Information": {
-"RVTVersion": "2022",
-"Project Name": "Project Name",
-"Project Number": "Project Number",
-"Author": "",
-"Project Address": "Enter address here",
-"Project Issue Date": "Issue Date",
-"Project Status": "Project Status",
-"Building Name": "",
-"Client Name": "Owner",
-"Organization Name": "",
-"Organization Description": ""
-},
-"selfDocumentIdentity": {
-"instanceId": "7f832a50-e1dc-4345-86e7-00acd3110a3a",
-"revitNumberOfSaves": 10
-}
-}
+
+<pre><code class="language-json">{
+  "Document Information": {
+    "RVTVersion": "2022",
+    "Project Name": "Project Name",
+    "Project Number": "Project Number",
+    "Author": "",
+    "Project Address": "Enter address here",
+    "Project Issue Date": "Issue Date",
+    "Project Status": "Project Status",
+    "Building Name": "",
+    "Client Name": "Owner",
+    "Organization Name": "",
+    "Organization Description": ""
+  },
+  "selfDocumentIdentity": {
+    "instanceId": "7f832a50-e1dc-4345-86e7-00acd3110a3a",
+    "revitNumberOfSaves": 10
+  }
+}</code></pre>
+
 Ali Atabey
 thank you for the quick response. I‘ll check with the customer. Should I CC you? They are new to APS, so it might just be inexperience.
 Eason Kang
@@ -190,6 +180,53 @@ Xiao Dong Liang
 this customer thinks Model Derivative is even not easy. I think they would not like to try with the more complicated Design Automation :grimacing:
 Ali Atabey
 Thank you both for the information. I'll pass it on to the customer. As I mentioned earlier, they are architects who are new to this process and learning as they go. This information will be very valuable to them.
+
+####<a name="2"></a> Add Extensible Storage Data from EXE
+
+[Mohamed Arshad](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/8461394) explains the detailed steps to launch Revit from an external EXE to modify and save an RVT or RFA document, e.g.,
+to [set `DataStorage` `Entity` from external application](https://forums.autodesk.com/t5/revit-api-forum/set-datastorage-entity-from-external-application/td-p/13085263):
+
+**Question:**
+Exploring options to create `DataStorage` and set entity in Revit document from external application.
+After setting DataStorage entity, I need to save the document.
+This needs to be done running a Revit instance in the background.
+Currently, I was able to create storage and update entity in an add-in.
+How can I achieve the same from a separate `exe`?
+
+The question is, how to start a new Revit instance from an `exe` and access the Revit API to update the data storage entity.
+
+**Answer:**
+You can start Revit from an external `EXE` using [Process.Start](https://duckduckgo.com/?q=process.start).
+
+All the other steps you describe require a valid Revit API context: to create `DataStorage`, set extensinble storage data in its `Entity` and save the document.
+
+One way to obtain a valid Revit API context is to use
+an [external event](https://www.revitapidocs.com/2024/05089477-4612-35b2-81a2-89c4f44370ea.htm).
+Many examples are provided in The Building Coder topic group
+on [`Idling` and external events for modeless access and driving Revit from outside](https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.28).
+
+Here is a possible step-by=step approach:
+
+- Implement your Extensible storage helper methods in a static class.
+- Design a simple standalone application (exe) that starts Revit in a separate process.
+
+<pre><code class="language-cs">static void Main(string[] args)
+{
+  string exeLocation = @"C:\Program Files\Autodesk\Revit 2023\Revit.exe";
+  string arguments = @"/languageENG /runhidden /nosplash";
+
+  ProcessStartInfo revitInfo= new ProcessStartInfo(exeLocation,arguments);
+  Process.Start(revitInfo);
+}</code></pre>
+
+- In the `OnStartup` method your application implements, subscribe to `ApplicationInitialized` event
+- When your add-in receives the event, open the document you want to add data storage by calling the helper methods
+- When the document is opened, perform the process; output whatever you need to output
+- Save and close the document
+- Exit the `ApplicationInitialized` event handler
+- When the standalone application receives the inter-process message from your add-in, kill the Revit process
+
+Many thanks to Mohamed for spelling out the detailed steps.
 
 ####<a name="2"></a> Tesla's Automamous Vehicles and Robots
 
