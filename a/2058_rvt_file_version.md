@@ -22,54 +22,11 @@
   https://thebuildingcoder.typepad.com/blog/2017/06/determining-rvt-file-version-using-python.html#comment-4484205626
   https://autodesk.slack.com/archives/C0PLC20PP/p1728689603509229
   Ali Atabey
-  Hi Team, a customer has the following question. I appriciate your guidance.
-  We use Autodesk APIs to monitor model health via dashboards, but we're having trouble retrieving model version years and cloud GUIDs (e.g., 994d0d57-67d7-4288-a3e8-e9bce5d0cae5). Is there an easier way to access this data than using the Model Derivative API?
   Xiao Dong Liang
-  could you ask the customer to elaborate the demo information that they are seeking for? Since they mentioned Model Derivative, I guess the info is Revit document info like attached demo. This is easiest to me, however, no idea why they still want to have easier way.
-  If they do not want to use cloud services, which means they need to program plugin by Revit API, and depends on the machine has installed Revit.. which is obviously complicated..
-  Or they want to Determining the RVT File version without Revit, either without uploading file to APS cloud (And use Model Derivative) , then they may check the article
-  @Jeremy Tammik
-   wrote, but I am not sure if it applies with latest Revit version.
-  https://jeremytammik.github.io/tbc/a/0887_rvt_file_version.htm
-  model-info.json
-  {
-      "Document Information": {
-          "RVTVersion": "2022",
-          "Project Name": "Project Name",
-          "Project Number": "Project Number",
-          "Author": "",
-          "Project Address": "Enter address here",
-          "Project Issue Date": "Issue Date",
-          "Project Status": "Project Status",
-          "Building Name": "",
-          "Client Name": "Owner",
-          "Organization Name": "",
-          "Organization Description": ""
-      },
-      "selfDocumentIdentity": {
-          "instanceId": "7f832a50-e1dc-4345-86e7-00acd3110a3a",
-          "revitNumberOfSaves": 10
-      }
-  }
-  Ali Atabey
-  thank you for the quick response. I‘ll check with the customer. Should I CC you? They are new to APS, so it might just be inexperience.
   Eason Kang
-  Just FYI, the Regx way in Jeremy’s blog post would not work for recent Revit versions (e.g. 2024, 2025) . A formal reliable way is to use Revit API ‘BasicFileInfo.Extract’ with Design Automation API for Revit instead, which doesn’t require opening the files.
-  https://github.com/yiskang/DA4R-RevitBasicFileInfoExtract
-  If I remember correctly, the regex method doesn’t return version info when testing with Revit 2024 models. (seemed due to scheme changes). A customer reported this issue through https://forge.zendesk.com/agent/tickets/17375
-  Identifying Revit File Version
-  After discussing with the customer, we used Revit API ‘BasicFileInfo.Extract’ with Design Automation API for Revit instead at the end to get the Revit file version year reliably.
-  https://aps.autodesk.com/blog/check-version-revit-file-using-design-automation-api (edited)
-  The DA approach is much more reliable based on my tests.
-  I tried the Regex one with the Revit 2024 file. I spent the whole afternoon trying to find out why it didn’t work at that time, but I failed, and then I wrote the sample addin for DA using Revit API ‘BasicFileInfo.Extract’.
-  Xiao Dong Liang
-  Thanks Eason! so it sounds it has to go with plugin for latest version of Revit files. which means Revit has to be installed..
-  Eason Kang
-  With Design Automation API, the customer should not have to install Revit on his machine, just need to run the workitem, right? :thinking_face: The Revit 2025 version can read RVT version equals and lower than 2025. So, we don’t need to make an app bundle for each Revit version.
-  Xiao Dong Liang
-  this customer thinks Model Derivative is even not easy. I think they would not like to try with the more complicated Design Automation :grimacing:
-  Ali Atabey
-  Thank you both for the information. I'll pass it on to the customer. As I mentioned earlier, they are architects who are new to this process and learning as they go. This information will be very valuable to them.
+
+- I would like to know the version of a rvt file before opening the file in revit
+  https://forums.autodesk.com/t5/revit-api-forum/i-would-like-to-know-the-version-of-a-rvt-file-before-opening/td-p/8403150
 
 - Set DataStorage Entity from external application
   https://forums.autodesk.com/t5/revit-api-forum/set-datastorage-entity-from-external-application/td-p/13085263
@@ -134,15 +91,13 @@ The Building Coder and
 many [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) threads discuss how this can be achieved:
 
 - [RVT File Version](http://thebuildingcoder.typepad.com/blog/2008/10/rvt-file-version.html)
-- [RFA Version and Context, Grey Commands, RDB Link](http://thebuildingcoder.typepad.com/blog/2009/06/rfa-version-grey-commands-family-context-and-rdb-link.html)
+- [RFA File Version](http://thebuildingcoder.typepad.com/blog/2009/06/rfa-version-grey-commands-family-context-and-rdb-link.html#1)
 - [Basic File Info and RVT File Version](http://thebuildingcoder.typepad.com/blog/2013/01/basic-file-info-and-rvt-file-version.html)
-- [Upgrading Family Files Silently, Part 2](http://thebuildingcoder.typepad.com/blog/2014/07/upgrading-family-files-silently-part-2.html)
 - [Determining RVT File Version Using Python](http://thebuildingcoder.typepad.com/blog/2017/06/determining-rvt-file-version-using-python.html)
-- [DA4R I/O, Logging, Updater and Custom Properties](https://thebuildingcoder.typepad.com/blog/2020/04/da4r-io-logging-updater-and-custom-properties.html)
-- [Automatically Open Correct RVT File Version](https://thebuildingcoder.typepad.com/blog/2020/05/automatically-open-correct-rvt-file-version.html#4)
+- [RvtVerFileOpen &ndash; Automatically Open Correct RVT File Version](https://thebuildingcoder.typepad.com/blog/2020/05/automatically-open-correct-rvt-file-version.html#4)
 - [Doc Session Id, API Context and External Events](https://thebuildingcoder.typepad.com/blog/2020/11/document-session-id-api-context-and-external-events.html#4)
 
-The official approach is to use Revit API ‘BasicFileInfo.Extract’;
+The official approach is to use the Revit API ‘BasicFileInfo’;
 Since it is a Revit API method, it requires a Revit session up and running with an appropriuate add-in loaded, but it does not require opening the RVT file in question.
 Some of the previously discussed solutions above work by extracting and analysings strings directly from the raw RVT file, or using the OLE document structure;
 apparently, those solutions no longer work.
@@ -156,78 +111,44 @@ How to determine RVT Version came up again in the following discussion:
 We use [Autodesk Platform Services APS](https://aps.autodesk.com/) APIs to monitor model health via dashboards, but we're having trouble retrieving model version years and cloud GUIDs (e.g., `994d0d57-67d7-4288-a3e8-e9bce5d0cae5`).
 Is there an easier way to access this data than using the Model Derivative API?
 
-Xiao Dong Liang
-could you ask the customer to elaborate the demo information that they are seeking for? Since they mentioned Model Derivative, I guess the info is Revit document info like attached demo. This is easiest to me, however, no idea why they still want to have easier way.
-If they do not want to use cloud services, which means they need to program plugin by Revit API, and depends on the machine has installed Revit.. which is obviously complicated..
-Or they want to Determining the RVT File version without Revit, either without uploading file to APS cloud (And use Model Derivative) , then they may check the article
-@Jeremy Tammik
-wrote, but I am not sure if it applies with latest Revit version.
-https://jeremytammik.github.io/tbc/a/0887_rvt_file_version.htm
-model-info.json
-
-<pre><code class="language-json">{
-  "Document Information": {
-    "RVTVersion": "2022",
-    "Project Name": "Project Name",
-    "Project Number": "Project Number",
-    "Author": "",
-    "Project Address": "Enter address here",
-    "Project Issue Date": "Issue Date",
-    "Project Status": "Project Status",
-    "Building Name": "",
-    "Client Name": "Owner",
-    "Organization Name": "",
-    "Organization Description": ""
-  },
-  "selfDocumentIdentity": {
-    "instanceId": "7f832a50-e1dc-4345-86e7-00acd3110a3a",
-    "revitNumberOfSaves": 10
-  }
-}</code></pre>
-
-
-Eason Kang
-Just FYI, the Regex way in Jeremy’s blog post would not work for recent Revit versions (e.g. 2024, 2025) .
-A formal reliable way is to use Revit API ‘BasicFileInfo.Extract’ with Design Automation API for Revit instead, which doesn’t require opening the files.
-https://github.com/yiskang/DA4R-RevitBasicFileInfoExtract
+**Answer:**
+The Regex approach described in the early blog posts does not work for recent Revit versions, e.g. Revit 2024 and Revit 2025.
+In these versions, you can access the saved version in a formal, reliable way using the Revit API ‘BasicFileInfo’ class, which doesn’t require opening the file in question.
+a Design Automation Sample of extracting `BasicFileInfo` from RVT or RFA file is provided by
+the [DA4R-RevitBasicFileInfoExtract](https://github.com/yiskang/DA4R-RevitBasicFileInfoExtract) project on GitHub.
 
 If I remember correctly, the regex method doesn’t return version info when testing with Revit 2024 models. (seemed due to scheme changes).
-A customer reported this issue through https://forge.zendesk.com/agent/tickets/17375
-Identifying Revit File Version
-After discussing with the customer, we used Revit API ‘BasicFileInfo.Extract’ with Design Automation API for Revit instead at the end to get the Revit file version year reliably.
-https://aps.autodesk.com/blog/check-version-revit-file-using-design-automation-api
+A customer reported this issue in a ticket on *Identifying Revit File Version*.
+We used DA4R-RevitBasicFileInfoExtract with Design Automation API for Revit instead to address this and reliably retrieve the Revit file version year, cf. the article on
+how to [check the version of a Revit file using Design Automation API](https://aps.autodesk.com/blog/check-version-revit-file-using-design-automation-api).
 
-The DA approach is much more reliable based on my tests.
-I tried the Regex one with the Revit 2024 file. I spent the whole afternoon trying to find out why it didn’t work at that time, but I failed, and then I wrote the sample addin for DA using Revit API ‘BasicFileInfo.Extract’.
-Xiao Dong Liang
-it sounds as if it has to go with plugin for latest version of Revit files. which means Revit has to be installed..
-Eason Kang
-With Design Automation API, the customer should not have to install Revit on his machine, just need to run the workitem, right?
-The Revit 2025 version can read RVT version equals and lower than 2025.
-So, we don’t need to make an app bundle for each Revit version.
+The DA approach is much more reliable, based on my tests.
+I tried the Regex one with the Revit 2024 file and spent the whole afternoon trying to find out why it didn’t work, but failed;
+then I wrote the DA4R-RevitBasicFileInfoExtract sample addin for DA instead.
 
-####<a name="3"></a> ?
+With Design Automation API, the customer does not have to install Revit on the local machine, just run the workitem.
+The Revit 2025 version can read all RVT versions equal to and lower than 2025.
+So, no need to make a separate app bundle for each Revit version.
 
-Chuong.Ho
+Many thanks to Eason Kang for this explanation and all his research and documentation.
 
-[know the RVT file version before opening the file in Revit]
+####<a name="3"></a> Read RVT File Version with RevitExtractor
 
-####<a name="4"></a> RevitExtractor
+[Chuong Ho](https://chuongmep.com/) suggested another solution for this topic in
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+on how to [know the version of a RVT file before opening the file in Revit](https://forums.autodesk.com/t5/revit-api-forum/i-would-like-to-know-the-version-of-a-rvt-file-before-opening/td-p/8403150):
 
-Chuong.Ho
-
-[know the RVT file version before opening the file in Revit]
-
-For a simple solution, use [Revit Extractor](https://github.com/chuongmep/revit-extractor);
-make sure you installed the package and use the right command:
+A simple solution is provided by
+using [Revit Extractor](https://github.com/chuongmep/revit-extractor),
+a Python library to easily read data and export Revit data from the native Revit format.
+Make sure you installed the package and use the right command:
 
 <pre><code class="language-py">  from revit_extract import RevitExtractor
   rvt_path = r"D:\_WIP\Download\Sample Office Building Model V1.rvt"
   version = RevitExtractor.get_version(rvt_path)
 print(version)</code></pre>
 
-
-####<a name="5"></a> Add Extensible Storage Data from EXE
+####<a name="4"></a> Add Extensible Storage Data from EXE
 
 [Mohamed Arshad](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/8461394) explains the detailed steps to launch Revit from an external EXE to modify and save an RVT or RFA document, e.g.,
 to [set `DataStorage` `Entity` from external application](https://forums.autodesk.com/t5/revit-api-forum/set-datastorage-entity-from-external-application/td-p/13085263):
@@ -274,7 +195,7 @@ Here is a possible step-by=step approach:
 
 Many thanks to Mohamed for spelling out the detailed steps.
 
-####<a name="6"></a> Tesla's Automamous Vehicles and Robots
+####<a name="5"></a> Tesla's Automamous Vehicles and Robots
 
 Moving away from the Revit API to other AI-related and technical issues,
 Tesla presented plans for automomous vehicles and humanoid robots in an 8-minutes video of
@@ -282,34 +203,34 @@ their [We, Robot Event](https://youtu.be/Mu-eK72ioDk):
 
 > CEO Elon Musk unveils Robotaxi, a fully autonomous car for less than $30,000, Robovan, a 20 passenger vehicle, and new updates to its humanoid robot, Optimus, for less than the cost of a car.
 
-####<a name="7"></a> State of AI Report 2024
+####<a name="6"></a> State of AI Report 2024
 
 Further AI-related news is presented in
 the [State of AI Report 2024](https://www.stateof.ai/).
 
-####<a name="8"></a> Nobel Prize for Science
+####<a name="7"></a> Nobel Prize for Science
 
 The nobel prize for science is also related to AI and depp learning, awarded to
 [John J. Hopfield and Geoffrey E. Hinton, training early artificial neural networks](https://www.nobelprize.org/prizes/physics/2024/press-release/).
 They used [physics to find patterns in information](https://www.nobelprize.org/uploads/2024/10/popular-physicsprize2024-2.pdf);
 Further [Scientific Background to the Nobel Prize in Physics 2024, For Foundational Discoveries And Inventions That Enable Machine Learning With Artificial Neural Networks](https://www.nobelprize.org/uploads/2024/09/advanced-physicsprize2024.pdf).
 
-####<a name="9"></a> AI Illiteracy and Misuse
+####<a name="8"></a> AI Illiteracy and Misuse
 
 One view of the risks associated with AI proposes that
 [AI will not destroy the world &ndash; AI illiteracy and misuse could](https://www.forbes.com/sites/luisromero/2024/10/08/ai-will-not-destroy-the-world-ai-illiteracy-and-misuse-could/).
 
-####<a name="10"></a> The Techno-Pro Attitude
+####<a name="9"></a> The Techno-Pro Attitude
 
 Another interesting philosophical discussion looks critically at scientific progress in general:
 analysing [The Techno-Pro Attitude](https://cacm.acm.org/article/do-all-problems-have-technical-fixes/),
 Robin K. Hill suggests we look at the underlying presumption of the technology imperative.
 
-####<a name="11"></a> Jevons Paradox
+####<a name="10"></a> Jevons Paradox
 
-In closing, I noted
+Let's end mentioning another common fallacy,
 the [Jevons paradox](https://en.wikipedia.org/wiki/Jevons_paradox);
 it occurs when technological progress increases the efficiency with which a resource is used (reducing the amount necessary for any one use), but the falling cost of use induces increases in demand enough that resource use is increased, rather than reduced.
 Governments, both historical and modern, typically expect that energy efficiency gains will lower energy consumption, rather than expecting the Jevons paradox.
-Right now, Switzerland is about to vote on increasing motorway capacity, hoping to reduce traffic jams, possibly heading straight into another unfortunate example of the Jevons paradox.
+On November 24, Switzerland will vote on whether to spend increasing motorway capacity, hoping to reduce traffic jams, possibly heading straight into another unfortunate example of the Jevons paradox.
 
