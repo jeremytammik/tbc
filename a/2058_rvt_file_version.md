@@ -276,43 +276,40 @@ Many thanks to Mohamed for spelling out the detailed steps.
 
 ####<a name="6"></a> Tesla's Automamous Vehicles and Robots
 
-Tesla's 'We, Robot' Event: Everything Revealed in 8 Minutes
-https://youtu.be/Mu-eK72ioDk
+Moving away from the Revit API to other AI-related and technical issues,
+Tesla presented plans for automomous vehicles and humanoid robots in an 8-minutes video of
+their [We, Robot Event](https://youtu.be/Mu-eK72ioDk):
 
-> At Tesla's 'We, Robot' event in Los Angeles, CEO Elon Musk unveils Robotaxi,  a fully autonomous car for less than $30,000, Robovan, a 20 passenger vehicle, and new updates to its humanoid robot, Optimus, for less than the cost of a car.
+> CEO Elon Musk unveils Robotaxi, a fully autonomous car for less than $30,000, Robovan, a 20 passenger vehicle, and new updates to its humanoid robot, Optimus, for less than the cost of a car.
 
 ####<a name="7"></a> State of AI Report 2024
 
-State of AI Report 2024
-https://www.stateof.ai/
+Further AI-related news is presented in
+the [State of AI Report 2024](https://www.stateof.ai/).
 
-####<a name="8"></a> AI Illiteracy and Misuse
+####<a name="8"></a> Nobel Prize for Science
 
-- AI Will Not Destroy The World—AI Illiteracy And Misuse Could
-https://www.forbes.com/sites/luisromero/2024/10/08/ai-will-not-destroy-the-world-ai-illiteracy-and-misuse-could/
+The nobel prize for science is also related to AI and depp learning, awarded to
+[John J. Hopfield and Geoffrey E. Hinton, training early artificial neural networks](https://www.nobelprize.org/prizes/physics/2024/press-release/).
+They used [physics to find patterns in information](https://www.nobelprize.org/uploads/2024/10/popular-physicsprize2024-2.pdf);
+Further [Scientific Background to the Nobel Prize in Physics 2024, For Foundational Discoveries And Inventions That Enable Machine Learning With Artificial Neural Networks](https://www.nobelprize.org/uploads/2024/09/advanced-physicsprize2024.pdf).
 
-####<a name="9"></a> Nobel Prize for Science
+####<a name="9"></a> AI Illiteracy and Misuse
 
-- nobel prize
-John J. Hopfield and Geoffrey E. Hinton trained artificial neural networks using physics
-https://www.nobelprize.org/prizes/physics/2024/press-release/
-They used physics to find patterns in information
-https://www.nobelprize.org/uploads/2024/10/popular-physicsprize2024-2.pdf
-Scientific Background to the Nobel Prize in Physics 2024: “For Foundational Discoveries And Inventions That Enable Machine Learning With Artificial Neural Networks”
-https://www.nobelprize.org/uploads/2024/09/advanced-physicsprize2024.pdf
+One view of the risks associated with AI proposes that
+[AI will not destroy the world &ndash; AI illiteracy and misuse could](https://www.forbes.com/sites/luisromero/2024/10/08/ai-will-not-destroy-the-world-ai-illiteracy-and-misuse-could/).
 
 ####<a name="10"></a> The Techno-Pro Attitude
 
-Let's also look critically at scientific progress
-
-- The Techno-Pro Attitude
-  https://cacm.acm.org/article/do-all-problems-have-technical-fixes/
-  Robin K. Hill suggests we look at the underlying presumption of the technology imperative.
-  philosophisches traktat
+Another interesting philosophical discussion looks critically at scientific progress in general:
+analysing [The Techno-Pro Attitude](https://cacm.acm.org/article/do-all-problems-have-technical-fixes/),
+Robin K. Hill suggests we look at the underlying presumption of the technology imperative.
 
 ####<a name="11"></a> Jevons Paradox
 
-[Jevons paradox](https://en.wikipedia.org/wiki/Jevons_paradox) occurs when technological progress increases the efficiency with which a resource is used (reducing the amount necessary for any one use), but the falling cost of use induces increases in demand enough that resource use is increased, rather than reduced.
+In closing, I noted
+the [Jevons paradox](https://en.wikipedia.org/wiki/Jevons_paradox);
+it occurs when technological progress increases the efficiency with which a resource is used (reducing the amount necessary for any one use), but the falling cost of use induces increases in demand enough that resource use is increased, rather than reduced.
 Governments, both historical and modern, typically expect that energy efficiency gains will lower energy consumption, rather than expecting the Jevons paradox.
-Right now, Switzerland is about to vote on increasing motorway capacity, possibly heading straight into another example of Jevons paradox.
+Right now, Switzerland is about to vote on increasing motorway capacity, hoping to reduce traffic jams, possibly heading straight into another unfortunate example of the Jevons paradox.
 
