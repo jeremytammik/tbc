@@ -83,13 +83,6 @@ A fresh look at the venerable topic of determining the RVT file version, a short
 - [The techno-pro attitude](#9)
 - [Jevons paradox](#10)
 
-
-<center>
-<img src="img/.png" alt="" title="" width="458"/> <!-- Pixel Height: 600 Pixel Width: 458 -->
-</center>
-
-
-
 ####<a name="2"></a> Determine RVT File Version
 
 The RVT file version is the version of Revit that was used to save an RVT project document.
@@ -153,10 +146,14 @@ using [Revit Extractor](https://github.com/chuongmep/revit-extractor),
 a Python library to easily read data and export Revit data from the native Revit format.
 Make sure you installed the package and use the right command:
 
-<pre><code class="language-py">  from revit_extract import RevitExtractor
-  rvt_path = r"D:\_WIP\Download\Sample Office Building Model V1.rvt"
-  version = RevitExtractor.get_version(rvt_path)
+<pre><code class="language-py">from revit_extract import RevitExtractor
+rvt_path = r"D:\_WIP\Download\Sample Office Building Model V1.rvt"
+version = RevitExtractor.get_version(rvt_path)
 print(version)</code></pre>
+
+<center>
+<img src="img/revitextractor.png" alt="RevitExtractor" title="RevitExtractor" width="400"/> <!-- Pixel Height: 435 Pixel Width: 1,067 -->
+</center>
 
 ####<a name="4"></a> Add Extensible Storage Data from EXE
 

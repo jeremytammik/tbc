@@ -81,9 +81,6 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 <li><a href="#9">The techno-pro attitude</a></li>
 <li><a href="#10">Jevons paradox</a></li>
 </ul>
-<p><center>
-<img src="img/.png" alt="" title="" width="458"/> <!-- Pixel Height: 600 Pixel Width: 458 -->
-</center></p>
 <h4><a name="2"></a> Determine RVT File Version</h4>
 <p>The RVT file version is the version of Revit that was used to save an RVT project document.
 Revit can open RVT files saved by earlier versions of Revit, and not those saved by later versions.
@@ -134,11 +131,14 @@ on how to <a href="https://forums.autodesk.com/t5/revit-api-forum/i-would-like-t
 using <a href="https://github.com/chuongmep/revit-extractor">Revit Extractor</a>,
 a Python library to easily read data and export Revit data from the native Revit format.
 Make sure you installed the package and use the right command:</p>
-<pre><code class="language-py">  from revit_extract import RevitExtractor
-  rvt_path = r"D:\_WIP\Download\Sample Office Building Model V1.rvt"
-  version = RevitExtractor.get_version(rvt_path)
+<pre><code class="language-py">from revit_extract import RevitExtractor
+rvt_path = r"D:\_WIP\Download\Sample Office Building Model V1.rvt"
+version = RevitExtractor.get_version(rvt_path)
 print(version)</code></pre>
 
+<p><center>
+<img src="img/revitextractor.png" alt="RevitExtractor" title="RevitExtractor" width="400"/> <!-- Pixel Height: 435 Pixel Width: 1,067 -->
+</center></p>
 <h4><a name="4"></a> Add Extensible Storage Data from EXE</h4>
 <p><a href="https://forums.autodesk.com/t5/user/viewprofilepage/user-id/8461394">Mohamed Arshad</a> explains the detailed steps to launch Revit from an external EXE to modify and save an RVT or RFA document, e.g.,
 to <a href="https://forums.autodesk.com/t5/revit-api-forum/set-datastorage-entity-from-external-application/td-p/13085263">set <code>DataStorage</code> <code>Entity</code> from external application</a>:</p>
