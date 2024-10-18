@@ -52,7 +52,17 @@ twitter:
 
  the @AutodeskRevit #RevitAPI #BIM @DynamoBIM
 
-&ndash; ...
+
+Determine RVT file version and add extensible storage data from EXE, AI- and tech-related news
+&ndash; Determine RVT file version
+&ndash; RVT file version with RevitExtractor
+&ndash; Add extensible storage data from EXE
+&ndash; Tesla autonomous vehicles and robots
+&ndash; State of AI Report 2024
+&ndash; Nobel prize for science
+&ndash; AI illiteracy and misuse
+&ndash; The techno-pro attitude
+&ndash; Jevons paradox...
 
 linkedin:
 
@@ -68,7 +78,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-<h3>Determine RVT Version</h3>
+<h3>Determine RVT Version and Add Data from EXE</h3>
 <p>A fresh look at the venerable topic of determining the RVT file version, a short example of driving Revit from outside to add extensible storage data, and lots of AI- and tech-related snippets:</p>
 <ul>
 <li><a href="#2">Determine RVT file version</a></li>
@@ -97,11 +107,11 @@ many <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API 
 <li><a href="https://thebuildingcoder.typepad.com/blog/2020/05/automatically-open-correct-rvt-file-version.html#4">RvtVerFileOpen &ndash; Automatically Open Correct RVT File Version</a></li>
 <li><a href="https://thebuildingcoder.typepad.com/blog/2020/11/document-session-id-api-context-and-external-events.html#4">Doc Session Id, API Context and External Events</a></li>
 </ul>
-<p>The official approach is to use the Revit API ‘BasicFileInfo’;
+<p>The official approach is to use the Revit API <code>BasicFileInfo</code>;
 Since it is a Revit API method, it requires a Revit session up and running with an appropriate add-in loaded, but it does not require opening the RVT file in question.
 Some of the previously discussed solutions above work by extracting and analysing strings directly from the raw RVT file, or using the OLE document structure;
 apparently, those solutions no longer work.</p>
-<p>By the way, another use of ‘BasicFileInfo` was discussed last week
+<p>By the way, another use of <code>BasicFileInfo</code> was discussed last week
 to <a href="https://thebuildingcoder.typepad.com/blog/2024/10/unload-links-offline-and-filter-for-types.html#5">unload links with transmission data</a>.</p>
 <p>How to determine RVT Version came up again in the following discussion:</p>
 <p><strong>Question:</strong>
@@ -109,7 +119,7 @@ We use <a href="https://aps.autodesk.com/">Autodesk Platform Services APS</a> AP
 Is there an easier way to access this data than using the Model Derivative API?</p>
 <p><strong>Answer:</strong>
 The Regex approach described in the early blog posts does not work for recent Revit versions, e.g. Revit 2024 and Revit 2025.
-In these versions, you can access the saved version in a formal, reliable way using the Revit API ‘BasicFileInfo’ class, which doesn’t require opening the file in question.
+In these versions, you can access the saved version in a formal, reliable way using the Revit API <code>BasicFileInfo</code> class, which doesn’t require opening the file in question.
 a Design Automation Sample of extracting <code>BasicFileInfo</code> from RVT or RFA file is provided by
 the <a href="https://github.com/yiskang/DA4R-RevitBasicFileInfoExtract">DA4R-RevitBasicFileInfoExtract</a> project on GitHub.</p>
 <p>If I remember correctly, the regex method doesn’t return version info when testing with Revit 2024 models. (seemed due to scheme changes).
@@ -206,4 +216,4 @@ Robin K. Hill suggests we look at the underlying presumption of the technology i
 the <a href="https://en.wikipedia.org/wiki/Jevons_paradox">Jevons paradox</a>;
 it occurs when technological progress increases the efficiency with which a resource is used (reducing the amount necessary for any one use), but the falling cost of use induces increases in demand enough that resource use is increased, rather than reduced.
 Governments, both historical and modern, typically expect that energy efficiency gains will lower energy consumption, rather than expecting the Jevons paradox.
-On November 24, Switzerland will vote on whether to spend increasing motorway capacity, hoping to reduce traffic jams, possibly heading straight into another unfortunate example of the Jevons paradox.</p>
+On November 24, Switzerland will vote on whether to spend heavily to increase motorway bottleneck capacity, hoping to reduce traffic jams, possibly heading straight into another unfortunate example of the Jevons paradox.</p>

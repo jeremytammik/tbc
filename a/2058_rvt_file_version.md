@@ -53,7 +53,17 @@ twitter:
 
  the @AutodeskRevit #RevitAPI #BIM @DynamoBIM
 
-&ndash; ...
+
+Determine RVT file version and add extensible storage data from EXE, AI- and tech-related news
+&ndash; Determine RVT file version
+&ndash; RVT file version with RevitExtractor
+&ndash; Add extensible storage data from EXE
+&ndash; Tesla autonomous vehicles and robots
+&ndash; State of AI Report 2024
+&ndash; Nobel prize for science
+&ndash; AI illiteracy and misuse
+&ndash; The techno-pro attitude
+&ndash; Jevons paradox...
 
 linkedin:
 
@@ -69,7 +79,7 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 -->
 
-### Determine RVT Version
+### Determine RVT Version and Add Data from EXE
 
 A fresh look at the venerable topic of determining the RVT file version, a short example of driving Revit from outside to add extensible storage data, and lots of AI- and tech-related snippets:
 
@@ -100,12 +110,12 @@ many [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/
 - [RvtVerFileOpen &ndash; Automatically Open Correct RVT File Version](https://thebuildingcoder.typepad.com/blog/2020/05/automatically-open-correct-rvt-file-version.html#4)
 - [Doc Session Id, API Context and External Events](https://thebuildingcoder.typepad.com/blog/2020/11/document-session-id-api-context-and-external-events.html#4)
 
-The official approach is to use the Revit API ‘BasicFileInfo’;
+The official approach is to use the Revit API `BasicFileInfo`;
 Since it is a Revit API method, it requires a Revit session up and running with an appropriate add-in loaded, but it does not require opening the RVT file in question.
 Some of the previously discussed solutions above work by extracting and analysing strings directly from the raw RVT file, or using the OLE document structure;
 apparently, those solutions no longer work.
 
-By the way, another use of ‘BasicFileInfo` was discussed last week
+By the way, another use of `BasicFileInfo` was discussed last week
 to [unload links with transmission data](https://thebuildingcoder.typepad.com/blog/2024/10/unload-links-offline-and-filter-for-types.html#5).
 
 How to determine RVT Version came up again in the following discussion:
@@ -116,7 +126,7 @@ Is there an easier way to access this data than using the Model Derivative API?
 
 **Answer:**
 The Regex approach described in the early blog posts does not work for recent Revit versions, e.g. Revit 2024 and Revit 2025.
-In these versions, you can access the saved version in a formal, reliable way using the Revit API ‘BasicFileInfo’ class, which doesn’t require opening the file in question.
+In these versions, you can access the saved version in a formal, reliable way using the Revit API `BasicFileInfo` class, which doesn’t require opening the file in question.
 a Design Automation Sample of extracting `BasicFileInfo` from RVT or RFA file is provided by
 the [DA4R-RevitBasicFileInfoExtract](https://github.com/yiskang/DA4R-RevitBasicFileInfoExtract) project on GitHub.
 
@@ -239,5 +249,5 @@ Let's end mentioning another common fallacy,
 the [Jevons paradox](https://en.wikipedia.org/wiki/Jevons_paradox);
 it occurs when technological progress increases the efficiency with which a resource is used (reducing the amount necessary for any one use), but the falling cost of use induces increases in demand enough that resource use is increased, rather than reduced.
 Governments, both historical and modern, typically expect that energy efficiency gains will lower energy consumption, rather than expecting the Jevons paradox.
-On November 24, Switzerland will vote on whether to spend increasing motorway capacity, hoping to reduce traffic jams, possibly heading straight into another unfortunate example of the Jevons paradox.
+On November 24, Switzerland will vote on whether to spend heavily to increase motorway bottleneck capacity, hoping to reduce traffic jams, possibly heading straight into another unfortunate example of the Jevons paradox.
 
