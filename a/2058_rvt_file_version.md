@@ -71,7 +71,17 @@ the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/b
 
 ### Determine RVT Version
 
-A fresh look at the venerable topic of determining the RVT file version, and
+A fresh look at the venerable topic of determining the RVT file version, a short example of driving Revit from outside to add extensible storage data, and lots of AI- and tech-related snippets:
+
+- [Determine RVT file version](#2)
+- [RVT file version with RevitExtractor](#3)
+- [Add extensible storage data from EXE](#4)
+- [Tesla autonomous vehicles and robots](#5)
+- [State of AI Report 2024](#6)
+- [Nobel prize for science](#7)
+- [AI illiteracy and misuse](#8)
+- [The techno-pro attitude](#9)
+- [Jevons paradox](#10)
 
 
 <center>
@@ -80,7 +90,7 @@ A fresh look at the venerable topic of determining the RVT file version, and
 
 
 
-####<a name="2"></a> Determine RVT Version
+####<a name="2"></a> Determine RVT File Version
 
 The RVT file version is the version of Revit that was used to save an RVT project document.
 Revit can open RVT files saved by earlier versions of Revit, and not those saved by later versions.
@@ -132,7 +142,7 @@ So, no need to make a separate app bundle for each Revit version.
 
 Many thanks to Eason Kang for this explanation and all his research and documentation.
 
-####<a name="3"></a> Read RVT File Version with RevitExtractor
+####<a name="3"></a> RVT File Version with RevitExtractor
 
 [Chuong Ho](https://chuongmep.com/) suggested another solution for this topic in
 the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
@@ -195,7 +205,7 @@ Here is a possible step-by=step approach:
 
 Many thanks to Mohamed for spelling out the detailed steps.
 
-####<a name="5"></a> Tesla's Automamous Vehicles and Robots
+####<a name="5"></a> Tesla Autonomous Vehicles and Robots
 
 Moving away from the Revit API to other AI-related and technical issues,
 Tesla presented plans for automomous vehicles and humanoid robots in an 8-minutes video of
