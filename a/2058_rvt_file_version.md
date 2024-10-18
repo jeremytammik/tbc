@@ -101,8 +101,8 @@ many [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/
 - [Doc Session Id, API Context and External Events](https://thebuildingcoder.typepad.com/blog/2020/11/document-session-id-api-context-and-external-events.html#4)
 
 The official approach is to use the Revit API ‘BasicFileInfo’;
-Since it is a Revit API method, it requires a Revit session up and running with an appropriuate add-in loaded, but it does not require opening the RVT file in question.
-Some of the previously discussed solutions above work by extracting and analysings strings directly from the raw RVT file, or using the OLE document structure;
+Since it is a Revit API method, it requires a Revit session up and running with an appropriate add-in loaded, but it does not require opening the RVT file in question.
+Some of the previously discussed solutions above work by extracting and analysing strings directly from the raw RVT file, or using the OLE document structure;
 apparently, those solutions no longer work.
 
 By the way, another use of ‘BasicFileInfo` was discussed last week
@@ -172,7 +172,7 @@ The question is, how to start a new Revit instance from an `exe` and access the 
 **Answer:**
 You can start Revit from an external `EXE` using [Process.Start](https://duckduckgo.com/?q=process.start).
 
-All the other steps you describe require a valid Revit API context: to create `DataStorage`, set extensinble storage data in its `Entity` and save the document.
+All the other steps you describe require a valid Revit API context: to create `DataStorage`, set extensible storage data in its `Entity` and save the document.
 
 One way to obtain a valid Revit API context is to use
 an [external event](https://www.revitapidocs.com/2024/05089477-4612-35b2-81a2-89c4f44370ea.htm).
@@ -205,7 +205,7 @@ Many thanks to Mohamed for spelling out the detailed steps.
 ####<a name="5"></a> Tesla Autonomous Vehicles and Robots
 
 Moving away from the Revit API to other AI-related and technical issues,
-Tesla presented plans for automomous vehicles and humanoid robots in an 8-minutes video of
+Tesla presented plans for autonomous vehicles and humanoid robots in an 8-minutes video of
 their [We, Robot Event](https://youtu.be/Mu-eK72ioDk):
 
 > CEO Elon Musk unveils Robotaxi, a fully autonomous car for less than $30,000, Robovan, a 20 passenger vehicle, and new updates to its humanoid robot, Optimus, for less than the cost of a car.
@@ -217,7 +217,7 @@ the [State of AI Report 2024](https://www.stateof.ai/).
 
 ####<a name="7"></a> Nobel Prize for Science
 
-The nobel prize for science is also related to AI and depp learning, awarded to
+The Nobel prize for science is also related to AI and deep learning, awarded to
 [John J. Hopfield and Geoffrey E. Hinton, training early artificial neural networks](https://www.nobelprize.org/prizes/physics/2024/press-release/).
 They used [physics to find patterns in information](https://www.nobelprize.org/uploads/2024/10/popular-physicsprize2024-2.pdf);
 Further [Scientific Background to the Nobel Prize in Physics 2024, For Foundational Discoveries And Inventions That Enable Machine Learning With Artificial Neural Networks](https://www.nobelprize.org/uploads/2024/09/advanced-physicsprize2024.pdf).

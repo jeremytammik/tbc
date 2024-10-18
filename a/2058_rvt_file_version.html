@@ -98,8 +98,8 @@ many <a href="http://forums.autodesk.com/t5/revit-api-forum/bd-p/160">Revit API 
 <li><a href="https://thebuildingcoder.typepad.com/blog/2020/11/document-session-id-api-context-and-external-events.html#4">Doc Session Id, API Context and External Events</a></li>
 </ul>
 <p>The official approach is to use the Revit API ‘BasicFileInfo’;
-Since it is a Revit API method, it requires a Revit session up and running with an appropriuate add-in loaded, but it does not require opening the RVT file in question.
-Some of the previously discussed solutions above work by extracting and analysings strings directly from the raw RVT file, or using the OLE document structure;
+Since it is a Revit API method, it requires a Revit session up and running with an appropriate add-in loaded, but it does not require opening the RVT file in question.
+Some of the previously discussed solutions above work by extracting and analysing strings directly from the raw RVT file, or using the OLE document structure;
 apparently, those solutions no longer work.</p>
 <p>By the way, another use of ‘BasicFileInfo` was discussed last week
 to <a href="https://thebuildingcoder.typepad.com/blog/2024/10/unload-links-offline-and-filter-for-types.html#5">unload links with transmission data</a>.</p>
@@ -151,7 +151,7 @@ How can I achieve the same from a separate <code>exe</code>?</p>
 <p>The question is, how to start a new Revit instance from an <code>exe</code> and access the Revit API to update the data storage entity.</p>
 <p><strong>Answer:</strong>
 You can start Revit from an external <code>EXE</code> using <a href="https://duckduckgo.com/?q=process.start">Process.Start</a>.</p>
-<p>All the other steps you describe require a valid Revit API context: to create <code>DataStorage</code>, set extensinble storage data in its <code>Entity</code> and save the document.</p>
+<p>All the other steps you describe require a valid Revit API context: to create <code>DataStorage</code>, set extensible storage data in its <code>Entity</code> and save the document.</p>
 <p>One way to obtain a valid Revit API context is to use
 an <a href="https://www.revitapidocs.com/2024/05089477-4612-35b2-81a2-89c4f44370ea.htm">external event</a>.
 Many examples are provided in The Building Coder topic group
@@ -181,7 +181,7 @@ on <a href="https://thebuildingcoder.typepad.com/blog/about-the-author.html#5.28
 <p>Many thanks to Mohamed for spelling out the detailed steps.</p>
 <h4><a name="5"></a> Tesla Autonomous Vehicles and Robots</h4>
 <p>Moving away from the Revit API to other AI-related and technical issues,
-Tesla presented plans for automomous vehicles and humanoid robots in an 8-minutes video of
+Tesla presented plans for autonomous vehicles and humanoid robots in an 8-minutes video of
 their <a href="https://youtu.be/Mu-eK72ioDk">We, Robot Event</a>:</p>
 <blockquote>
 <p>CEO Elon Musk unveils Robotaxi, a fully autonomous car for less than $30,000, Robovan, a 20 passenger vehicle, and new updates to its humanoid robot, Optimus, for less than the cost of a car.</p>
@@ -190,7 +190,7 @@ their <a href="https://youtu.be/Mu-eK72ioDk">We, Robot Event</a>:</p>
 <p>Further AI-related news is presented in
 the <a href="https://www.stateof.ai/">State of AI Report 2024</a>.</p>
 <h4><a name="7"></a> Nobel Prize for Science</h4>
-<p>The nobel prize for science is also related to AI and depp learning, awarded to
+<p>The Nobel prize for science is also related to AI and deep learning, awarded to
 <a href="https://www.nobelprize.org/prizes/physics/2024/press-release/">John J. Hopfield and Geoffrey E. Hinton, training early artificial neural networks</a>.
 They used <a href="https://www.nobelprize.org/uploads/2024/10/popular-physicsprize2024-2.pdf">physics to find patterns in information</a>;
 Further <a href="https://www.nobelprize.org/uploads/2024/09/advanced-physicsprize2024.pdf">Scientific Background to the Nobel Prize in Physics 2024, For Foundational Discoveries And Inventions That Enable Machine Learning With Artificial Neural Networks</a>.</p>
