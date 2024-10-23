@@ -1,0 +1,147 @@
+<p><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bc.css"></p>
+<!-- https://highlightjs.org/#usage
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+-->
+
+<!-- https://prismjs.com -->
+<p><link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css" rel="stylesheet" /></p>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+<style> code[class*=language-], pre[class*=language-] { font-size : 90%; } </style>
+
+<p></head></p>
+<!---
+
+- Revit 2025.3
+  updated App Manager
+  REVIT_2025_3_SDK.msi
+  updated SDK page
+  https://aps.autodesk.com/developer/overview/revit
+  check if the product is out before blogging about it
+  https://www.autodesk.com/blogs/aec/2024/10/15/autodesk-revit-2025-3/
+  What’s New and Improved in Revit 2025.3
+
+- #AU2024 #Revit API Wish 1 &ndash; turn off annotations for all links in a view
+  https://boostyourbim.wordpress.com/2024/10/16/au2024-revit-api-wish-1/
+
+- #AU2024 Wish 2 &ndash; select objects by picking subcategory
+  https://boostyourbim.wordpress.com/2024/10/16/au2024-wish-2/
+
+- https://autodesk.slack.com/archives/C016D5HE66T/p1729611101222799
+  [Introducing computer use, a new Claude 3.5 Sonnet, and Claude 3.5 Haiku](https://www.anthropic.com/news/3-5-models-and-computer-use)
+  two-minute video
+  on [Claude | Computer use for automating operations](https://youtu.be/ODaHJzOyVCQ)
+  BUILD WITH CLAUDE documentation
+  on [computer use (beta)](https://docs.anthropic.com/en/docs/build-with-claude/computer-use)
+
+
+twitter:
+
+ the @AutodeskRevit #RevitAPI #BIM @DynamoBIM https://thebuildingcoder.typepad.com/blog/2024/10/determine-rvt-version-and-add-data-from-exe.html
+
+
+&ndash; ...
+
+linkedin:
+
+#BIM #DynamoBIM #AutodeskAPS #Revit #API #IFC #SDK #Autodesk #AEC #adsk
+
+the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
+
+<center>
+<img src="img/" alt="" title="" width="600"/>
+<p style="font-size: 80%; font-style:italic"></p>
+<a href="img/.gif"><p style="font-size: 80%; font-style:italic">Click for animation</p></a>
+</center>
+
+-->
+
+<h3>Revit 2025.3 and AU Wishes</h3>
+<p>AU is over and Revit 2025.3 has been released:</p>
+<ul>
+<li><a href="#2">Revit 2025.3</a></li>
+<li><a href="#3">Revit 2025.3 SDK</a></li>
+<li><a href="#4">Boost Your BIM AU API wishes</a></li>
+<li><a href="#5">Claude computer use does stuff</a></li>
+</ul>
+<h4><a name="2"></a> Revit 2025.3</h4>
+<p>Revit 2025.3 has been released.
+An overview of the new features is provided by The Factory
+in <a href="https://www.autodesk.com/blogs/aec/2024/10/15/autodesk-revit-2025-3/">what’s new and improved in Revit 2025.3</a>.
+Highlights at a glance:</p>
+<ul>
+<li>Productivity enhancements for documentation production</li>
+<li>Performance and user experience improvements, including your UI readability feedback</li>
+<li>Export ceiling grids to IFC</li>
+<li>Modernized UI for load cases and combinations</li>
+<li>Rebar group sets when exporting to IFC</li>
+<li>Duplicate layers for system families</li>
+<li>Add-in manager</li>
+<li>Background PDF export initialization dialog</li>
+<li>In-context spell check</li>
+<li>New updates for Autodesk Insight, including direct data exchange for more automation in AIA2030 reporting</li>
+<li>Recenter room reference lines and room tags</li>
+</ul>
+<p>Of special interest to users and developers alike, the updated Add-In Manager enables you to identify all installed add-ins for each version of Revit, simply enable or disable individual add-ins before opening Revit and provides more visibility on critical insights like the load time of each add-in so that you can make easy and informed decisions about which add-ins may be reducing the time for you to get to work in Revit:</p>
+<p><center>
+<img src="img/2025_3_addin_manager.png" alt="Add-in manager" title="Add-in manager" width="500"/>
+</center></p>
+<h4><a name="3"></a> Revit 2025.3 SDK</h4>
+<!-- REVIT_2025_3_SDK.msi -->
+
+<p>The Revit SDK has been updated for Revit 2025.3, and the new version is available from
+the <a href="https://aps.autodesk.com/developer/overview/revit">Revit developer page</a>.</p>
+<p>I compared the Revit 2025 SDK with the new version and created <a href="doc/2025_3_file_diff.txt">a list of differing files</a>.
+Note the following new files:</p>
+<ul>
+<li>./Samples/AnalysisVisualizationFramework/DistanceToSurfaces/CS/<ul>
+<li>Command.cs</li>
+<li>DistanceToSurfaces.addin</li>
+<li>DistanceToSurfaces.csproj</li>
+<li>ReadMe_DistanceToSurfaces.rtf</li>
+</ul>
+</li>
+<li>./Samples/ExternalResourceServer/ExternalResourceDBServer/CS/<ul>
+<li>ServerInterfaceExtensionsForRevitLinks.cs</li>
+</ul>
+</li>
+<li>./Samples/Massing/DividedSurfaceByIntersects/CS/<ul>
+<li>Command.cs</li>
+<li>DividedSurfaceByIntersects.addin</li>
+<li>DividedSurfaceByIntersects.csproj</li>
+<li>Properties/AssemblyInfo.cs</li>
+<li>ReadMe_DividedSurfaceByIntersects.rtf</li>
+</ul>
+</li>
+<li>./Structural Analysis SDK/Examples/Concrete/CodeCheckingConcreteExample/<ul>
+<li>Concrete/InternalForcesSurface.cs</li>
+<li>Main/Calculation/SurfaceSection.cs</li>
+<li>Main/ResultSurfaceElement.cs</li>
+<li>Server/ServerResultsSurface.cs</li>
+<li>Utility/ResultInPointSurface.cs</li>
+</ul>
+</li>
+</ul>
+<p>So, we seem to have gained a new external command or two and some other enhancements.</p>
+<h4><a name="4"></a> Boost Your BIM AU API Wishes</h4>
+<p>Once again, Harry Mattison of <a href="https://x.com/BoostYourBIM">Boost Your BIM</a> fulfilled several AU API wishes that yoou might weant to check out:</p>
+<ol>
+<li><a href="https://boostyourbim.wordpress.com/2024/10/16/au2024-revit-api-wish-1/">Turn off annotations for all links in a view</a></li>
+<li><a href="https://boostyourbim.wordpress.com/2024/10/16/au2024-wish-2/">Select objects by picking subcategory</a></li>
+</ol>
+<p>Many thanks to Harry for sharing these and once again proving that a lot can be achieved with the Revit API.</p>
+<h4><a name="5"></a> Claude Computer Use Does Stuff</h4>
+<p>Anthropic announced
+<a href="https://www.anthropic.com/news/3-5-models-and-computer-use">computer use, a new Claude 3.5 Sonnet, and Claude 3.5 Haiku</a>.</p>
+<p>To understand what this can mean, watch the two-minute video
+on <a href="https://youtu.be/ODaHJzOyVCQ">Claude computer use for automating operations</a>:</p>
+<iframe width="480" height="270" src="https://www.youtube.com/embed/ODaHJzOyVCQ?si=xCV1TQmyech5AxRp" title="Claude computer use for automating operations" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+<p>It is already generating quite a stir in social media and
+the <a href="https://duckduckgo.com/?q=claude+computer+use">Internet in general</a>.</p>
+<p>For more details, check out the Claude documentation
+on <a href="https://docs.anthropic.com/en/docs/build-with-claude/computer-use">computer use (beta)</a>.</p>
