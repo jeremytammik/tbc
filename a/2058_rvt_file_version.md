@@ -176,7 +176,7 @@ version = RevitExtractor.get_version(rvt_path)
 print(version)</code></pre>
 
 <center>
-<img src="img/revitextractor.png" alt="RevitExtractor" title="RevitExtractor" width="400"/> -- Pixel Height: 435 Pixel Width: 1,067 --
+<img src="img/revitextractor.png" alt="RevitExtractor" title="RevitExtractor" width="400"/>
 </center>
 
 <!--
