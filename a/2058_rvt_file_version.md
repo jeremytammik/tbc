@@ -122,6 +122,7 @@ many [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/
 - [Determining RVT File Version Using Python](http://thebuildingcoder.typepad.com/blog/2017/06/determining-rvt-file-version-using-python.html)
 - [RvtVerFileOpen &ndash; Automatically Open Correct RVT File Version](https://thebuildingcoder.typepad.com/blog/2020/05/automatically-open-correct-rvt-file-version.html#4)
 - [Doc Session Id, API Context and External Events](https://thebuildingcoder.typepad.com/blog/2020/11/document-session-id-api-context-and-external-events.html#4)
+- [Know the version of a RVT file before opening the file in Revit](https://forums.autodesk.com/t5/revit-api-forum/i-would-like-to-know-the-version-of-a-rvt-file-before-opening/td-p/8403150)
 
 The official approach is to use the Revit API `BasicFileInfo`;
 Since it is a Revit API method, it requires a Revit session up and running with an appropriate add-in loaded, but it does not require opening the RVT file in question.
@@ -175,8 +176,41 @@ version = RevitExtractor.get_version(rvt_path)
 print(version)</code></pre>
 
 <center>
-<img src="img/revitextractor.png" alt="RevitExtractor" title="RevitExtractor" width="400"/> <!-- Pixel Height: 435 Pixel Width: 1,067 -->
+<img src="img/revitextractor.png" alt="RevitExtractor" title="RevitExtractor" width="400"/> -- Pixel Height: 435 Pixel Width: 1,067 --
 </center>
+
+<!--
+
+From: Eason Kang <eason.kang@autodesk.com>
+Date: Thursday, 24 October 2024 at 09:09
+To: Jeremy Tammik <jeremy.tammik@autodesk.com>
+Cc: Mikako Harada <mikako.harada@autodesk.com>
+Subject: Regarding the blog post of using Revit extractor to check RVT version
+
+Hi Jeremy,
+
+Hope you’re doing well!
+
+Could you help remove the contents of using Revit extractor to check RVT version from your blog post?
+
+Image
+
+I understand the way Chuong Ho shared is better than using Revit API BasicFileInfo, but…
+
+Promoting this approach will potentially hurt the APS Model Derivative service, as APS uses the same extractor for translating RVT on the cloud.
+
+In addition,
+According to the Revit engineering team’s PM, using that Revit extractor shipped with Revit Desktop is not a supported scenario. It’s for the Revit shared views feature only.
+
+Image
+
+Slack ref: https://autodesk.slack.com/archives/C0U4RCJ1M/p1724764990701349?thread_ts=1724726255.161639&cid=C0U4RCJ1M
+
+Cheers,
+
+Eason Kang
+
+-->
 
 ####<a name="4"></a> Add Extensible Storage Data from EXE
 
