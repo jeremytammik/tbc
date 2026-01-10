@@ -120,7 +120,7 @@ describe('Mobile Chronological Sheet', () => {
       expect(document.querySelector('.tbc-chrono-mobile-sheet.collapsed')).toBeTruthy();
     });
 
-    test('TC-02: Context label placeholder exists', () => {
+    test('TC-02: Context label shows correct format', () => {
       const sheet = document.createElement('div');
       sheet.className = 'tbc-chrono-mobile-sheet collapsed';
       sheet.innerHTML = `
@@ -132,7 +132,13 @@ describe('Mobile Chronological Sheet', () => {
       
       const label = document.querySelector('.tbc-sheet-context');
       expect(label).toBeTruthy();
+      
+      // Verify the format matches updateContextLabel() implementation:
+      // When current post exists: "{year} · Post {yearIndex} of {yearCount}"
+      // The format uses "Post" without "#" prefix (unlike post items which show "#0001")
       expect(label.textContent).toContain('2026');
+      expect(label.textContent).toMatch(/Post \d+ of \d+/);
+      expect(label.textContent).toBe('2026 · Post 1 of 2');
     });
 
     test('TC-03: Tap on collapsed bar should have click handler', () => {
