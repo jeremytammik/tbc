@@ -255,6 +255,44 @@ body.tbc-resizing * {
   color: #fc8181;
 }
 
+/* Search Options - Content Toggle */
+.tbc-search-options {
+  padding: 6px 0 0 0;
+  font-size: 12px;
+}
+
+.tbc-search-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  color: var(--tbc-sidebar-text-muted);
+  user-select: none;
+  transition: color var(--tbc-transition-speed);
+}
+
+.tbc-search-toggle:hover {
+  color: var(--tbc-sidebar-text);
+}
+
+.tbc-search-toggle input[type="checkbox"] {
+  cursor: pointer;
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  accent-color: var(--tbc-accent-primary);
+}
+
+.tbc-search-toggle input[type="checkbox"]:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.tbc-search-toggle input[type="checkbox"]:disabled + span {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 /* ================================
    Welcome Link
    ================================ */
@@ -1521,5 +1559,130 @@ body.tbc-sheet-open {
   .tbc-sheet-back,
   .tbc-sheet-close {
     transition: none !important;
+  }
+}
+
+/* ================================
+   In-Page Content Highlighting
+   ================================ */
+
+/* Highlighted text */
+.tbc-content-highlight {
+  background-color: #fff3cd;
+  color: inherit;
+  padding: 1px 2px;
+  border-radius: 2px;
+  box-shadow: 0 0 0 1px rgba(255, 193, 7, 0.3);
+  transition: background-color 0.3s ease;
+}
+
+.tbc-content-highlight.active {
+  background-color: #ffc107;
+  box-shadow: 0 0 0 2px rgba(255, 193, 7, 0.5);
+}
+
+/* Pulse animation for first match */
+.tbc-content-highlight.tbc-highlight-pulse {
+  animation: highlightPulse 1.5s ease-out;
+}
+
+@keyframes highlightPulse {
+  0% { background-color: #ffc107; transform: scale(1.05); }
+  50% { background-color: #ffeb3b; }
+  100% { background-color: #fff3cd; transform: scale(1); }
+}
+
+/* Floating counter badge */
+.tbc-highlight-counter {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: var(--tbc-sidebar-bg, #f5f5f5);
+  border: 1px solid var(--tbc-sidebar-border, #ddd);
+  border-radius: 8px;
+  padding: 10px 15px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  max-width: 350px;
+}
+
+.tbc-highlight-count {
+  background: var(--tbc-accent-primary, #0066cc);
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: bold;
+  min-width: 24px;
+  text-align: center;
+}
+
+.tbc-highlight-label {
+  color: var(--tbc-sidebar-text, #333);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
+}
+
+.tbc-highlight-clear,
+.tbc-highlight-nav {
+  background: transparent;
+  border: 1px solid var(--tbc-sidebar-border, #ddd);
+  border-radius: 4px;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.15s ease;
+  font-size: 14px;
+  color: var(--tbc-sidebar-text, #333);
+}
+
+.tbc-highlight-clear:hover,
+.tbc-highlight-nav:hover {
+  background: var(--tbc-sidebar-hover, #e8e8e8);
+}
+
+/* Mobile adjustments for highlight counter */
+@media (max-width: 768px) {
+  .tbc-highlight-counter {
+    top: auto;
+    bottom: 70px; /* Above mobile sheet */
+    right: 10px;
+    left: 10px;
+    max-width: none;
+    justify-content: center;
+  }
+
+  .tbc-highlight-label {
+    display: none;
+  }
+}
+
+/* Reduced motion for highlights */
+@media (prefers-reduced-motion: reduce) {
+  .tbc-content-highlight,
+  .tbc-content-highlight.tbc-highlight-pulse {
+    animation: none;
+    transition: none;
+  }
+}
+
+/* Print: hide counter, keep highlights */
+@media print {
+  .tbc-highlight-counter {
+    display: none;
+  }
+
+  .tbc-content-highlight {
+    background-color: #ffff00 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
 }

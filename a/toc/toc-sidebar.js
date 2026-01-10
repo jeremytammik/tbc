@@ -23,6 +23,9 @@
   // ================================
   const CONFIG = {
     tocDataUrl: 'toc/toc-data.json',
+    searchIndexUrl: 'toc/search-index.json',
+    enableContentSearch: true,
+    searchCacheTime: 24 * 60 * 60 * 1000, // 24 hours
     defaultWidth: 280,
     minWidth: 180,
     maxWidth: 500,
@@ -30,7 +33,10 @@
     storageKeys: {
       width: 'tbc-sidebar-width',
       expanded: 'tbc-expanded-topics',
-      scroll: 'tbc-sidebar-scroll'
+      scroll: 'tbc-sidebar-scroll',
+      searchIndex: 'tbc-sidebar-search-index',
+      searchIndexTime: 'tbc-sidebar-search-index-time',
+      searchInContent: 'tbc-sidebar-search-in-content'
     }
   };
 
@@ -43,7 +49,10 @@
     expandedTopics: new Set(),
     isResizing: false,
     isMobileOpen: false,
-    searchQuery: ''
+    searchQuery: '',
+    searchIndex: null,
+    searchIndexLoaded: false,
+    searchInContent: false
   };
 
   // ================================
@@ -132,6 +141,129 @@
     }
   }
 
+  async function loadSearchIndex() {
+    if (!CONFIG.enableContentSearch) {
+      return;
+    }
+
+    // Check cache first
+    try {
+      const cached = localStorage.getItem(CONFIG.storageKeys.searchIndex);
+      const cacheTime = localStorage.getItem(CONFIG.storageKeys.searchIndexTime);
+
+      if (cached && cacheTime) {
+        const cachedData = JSON.parse(cached);
+        const cacheTimeNum = Number.parseInt(cacheTime, 10);
+
+        if (Number.isFinite(cacheTimeNum) && cacheTimeNum >= 0) {
+          const age = Date.now() - cacheTimeNum;
+
+          // Validate cache structure
+          const isValid = cachedData &&
+            typeof cachedData === 'object' &&
+            typeof cachedData.version === 'string' &&
+            typeof cachedData.totalPosts === 'number' &&
+            Array.isArray(cachedData.posts);
+
+          // Use cache if valid and not expired
+          if (isValid && age >= 0 && age < CONFIG.searchCacheTime && cachedData.version === '1.0') {
+            console.log('Using cached search index');
+            state.searchIndex = cachedData;
+            state.searchIndexLoaded = true;
+            updateContentToggleState();
+            return;
+          }
+        } else {
+          console.warn('Ignoring search index cache due to invalid cache time value:', cacheTime);
+        }
+      }
+    } catch (e) {
+      console.warn('Failed to load cached search index');
+    }
+
+    // Fetch fresh index
+    const currentPath = window.location.pathname;
+    let basePath = '';
+
+    if (currentPath.includes('/a/') && !currentPath.endsWith('/a/') && !currentPath.endsWith('/a/index.html')) {
+      basePath = '';
+    } else if (currentPath.endsWith('/a/') || currentPath.endsWith('/a/index.html')) {
+      basePath = '';
+    } else if (currentPath === '/index.html' || currentPath === '/' || currentPath.match(/^\/\d{4}_/)) {
+      basePath = '';
+    } else {
+      basePath = 'a/';
+    }
+
+    try {
+      const url = basePath + CONFIG.searchIndexUrl;
+      const FETCH_TIMEOUT_MS = 10000;
+      const controller = new AbortController();
+      const { signal } = controller;
+      let timeoutId;
+
+      try {
+        timeoutId = window.setTimeout(() => {
+          controller.abort();
+        }, FETCH_TIMEOUT_MS);
+
+        const response = await fetch(url, { signal });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+
+        const index = await response.json();
+        state.searchIndex = index;
+        state.searchIndexLoaded = true;
+
+        // Cache it
+        try {
+          localStorage.setItem(CONFIG.storageKeys.searchIndex, JSON.stringify(index));
+          localStorage.setItem(CONFIG.storageKeys.searchIndexTime, Date.now().toString());
+        } catch (e) {
+          console.warn('Failed to cache search index');
+        }
+
+        console.log(`Search index loaded: ${index.totalPosts} posts`);
+        updateContentToggleState();
+      } finally {
+        if (timeoutId !== undefined) {
+          clearTimeout(timeoutId);
+        }
+      }
+    } catch (error) {
+      if (error.name === 'AbortError') {
+        console.error('Failed to load search index: request timed out');
+      } else {
+        console.error('Failed to load search index:', error);
+      }
+      state.searchIndexLoaded = false;
+      updateContentToggleState();
+    }
+  }
+
+  function updateContentToggleState() {
+    const toggle = document.getElementById('tbc-search-content-toggle');
+    if (!toggle) return;
+
+    if (state.searchIndexLoaded) {
+      toggle.disabled = false;
+      toggle.title = 'Search in post content as well as titles';
+      // Restore saved preference
+      const savedPref = localStorage.getItem(CONFIG.storageKeys.searchInContent);
+      if (savedPref === 'true') {
+        toggle.checked = true;
+        state.searchInContent = true;
+      }
+    } else {
+      toggle.disabled = true;
+      toggle.checked = false;
+      toggle.title = 'Search index not available';
+      state.searchInContent = false;
+    }
+  }
+
   // ================================
   // State Persistence
   // ================================
@@ -214,6 +346,12 @@
                  autocomplete="off"
                  aria-label="Search post titles">
           <button id="tbc-search-clear" class="hidden" aria-label="Clear search">×</button>
+        </div>
+        <div class="tbc-search-options">
+          <label class="tbc-search-toggle">
+            <input type="checkbox" id="tbc-search-content-toggle" disabled title="Loading search index...">
+            <span>Search in content</span>
+          </label>
         </div>
         <div id="tbc-search-results"></div>
       </div>
@@ -374,6 +512,13 @@
       state.tocData = await loadTocData();
       renderSidebar();
       sidebar.classList.remove('loading');
+
+      // Load search index (don't block UI)
+      if (CONFIG.enableContentSearch) {
+        loadSearchIndex().catch(err => {
+          console.warn('Search index unavailable, content search disabled:', err);
+        });
+      }
     } catch (error) {
       renderError(error);
       sidebar.classList.remove('loading');
@@ -548,6 +693,7 @@
   function initSearch() {
     const input = document.getElementById('tbc-search-input');
     const clearBtn = document.getElementById('tbc-search-clear');
+    const contentToggle = document.getElementById('tbc-search-content-toggle');
     
     if (!input) return;
     
@@ -566,6 +712,23 @@
       resetSearch();
       input.focus();
     });
+
+    // Content search toggle handler
+    if (contentToggle) {
+      contentToggle.addEventListener('change', () => {
+        state.searchInContent = contentToggle.checked;
+        // Save preference
+        try {
+          localStorage.setItem(CONFIG.storageKeys.searchInContent, contentToggle.checked.toString());
+        } catch (e) {
+          // Ignore storage errors
+        }
+        // Re-run search with new mode
+        if (state.searchQuery) {
+          performSearch(state.searchQuery);
+        }
+      });
+    }
   }
 
   function performSearch(query) {
@@ -577,6 +740,16 @@
       return;
     }
     
+    // Use content search if enabled and index is loaded
+    if (state.searchInContent && state.searchIndexLoaded) {
+      performContentSearch(query);
+    } else {
+      performTitleSearch(query);
+    }
+  }
+
+  function performTitleSearch(query) {
+    const resultsDiv = document.getElementById('tbc-search-results');
     const topics = document.querySelectorAll('.tbc-topic');
     const posts = document.querySelectorAll('.tbc-post-link');
     let matchCount = 0;
@@ -629,12 +802,108 @@
     });
     
     // Update results count
+    updateResultsCount(matchCount, resultsDiv, false);
+  }
+
+  function performContentSearch(query) {
+    const resultsDiv = document.getElementById('tbc-search-results');
+    const topics = document.querySelectorAll('.tbc-topic');
+    const posts = document.querySelectorAll('.tbc-post-link');
+    const matchingPosts = new Set();
+
+    // Search in index
+    if (state.searchIndex && state.searchIndex.posts) {
+      state.searchIndex.posts.forEach(post => {
+        const titleMatch = post.title.toLowerCase().includes(query);
+        const contentMatch = post.contentPreview && post.contentPreview.includes(query);
+
+        if (titleMatch || contentMatch) {
+          matchingPosts.add(post.file);
+        }
+      });
+    }
+
+    let matchCount = 0;
+
+    // Update DOM based on matches
+    posts.forEach(post => {
+      const href = post.getAttribute('href');
+      const matches = matchingPosts.has(href);
+
+      post.classList.toggle('tbc-search-no-match', !matches);
+
+      if (matches) {
+        matchCount++;
+
+        // Highlight only title (content not visible in sidebar)
+        const title = post.textContent.toLowerCase();
+        if (title.includes(query)) {
+          highlightText(post, query);
+        } else {
+          removeHighlight(post);
+        }
+
+        // Add highlight parameter to link for in-page highlighting
+        if (!post.dataset.originalHref) {
+          post.dataset.originalHref = href;
+        }
+        const url = new URL(href, window.location.origin);
+        url.searchParams.set('highlight', query);
+        post.setAttribute('href', url.pathname + url.search);
+
+        const topic = post.closest('.tbc-topic');
+        if (topic) {
+          topic.classList.add('expanded');
+          state.expandedTopics.add(topic.dataset.topicId);
+        }
+      } else {
+        removeHighlight(post);
+        // Restore original href
+        if (post.dataset.originalHref) {
+          post.setAttribute('href', post.dataset.originalHref);
+          delete post.dataset.originalHref;
+        }
+      }
+    });
+
+    // Handle topics
+    topics.forEach(topic => {
+      const topicTitle = topic.querySelector('.tbc-topic-title');
+      const topicTitleText = topicTitle ? topicTitle.textContent.toLowerCase() : '';
+      const topicMatches = topicTitleText.includes(query);
+      const hasVisiblePosts = topic.querySelector('.tbc-post-link:not(.tbc-search-no-match)');
+
+      if (topicMatches) {
+        topic.classList.remove('tbc-search-no-match');
+        topic.classList.add('expanded');
+        state.expandedTopics.add(topic.dataset.topicId);
+
+        // Show all posts in matching topic
+        topic.querySelectorAll('.tbc-post-link').forEach(p => {
+          if (p.classList.contains('tbc-search-no-match')) {
+            p.classList.remove('tbc-search-no-match');
+            matchCount++;
+          }
+        });
+
+        if (topicTitle) highlightText(topicTitle, query);
+      } else {
+        topic.classList.toggle('tbc-search-no-match', !hasVisiblePosts);
+        if (topicTitle) removeHighlight(topicTitle);
+      }
+    });
+
+    updateResultsCount(matchCount, resultsDiv, true);
+  }
+
+  function updateResultsCount(matchCount, resultsDiv, isContentSearch) {
     if (resultsDiv) {
       if (matchCount === 0) {
         resultsDiv.textContent = 'No posts found';
         resultsDiv.classList.add('no-results');
       } else {
-        resultsDiv.textContent = `${matchCount} result${matchCount === 1 ? '' : 's'}`;
+        const mode = isContentSearch ? ' (title + content)' : '';
+        resultsDiv.textContent = `${matchCount} result${matchCount === 1 ? '' : 's'}${mode}`;
         resultsDiv.classList.remove('no-results');
       }
     }
@@ -648,6 +917,11 @@
     posts.forEach(post => {
       post.classList.remove('tbc-search-no-match');
       removeHighlight(post);
+      // Restore original href if modified by content search
+      if (post.dataset.originalHref) {
+        post.setAttribute('href', post.dataset.originalHref);
+        delete post.dataset.originalHref;
+      }
     });
     
     topics.forEach(topic => {
@@ -1872,6 +2146,274 @@
     document.addEventListener('DOMContentLoaded', initChronoColumn);
   } else {
     initChronoColumn();
+  }
+
+})();
+
+// ================================
+// In-Page Content Highlighting (Independent Module)
+// ================================
+(function initContentHighlightModule() {
+  'use strict';
+
+  const HIGHLIGHT_CONFIG = {
+    paramName: 'highlight',
+    className: 'tbc-content-highlight',
+    maxHighlights: 100,
+    scrollToFirst: true,
+    animateDuration: 2000
+  };
+
+  /**
+   * Initialize in-page content highlighting from URL parameter
+   */
+  function initContentHighlighting() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const highlightTerm = urlParams.get(HIGHLIGHT_CONFIG.paramName);
+
+    if (!highlightTerm || highlightTerm.trim().length < 2) return;
+
+    const term = highlightTerm.trim();
+    console.log(`Highlighting content for: "${term}"`);
+
+    // Wait for content to be ready
+    requestAnimationFrame(() => {
+      highlightContentMatches(term);
+    });
+  }
+
+  /**
+   * Escape special regex characters
+   */
+  function escapeRegex(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
+  /**
+   * Highlight all matches of term in the page content
+   */
+  function highlightContentMatches(term) {
+    // Target the main content area (avoid sidebar, nav, code blocks)
+    const contentArea = document.querySelector('#tbc-content .tbc-blog-content') ||
+                        document.querySelector('#tbc-content article') ||
+                        document.querySelector('#tbc-content') ||
+                        document.querySelector('article') ||
+                        document.body;
+
+    if (!contentArea) {
+      console.warn('No content area found for highlighting');
+      return;
+    }
+
+    // Elements to skip
+    const skipSelectors = [
+      'script', 'style', 'noscript', 'iframe',
+      'pre', 'code',  // Skip code blocks
+      '.tbc-sidebar', '#tbc-sidebar',
+      '.tbc-chrono-column', '.tbc-chrono-nav',
+      '.tbc-mobile-sheet', '.tbc-highlight-counter'
+    ];
+
+    // Walk text nodes and highlight matches
+    const treeWalker = document.createTreeWalker(
+      contentArea,
+      NodeFilter.SHOW_TEXT,
+      {
+        acceptNode: function(node) {
+          // Skip empty nodes
+          if (!node.textContent.trim()) {
+            return NodeFilter.FILTER_REJECT;
+          }
+          // Skip nodes inside excluded elements
+          let parent = node.parentElement;
+          while (parent) {
+            if (skipSelectors.some(sel => parent.matches && parent.matches(sel))) {
+              return NodeFilter.FILTER_REJECT;
+            }
+            parent = parent.parentElement;
+          }
+          return NodeFilter.FILTER_ACCEPT;
+        }
+      }
+    );
+
+    const nodesToHighlight = [];
+    const regex = new RegExp(`(${escapeRegex(term)})`, 'gi');
+
+    // Collect nodes first (can't modify DOM while walking)
+    let node;
+    while ((node = treeWalker.nextNode())) {
+      if (regex.test(node.textContent)) {
+        nodesToHighlight.push(node);
+        regex.lastIndex = 0; // Reset regex
+      }
+    }
+
+    if (nodesToHighlight.length === 0) {
+      console.log('No matches found for highlighting');
+      return;
+    }
+
+    let totalHighlights = 0;
+    const allMarks = [];
+
+    // Apply highlights
+    nodesToHighlight.forEach(textNode => {
+      if (totalHighlights >= HIGHLIGHT_CONFIG.maxHighlights) return;
+
+      const text = textNode.textContent;
+      const parts = text.split(regex);
+
+      if (parts.length <= 1) return;
+
+      const fragment = document.createDocumentFragment();
+
+      parts.forEach(part => {
+        if (part.match(regex)) {
+          if (totalHighlights < HIGHLIGHT_CONFIG.maxHighlights) {
+            const mark = document.createElement('mark');
+            mark.className = HIGHLIGHT_CONFIG.className;
+            mark.textContent = part;
+            fragment.appendChild(mark);
+            allMarks.push(mark);
+            totalHighlights++;
+          } else {
+            fragment.appendChild(document.createTextNode(part));
+          }
+        } else {
+          fragment.appendChild(document.createTextNode(part));
+        }
+      });
+
+      textNode.parentNode.replaceChild(fragment, textNode);
+    });
+
+    console.log(`Highlighted ${totalHighlights} matches`);
+
+    // Create counter badge
+    if (allMarks.length > 0) {
+      createHighlightCounter(allMarks, term);
+
+      // Scroll to first match
+      if (HIGHLIGHT_CONFIG.scrollToFirst) {
+        setTimeout(() => {
+          allMarks[0].classList.add('tbc-highlight-pulse');
+          allMarks[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 100);
+      }
+    }
+  }
+
+  /**
+   * Create floating counter badge with navigation
+   */
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function createHighlightCounter(allMarks, term) {
+    const counter = document.createElement('div');
+    counter.className = 'tbc-highlight-counter';
+    const displayTerm = term.length > 20 ? term.substring(0, 20) + '...' : term;
+    const escapedTerm = escapeHtml(displayTerm);
+    counter.innerHTML = `
+      <span class="tbc-highlight-count">${allMarks.length}</span>
+      <span class="tbc-highlight-label">matches for "${escapedTerm}"</span>
+      <button class="tbc-highlight-nav tbc-highlight-prev" aria-label="Previous match">▲</button>
+      <button class="tbc-highlight-nav tbc-highlight-next" aria-label="Next match">▼</button>
+      <button class="tbc-highlight-clear" aria-label="Clear highlights">×</button>
+    `;
+    document.body.appendChild(counter);
+
+    let currentIndex = 0;
+
+    // Keyboard navigation
+    function highlightKeyHandler(e) {
+      if (e.key === 'Escape') {
+        cleanup();
+      } else if (e.key === 'F3' || (e.ctrlKey && e.key === 'g')) {
+        e.preventDefault();
+        if (e.shiftKey) {
+          currentIndex = (currentIndex - 1 + allMarks.length) % allMarks.length;
+        } else {
+          currentIndex = (currentIndex + 1) % allMarks.length;
+        }
+        scrollToHighlight(allMarks, currentIndex);
+      }
+    }
+    document.addEventListener('keydown', highlightKeyHandler);
+
+    // Cleanup function to remove highlights, counter, and event listener
+    function cleanup() {
+      clearContentHighlights();
+      counter.remove();
+      document.removeEventListener('keydown', highlightKeyHandler);
+      // Remove highlight param from URL
+      const url = new URL(window.location);
+      url.searchParams.delete(HIGHLIGHT_CONFIG.paramName);
+      window.history.replaceState({}, '', url);
+    }
+
+    // Clear button
+    counter.querySelector('.tbc-highlight-clear').addEventListener('click', () => {
+      cleanup();
+    });
+
+    // Navigation buttons
+    counter.querySelector('.tbc-highlight-prev').addEventListener('click', () => {
+      if (allMarks.length === 0) return;
+      currentIndex = (currentIndex - 1 + allMarks.length) % allMarks.length;
+      scrollToHighlight(allMarks, currentIndex);
+    });
+
+    counter.querySelector('.tbc-highlight-next').addEventListener('click', () => {
+      if (allMarks.length === 0) return;
+      currentIndex = (currentIndex + 1) % allMarks.length;
+      scrollToHighlight(allMarks, currentIndex);
+    });
+  }
+
+  /**
+   * Scroll to a specific highlight
+   */
+  function scrollToHighlight(allMarks, index) {
+    // Remove active class from all
+    document.querySelectorAll('.' + HIGHLIGHT_CONFIG.className + '.active')
+      .forEach(m => m.classList.remove('active'));
+
+    // Add active class and scroll
+    const mark = allMarks[index];
+    if (mark) {
+      mark.classList.add('active');
+      mark.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }
+
+  /**
+   * Clear all content highlights
+   */
+  function clearContentHighlights() {
+    const marks = document.querySelectorAll('.' + HIGHLIGHT_CONFIG.className);
+
+    marks.forEach(mark => {
+      const text = document.createTextNode(mark.textContent);
+      mark.parentNode.replaceChild(text, mark);
+    });
+
+    // Normalize to merge adjacent text nodes
+    document.body.normalize();
+  }
+
+  // Initialize on DOM ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initContentHighlighting);
+  } else {
+    initContentHighlighting();
   }
 
 })();

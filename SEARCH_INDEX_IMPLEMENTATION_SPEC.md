@@ -1,5 +1,20 @@
 # Search Index Implementation Specification
 
+**Version**: 1.1 (Corrected January 10, 2026)
+
+## Changelog
+
+### v1.1 (January 10, 2026)
+- **Fixed**: Python import ordering (sys must be imported before Path usage)
+- **Fixed**: `update_post.py` integration - clarified it doesn't have `update_all_posts_section()`
+- **Fixed**: CONFIG/state location - clarified these are inside Sidebar IIFE scope (lines 24, 40)
+- **Fixed**: `loadSearchIndex()` integration - moved into `initSidebar()` after TOC loads (not separate `init()`)
+- **Fixed**: LocalStorage cache keys - changed from `tbc-search-*` to `tbc-sidebar-search-*` for consistency
+- **Added**: Note about existing `escapeHtml()` function (line 60) - avoid duplication
+- **Clarified**: Phase 2 in-page highlighting is independent of sidebar IIFE scope
+
+---
+
 ## Overview
 
 This document provides a comprehensive specification and implementation plan for enhancing The Building Coder search functionality to include post content in addition to post titles. The solution uses a pre-built search index approach that balances performance, maintainability, and user experience.
@@ -436,17 +451,19 @@ cat a/toc/search-index.json | head -50
 **Implementation**:
 
 ```python
-# Add to imports at top of file
+# NOTE: Path is already imported in publish_post.py at line 28
+# Add sys import near other imports at top of file (around line 26)
 import sys
 
-# Add path handling before other imports
+# Add path handling AFTER existing Path import but BEFORE build_search_index import
 SCRIPTS_DIR = Path(__file__).parent
 if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
+# Add this import after the path handling above
 from build_search_index import SearchIndexBuilder
 
-# Add new function
+# Add new function (place near other update_* functions, around line 340)
 def update_search_index(dry_run=False):
     """Regenerate search index after publishing a post."""
     if dry_run:
@@ -538,17 +555,21 @@ def main():
 #### 4.3 Update `update_post.py`
 
 **Current Flow**:
-1. Update HTML file
-2. Update metadata in chrono-data.json if changed
-3. Update toc-data.json if changed
-4. Update All Posts section if changed
+1. Update HTML file (title tag)
+2. Update metadata in index.html if changed
+3. Update chrono-data.json if changed
+4. Update toc-data.json if changed
+
+> **Note**: Unlike `publish_post.py` and `delete_post.py`, this script does NOT call
+> `update_all_posts_section()`. The search index update should be added after the
+> existing update operations.
 
 **New Flow** (add step):
-1. Update HTML file
-2. Update metadata in chrono-data.json if changed
-3. Update toc-data.json if changed
-4. Update All Posts section if changed
-5. **Regenerate search-index.json** ← NEW
+1. Update HTML file (title tag)
+2. Update metadata in index.html if changed
+3. Update chrono-data.json if changed
+4. Update toc-data.json if changed
+5. **Regenerate search-index.json if content changed** ← NEW
 
 **Implementation**: Same pattern as above
 
@@ -589,22 +610,41 @@ def main():
 
 #### 5.1 Load Search Index
 
-**Location**: `a/toc/toc-sidebar.js`
+**Location**: `a/toc/toc-sidebar.js` (Sidebar IIFE, lines 1-893)
 
-**Add to Configuration**:
+> **IMPORTANT**: The sidebar IIFE has its own `CONFIG` (line 24) and `state` (line 40)
+> objects that are scoped within the IIFE. Add these properties to the EXISTING objects,
+> not as new declarations.
+
+**Add to CONFIG** (line 24, inside Sidebar IIFE):
 ```javascript
 const CONFIG = {
-  // ... existing config ...
+  tocDataUrl: 'toc/toc-data.json',
+  defaultWidth: 300,
+  minWidth: 200,
+  maxWidth: 600,
+  searchDebounce: 150,
+  // NEW: Add these properties
   searchIndexUrl: 'toc/search-index.json',
   enableContentSearch: true,  // Feature flag
   searchCacheTime: 24 * 60 * 60 * 1000, // 24 hours
+  storageKeys: {
+    width: 'tbc-sidebar-width',
+    expanded: 'tbc-expanded-topics',
+  },
 };
 ```
 
-**Add to State**:
+**Add to state** (line 40, inside Sidebar IIFE):
 ```javascript
 const state = {
-  // ... existing state ...
+  tocData: null,
+  currentPage: null,
+  expandedTopics: new Set(),
+  isResizing: false,
+  isMobileOpen: false,
+  searchQuery: '',
+  // NEW: Add these properties
   searchIndex: null,
   searchIndexLoaded: false,
   searchInContent: false,  // User preference
@@ -614,10 +654,10 @@ const state = {
 **Add Load Function**:
 ```javascript
 async function loadSearchIndex() {
-  // Check cache first
+  // Check cache first (use 'tbc-sidebar-' prefix for consistency)
   try {
-    const cached = localStorage.getItem('tbc-search-index');
-    const cacheTime = localStorage.getItem('tbc-search-index-time');
+    const cached = localStorage.getItem('tbc-sidebar-search-index');
+    const cacheTime = localStorage.getItem('tbc-sidebar-search-index-time');
     
     if (cached && cacheTime) {
       const cachedData = JSON.parse(cached);
@@ -686,10 +726,10 @@ async function loadSearchIndex() {
       state.searchIndex = index;
       state.searchIndexLoaded = true;
       
-      // Cache it
+      // Cache it (use 'tbc-sidebar-' prefix for consistency with other sidebar storage)
       try {
-        localStorage.setItem('tbc-search-index', JSON.stringify(index));
-        localStorage.setItem('tbc-search-index-time', Date.now().toString());
+        localStorage.setItem('tbc-sidebar-search-index', JSON.stringify(index));
+        localStorage.setItem('tbc-sidebar-search-index-time', Date.now().toString());
       } catch (e) {
         console.warn('Failed to cache search index');
       }
@@ -712,17 +752,33 @@ async function loadSearchIndex() {
 }
 ```
 
-**Initialize on Startup**:
+**Initialize on Startup** (inside `initSidebar()` function, after line 374):
+
+> **Note**: There is no separate `init()` function. The search index should be loaded
+> inside `initSidebar()` AFTER the TOC data is loaded successfully. This ensures the
+> sidebar UI is ready before attempting to load the search index.
+
 ```javascript
-async function init() {
-  // ... existing init code ...
+async function initSidebar() {
+  // ... existing code up to line 374 ...
   
-  // Load search index (don't block UI)
-  loadSearchIndex().catch(err => {
-    console.warn('Search index unavailable, content search disabled');
-  });
+  // Load TOC data
+  try {
+    state.tocData = await loadTocData();
+    renderSidebar();
+    sidebar.classList.remove('loading');
+    
+    // NEW: Load search index (don't block UI)
+    if (CONFIG.enableContentSearch) {
+      loadSearchIndex().catch(err => {
+        console.warn('Search index unavailable, content search disabled');
+      });
+    }
+  } catch (error) {
+    // ... existing error handling ...
+  }
   
-  // ... rest of init ...
+  // ... rest of initSidebar ...
 }
 ```
 
@@ -881,6 +937,9 @@ function updateResultsCount(matchCount, resultsDiv, isContentSearch = false) {
   }
 }
 ```
+
+> **Note**: The `escapeHtml()` function already exists in the Sidebar IIFE at line 60.
+> Do NOT duplicate it - reuse the existing function for any HTML escaping needs.
 
 #### 5.3 UI Enhancement - Content Search Toggle
 
@@ -1260,7 +1319,7 @@ Add logging to track:
 ### 10. Future Enhancements
 
 **Phase 2 Possibilities**:
-1. Full-text search with fuzzy matching
+1. ~~Full-text search with fuzzy matching~~ (see Phase 2 below)
 2. Search suggestions/autocomplete
 3. Search filters (by year, topic, tag)
 4. Search history
@@ -1270,6 +1329,503 @@ Add logging to track:
 8. Multi-language support
 9. Voice search
 10. Search API for external tools
+
+---
+
+## Phase 2: In-Page Content Highlighting
+
+### 10.1 Overview
+
+When a user searches for a term and navigates to a result, the search term should be **highlighted within the page content** itself, not just in the sidebar. This provides visual confirmation that the user found the right page and helps them locate the relevant content quickly.
+
+### 10.2 Implementation Approach
+
+**URL Parameter Method**: Append `?highlight=<term>` to search result URLs. On page load, detect the parameter and highlight matching terms in the content.
+
+### 10.3 JavaScript Implementation
+
+> **IMPORTANT**: This code is **independent** of the Sidebar IIFE. It should be added as a
+> **new separate IIFE** at the end of `toc-sidebar.js` (after line 1842), or in a separate
+> file (`content-highlight.js`). This code operates on the page content, not the sidebar.
+
+**Add as new IIFE at end of `toc-sidebar.js`** (after line 1842):
+
+```javascript
+// ================================
+// In-Page Content Highlighting (Independent Module)
+// ================================
+(function initContentHighlightModule() {
+  'use strict';
+  
+  const HIGHLIGHT_CONFIG = {
+    paramName: 'highlight',
+    className: 'tbc-content-highlight',
+    maxHighlights: 100,  // Prevent performance issues on pages with many matches
+    scrollToFirst: true,
+    animateDuration: 2000  // Time before highlight fades slightly
+  };
+
+  /**
+   * Initialize in-page content highlighting from URL parameter
+   */
+  function initContentHighlighting() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const highlightTerm = urlParams.get(HIGHLIGHT_CONFIG.paramName);
+    
+    if (!highlightTerm || highlightTerm.trim().length < 2) return;
+    
+    const term = highlightTerm.trim();
+    console.log(`Highlighting content for: "${term}"`);
+    
+    // Wait for content to be ready
+    requestAnimationFrame(() => {
+      highlightContentMatches(term);
+    });
+  }
+
+  /**
+   * Highlight all matches of term in the page content
+   */
+  function highlightContentMatches(term) {
+    // Target the main content area (avoid sidebar, nav, code blocks)
+    const contentArea = document.querySelector('#tbc-content .tbc-blog-content') ||
+                        document.querySelector('#tbc-content article') ||
+                        document.querySelector('#tbc-content') ||
+                        document.querySelector('article') ||
+                        document.body;
+    
+    if (!contentArea) {
+      console.warn('No content area found for highlighting');
+      return;
+    }
+    
+    // Elements to skip
+    const skipSelectors = [
+      'script', 'style', 'noscript', 'iframe',
+      'pre', 'code',  // Skip code blocks
+      '.tbc-sidebar', '#tbc-sidebar',
+      '.tbc-chrono-column', '.tbc-chrono-nav',
+    '.tbc-chrono-mobile-sheet',
+    'nav', 'header', 'footer'
+  ];
+  
+  let highlightCount = 0;
+  let firstHighlight = null;
+  
+  // Walk text nodes and highlight matches
+  const walker = document.createTreeWalker(
+    contentArea,
+    NodeFilter.SHOW_TEXT,
+    {
+      acceptNode: function(node) {
+        // Check if parent or ancestor should be skipped
+        let parent = node.parentElement;
+        while (parent) {
+          if (skipSelectors.some(sel => parent.matches && parent.matches(sel))) {
+            return NodeFilter.FILTER_REJECT;
+          }
+          parent = parent.parentElement;
+        }
+        
+        // Only accept nodes with actual text content
+        if (node.textContent.trim().length === 0) {
+          return NodeFilter.FILTER_REJECT;
+        }
+        
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    }
+  );
+  
+  const nodesToProcess = [];
+  let node;
+  while (node = walker.nextNode()) {
+    if (node.textContent.toLowerCase().includes(term.toLowerCase())) {
+      nodesToProcess.push(node);
+    }
+  }
+  
+  // Process nodes (can't modify during tree walk)
+  for (const textNode of nodesToProcess) {
+    if (highlightCount >= HIGHLIGHT_CONFIG.maxHighlights) break;
+    
+    const result = highlightTextNode(textNode, term);
+    highlightCount += result.count;
+    
+    if (!firstHighlight && result.firstMark) {
+      firstHighlight = result.firstMark;
+    }
+  }
+  
+  console.log(`Highlighted ${highlightCount} matches`);
+  
+  // Scroll to first match
+  if (HIGHLIGHT_CONFIG.scrollToFirst && firstHighlight) {
+    setTimeout(() => {
+      firstHighlight.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      
+      // Add pulse animation to first match
+      firstHighlight.classList.add('tbc-highlight-pulse');
+    }, 300);
+  }
+  
+  // Add highlight counter badge
+  if (highlightCount > 0) {
+    showHighlightCounter(highlightCount, term);
+  }
+}
+
+/**
+ * Highlight term within a single text node
+ */
+function highlightTextNode(textNode, term) {
+  const text = textNode.textContent;
+  const lowerText = text.toLowerCase();
+  const lowerTerm = term.toLowerCase();
+  
+  let result = { count: 0, firstMark: null };
+  
+  // Find all matches
+  const matches = [];
+  let pos = 0;
+  while ((pos = lowerText.indexOf(lowerTerm, pos)) !== -1) {
+    matches.push({
+      start: pos,
+      end: pos + term.length,
+      text: text.substring(pos, pos + term.length)  // Preserve original case
+    });
+    pos += term.length;
+  }
+  
+  if (matches.length === 0) return result;
+  
+  // Create fragment with highlighted spans
+  const fragment = document.createDocumentFragment();
+  let lastEnd = 0;
+  
+  for (const match of matches) {
+    // Text before match
+    if (match.start > lastEnd) {
+      fragment.appendChild(document.createTextNode(text.substring(lastEnd, match.start)));
+    }
+    
+    // Highlighted match
+    const mark = document.createElement('mark');
+    mark.className = HIGHLIGHT_CONFIG.className;
+    mark.textContent = match.text;
+    fragment.appendChild(mark);
+    
+    if (!result.firstMark) {
+      result.firstMark = mark;
+    }
+    result.count++;
+    
+    lastEnd = match.end;
+  }
+  
+  // Text after last match
+  if (lastEnd < text.length) {
+    fragment.appendChild(document.createTextNode(text.substring(lastEnd)));
+  }
+  
+  // Replace original text node
+  textNode.parentNode.replaceChild(fragment, textNode);
+  
+  return result;
+}
+
+/**
+ * Show floating counter badge with match count
+ */
+function showHighlightCounter(count, term) {
+  // Remove existing counter
+  const existing = document.querySelector('.tbc-highlight-counter');
+  if (existing) existing.remove();
+  
+  const counter = document.createElement('div');
+  counter.className = 'tbc-highlight-counter';
+  counter.innerHTML = `
+    <span class="tbc-highlight-count">${count}</span>
+    <span class="tbc-highlight-label">matches for "${escapeHtml(term)}"</span>
+    <button class="tbc-highlight-clear" aria-label="Clear highlights">✕</button>
+    <button class="tbc-highlight-nav tbc-highlight-prev" aria-label="Previous match">↑</button>
+    <button class="tbc-highlight-nav tbc-highlight-next" aria-label="Next match">↓</button>
+  `;
+  
+  document.body.appendChild(counter);
+  
+  // Current match index for navigation
+  let currentIndex = 0;
+  const allMarks = document.querySelectorAll('.' + HIGHLIGHT_CONFIG.className);
+  
+  // Clear button
+  counter.querySelector('.tbc-highlight-clear').addEventListener('click', () => {
+    clearContentHighlights();
+    counter.remove();
+    
+    // Remove highlight param from URL
+    const url = new URL(window.location);
+    url.searchParams.delete(HIGHLIGHT_CONFIG.paramName);
+    window.history.replaceState({}, '', url);
+  });
+  
+  // Navigation buttons
+  counter.querySelector('.tbc-highlight-prev').addEventListener('click', () => {
+    if (allMarks.length === 0) return;
+    currentIndex = (currentIndex - 1 + allMarks.length) % allMarks.length;
+    scrollToHighlight(allMarks[currentIndex]);
+  });
+  
+  counter.querySelector('.tbc-highlight-next').addEventListener('click', () => {
+    if (allMarks.length === 0) return;
+    currentIndex = (currentIndex + 1) % allMarks.length;
+    scrollToHighlight(allMarks[currentIndex]);
+  });
+  
+  // Keyboard navigation
+  document.addEventListener('keydown', function highlightNav(e) {
+    if (e.key === 'Escape') {
+      clearContentHighlights();
+      counter.remove();
+      document.removeEventListener('keydown', highlightNav);
+    } else if (e.key === 'F3' || (e.ctrlKey && e.key === 'g')) {
+      e.preventDefault();
+      if (e.shiftKey) {
+        currentIndex = (currentIndex - 1 + allMarks.length) % allMarks.length;
+      } else {
+        currentIndex = (currentIndex + 1) % allMarks.length;
+      }
+      scrollToHighlight(allMarks[currentIndex]);
+    }
+  });
+}
+
+function scrollToHighlight(mark) {
+  // Remove active class from all
+  document.querySelectorAll('.' + HIGHLIGHT_CONFIG.className + '.active')
+    .forEach(m => m.classList.remove('active'));
+  
+  // Add active class and scroll
+  mark.classList.add('active');
+  mark.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+/**
+ * Clear all content highlights
+ */
+function clearContentHighlights() {
+  const marks = document.querySelectorAll('.' + HIGHLIGHT_CONFIG.className);
+  
+  marks.forEach(mark => {
+    const text = document.createTextNode(mark.textContent);
+    mark.parentNode.replaceChild(text, mark);
+  });
+  
+  // Normalize to merge adjacent text nodes
+  document.body.normalize();
+}
+
+// Initialize on DOM ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initContentHighlighting);
+  } else {
+    initContentHighlighting();
+  }
+
+})(); // End of Content Highlight IIFE
+```
+
+### 10.4 CSS Styles for In-Page Highlighting
+
+**Add to `toc-sidebar.css`**:
+
+```css
+/* ================================
+   In-Page Content Highlighting
+   ================================ */
+
+/* Highlighted text */
+.tbc-content-highlight {
+  background-color: #fff3cd;
+  color: inherit;
+  padding: 1px 2px;
+  border-radius: 2px;
+  box-shadow: 0 0 0 1px rgba(255, 193, 7, 0.3);
+  transition: background-color 0.3s ease;
+}
+
+.tbc-content-highlight.active {
+  background-color: #ffc107;
+  box-shadow: 0 0 0 2px rgba(255, 193, 7, 0.5);
+}
+
+/* Pulse animation for first match */
+.tbc-content-highlight.tbc-highlight-pulse {
+  animation: highlightPulse 1.5s ease-out;
+}
+
+@keyframes highlightPulse {
+  0% { background-color: #ffc107; transform: scale(1.1); }
+  50% { background-color: #ffeb3b; }
+  100% { background-color: #fff3cd; transform: scale(1); }
+}
+
+/* Floating counter badge */
+.tbc-highlight-counter {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: var(--tbc-sidebar-bg, #f5f5f5);
+  border: 1px solid var(--tbc-sidebar-border, #ddd);
+  border-radius: 8px;
+  padding: 10px 15px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  max-width: 350px;
+}
+
+.tbc-highlight-count {
+  background: var(--tbc-accent-primary, #0066cc);
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: bold;
+  min-width: 24px;
+  text-align: center;
+}
+
+.tbc-highlight-label {
+  color: var(--tbc-sidebar-text, #333);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
+}
+
+.tbc-highlight-clear,
+.tbc-highlight-nav {
+  background: transparent;
+  border: 1px solid var(--tbc-sidebar-border, #ddd);
+  border-radius: 4px;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.15s ease;
+}
+
+.tbc-highlight-clear:hover,
+.tbc-highlight-nav:hover {
+  background: var(--tbc-sidebar-hover, #e8e8e8);
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .tbc-highlight-counter {
+    top: auto;
+    bottom: 70px; /* Above mobile sheet */
+    right: 10px;
+    left: 10px;
+    max-width: none;
+    justify-content: center;
+  }
+  
+  .tbc-highlight-label {
+    display: none;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .tbc-content-highlight,
+  .tbc-content-highlight.tbc-highlight-pulse {
+    animation: none;
+    transition: none;
+  }
+}
+
+/* Print: hide counter, keep highlights */
+@media print {
+  .tbc-highlight-counter {
+    display: none;
+  }
+  
+  .tbc-content-highlight {
+    background-color: #ffff00 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+```
+
+### 10.5 Update Search Result Links
+
+**Modify the search results to include highlight parameter**:
+
+```javascript
+// In performContentSearch() - update post links
+function updateSearchResultLinks(query) {
+  const posts = document.querySelectorAll('.tbc-post-link:not(.tbc-search-no-match)');
+  
+  posts.forEach(post => {
+    const href = post.getAttribute('href');
+    if (!href) return;
+    
+    // Parse existing URL
+    const url = new URL(href, window.location.origin);
+    
+    // Add highlight parameter
+    url.searchParams.set('highlight', query);
+    
+    // Update href
+    post.setAttribute('href', url.toString());
+    
+    // Store original href for cleanup
+    if (!post.dataset.originalHref) {
+      post.dataset.originalHref = href;
+    }
+  });
+}
+
+// In resetSearch() - restore original hrefs
+function resetSearchResultLinks() {
+  const posts = document.querySelectorAll('.tbc-post-link[data-original-href]');
+  
+  posts.forEach(post => {
+    post.setAttribute('href', post.dataset.originalHref);
+    delete post.dataset.originalHref;
+  });
+}
+```
+
+### 10.6 Keyboard Shortcuts
+
+| Key | Action |
+|-----|--------|
+| `Escape` | Clear all highlights and close counter |
+| `F3` or `Ctrl+G` | Jump to next highlight |
+| `Shift+F3` or `Ctrl+Shift+G` | Jump to previous highlight |
+
+### 10.7 Testing Checklist
+
+- [ ] Highlights appear for URL parameter `?highlight=term`
+- [ ] First match is scrolled into view
+- [ ] Counter badge shows correct count
+- [ ] Previous/Next navigation works
+- [ ] Clear button removes all highlights
+- [ ] Escape key clears highlights
+- [ ] Code blocks are NOT highlighted
+- [ ] Sidebar content is NOT highlighted
+- [ ] Works on mobile viewport
+- [ ] Works with special characters in search term
+- [ ] Performance acceptable with 100+ matches
+- [ ] Print styles work correctly
 
 ### 11. Additional Implementation Notes
 
@@ -1316,16 +1872,38 @@ When content search toggle is disabled (index not loaded):
 
 ## Implementation Timeline
 
-| Phase | Task | Effort | Dependencies |
-|-------|------|--------|--------------|
+### Phase 1: Search Index & Content Search
+
+| Step | Task | Effort | Dependencies |
+|------|------|--------|--------------|
 | 1 | Create `build_search_index.py` | 4-6 hours | BeautifulSoup |
-| 2 | Generate initial index | 30 min | Phase 1 |
-| 3 | Update publish scripts | 2 hours | Phase 1 |
-| 4 | Update JavaScript search | 4-6 hours | Phase 2 |
-| 5 | Add UI toggle | 2 hours | Phase 4 |
-| 6 | Testing & debugging | 4 hours | Phase 5 |
-| 7 | Documentation | 2 hours | All phases |
-| **Total** | **18-24 hours** | | |
+| 2 | Generate initial index | 30 min | Step 1 |
+| 3 | Update publish scripts | 2 hours | Step 1 |
+| 4 | Update JavaScript search | 4-6 hours | Step 2 |
+| 5 | Add UI toggle | 2 hours | Step 4 |
+| 6 | Testing & debugging | 4 hours | Step 5 |
+| 7 | Documentation | 2 hours | All steps |
+| **Phase 1 Total** | | **18-24 hours** | |
+
+### Phase 2: In-Page Content Highlighting
+
+| Step | Task | Effort | Dependencies |
+|------|------|--------|--------------|
+| 8 | Implement `initContentHighlighting()` | 3-4 hours | Phase 1 |
+| 9 | Add highlight CSS styles | 1 hour | Step 8 |
+| 10 | Implement counter badge & navigation | 2 hours | Step 8 |
+| 11 | Update search result links | 1 hour | Step 8 |
+| 12 | Add keyboard shortcuts | 1 hour | Step 10 |
+| 13 | Testing & debugging | 2 hours | All Phase 2 |
+| **Phase 2 Total** | | **10-12 hours** | |
+
+### Combined Timeline
+
+| Phase | Effort | Cumulative |
+|-------|--------|------------|
+| Phase 1: Search Index | 18-24 hours | 18-24 hours |
+| Phase 2: In-Page Highlighting | 10-12 hours | 28-36 hours |
+| **Total** | | **28-36 hours** |
 
 ---
 
@@ -1395,10 +1973,10 @@ pip install -r scripts/requirements.txt
 
 ## Conclusion
 
-This specification provides a complete roadmap for implementing content search with a pre-built index. The approach balances performance, maintainability, and user experience while working within the constraints of a static GitHub Pages site.
+This specification provides a complete roadmap for implementing content search with a pre-built index (Phase 1) and in-page content highlighting (Phase 2). The approach balances performance, maintainability, and user experience while working within the constraints of a static GitHub Pages site.
 
-Key advantages:
-- ✅ Fast client-side search
+### Phase 1 Key Features (Search Index)
+- ✅ Fast client-side content search
 - ✅ No server infrastructure required
 - ✅ Works offline after initial load
 - ✅ Automatic maintenance via scripts
@@ -1407,16 +1985,26 @@ Key advantages:
 - ✅ Optimized file size (~130-170KB compressed)
 - ✅ Comprehensive error handling
 
-**Fixes Applied** (v1.1):
-1. ✅ Python type hints use `Tuple` for Python 3.7+ compatibility
-2. ✅ Consistent `html` module import as `html_lib`
-3. ✅ Proper path handling for module imports
-4. ✅ Dry-run support in all integration functions
-5. ✅ BasePath handling matches existing `loadTocData()` logic
-6. ✅ Version-based cache invalidation
-7. ✅ Optimized CONTENT_PREVIEW_LENGTH to 800 chars
-8. ✅ Comprehensive error state testing
-9. ✅ CSS integration location specified
-10. ✅ BeautifulSoup dependency noted as already available
+### Phase 2 Key Features (In-Page Highlighting)
+- ✅ Highlights search terms within page content
+- ✅ Scrolls to first match automatically
+- ✅ Floating counter with match navigation
+- ✅ Keyboard shortcuts (F3, Escape)
+- ✅ Skips code blocks and navigation areas
+- ✅ Mobile-responsive counter positioning
+- ✅ Reduced motion support
+- ✅ Print-friendly styles
+
+**Fixes Applied** (v1.2):
+1. ✅ All fixes from v1.1
+2. ✅ Added Phase 2: In-Page Content Highlighting
+3. ✅ URL parameter `?highlight=term` for deep-linking
+4. ✅ Tree walker for efficient DOM traversal
+5. ✅ Skip selectors for code blocks, sidebar, nav
+6. ✅ Maximum highlight limit for performance
+7. ✅ Navigation between highlights with keyboard
+8. ✅ Clear highlights with Escape key
+9. ✅ Mobile-responsive counter badge
+10. ✅ Updated timeline for combined phases (28-36 hours)
 
 Implementation should proceed in phases, with thorough testing at each stage to ensure quality and performance. All identified issues have been addressed in this updated specification.

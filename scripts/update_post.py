@@ -26,6 +26,11 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
+# Add scripts directory to path for local imports
+SCRIPTS_DIR = Path(__file__).parent
+if str(SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPTS_DIR))
+
 # Configuration
 REPO_ROOT = Path(__file__).parent.parent
 POSTS_DIR = REPO_ROOT / "a"
@@ -353,6 +358,35 @@ def update_toc(filename, new_title=None, dry_run=False):
         return False
 
 
+def update_search_index(dry_run=False):
+    """Regenerate search index after updating a post.
+    
+    Args:
+        dry_run: If True, show preview without writing
+        
+    Returns:
+        bool: True if successful, False otherwise
+    """
+    if dry_run:
+        print("[DRY RUN] Would regenerate search index")
+        return True
+    
+    print("\nUpdating search index...")
+    try:
+        from build_search_index import SearchIndexBuilder
+        builder = SearchIndexBuilder()
+        builder.run()
+        return True
+    except ImportError as e:
+        print(f"Warning: Could not import search index builder: {e}")
+        print("Search index may be out of date")
+        return False
+    except Exception as e:
+        print(f"Warning: Failed to update search index: {e}")
+        print("Search index may be out of date")
+        return False
+
+
 def update_post(filename, title=None, date=None, categories=None, 
                 update_html=True, dry_run=False):
     """Update a post's metadata across all relevant files."""
@@ -395,6 +429,10 @@ def update_post(filename, title=None, date=None, categories=None,
     # Update "All Posts" section in index.html if chrono was updated
     if results['chrono']:
         update_all_posts_section(dry_run)
+    
+    # Update search index when searchable metadata (currently the title) changes
+    if title:
+        update_search_index(dry_run)
     
     # Summary
     print()
