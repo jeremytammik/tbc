@@ -916,6 +916,19 @@
     }
   };
 
+  // Mobile Sheet Configuration
+  const MOBILE_CONFIG = {
+    breakpoint: 768,
+    landscapeBreakpoint: 896,
+    storageKeys: {
+      sheetState: 'tbc-chrono-sheet-state',
+      selectedYear: 'tbc-chrono-selected-year',
+      selectedMonth: 'tbc-chrono-selected-month'
+    },
+    swipeThreshold: 50,
+    animationDuration: 250
+  };
+
   // ================================
   // State
   // ================================
@@ -925,6 +938,44 @@
     expandedYears: new Set()
   };
 
+  // Mobile Sheet State
+  const mobileState = {
+    mode: 'collapsed', // 'collapsed' | 'years' | 'months'
+    selectedYear: null,
+    selectedMonth: null,
+    touchStartY: 0,
+    isLandscape: false,
+    scrollPosition: 0
+  };
+
+  // Feature flag for mobile sheet (configurable at runtime)
+  // Priority:
+  //   1. URL query parameter: ?mobileSheet=true|false
+  //   2. localStorage key: 'tbc-enable-mobile-sheet' ("true" | "false")
+  //   3. Default: true
+  const ENABLE_MOBILE_SHEET = (function() {
+    try {
+      if (typeof window !== 'undefined') {
+        // URL query parameter override
+        if (window.location && window.location.search) {
+          const params = new URLSearchParams(window.location.search);
+          const param = params.get('mobileSheet');
+          if (param === 'true' || param === '1') return true;
+          if (param === 'false' || param === '0') return false;
+        }
+
+        // localStorage override
+        if (window.localStorage) {
+          const stored = window.localStorage.getItem('tbc-enable-mobile-sheet');
+          if (stored === 'true') return true;
+          if (stored === 'false') return false;
+        }
+      }
+    } catch (e) {
+      // Ignore configuration errors and fall back to default
+    }
+    return true;
+  })();
   // ================================
   // Utility Functions
   // ================================
@@ -1268,6 +1319,492 @@
   }
 
   // ================================
+  // Mobile Sheet - Viewport Detection
+  // ================================
+  function isMobileViewport() {
+    return window.matchMedia(`(max-width: ${MOBILE_CONFIG.breakpoint}px)`).matches;
+  }
+
+  function isLandscape() {
+    return window.matchMedia('(orientation: landscape)').matches;
+  }
+
+  // ================================
+  // Mobile Sheet - Body Scroll Lock
+  // ================================
+  function setBodyScrollLock(locked) {
+    if (locked) {
+      mobileState.scrollPosition = window.scrollY;
+      document.body.classList.add('tbc-sheet-open');
+      document.body.style.top = `-${mobileState.scrollPosition}px`;
+    } else {
+      document.body.classList.remove('tbc-sheet-open');
+      document.body.style.top = '';
+      window.scrollTo(0, mobileState.scrollPosition || 0);
+    }
+  }
+
+  // ================================
+  // Mobile Sheet - Overlay Management
+  // ================================
+  function setOverlayVisible(visible) {
+    const overlay = document.querySelector('.tbc-chrono-overlay');
+    if (!overlay) return;
+    
+    if (visible) {
+      overlay.classList.add('visible');
+    } else {
+      overlay.classList.remove('visible');
+    }
+  }
+
+  // ================================
+  // Mobile Sheet - State Management
+  // ================================
+  function setSheetMode(mode) {
+    const sheet = document.querySelector('.tbc-chrono-mobile-sheet');
+    if (!sheet) return;
+
+    sheet.classList.remove('collapsed', 'partial', 'expanded');
+    mobileState.mode = mode;
+    
+    switch (mode) {
+      case 'collapsed':
+        sheet.classList.add('collapsed');
+        setBodyScrollLock(false);
+        setOverlayVisible(false);
+        break;
+      case 'years':
+        sheet.classList.add('partial');
+        setBodyScrollLock(true);
+        setOverlayVisible(true);
+        renderYearGrid();
+        break;
+      case 'months':
+        sheet.classList.add('expanded');
+        setBodyScrollLock(true);
+        setOverlayVisible(true);
+        renderMonthView();
+        break;
+    }
+
+    saveMobileSheetState();
+  }
+
+  // ================================
+  // Mobile Sheet - Year Grid Rendering
+  // ================================
+  function renderYearGrid() {
+    const container = document.querySelector('.tbc-sheet-content');
+    if (!container) return;
+
+    if (!chronoState.data || !chronoState.data.years) {
+      container.innerHTML = `
+        <div class="tbc-sheet-empty-state">
+          <div class="tbc-sheet-empty-state-icon">📅</div>
+          <div>Navigation unavailable</div>
+          <div style="font-size: 12px; margin-top: 8px;">Unable to load post data</div>
+        </div>
+      `;
+      return;
+    }
+
+    const years = chronoState.data.years || [];
+    
+    if (years.length === 0) {
+      container.innerHTML = `
+        <div class="tbc-sheet-empty-state">
+          <div class="tbc-sheet-empty-state-icon">📝</div>
+          <div>No posts found</div>
+        </div>
+      `;
+      return;
+    }
+
+    const currentYear = chronoState.currentPostNum 
+      ? findPostByNum(chronoState.data.posts, chronoState.currentPostNum)?.year 
+      : null;
+
+    let html = `
+      <div class="tbc-year-grid-header">Browse by Year</div>
+      <div class="tbc-year-grid">
+    `;
+
+    for (const yearData of years) {
+      const isCurrent = yearData.year === currentYear;
+      html += `
+        <button class="tbc-year-chip ${isCurrent ? 'current' : ''}" 
+                data-year="${yearData.year}"
+                aria-label="${yearData.year}, ${yearData.count} posts">
+          <span class="tbc-year-chip-year">${yearData.year}</span>
+          <span class="tbc-year-chip-count">${yearData.count}</span>
+        </button>
+      `;
+    }
+
+    html += '</div>';
+    container.innerHTML = html;
+
+    // Add click handlers
+    container.querySelectorAll('.tbc-year-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        mobileState.selectedYear = parseInt(chip.dataset.year);
+        // Find the newest month with posts for this year
+        const yearPosts = chronoState.data.posts.filter(p => p.year === mobileState.selectedYear);
+        const months = [...new Set(yearPosts.map(p => p.month))];
+        mobileState.selectedMonth = Math.max(...months);
+        setSheetMode('months');
+      });
+    });
+  }
+
+  // ================================
+  // Mobile Sheet - Month View Rendering
+  // ================================
+  function renderMonthView() {
+    const container = document.querySelector('.tbc-sheet-content');
+    if (!container || !chronoState.data || !mobileState.selectedYear) return;
+
+    const year = mobileState.selectedYear;
+    const posts = chronoState.data.posts.filter(p => p.year === year);
+    
+    // Group by month
+    const monthGroups = {};
+    for (const post of posts) {
+      if (!monthGroups[post.month]) {
+        monthGroups[post.month] = [];
+      }
+      monthGroups[post.month].push(post);
+    }
+
+    // Sort months descending
+    const months = Object.keys(monthGroups)
+      .map(m => parseInt(m))
+      .sort((a, b) => b - a);
+
+    const selectedMonth = mobileState.selectedMonth || months[0];
+    const monthNames = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+                        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+    const isLandscapeMode = isLandscape() && window.matchMedia(`(max-width: ${MOBILE_CONFIG.landscapeBreakpoint}px)`).matches;
+
+    let html = `
+      <div class="tbc-sheet-header">
+        <button class="tbc-sheet-back" aria-label="Back to years">←</button>
+        <div class="tbc-sheet-title">
+          <span class="tbc-sheet-year">${year}</span>
+          <span class="tbc-sheet-count">${posts.length} posts</span>
+        </div>
+        <button class="tbc-sheet-close" aria-label="Close">✕</button>
+      </div>
+    `;
+
+    if (isLandscapeMode) {
+      // Landscape: side-by-side layout
+      html += '<div class="tbc-sheet-content-landscape">';
+      html += '<div class="tbc-month-list-sidebar">';
+      for (const month of months) {
+        const isActive = month === selectedMonth;
+        const count = monthGroups[month].length;
+        html += `
+          <button class="tbc-month-tab ${isActive ? 'active' : ''}" 
+                  role="tab"
+                  aria-selected="${isActive}"
+                  data-month="${month}">
+            ${monthNames[month]}
+            <span class="tbc-month-tab-count">${count}</span>
+          </button>
+        `;
+      }
+      html += '</div><div class="tbc-post-list-main">';
+    } else {
+      // Portrait: horizontal tabs
+      html += '<div class="tbc-month-tabs" role="tablist">';
+      for (const month of months) {
+        const isActive = month === selectedMonth;
+        const count = monthGroups[month].length;
+        html += `
+          <button class="tbc-month-tab ${isActive ? 'active' : ''}" 
+                  role="tab"
+                  aria-selected="${isActive}"
+                  data-month="${month}">
+            ${monthNames[month]}
+            <span class="tbc-month-tab-count">${count}</span>
+          </button>
+        `;
+      }
+      html += '</div>';
+    }
+
+    html += '<div class="tbc-post-list" role="listbox">';
+
+    // Render posts for selected month (newest first)
+    const monthPosts = monthGroups[selectedMonth] || [];
+    const currentNum = chronoState.currentPostNum;
+
+    for (const post of monthPosts.slice().reverse()) {
+      const isCurrent = post.num === currentNum;
+      const escapedTitle = escapeHtml(post.title);
+      html += `
+        <a href="${post.file}" 
+           class="tbc-post-item ${isCurrent ? 'current' : ''}"
+           role="option"
+           aria-selected="${isCurrent}">
+          <span class="tbc-post-num">#${String(post.num).padStart(4, '0')}</span>
+          <span class="tbc-post-title">${escapedTitle}</span>
+          <span class="tbc-post-date">${post.date}</span>
+        </a>
+      `;
+    }
+
+    html += '</div>';
+
+    if (isLandscapeMode) {
+      html += '</div></div>'; // Close post-list-main and content-landscape
+    }
+
+    container.innerHTML = html;
+
+    // Add event handlers
+    container.querySelector('.tbc-sheet-back').addEventListener('click', () => {
+      setSheetMode('years');
+    });
+
+    container.querySelector('.tbc-sheet-close').addEventListener('click', () => {
+      setSheetMode('collapsed');
+    });
+
+    container.querySelectorAll('.tbc-month-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        mobileState.selectedMonth = parseInt(tab.dataset.month);
+        renderMonthView();
+      });
+    });
+
+    // Scroll active month tab into view
+    const activeTab = container.querySelector('.tbc-month-tab.active');
+    if (activeTab && !isLandscapeMode) {
+      const prefersReducedMotion = typeof window !== 'undefined'
+        && typeof window.matchMedia === 'function'
+        && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const scrollBehavior = prefersReducedMotion ? 'auto' : 'smooth';
+      activeTab.scrollIntoView({ behavior: scrollBehavior, block: 'nearest', inline: 'center' });
+    }
+  }
+
+  // Helper to escape HTML
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  // ================================
+  // Mobile Sheet - Touch Gesture Handling
+  // ================================
+  function initTouchGestures(sheet) {
+    let startY = 0;
+    let currentY = 0;
+
+    sheet.addEventListener('touchstart', (e) => {
+      startY = e.touches[0].clientY;
+    }, { passive: true });
+
+    sheet.addEventListener('touchmove', (e) => {
+      currentY = e.touches[0].clientY;
+    }, { passive: true });
+
+    sheet.addEventListener('touchend', () => {
+      const deltaY = startY - currentY;
+      
+      if (Math.abs(deltaY) > MOBILE_CONFIG.swipeThreshold) {
+        if (deltaY > 0) {
+          // Swipe up - expand
+          if (mobileState.mode === 'collapsed') {
+            setSheetMode('years');
+          }
+        } else {
+          // Swipe down - collapse
+          if (mobileState.mode === 'years') {
+            setSheetMode('collapsed');
+          } else if (mobileState.mode === 'months') {
+            setSheetMode('years');
+          }
+        }
+      }
+    });
+  }
+
+  // ================================
+  // Mobile Sheet - Focus Trap
+  // ================================
+  function initFocusTrap(container) {
+    const focusableSelector = 'button, a[href], input, [tabindex]:not([tabindex="-1"])';
+    
+    container.addEventListener('keydown', (e) => {
+      // Escape key closes sheet
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        setSheetMode('collapsed');
+        return;
+      }
+      
+      // Tab trap
+      if (e.key === 'Tab') {
+        const focusable = container.querySelectorAll(focusableSelector);
+        if (focusable.length === 0) return;
+        
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    });
+  }
+
+  // ================================
+  // Mobile Sheet - State Persistence
+  // ================================
+  function saveMobileSheetState() {
+    try {
+      localStorage.setItem(MOBILE_CONFIG.storageKeys.sheetState, mobileState.mode);
+      if (mobileState.selectedYear) {
+        localStorage.setItem(MOBILE_CONFIG.storageKeys.selectedYear, 
+                             mobileState.selectedYear.toString());
+      }
+      if (mobileState.selectedMonth) {
+        localStorage.setItem(MOBILE_CONFIG.storageKeys.selectedMonth, 
+                             mobileState.selectedMonth.toString());
+      }
+    } catch (e) {
+      console.warn('Failed to save mobile sheet state to localStorage');
+      console.warn('Failed to save mobile sheet state to localStorage:', e);
+    }
+  }
+
+  function loadMobileSheetState() {
+    try {
+      const mode = localStorage.getItem(MOBILE_CONFIG.storageKeys.sheetState);
+      const year = localStorage.getItem(MOBILE_CONFIG.storageKeys.selectedYear);
+      const month = localStorage.getItem(MOBILE_CONFIG.storageKeys.selectedMonth);
+
+      if (year) mobileState.selectedYear = parseInt(year);
+      if (month) mobileState.selectedMonth = parseInt(month);
+      if (mode && ['collapsed', 'years', 'months'].includes(mode)) {
+        return mode;
+      }
+    } catch (e) {
+      console.warn('Failed to load mobile sheet state from localStorage:', e);
+    }
+    return 'collapsed';
+  }
+
+  // ================================
+  // Mobile Sheet - Context Label Update
+  // ================================
+  function updateContextLabel() {
+    const label = document.querySelector('.tbc-sheet-context');
+    if (!label || !chronoState.data) return;
+
+    const currentNum = chronoState.currentPostNum;
+    if (currentNum) {
+      const post = findPostByNum(chronoState.data.posts, currentNum);
+      if (post) {
+        const yearPosts = chronoState.data.posts.filter(p => p.year === post.year);
+        const yearIndex = yearPosts.findIndex(p => p.num === currentNum) + 1;
+        label.textContent = `${post.year} · Post ${yearIndex} of ${yearPosts.length}`;
+        return;
+      }
+    }
+    
+    label.textContent = `${chronoState.data.posts.length} posts · Tap to browse`;
+  }
+
+  // ================================
+  // Mobile Sheet - Initialization
+  // ================================
+  function initMobileSheet() {
+    if (!isMobileViewport()) return;
+
+    // Mark body for CSS targeting
+    document.body.classList.add('tbc-has-chrono-sheet');
+
+    // Create overlay
+    const overlay = document.createElement('div');
+    overlay.className = 'tbc-chrono-overlay';
+    overlay.addEventListener('click', () => setSheetMode('collapsed'));
+
+    // Create sheet
+    const sheet = document.createElement('div');
+    sheet.className = 'tbc-chrono-mobile-sheet collapsed';
+    sheet.setAttribute('role', 'dialog');
+    sheet.setAttribute('aria-label', 'Chronological post navigation');
+    sheet.innerHTML = `
+      <div class="tbc-sheet-drag-handle"></div>
+      <div class="tbc-sheet-collapsed-bar">
+        <span class="tbc-sheet-context"></span>
+      </div>
+      <div class="tbc-sheet-content"></div>
+    `;
+
+    document.body.appendChild(overlay);
+    document.body.appendChild(sheet);
+
+    // Initialize touch gestures
+    initTouchGestures(sheet);
+
+    // Initialize focus trap
+    initFocusTrap(sheet);
+
+    // Set up collapsed bar click
+    sheet.querySelector('.tbc-sheet-collapsed-bar').addEventListener('click', () => {
+      setSheetMode('years');
+    });
+
+    // Update context label
+    updateContextLabel();
+
+    // Restore state (but start collapsed to avoid jarring experience)
+    const savedMode = loadMobileSheetState();
+    // Only restore non-collapsed state if there was user selection
+    if (savedMode !== 'collapsed' && mobileState.selectedYear) {
+      if (savedMode === 'months' && !mobileState.selectedMonth) {
+        // Months view requires both a year and a month; fall back to years view if month is missing
+        setSheetMode('years');
+      } else {
+        setSheetMode(savedMode);
+      }
+    }
+
+    // Handle orientation changes
+    window.matchMedia('(orientation: landscape)').addEventListener('change', () => {
+      mobileState.isLandscape = isLandscape();
+      if (mobileState.mode === 'months') {
+        renderMonthView(); // Re-render for layout change
+      }
+    });
+
+    // Handle viewport resize
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        if (!isMobileViewport() && mobileState.mode !== 'collapsed') {
+          setSheetMode('collapsed');
+        }
+      }, 150);
+    });
+
+    console.log('Mobile chrono sheet initialized');
+  }
+
+  // ================================
   // Initialize
   // ================================
   async function initChronoColumn() {
@@ -1318,6 +1855,11 @@
       if (years.length > 0 && !chronoState.expandedYears.has(years[0].year)) {
         toggleYear(years[0].year);
       }
+    }
+    
+    // Initialize mobile sheet if enabled and on mobile viewport
+    if (ENABLE_MOBILE_SHEET && isMobileViewport()) {
+      initMobileSheet();
     }
     
     console.log('Chrono column initialized');

@@ -1118,3 +1118,408 @@ body.tbc-resizing * {
     display: none;
   }
 }
+
+/* ================================
+   MOBILE CHRONOLOGICAL BOTTOM SHEET
+   ================================ */
+
+/* CSS Custom Properties for Mobile Sheet */
+:root {
+  --tbc-sheet-collapsed-height: 48px;
+  --tbc-sheet-partial-height: 50vh;
+  --tbc-sheet-expanded-height: 85vh;
+  --tbc-sheet-z: 1000;
+  --tbc-sheet-transition: 250ms ease-out;
+  --tbc-tab-transition: 150ms ease-in-out;
+  --tbc-touch-min: 44px;
+}
+
+/* Body scroll lock when sheet is expanded */
+body.tbc-sheet-open {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+}
+
+/* ================================
+   Mobile Bottom Sheet Container
+   ================================ */
+@media (max-width: 768px) {
+  /* Overlay backdrop */
+  .tbc-chrono-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: calc(var(--tbc-sheet-z) - 1);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity var(--tbc-sheet-transition),
+                visibility var(--tbc-sheet-transition);
+  }
+
+  .tbc-chrono-overlay.visible {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  /* Bottom sheet container */
+  .tbc-chrono-mobile-sheet {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: var(--tbc-sheet-collapsed-height);
+    background: var(--tbc-sidebar-bg);
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    z-index: var(--tbc-sheet-z);
+    transition: height var(--tbc-sheet-transition);
+    overflow: hidden;
+    /* Safe area for notched phones */
+    padding-bottom: env(safe-area-inset-bottom);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .tbc-chrono-mobile-sheet.partial {
+    height: var(--tbc-sheet-partial-height);
+  }
+
+  .tbc-chrono-mobile-sheet.expanded {
+    height: var(--tbc-sheet-expanded-height);
+  }
+
+  /* Hide desktop chrono column on mobile when sheet is present */
+  .tbc-chrono-mobile-sheet ~ .tbc-chrono-column,
+  body.tbc-has-chrono-sheet .tbc-chrono-column {
+    display: none !important;
+  }
+
+  /* Drag handle indicator */
+  .tbc-sheet-drag-handle {
+    width: 36px;
+    height: 4px;
+    background: var(--tbc-sidebar-border);
+    border-radius: 2px;
+    margin: 8px auto 0;
+    flex-shrink: 0;
+  }
+
+  /* Collapsed bar */
+  .tbc-sheet-collapsed-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: calc(var(--tbc-sheet-collapsed-height) - 12px);
+    padding: 0 16px;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .tbc-sheet-context {
+    font-size: 14px;
+    color: var(--tbc-sidebar-text);
+    font-weight: 500;
+  }
+
+  /* Sheet content area */
+  .tbc-sheet-content {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Sheet header (shown in months view) */
+  .tbc-sheet-header {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--tbc-sidebar-border);
+    gap: 12px;
+    flex-shrink: 0;
+  }
+
+  .tbc-sheet-back,
+  .tbc-sheet-close {
+    width: var(--tbc-touch-min);
+    height: var(--tbc-touch-min);
+    border: none;
+    background: transparent;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--tbc-sidebar-text);
+    border-radius: 50%;
+    transition: background-color var(--tbc-tab-transition);
+  }
+
+  .tbc-sheet-back:hover,
+  .tbc-sheet-close:hover {
+    background: var(--tbc-sidebar-hover);
+  }
+
+  .tbc-sheet-title {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .tbc-sheet-year {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--tbc-sidebar-text);
+  }
+
+  .tbc-sheet-count {
+    font-size: 12px;
+    color: var(--tbc-sidebar-text-muted);
+  }
+}
+
+/* ================================
+   Year Grid (Partial Expand State)
+   ================================ */
+@media (max-width: 768px) {
+  .tbc-year-grid-header {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--tbc-sidebar-text-muted);
+    padding: 16px 16px 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .tbc-year-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 8px;
+    padding: 8px 16px 16px;
+  }
+
+  .tbc-year-chip {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 8px;
+    min-height: var(--tbc-touch-min);
+    background: var(--tbc-sidebar-bg-light);
+    border: 1px solid var(--tbc-sidebar-border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color var(--tbc-tab-transition),
+                border-color var(--tbc-tab-transition);
+  }
+
+  .tbc-year-chip:hover {
+    background: var(--tbc-sidebar-hover);
+  }
+
+  .tbc-year-chip.current {
+    border-color: var(--tbc-accent-primary);
+    background: rgba(0, 102, 204, 0.08);
+  }
+
+  .tbc-year-chip-year {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--tbc-sidebar-text);
+  }
+
+  .tbc-year-chip-count {
+    font-size: 11px;
+    color: var(--tbc-sidebar-text-muted);
+    margin-top: 2px;
+  }
+}
+
+/* ================================
+   Month Tabs (Expanded State)
+   ================================ */
+@media (max-width: 768px) {
+  .tbc-month-tabs {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 0 16px;
+    gap: 4px;
+    border-bottom: 1px solid var(--tbc-sidebar-border);
+    flex-shrink: 0;
+  }
+
+  .tbc-month-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .tbc-month-tab {
+    flex-shrink: 0;
+    scroll-snap-align: start;
+    padding: 12px 16px;
+    min-width: var(--tbc-touch-min);
+    text-align: center;
+    border: none;
+    background: transparent;
+    color: var(--tbc-sidebar-text-muted);
+    font-size: 14px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: color var(--tbc-tab-transition),
+                border-color var(--tbc-tab-transition);
+  }
+
+  .tbc-month-tab.active {
+    color: var(--tbc-accent-primary);
+    border-bottom-color: var(--tbc-accent-primary);
+  }
+
+  .tbc-month-tab-count {
+    display: block;
+    font-size: 11px;
+    color: var(--tbc-sidebar-text-muted);
+    margin-top: 2px;
+  }
+
+  .tbc-month-tab.active .tbc-month-tab-count {
+    color: var(--tbc-accent-primary);
+  }
+}
+
+/* ================================
+   Post List (Expanded State)
+   ================================ */
+@media (max-width: 768px) {
+  .tbc-post-list {
+    padding: 8px 0;
+  }
+
+  .tbc-post-item {
+    display: flex;
+    flex-direction: column;
+    padding: 12px 16px;
+    text-decoration: none;
+    color: var(--tbc-sidebar-text);
+    border-bottom: 1px solid var(--tbc-sidebar-border);
+    transition: background-color var(--tbc-tab-transition);
+    min-height: var(--tbc-touch-min);
+    justify-content: center;
+  }
+
+  .tbc-post-item:hover {
+    background: var(--tbc-sidebar-hover);
+  }
+
+  .tbc-post-item.current {
+    background: rgba(0, 102, 204, 0.08);
+    border-left: 3px solid var(--tbc-accent-primary);
+    padding-left: 13px;
+  }
+
+  .tbc-post-num {
+    font-size: 11px;
+    color: var(--tbc-sidebar-text-muted);
+    font-family: 'Consolas', 'Monaco', monospace;
+  }
+
+  .tbc-post-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--tbc-sidebar-text);
+    margin-top: 2px;
+    line-height: 1.3;
+  }
+
+  .tbc-post-date {
+    font-size: 11px;
+    color: var(--tbc-sidebar-text-muted);
+    margin-top: 4px;
+  }
+}
+
+/* ================================
+   Empty State
+   ================================ */
+@media (max-width: 768px) {
+  .tbc-sheet-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+    color: var(--tbc-sidebar-text-muted);
+    text-align: center;
+    padding: 24px;
+  }
+
+  .tbc-sheet-empty-state-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+  }
+}
+
+/* ================================
+   Landscape Layout
+   ================================ */
+@media (max-width: 896px) and (orientation: landscape) {
+  .tbc-chrono-mobile-sheet.expanded {
+    height: 100vh;
+    border-radius: 0;
+  }
+
+  .tbc-sheet-content-landscape {
+    display: flex;
+    height: calc(100% - 60px);
+  }
+
+  .tbc-month-list-sidebar {
+    width: 140px;
+    flex-shrink: 0;
+    border-right: 1px solid var(--tbc-sidebar-border);
+    overflow-y: auto;
+  }
+
+  .tbc-month-list-sidebar .tbc-month-tab {
+    display: block;
+    width: 100%;
+    text-align: left;
+    border-bottom: none;
+    border-left: 2px solid transparent;
+    padding: 10px 12px;
+  }
+
+  .tbc-month-list-sidebar .tbc-month-tab.active {
+    border-left-color: var(--tbc-accent-primary);
+    border-bottom-color: transparent;
+    background: rgba(0, 102, 204, 0.08);
+  }
+
+  .tbc-post-list-main {
+    flex: 1;
+    overflow-y: auto;
+  }
+}
+
+/* ================================
+   Reduced Motion Support
+   ================================ */
+@media (prefers-reduced-motion: reduce) {
+  .tbc-chrono-mobile-sheet,
+  .tbc-chrono-overlay,
+  .tbc-month-tab,
+  .tbc-year-chip,
+  .tbc-post-item,
+  .tbc-sheet-back,
+  .tbc-sheet-close {
+    transition: none !important;
+  }
+}
