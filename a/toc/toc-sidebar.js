@@ -2332,14 +2332,36 @@
 
     let currentIndex = 0;
 
-    // Clear button
-    counter.querySelector('.tbc-highlight-clear').addEventListener('click', () => {
+    // Keyboard navigation
+    function highlightKeyHandler(e) {
+      if (e.key === 'Escape') {
+        cleanup();
+      } else if (e.key === 'F3' || (e.ctrlKey && e.key === 'g')) {
+        e.preventDefault();
+        if (e.shiftKey) {
+          currentIndex = (currentIndex - 1 + allMarks.length) % allMarks.length;
+        } else {
+          currentIndex = (currentIndex + 1) % allMarks.length;
+        }
+        scrollToHighlight(allMarks, currentIndex);
+      }
+    }
+    document.addEventListener('keydown', highlightKeyHandler);
+
+    // Cleanup function to remove highlights, counter, and event listener
+    function cleanup() {
       clearContentHighlights();
       counter.remove();
+      document.removeEventListener('keydown', highlightKeyHandler);
       // Remove highlight param from URL
       const url = new URL(window.location);
       url.searchParams.delete(HIGHLIGHT_CONFIG.paramName);
       window.history.replaceState({}, '', url);
+    }
+
+    // Clear button
+    counter.querySelector('.tbc-highlight-clear').addEventListener('click', () => {
+      cleanup();
     });
 
     // Navigation buttons
@@ -2354,28 +2376,6 @@
       currentIndex = (currentIndex + 1) % allMarks.length;
       scrollToHighlight(allMarks, currentIndex);
     });
-
-    // Keyboard navigation
-    function highlightKeyHandler(e) {
-      if (e.key === 'Escape') {
-        clearContentHighlights();
-        counter.remove();
-        document.removeEventListener('keydown', highlightKeyHandler);
-        // Remove highlight param from URL
-        const url = new URL(window.location);
-        url.searchParams.delete(HIGHLIGHT_CONFIG.paramName);
-        window.history.replaceState({}, '', url);
-      } else if (e.key === 'F3' || (e.ctrlKey && e.key === 'g')) {
-        e.preventDefault();
-        if (e.shiftKey) {
-          currentIndex = (currentIndex - 1 + allMarks.length) % allMarks.length;
-        } else {
-          currentIndex = (currentIndex + 1) % allMarks.length;
-        }
-        scrollToHighlight(allMarks, currentIndex);
-      }
-    }
-    document.addEventListener('keydown', highlightKeyHandler);
   }
 
   /**
