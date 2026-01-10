@@ -948,9 +948,34 @@
     scrollPosition: 0
   };
 
-  // Feature flag for mobile sheet (set to false to disable)
-  const ENABLE_MOBILE_SHEET = true;
+  // Feature flag for mobile sheet (configurable at runtime)
+  // Priority:
+  //   1. URL query parameter: ?mobileSheet=true|false
+  //   2. localStorage key: 'tbc-enable-mobile-sheet' ("true" | "false")
+  //   3. Default: true
+  const ENABLE_MOBILE_SHEET = (function() {
+    try {
+      if (typeof window !== 'undefined') {
+        // URL query parameter override
+        if (window.location && window.location.search) {
+          const params = new URLSearchParams(window.location.search);
+          const param = params.get('mobileSheet');
+          if (param === 'true' || param === '1') return true;
+          if (param === 'false' || param === '0') return false;
+        }
 
+        // localStorage override
+        if (window.localStorage) {
+          const stored = window.localStorage.getItem('tbc-enable-mobile-sheet');
+          if (stored === 'true') return true;
+          if (stored === 'false') return false;
+        }
+      }
+    } catch (e) {
+      // Ignore configuration errors and fall back to default
+    }
+    return true;
+  })();
   // ================================
   // Utility Functions
   // ================================
