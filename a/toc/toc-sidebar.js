@@ -2269,8 +2269,7 @@
       const fragment = document.createDocumentFragment();
 
       parts.forEach(part => {
-        if (regex.test(part)) {
-          regex.lastIndex = 0;
+        if (part.match(regex)) {
           if (totalHighlights < HIGHLIGHT_CONFIG.maxHighlights) {
             const mark = document.createElement('mark');
             mark.className = HIGHLIGHT_CONFIG.className;
