@@ -1584,7 +1584,11 @@
     // Scroll active month tab into view
     const activeTab = container.querySelector('.tbc-month-tab.active');
     if (activeTab && !isLandscapeMode) {
-      activeTab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      const prefersReducedMotion = typeof window !== 'undefined'
+        && typeof window.matchMedia === 'function'
+        && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const scrollBehavior = prefersReducedMotion ? 'auto' : 'smooth';
+      activeTab.scrollIntoView({ behavior: scrollBehavior, block: 'nearest', inline: 'center' });
     }
   }
 
