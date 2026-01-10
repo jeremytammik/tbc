@@ -1679,7 +1679,7 @@
                              mobileState.selectedMonth.toString());
       }
     } catch (e) {
-      console.warn('Failed to save sheet state');
+      console.warn('Failed to save mobile sheet state to localStorage:', e);
     }
   }
 
@@ -1695,7 +1695,7 @@
         return mode;
       }
     } catch (e) {
-      console.warn('Failed to load sheet state');
+      console.warn('Failed to load mobile sheet state from localStorage:', e);
     }
     return 'collapsed';
   }
