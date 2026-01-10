@@ -2308,12 +2308,23 @@
   /**
    * Create floating counter badge with navigation
    */
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
   function createHighlightCounter(allMarks, term) {
     const counter = document.createElement('div');
     counter.className = 'tbc-highlight-counter';
+    const displayTerm = term.length > 20 ? term.substring(0, 20) + '...' : term;
+    const escapedTerm = escapeHtml(displayTerm);
     counter.innerHTML = `
       <span class="tbc-highlight-count">${allMarks.length}</span>
-      <span class="tbc-highlight-label">matches for "${term.length > 20 ? term.substring(0, 20) + '...' : term}"</span>
+      <span class="tbc-highlight-label">matches for "${escapedTerm}"</span>
       <button class="tbc-highlight-nav tbc-highlight-prev" aria-label="Previous match">▲</button>
       <button class="tbc-highlight-nav tbc-highlight-next" aria-label="Next match">▼</button>
       <button class="tbc-highlight-clear" aria-label="Clear highlights">×</button>
