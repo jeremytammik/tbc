@@ -1684,6 +1684,7 @@
       }
     } catch (e) {
       console.warn('Failed to save mobile sheet state to localStorage');
+      console.warn('Failed to save mobile sheet state to localStorage:', e);
     }
   }
 
@@ -1699,7 +1700,7 @@
         return mode;
       }
     } catch (e) {
-      console.warn('Failed to load mobile sheet state from localStorage');
+      console.warn('Failed to load mobile sheet state from localStorage:', e);
     }
     return 'collapsed';
   }
@@ -1773,7 +1774,12 @@
     const savedMode = loadMobileSheetState();
     // Only restore non-collapsed state if there was user selection
     if (savedMode !== 'collapsed' && mobileState.selectedYear) {
-      setSheetMode(savedMode);
+      if (savedMode === 'months' && !mobileState.selectedMonth) {
+        // Months view requires both a year and a month; fall back to years view if month is missing
+        setSheetMode('years');
+      } else {
+        setSheetMode(savedMode);
+      }
     }
 
     // Handle orientation changes

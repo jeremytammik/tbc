@@ -1125,12 +1125,12 @@ body.tbc-resizing * {
 
 /* CSS Custom Properties for Mobile Sheet */
 :root {
-  --tbc-sheet-collapsed-height: 56px;
-  --tbc-sheet-partial-height: 45vh;
+  --tbc-sheet-collapsed-height: 48px;
+  --tbc-sheet-partial-height: 50vh;
   --tbc-sheet-expanded-height: 85vh;
   --tbc-sheet-z: 1000;
   --tbc-sheet-transition: 250ms ease-out;
-  --tbc-tab-transition: 0.15s ease;
+  --tbc-tab-transition: 150ms ease-in-out;
   --tbc-touch-min: 44px;
 }
 
@@ -1154,7 +1154,7 @@ body.tbc-sheet-open {
     right: 0;
     bottom: 0;
     background: rgba(0, 0, 0, 0.4);
-    z-index: 999;
+    z-index: calc(var(--tbc-sheet-z) - 1);
     opacity: 0;
     visibility: hidden;
     transition: opacity var(--tbc-sheet-transition),
