@@ -1683,6 +1683,7 @@
                              mobileState.selectedMonth.toString());
       }
     } catch (e) {
+      console.warn('Failed to save mobile sheet state to localStorage');
       console.warn('Failed to save mobile sheet state to localStorage:', e);
     }
   }
