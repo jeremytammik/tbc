@@ -1773,7 +1773,12 @@
     const savedMode = loadMobileSheetState();
     // Only restore non-collapsed state if there was user selection
     if (savedMode !== 'collapsed' && mobileState.selectedYear) {
-      setSheetMode(savedMode);
+      if (savedMode === 'months' && !mobileState.selectedMonth) {
+        // Months view requires both a year and a month; fall back to years view if month is missing
+        setSheetMode('years');
+      } else {
+        setSheetMode(savedMode);
+      }
     }
 
     // Handle orientation changes
