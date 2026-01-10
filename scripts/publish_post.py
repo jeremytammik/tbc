@@ -527,6 +527,9 @@ def publish_post(md_file, date=None, title=None, slug=None,
         update_all_posts_section(dry_run)
     
     # Update search index
+    # Note: Search index updates are intentionally tied to TOC/data updates,
+    # so we reuse update_toc_flag here. If this coupling changes in the future,
+    # introduce a dedicated flag for search index updates.
     if update_toc_flag:
         update_search_index(dry_run)
     
