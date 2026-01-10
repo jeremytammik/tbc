@@ -430,7 +430,7 @@ def update_post(filename, title=None, date=None, categories=None,
     if results['chrono']:
         update_all_posts_section(dry_run)
     
-    # Update search index if title changed (content may have changed)
+    # Update search index when searchable metadata (currently the title) changes
     if title:
         update_search_index(dry_run)
     
