@@ -21,6 +21,11 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
+# Add scripts directory to path for local imports
+SCRIPTS_DIR = Path(__file__).parent
+if str(SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPTS_DIR))
+
 try:
     import markdown
     import frontmatter
@@ -412,6 +417,35 @@ def update_all_posts_section(dry_run=False):
     return True
 
 
+def update_search_index(dry_run=False):
+    """Regenerate search index after publishing a post.
+    
+    Args:
+        dry_run: If True, show preview without writing
+        
+    Returns:
+        bool: True if successful, False otherwise
+    """
+    if dry_run:
+        print("[DRY RUN] Would regenerate search index")
+        return True
+    
+    print("\nUpdating search index...")
+    try:
+        from build_search_index import SearchIndexBuilder
+        builder = SearchIndexBuilder()
+        builder.run()
+        return True
+    except ImportError as e:
+        print(f"Warning: Could not import search index builder: {e}")
+        print("Search index may be out of date")
+        return False
+    except Exception as e:
+        print(f"Warning: Failed to update search index: {e}")
+        print("Search index may be out of date")
+        return False
+
+
 def publish_post(md_file, date=None, title=None, slug=None, 
                  dry_run=False, update_idx=True, update_toc_flag=True, 
                  update_stats=True):
@@ -491,6 +525,10 @@ def publish_post(md_file, date=None, title=None, slug=None,
     # Update "All Posts" section in index.html
     if update_toc_flag:
         update_all_posts_section(dry_run)
+    
+    # Update search index
+    if update_toc_flag:
+        update_search_index(dry_run)
     
     # Update homepage stats
     if update_stats:
