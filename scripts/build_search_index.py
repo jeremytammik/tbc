@@ -26,9 +26,10 @@ from pathlib import Path
 
 try:
     from bs4 import BeautifulSoup
-except ImportError:
-    print("Error: BeautifulSoup is required. Install with: pip install beautifulsoup4")
-    sys.exit(1)
+except ImportError as exc:
+    raise ImportError(
+        "BeautifulSoup is required. Install it with: pip install beautifulsoup4"
+    ) from exc
 
 # Configuration
 REPO_ROOT = Path(__file__).parent.parent
