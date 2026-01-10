@@ -299,9 +299,8 @@ def delete_post(filename, dry_run=False):
     if chrono_updated:
         update_all_posts_section(dry_run)
     
-    # Update search index
-    if chrono_updated:
-        update_search_index(dry_run)
+    # Update search index (always refresh after delete to avoid stale results)
+    update_search_index(dry_run)
     
     # Summary
     print()
