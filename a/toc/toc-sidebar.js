@@ -56,21 +56,23 @@
 
   /**
    * Get base path for Pagefind assets based on current page location
-   * @returns {string} Base path ending with /
+   * @returns {string} Base path (empty string or 'a/')
    */
   function getPagefindBasePath() {
     const currentPath = window.location.pathname;
     
-    // If we're in /a/ directory or subdirectory
+    // Check if we're at a post page (####_*.htm or ####_*.html)
+    // This works for both /a/0001_welcome.htm and /0001_welcome.htm
+    if (currentPath.match(/\/?\d{4}_[^/]+\.html?$/)) {
+      return '';  // Same directory level as posts
+    }
+    
+    // If we're in /a/ directory
     if (currentPath.includes('/a/')) {
-      // Check if we're at a post page (####_*.htm)
-      if (currentPath.match(/\/\d{4}_[^/]+\.html?$/)) {
-        return '';  // Same directory as posts
-      }
       return '';
     }
     
-    // Root level
+    // Root level of full site (not local Pagefind server)
     return 'a/';
   }
 
@@ -83,6 +85,8 @@
       const basePath = getPagefindBasePath();
       const pagefindUrl = basePath + CONFIG.pagefindPath;
       
+      console.log('Loading Pagefind from:', pagefindUrl);
+      
       // Dynamic import of Pagefind
       pagefind = await import(pagefindUrl);
       await pagefind.init();
@@ -91,6 +95,7 @@
       return true;
     } catch (error) {
       console.warn('Pagefind not available, using fallback search:', error.message);
+      console.warn('Attempted URL:', getPagefindBasePath() + CONFIG.pagefindPath);
       pagefind = null;
       return false;
     }
