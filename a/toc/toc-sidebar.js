@@ -212,7 +212,7 @@
       container.classList.toggle('expanded');
       container.classList.toggle('collapsed');
       toggleBtn.setAttribute('aria-expanded', !isExpanded);
-      toggleBtn.setAttribute('aria-label', isExpanded ? 'Expand excerpt' : 'Collapse excerpt');
+      toggleBtn.setAttribute('aria-label', isExpanded ? 'Collapse excerpt' : 'Expand excerpt');
       toggleBtn.textContent = isExpanded ? '▼' : '▲';
     });
     
