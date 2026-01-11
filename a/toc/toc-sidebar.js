@@ -56,6 +56,157 @@
   };
 
   // ================================
+  // Match Type Constants (Content Match Indicator)
+  // ================================
+  const MATCH_TYPE = Object.freeze({
+    NONE: 0,
+    TITLE_ONLY: 1,
+    CONTENT_ONLY: 2,
+    BOTH: 3
+  });
+
+  /**
+   * Determine the type of match for a post against a search query
+   * @param {Object} post - Post object with title and contentPreview
+   * @param {string} query - Lowercase search query
+   * @returns {number} MATCH_TYPE value
+   */
+  function getMatchType(post, query) {
+    const titleMatch = post.title && post.title.toLowerCase().includes(query);
+    const contentMatch = post.contentPreview && 
+      post.contentPreview.toLowerCase().includes(query);
+    
+    if (titleMatch && contentMatch) return MATCH_TYPE.BOTH;
+    if (titleMatch) return MATCH_TYPE.TITLE_ONLY;
+    if (contentMatch) return MATCH_TYPE.CONTENT_ONLY;
+    return MATCH_TYPE.NONE;
+  }
+
+  /**
+   * Generate an excerpt showing context around the matched term
+   * Uses the proper-case 'excerpt' field for display when available,
+   * falls back to 'contentPreview' for longer context.
+   * 
+   * @param {Object} postData - Post data with excerpt and contentPreview
+   * @param {string} query - Search query (lowercase)
+   * @param {number} maxLength - Maximum excerpt length (default 80)
+   * @returns {Object|null} { text: string, query: string, isLowercase: boolean } or null
+   */
+  function generateExcerptForDisplay(postData, query, maxLength = 80) {
+    if (!query || typeof query !== 'string' || query.length === 0) return null;
+    
+    // Limit query length to prevent ReDoS
+    const safeQuery = query.substring(0, 100);
+    
+    // Prefer the proper-case excerpt field if it contains the match
+    const excerpt = postData.excerpt || '';
+    const contentPreview = postData.contentPreview || '';
+    
+    // Check which field contains the match
+    const excerptHasMatch = excerpt.toLowerCase().includes(safeQuery);
+    const sourceText = excerptHasMatch ? excerpt : contentPreview;
+    
+    if (!sourceText || sourceText.length === 0) return null;
+    
+    const lowerSource = sourceText.toLowerCase();
+    const matchIndex = lowerSource.indexOf(safeQuery);
+    
+    if (matchIndex === -1) return null;
+    
+    // Calculate window around match
+    const halfWindow = Math.floor((maxLength - safeQuery.length) / 2);
+    let start = Math.max(0, matchIndex - halfWindow);
+    let end = Math.min(sourceText.length, matchIndex + safeQuery.length + halfWindow);
+    
+    // Adjust to word boundaries (don't cut words in half)
+    if (start > 0) {
+      const spaceAfterStart = sourceText.indexOf(' ', start);
+      if (spaceAfterStart !== -1 && spaceAfterStart < matchIndex) {
+        start = spaceAfterStart + 1;
+      }
+    }
+    if (end < sourceText.length) {
+      const spaceBeforeEnd = sourceText.lastIndexOf(' ', end);
+      if (spaceBeforeEnd > matchIndex + safeQuery.length) {
+        end = spaceBeforeEnd;
+      }
+    }
+    
+    let excerptText = sourceText.substring(start, end).trim();
+    
+    // Add ellipsis indicators
+    if (start > 0) excerptText = '...' + excerptText;
+    if (end < sourceText.length) excerptText = excerptText + '...';
+    
+    return {
+      text: excerptText,
+      query: safeQuery,
+      isLowercase: !excerptHasMatch  // Flag if using lowercase contentPreview
+    };
+  }
+
+  /**
+   * Create excerpt DOM element with highlighted search term
+   * @param {Object} excerptData - Result from generateExcerptForDisplay()
+   * @param {string} postFile - Post filename for unique ID
+   * @returns {HTMLElement} Excerpt container element
+   */
+  function createExcerptElement(excerptData, postFile) {
+    const container = document.createElement('div');
+    container.className = 'tbc-excerpt collapsed';
+    container.id = `excerpt-${postFile.replace(/\./g, '-')}`;
+    container.setAttribute('role', 'note');
+    container.setAttribute('aria-label', 'Content excerpt');
+    
+    const textSpan = document.createElement('span');
+    textSpan.className = 'tbc-excerpt-text';
+    
+    // Add lowercase indicator if using contentPreview fallback
+    if (excerptData.isLowercase) {
+      textSpan.classList.add('tbc-excerpt-lowercase');
+    }
+    
+    // Highlight the search term within the excerpt (escapeRegex already exists below)
+    const regex = new RegExp(`(${escapeRegex(excerptData.query)})`, 'gi');
+    const safeExcerpt = escapeHtml(excerptData.text);
+    textSpan.innerHTML = '"' + safeExcerpt.replace(regex, '<mark>$1</mark>') + '"';
+    
+    const toggleBtn = document.createElement('button');
+    toggleBtn.className = 'tbc-excerpt-toggle';
+    toggleBtn.setAttribute('aria-label', 'Toggle excerpt visibility');
+    toggleBtn.setAttribute('aria-expanded', 'false');
+    toggleBtn.textContent = '▼';
+    
+    toggleBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const isExpanded = container.classList.contains('expanded');
+      container.classList.toggle('expanded');
+      container.classList.toggle('collapsed');
+      toggleBtn.setAttribute('aria-expanded', !isExpanded);
+      toggleBtn.textContent = isExpanded ? '▼' : '▲';
+    });
+    
+    container.appendChild(textSpan);
+    container.appendChild(toggleBtn);
+    
+    return container;
+  }
+
+  /**
+   * Remove all excerpt elements and content-match classes
+   * Used when clearing search or toggling content search off
+   */
+  function removeAllExcerpts() {
+    const excerpts = document.querySelectorAll('.tbc-excerpt');
+    excerpts.forEach(excerpt => excerpt.remove());
+    
+    // Also remove content-match class from all posts
+    const contentMatches = document.querySelectorAll('.tbc-content-match');
+    contentMatches.forEach(el => el.classList.remove('tbc-content-match'));
+  }
+
+  // ================================
   // Utility Functions
   // ================================
   function debounce(func, wait) {
@@ -723,6 +874,12 @@
         } catch (e) {
           // Ignore storage errors
         }
+        
+        // Clean up content match indicators when disabling content search
+        if (!contentToggle.checked) {
+          removeAllExcerpts();
+        }
+        
         // Re-run search with new mode
         if (state.searchQuery) {
           performSearch(state.searchQuery);
@@ -809,16 +966,30 @@
     const resultsDiv = document.getElementById('tbc-search-results');
     const topics = document.querySelectorAll('.tbc-topic');
     const posts = document.querySelectorAll('.tbc-post-link');
-    const matchingPosts = new Set();
+    const matchingPosts = new Map(); // Changed from Set to Map for match metadata
+
+    // Track match type counts for result breakdown
+    let titleMatchCount = 0;
+    let contentOnlyMatchCount = 0;
 
     // Search in index
     if (state.searchIndex && state.searchIndex.posts) {
       state.searchIndex.posts.forEach(post => {
-        const titleMatch = post.title.toLowerCase().includes(query);
-        const contentMatch = post.contentPreview && post.contentPreview.includes(query);
+        const matchType = getMatchType(post, query);
 
-        if (titleMatch || contentMatch) {
-          matchingPosts.add(post.file);
+        if (matchType !== MATCH_TYPE.NONE) {
+          matchingPosts.set(post.file, {
+            matchType: matchType,
+            title: post.title,
+            excerpt: post.excerpt,
+            contentPreview: post.contentPreview
+          });
+          
+          if (matchType === MATCH_TYPE.CONTENT_ONLY) {
+            contentOnlyMatchCount++;
+          } else {
+            titleMatchCount++;
+          }
         }
       });
     }
@@ -828,12 +999,41 @@
     // Update DOM based on matches
     posts.forEach(post => {
       const href = post.getAttribute('href');
-      const matches = matchingPosts.has(href);
+      const matchData = matchingPosts.get(href);
+      const matches = !!matchData;
 
       post.classList.toggle('tbc-search-no-match', !matches);
 
       if (matches) {
         matchCount++;
+
+        // Add content-match class for content-only matches
+        if (matchData.matchType === MATCH_TYPE.CONTENT_ONLY) {
+          post.classList.add('tbc-content-match');
+          
+          // Remove any existing excerpt
+          const existingExcerpt = post.parentElement.querySelector('.tbc-excerpt');
+          if (existingExcerpt) {
+            existingExcerpt.remove();
+          }
+          
+          // Generate and insert new excerpt
+          const excerptData = generateExcerptForDisplay(matchData, query);
+          if (excerptData) {
+            const excerptElement = createExcerptElement(excerptData, href);
+            post.parentElement.insertBefore(excerptElement, post.nextSibling);
+            // Add ARIA description to post link
+            post.setAttribute('aria-describedby', excerptElement.id);
+          }
+        } else {
+          post.classList.remove('tbc-content-match');
+          // Remove excerpt if match type changed
+          const existingExcerpt = post.parentElement.querySelector('.tbc-excerpt');
+          if (existingExcerpt) {
+            existingExcerpt.remove();
+          }
+          post.removeAttribute('aria-describedby');
+        }
 
         // Highlight only title (content not visible in sidebar)
         const title = post.textContent.toLowerCase();
@@ -858,6 +1058,13 @@
         }
       } else {
         removeHighlight(post);
+        post.classList.remove('tbc-content-match'); // Clean up content match indicator
+        post.removeAttribute('aria-describedby');
+        // Remove any excerpt
+        const existingExcerpt = post.parentElement.querySelector('.tbc-excerpt');
+        if (existingExcerpt) {
+          existingExcerpt.remove();
+        }
         // Restore original href
         if (post.dataset.originalHref) {
           post.setAttribute('href', post.dataset.originalHref);
@@ -893,7 +1100,30 @@
       }
     });
 
-    updateResultsCount(matchCount, resultsDiv, true);
+    updateResultsCountWithBreakdown(matchCount, titleMatchCount, contentOnlyMatchCount, resultsDiv);
+  }
+
+  /**
+   * Update search results count with match type breakdown
+   * @param {number} matchCount - Total visible match count
+   * @param {number} titleCount - Matches in title (including BOTH)
+   * @param {number} contentOnlyCount - Matches in content only
+   * @param {HTMLElement} resultsDiv - Results count element
+   */
+  function updateResultsCountWithBreakdown(matchCount, titleCount, contentOnlyCount, resultsDiv) {
+    if (!resultsDiv) return;
+    
+    if (matchCount === 0) {
+      resultsDiv.textContent = 'No posts found';
+      resultsDiv.classList.add('no-results');
+    } else if (contentOnlyCount === 0) {
+      resultsDiv.textContent = `${matchCount} result${matchCount === 1 ? '' : 's'}`;
+      resultsDiv.classList.remove('no-results');
+    } else {
+      resultsDiv.innerHTML = `${matchCount} result${matchCount === 1 ? '' : 's'} ` +
+        `<span class="tbc-result-breakdown">(${titleCount} in title, ${contentOnlyCount} in content)</span>`;
+      resultsDiv.classList.remove('no-results');
+    }
   }
 
   function updateResultsCount(matchCount, resultsDiv, isContentSearch) {
@@ -914,9 +1144,13 @@
     const topics = document.querySelectorAll('.tbc-topic');
     const posts = document.querySelectorAll('.tbc-post-link');
     
+    // Remove all excerpts and content match indicators
+    removeAllExcerpts();
+    
     posts.forEach(post => {
       post.classList.remove('tbc-search-no-match');
       removeHighlight(post);
+      post.removeAttribute('aria-describedby');
       // Restore original href if modified by content search
       if (post.dataset.originalHref) {
         post.setAttribute('href', post.dataset.originalHref);

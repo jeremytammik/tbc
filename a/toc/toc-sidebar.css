@@ -586,6 +586,116 @@ body.tbc-resizing * {
 }
 
 /* ================================
+   Content Match Indicators
+   ================================ */
+
+/* Content-only match background and indicator */
+.tbc-post-link.tbc-content-match {
+  background: linear-gradient(90deg, 
+    rgba(66, 153, 225, 0.10) 0%, 
+    rgba(66, 153, 225, 0.03) 100%);
+  border-left: 2px solid var(--tbc-accent-primary, #0066cc);
+  padding-left: 8px;
+  margin-left: -10px;
+  border-radius: 0 4px 4px 0;
+}
+
+/* Content match icon indicator */
+.tbc-post-link.tbc-content-match::after {
+  content: ' 📄';
+  font-size: 10px;
+  opacity: 0.7;
+  vertical-align: middle;
+}
+
+/* Result count breakdown styling */
+.tbc-result-breakdown {
+  font-size: 10px;
+  color: var(--tbc-sidebar-text-muted, #666);
+  font-weight: normal;
+}
+
+/* ================================
+   Excerpt Display Styles
+   ================================ */
+
+/* Excerpt container - base styles */
+.tbc-excerpt {
+  overflow: hidden;
+  transition: max-height 0.25s ease, opacity 0.2s ease, padding 0.2s ease;
+}
+
+/* Excerpt container - collapsed state (default) */
+.tbc-excerpt.collapsed {
+  max-height: 0;
+  opacity: 0;
+  padding: 0;
+}
+
+/* Excerpt container - expanded state */
+.tbc-excerpt.expanded {
+  max-height: 60px;
+  opacity: 1;
+  padding: 4px 0 6px 12px;
+  margin-top: 2px;
+}
+
+/* Excerpt text styling */
+.tbc-excerpt-text {
+  font-size: 11px;
+  color: var(--tbc-sidebar-text-muted, #666);
+  font-style: italic;
+  line-height: 1.4;
+  display: block;
+  padding-left: 8px;
+  border-left: 1px solid var(--tbc-sidebar-border, #ddd);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Lowercase indicator for contentPreview fallback */
+.tbc-excerpt-text.tbc-excerpt-lowercase {
+  text-transform: none; /* Keep as-is, just note it's lowercase */
+}
+
+/* Highlighted term within excerpt */
+.tbc-excerpt-text mark {
+  background: #fff3cd;
+  color: inherit;
+  padding: 0 2px;
+  border-radius: 2px;
+  font-style: normal;
+}
+
+/* Expand/collapse toggle button */
+.tbc-excerpt-toggle {
+  background: none;
+  border: none;
+  color: var(--tbc-sidebar-text-muted, #888);
+  cursor: pointer;
+  font-size: 10px;
+  padding: 2px 4px;
+  margin-left: 4px;
+  transition: transform 0.2s ease;
+  vertical-align: middle;
+}
+
+.tbc-excerpt-toggle:hover {
+  color: var(--tbc-accent-primary, #0066cc);
+}
+
+.tbc-excerpt-toggle:focus {
+  outline: 2px solid var(--tbc-accent-primary, #0066cc);
+  outline-offset: 1px;
+  border-radius: 2px;
+}
+
+/* Toggle rotation when expanded */
+.tbc-excerpt.expanded .tbc-excerpt-toggle {
+  transform: rotate(180deg);
+}
+
+/* ================================
    Mobile Toggle Button
    ================================ */
 #tbc-mobile-toggle {
@@ -1672,6 +1782,19 @@ body.tbc-sheet-open {
     animation: none;
     transition: none;
   }
+  
+  /* Reduced motion for excerpt animations */
+  .tbc-excerpt {
+    transition: none;
+  }
+  
+  .tbc-excerpt-toggle {
+    transition: none;
+  }
+  
+  .tbc-post-link.tbc-content-match {
+    transition: none;
+  }
 }
 
 /* Print: hide counter, keep highlights */
@@ -1684,5 +1807,10 @@ body.tbc-sheet-open {
     background-color: #ffff00 !important;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
+  }
+  
+  /* Hide excerpts in print */
+  .tbc-excerpt {
+    display: none;
   }
 }
