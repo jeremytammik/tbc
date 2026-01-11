@@ -6,6 +6,15 @@ The repository hosts all the HTML, CSS and markdown source text for The Building
 
 It also boasts a complete index of all posts.
 
+## Features
+
+- **2,079 blog posts** spanning 2008-2025
+- **Wiki-style TOC sidebar** with 58 topic categories and 2,000+ posts
+- **Pagefind search** - fast, lightweight full-text search across all content
+- **Chronological navigation** - browse posts by year/month in the Timeline sidebar
+- **Mobile-responsive** - hamburger menu for sidebar on small screens
+- **Fully offline capable** - all internal links work locally
+
 ## Offline Local Hosting
 
 Beginning 2026, The Building Coder has been modified for **fully offline local hosting**. 
@@ -18,6 +27,15 @@ All obsolete internal Typepad links have been converted to point to local files,
 - **640+ unavailable resources** (old file downloads, category pages) converted to text with notes
 - **CSS fix** for proper code block formatting with preserved indentation
 - **Backup** of original files stored in `a_backup/`
+
+## Search
+
+The archive uses [Pagefind](https://pagefind.app/) for fast, lightweight full-text search:
+
+- **Sharded index** - only downloads ~50-100KB per query (vs 6.9MB all-at-once)
+- **2,079 posts indexed** with 69,000+ unique words
+- **Auto-updated** via GitHub Actions when HTML files change
+- **Works offline** once the page is loaded
 
 ### Running Locally
 
@@ -74,6 +92,12 @@ Jeremy Tammik,
 ## Offline Hosting Modifications
 
 Modifications for offline hosting by [@parametrix](https://github.com/parametrix), January 2026.
+
+## Documentation
+
+- [PUBLISHING_GUIDE.md](PUBLISHING_GUIDE.md) - How to publish and manage blog posts
+- [BLOG_STATS.md](BLOG_STATS.md) - Archive statistics
+- [docs/archive/](docs/archive/) - Historical implementation documents
 
 ## License
 
