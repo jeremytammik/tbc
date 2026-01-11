@@ -56,7 +56,7 @@
 
   /**
    * Get base path for Pagefind assets based on current page location
-   * @returns {string} Base path (empty string or 'a/')
+   * @returns {string} Absolute path starting with /
    */
   function getPagefindBasePath() {
     const currentPath = window.location.pathname;
@@ -64,16 +64,16 @@
     // Check if we're at a post page (####_*.htm or ####_*.html)
     // This works for both /a/0001_welcome.htm and /0001_welcome.htm
     if (currentPath.match(/\/?\d{4}_[^/]+\.html?$/)) {
-      return '';  // Same directory level as posts
+      return '/';  // Root level (for local Pagefind server)
     }
     
-    // If we're in /a/ directory
+    // If we're in /a/ directory on the full site
     if (currentPath.includes('/a/')) {
-      return '';
+      return '/a/';
     }
     
-    // Root level of full site (not local Pagefind server)
-    return 'a/';
+    // Root level
+    return '/';
   }
 
   /**
@@ -145,8 +145,9 @@
       html += '<ul class="tbc-pagefind-results">';
 
       for (const result of loadedResults) {
-        const title = result.meta?.title || 'Untitled';
         const url = result.url;
+        // Get title from TOC data (more accurate) or fall back to Pagefind metadata
+        const title = getTitleFromUrl(url) || result.meta?.title || 'Untitled';
         // Pagefind provides excerpts with <mark> tags for highlighting
         const excerpt = result.excerpt || '';
         
@@ -177,6 +178,32 @@
       // Fall back to title search
       setTimeout(() => performTitleSearch(query), 100);
     }
+  }
+
+  /**
+   * Get post title from TOC data by URL
+   * @param {string} url - Post URL (e.g., "/1807_createviaoffset.html")
+   * @returns {string|null} Post title or null if not found
+   */
+  function getTitleFromUrl(url) {
+    if (!state.tocData || !state.tocData.topics) return null;
+    
+    // Extract filename from URL
+    const filename = url.split('/').pop();
+    if (!filename) return null;
+    
+    // Search through all topics and posts
+    for (const topic of state.tocData.topics) {
+      if (topic.posts) {
+        for (const post of topic.posts) {
+          if (post.file === filename) {
+            return post.title;
+          }
+        }
+      }
+    }
+    
+    return null;
   }
 
   /**
