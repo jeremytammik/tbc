@@ -55,6 +55,7 @@ POST_TEMPLATE = '''<!DOCTYPE html>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Building Coder</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="stylesheet" href="bc.css">
     <link rel="stylesheet" href="google-code-prettify/prettify.css">
     <script src="google-code-prettify/run_prettify.js"></script>
