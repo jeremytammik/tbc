@@ -1,0 +1,35 @@
+name: Build Pagefind Index
+
+on:
+  push:
+    branches:
+      - gh-pages
+    paths:
+      - 'a/**/*.htm'
+      - 'a/**/*.html'
+      - 'pagefind.yml'
+  workflow_dispatch:
+
+jobs:
+  build-index:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Build Pagefind index
+        run: npx -y pagefind --site a --output-path a/pagefind
+
+      - name: Commit and push Pagefind index
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add a/pagefind/
+          git diff --staged --quiet || git commit -m "Update Pagefind search index [skip ci]"
+          git push

@@ -1,0 +1,28 @@
+# Pagefind configuration
+# See: https://pagefind.app/docs/config-options/
+
+# Source directory containing HTML files (renamed from 'source' in v1.0)
+site: a
+
+# Output directory for Pagefind index (relative to site)
+output_subdir: pagefind
+
+# Only index blog post pages (####_*.htm and ####_*.html)
+# Note: Pagefind globs are relative to site directory
+glob: "[0-9][0-9][0-9][0-9]_*.{htm,html}"
+
+# Exclude non-content elements from indexing
+exclude_selectors:
+  - "#tbc-sidebar"
+  - ".tbc-sidebar"
+  - "#tbc-chrono-nav"
+  - ".tbc-chrono-nav"
+  - "nav"
+  - "footer"
+  - "script"
+  - "style"
+  - ".tbc-sidebar-overlay"
+  - ".tbc-mobile-toggle"
+
+# Keep URLs relative (important for GitHub Pages subdirectory)
+keep_index_url: false

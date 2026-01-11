@@ -255,42 +255,82 @@ body.tbc-resizing * {
   color: #fc8181;
 }
 
-/* Search Options - Content Toggle */
-.tbc-search-options {
-  padding: 6px 0 0 0;
-  font-size: 12px;
-}
-
-.tbc-search-toggle {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
+/* Pagefind Search Results */
+.tbc-search-loading,
+.tbc-search-no-results,
+.tbc-search-error {
+  padding: 12px;
+  text-align: center;
+  font-size: 13px;
   color: var(--tbc-sidebar-text-muted);
-  user-select: none;
-  transition: color var(--tbc-transition-speed);
 }
 
-.tbc-search-toggle:hover {
-  color: var(--tbc-sidebar-text);
+.tbc-search-error {
+  color: #fc8181;
 }
 
-.tbc-search-toggle input[type="checkbox"] {
-  cursor: pointer;
-  width: 14px;
-  height: 14px;
+.tbc-search-count {
+  padding: 8px 12px;
+  font-size: 12px;
+  color: var(--tbc-sidebar-text-muted);
+  border-bottom: 1px solid var(--tbc-sidebar-border);
+}
+
+.tbc-search-more {
+  padding: 8px 12px;
+  font-size: 12px;
+  color: var(--tbc-sidebar-text-muted);
+  text-align: center;
+  font-style: italic;
+}
+
+.tbc-pagefind-results {
+  list-style: none;
   margin: 0;
-  accent-color: var(--tbc-accent-primary);
+  padding: 0;
+  max-height: calc(100vh - 250px);
+  overflow-y: auto;
 }
 
-.tbc-search-toggle input[type="checkbox"]:disabled {
-  cursor: not-allowed;
-  opacity: 0.5;
+.tbc-pagefind-result {
+  border-bottom: 1px solid var(--tbc-sidebar-border);
 }
 
-.tbc-search-toggle input[type="checkbox"]:disabled + span {
-  opacity: 0.5;
-  cursor: not-allowed;
+.tbc-pagefind-link {
+  display: block;
+  padding: 10px 12px;
+  text-decoration: none;
+  color: inherit;
+  transition: background-color var(--tbc-transition-speed);
+}
+
+.tbc-pagefind-link:hover {
+  background-color: var(--tbc-sidebar-hover);
+}
+
+.tbc-pagefind-title {
+  display: block;
+  font-weight: 500;
+  color: var(--tbc-accent-primary);
+  margin-bottom: 4px;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.tbc-pagefind-excerpt {
+  display: block;
+  font-size: 12px;
+  color: var(--tbc-sidebar-text-muted);
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+/* Pagefind highlight marks in excerpts */
+.tbc-pagefind-excerpt mark {
+  background-color: rgba(255, 235, 59, 0.4);
+  color: inherit;
+  padding: 0 2px;
+  border-radius: 2px;
 }
 
 /* ================================
@@ -617,87 +657,6 @@ body.tbc-resizing * {
   font-size: 10px;
   color: var(--tbc-sidebar-text-muted, #666);
   font-weight: normal;
-}
-
-/* ================================
-   Excerpt Display Styles
-   ================================ */
-
-/* Excerpt container - base styles */
-.tbc-excerpt {
-  overflow: hidden;
-  transition: max-height 0.25s ease, opacity 0.2s ease, padding 0.2s ease;
-}
-
-/* Excerpt container - collapsed state (default) */
-.tbc-excerpt.collapsed {
-  max-height: 0;
-  opacity: 0;
-  padding: 0;
-}
-
-/* Excerpt container - expanded state */
-.tbc-excerpt.expanded {
-  max-height: 6em;
-  overflow: auto;
-  opacity: 1;
-  padding: 4px 0 6px 12px;
-  margin-top: 2px;
-}
-
-/* Excerpt text styling */
-.tbc-excerpt-text {
-  font-size: 11px;
-  color: var(--tbc-sidebar-text-muted, #666);
-  font-style: italic;
-  line-height: 1.4;
-  display: block;
-  padding-left: 8px;
-  border-left: 1px solid var(--tbc-sidebar-border, #ddd);
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-}
-
-/* Lowercase indicator for contentPreview fallback */
-.tbc-excerpt-text.tbc-excerpt-lowercase {
-  text-transform: none; /* Keep as-is, just note it's lowercase */
-}
-
-/* Highlighted term within excerpt */
-.tbc-excerpt-text mark {
-  background: #fff3cd;
-  color: inherit;
-  padding: 0 2px;
-  border-radius: 2px;
-  font-style: normal;
-}
-
-/* Expand/collapse toggle button */
-.tbc-excerpt-toggle {
-  background: none;
-  border: none;
-  color: var(--tbc-sidebar-text-muted, #888);
-  cursor: pointer;
-  font-size: 10px;
-  padding: 2px 4px;
-  margin-left: 4px;
-  transition: transform 0.2s ease;
-  vertical-align: middle;
-}
-
-.tbc-excerpt-toggle:hover {
-  color: var(--tbc-accent-primary, #0066cc);
-}
-
-.tbc-excerpt-toggle:focus {
-  outline: 2px solid var(--tbc-accent-primary, #0066cc);
-  outline-offset: 1px;
-  border-radius: 2px;
-}
-
-/* Toggle rotation when expanded */
-.tbc-excerpt.expanded .tbc-excerpt-toggle {
-  transform: rotate(180deg);
 }
 
 /* ================================
@@ -1788,15 +1747,6 @@ body.tbc-sheet-open {
     transition: none;
   }
   
-  /* Reduced motion for excerpt animations */
-  .tbc-excerpt {
-    transition: none;
-  }
-  
-  .tbc-excerpt-toggle {
-    transition: none;
-  }
-  
   .tbc-post-link.tbc-content-match {
     transition: none;
   }
@@ -1812,10 +1762,5 @@ body.tbc-sheet-open {
     background-color: #ffff00 !important;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
-  }
-  
-  /* Hide excerpts in print */
-  .tbc-excerpt {
-    display: none;
   }
 }

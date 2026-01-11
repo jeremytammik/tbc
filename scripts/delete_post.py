@@ -245,33 +245,10 @@ def update_all_posts_section(dry_run=False):
     return True
 
 
-def update_search_index(dry_run=False):
-    """Regenerate search index after deleting a post.
-    
-    Args:
-        dry_run: If True, show preview without writing
-        
-    Returns:
-        bool: True if successful, False otherwise
-    """
-    if dry_run:
-        print("[DRY RUN] Would regenerate search index")
-        return True
-    
-    print("\nUpdating search index...")
-    try:
-        from build_search_index import SearchIndexBuilder
-        builder = SearchIndexBuilder()
-        builder.run()
-        return True
-    except ImportError as e:
-        print(f"Warning: Could not import search index builder: {e}")
-        print("Search index may be out of date")
-        return False
-    except Exception as e:
-        print(f"Warning: Failed to update search index: {e}")
-        print("Search index may be out of date")
-        return False
+# NOTE: The update_search_index function has been removed.
+# Search is now powered by Pagefind, which is automatically rebuilt
+# by the GitHub Actions workflow (.github/workflows/pagefind.yml)
+# when HTML files are pushed to gh-pages.
 
 
 def delete_post(filename, dry_run=False):
@@ -299,8 +276,8 @@ def delete_post(filename, dry_run=False):
     if chrono_updated:
         update_all_posts_section(dry_run)
     
-    # Update search index (always refresh after delete to avoid stale results)
-    update_search_index(dry_run)
+    # Note: Search index (Pagefind) is automatically rebuilt by GitHub Actions
+    # when HTML files are pushed to gh-pages. No local update needed.
     
     # Summary
     print()
