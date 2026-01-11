@@ -1121,7 +1121,8 @@
         if (!post.dataset.originalHref) {
           post.dataset.originalHref = href;
         }
-        const url = new URL(href, window.location.origin);
+        // Use window.location.href as base to resolve relative paths correctly
+        const url = new URL(href, window.location.href);
         url.searchParams.set('highlight', query);
         post.setAttribute('href', url.pathname + url.search);
 
