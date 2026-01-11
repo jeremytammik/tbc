@@ -201,7 +201,7 @@
     
     const toggleBtn = document.createElement('button');
     toggleBtn.className = 'tbc-excerpt-toggle';
-    toggleBtn.setAttribute('aria-label', 'Toggle excerpt visibility');
+    toggleBtn.setAttribute('aria-label', 'Expand excerpt');
     toggleBtn.setAttribute('aria-expanded', 'false');
     toggleBtn.textContent = '▼';
     
@@ -212,6 +212,7 @@
       container.classList.toggle('expanded');
       container.classList.toggle('collapsed');
       toggleBtn.setAttribute('aria-expanded', !isExpanded);
+      toggleBtn.setAttribute('aria-label', isExpanded ? 'Expand excerpt' : 'Collapse excerpt');
       toggleBtn.textContent = isExpanded ? '▼' : '▲';
     });
     
