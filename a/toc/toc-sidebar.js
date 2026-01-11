@@ -156,7 +156,7 @@
   function createExcerptElement(excerptData, postFile) {
     const container = document.createElement('div');
     container.className = 'tbc-excerpt collapsed';
-    container.id = `excerpt-${postFile.replace(/\./g, '-')}`;
+    container.id = `excerpt-${postFile.replace(/[^a-zA-Z0-9-]/g, '-')}`;
     container.setAttribute('role', 'note');
     container.setAttribute('aria-label', 'Content excerpt');
     
