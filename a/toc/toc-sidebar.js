@@ -23,9 +23,7 @@
   // ================================
   const CONFIG = {
     tocDataUrl: 'toc/toc-data.json',
-    searchIndexUrl: 'toc/search-index.json',
-    enableContentSearch: true,
-    searchCacheTime: 24 * 60 * 60 * 1000, // 24 hours
+    pagefindPath: 'pagefind/pagefind.js',
     defaultWidth: 280,
     minWidth: 180,
     maxWidth: 500,
@@ -33,10 +31,7 @@
     storageKeys: {
       width: 'tbc-sidebar-width',
       expanded: 'tbc-expanded-topics',
-      scroll: 'tbc-sidebar-scroll',
-      searchIndex: 'tbc-sidebar-search-index',
-      searchIndexTime: 'tbc-sidebar-search-index-time',
-      searchInContent: 'tbc-sidebar-search-in-content'
+      scroll: 'tbc-sidebar-scroll'
     }
   };
 
@@ -49,232 +44,154 @@
     expandedTopics: new Set(),
     isResizing: false,
     isMobileOpen: false,
-    searchQuery: '',
-    searchIndex: null,
-    searchIndexLoaded: false,
-    searchInContent: false
+    searchQuery: ''
   };
 
+  // Pagefind instance (loaded dynamically)
+  let pagefind = null;
+
   // ================================
-  // Match Type Constants (Content Match Indicator)
+  // Pagefind Integration
   // ================================
-  const MATCH_TYPE = Object.freeze({
-    NONE: 0,
-    TITLE_ONLY: 1,
-    CONTENT_ONLY: 2,
-    BOTH: 3
-  });
 
   /**
-   * Parse search query into individual words
-   * Filters out empty strings and trims whitespace
-   * @param {string} query - Search query (already lowercase)
-   * @returns {string[]} Array of non-empty words
+   * Get base path for Pagefind assets based on current page location
+   * @returns {string} Base path ending with /
    */
-  function parseSearchWords(query) {
-    if (!query || typeof query !== 'string') return [];
-    return query.trim().split(/\s+/).filter(word => word.length > 0);
-  }
-
-  /**
-   * Check if text contains all search words (AND logic)
-   * @param {string} text - Text to search (should be lowercase for content)
-   * @param {string[]} words - Array of search words (lowercase)
-   * @returns {boolean} True if ALL words are found
-   */
-  function containsAllWords(text, words) {
-    if (!text || !words || words.length === 0) return false;
-    return words.every(word => text.includes(word));
-  }
-
-  /**
-   * Determine the type of match for a post against a search query
-   * Supports multi-word queries with AND logic (all words must match)
-   * @param {Object} post - Post object with title and contentPreview
-   * @param {string} query - Lowercase search query (may contain multiple words)
-   * @returns {number} MATCH_TYPE value
-   */
-  function getMatchType(post, query) {
-    const words = parseSearchWords(query);
-    if (words.length === 0) return MATCH_TYPE.NONE;
+  function getPagefindBasePath() {
+    const currentPath = window.location.pathname;
     
-    const titleLower = post.title ? post.title.toLowerCase() : '';
-    const titleMatch = containsAllWords(titleLower, words);
-    
-    // contentPreview is stored in lowercase in the search index
-    const contentMatch = containsAllWords(post.contentPreview, words);
-    
-    if (titleMatch && contentMatch) return MATCH_TYPE.BOTH;
-    if (titleMatch) return MATCH_TYPE.TITLE_ONLY;
-    if (contentMatch) return MATCH_TYPE.CONTENT_ONLY;
-    return MATCH_TYPE.NONE;
-  }
-
-  /**
-   * Generate an excerpt showing context around matched terms
-   * For multi-word queries, centers on the first found word
-   * Uses the proper-case 'excerpt' field for display when available,
-   * falls back to 'contentPreview' for longer context.
-   * 
-   * @param {Object} postData - Post data with excerpt and contentPreview
-   * @param {string} query - Search query (lowercase, may be multi-word)
-   * @param {number} maxLength - Maximum excerpt length (default 80)
-   * @returns {Object|null} { text: string, query: string, isLowercase: boolean } or null
-   */
-  function generateExcerptForDisplay(postData, query, maxLength = 80) {
-    if (!query || typeof query !== 'string' || query.length === 0) return null;
-    
-    // Parse words and limit total length to prevent ReDoS
-    const words = parseSearchWords(query.substring(0, 100));
-    if (words.length === 0) return null;
-    
-    const excerpt = postData.excerpt || '';
-    const contentPreview = postData.contentPreview || '';
-    
-    // Check which source has matches
-    const excerptLower = excerpt.toLowerCase();
-    const excerptMatchCount = words.filter(w => excerptLower.includes(w)).length;
-    
-    // contentPreview is already lowercase
-    const contentMatchCount = words.filter(w => contentPreview.includes(w)).length;
-    
-    // Prefer excerpt if it has any matches, otherwise use contentPreview
-    const sourceText = (excerptMatchCount > 0) ? excerpt : contentPreview;
-    if (!sourceText || sourceText.length === 0) return null;
-    
-    const lowerSource = sourceText.toLowerCase();
-    
-    // Find the first matching word and its position
-    let firstMatchIndex = -1;
-    let matchedWord = '';
-    for (const word of words) {
-      const idx = lowerSource.indexOf(word);
-      if (idx !== -1 && (firstMatchIndex === -1 || idx < firstMatchIndex)) {
-        firstMatchIndex = idx;
-        matchedWord = word;
+    // If we're in /a/ directory or subdirectory
+    if (currentPath.includes('/a/')) {
+      // Check if we're at a post page (####_*.htm)
+      if (currentPath.match(/\/\d{4}_[^/]+\.html?$/)) {
+        return '';  // Same directory as posts
       }
+      return '';
     }
     
-    if (firstMatchIndex === -1) return null;
-    
-    // Calculate window around first match
-    const halfWindow = Math.floor((maxLength - matchedWord.length) / 2);
-    let start = Math.max(0, firstMatchIndex - halfWindow);
-    let end = Math.min(sourceText.length, firstMatchIndex + matchedWord.length + halfWindow);
-    
-    // Adjust to word boundaries (don't cut words in half)
-    if (start > 0) {
-      const spaceAfterStart = sourceText.indexOf(' ', start);
-      if (spaceAfterStart !== -1 && spaceAfterStart < firstMatchIndex) {
-        start = spaceAfterStart + 1;
-      }
-    }
-    if (end < sourceText.length) {
-      const spaceBeforeEnd = sourceText.lastIndexOf(' ', end);
-      if (spaceBeforeEnd > firstMatchIndex + matchedWord.length) {
-        end = spaceBeforeEnd;
-      }
-    }
-    
-    let excerptText = sourceText.substring(start, end).trim();
-    
-    // Add ellipsis indicators
-    if (start > 0) excerptText = '...' + excerptText;
-    if (end < sourceText.length) excerptText = excerptText + '...';
-    
-    return {
-      text: excerptText,
-      query: matchedWord,  // First matched word for highlighting
-      isLowercase: excerptMatchCount === 0  // Flag if using lowercase contentPreview
-    };
+    // Root level
+    return 'a/';
   }
 
   /**
-   * Create excerpt DOM element with highlighted search term
-   * @param {Object} excerptData - Result from generateExcerptForDisplay()
-   * @param {string} postFile - Post filename for unique ID
-   * @returns {HTMLElement} Excerpt container element
+   * Initialize Pagefind search library
+   * Loads Pagefind dynamically and initializes it
    */
-  function createExcerptElement(excerptData, postFile) {
-    const container = document.createElement('div');
-    container.className = 'tbc-excerpt collapsed';
-    container.id = `excerpt-${postFile.replace(/[^a-zA-Z0-9-]/g, '-')}`;
-    container.setAttribute('role', 'note');
-    container.setAttribute('aria-label', 'Content excerpt');
-    
-    const textSpan = document.createElement('span');
-    textSpan.className = 'tbc-excerpt-text';
-    
-    // Add lowercase indicator if using contentPreview fallback
-    if (excerptData.isLowercase) {
-      textSpan.classList.add('tbc-excerpt-lowercase');
+  async function initPagefind() {
+    try {
+      const basePath = getPagefindBasePath();
+      const pagefindUrl = basePath + CONFIG.pagefindPath;
+      
+      // Dynamic import of Pagefind
+      pagefind = await import(pagefindUrl);
+      await pagefind.init();
+      
+      console.log('Pagefind initialized successfully');
+      return true;
+    } catch (error) {
+      console.warn('Pagefind not available, using fallback search:', error.message);
+      pagefind = null;
+      return false;
     }
-    
-    // Highlight the search term within the excerpt using DOM nodes to avoid breaking HTML entities
-    const query = excerptData.query;
-    if (!query) {
-      // No query to highlight; just render the excerpt text with quotes
-      textSpan.textContent = `"${excerptData.text}"`;
-    } else {
-      const regex = new RegExp(`(${escapeRegex(query)})`, 'gi');
-      const parts = excerptData.text.split(regex);
-      
-      // Add opening quote
-      textSpan.appendChild(document.createTextNode('"'));
-      
-      parts.forEach((part, index) => {
-        if (part === '') {
-          return;
-        }
-        if (index % 2 === 0) {
-          // Non-matching text segment
-          textSpan.appendChild(document.createTextNode(part));
-        } else {
-          // Matching segment: wrap in <mark>
-          const mark = document.createElement('mark');
-          mark.textContent = part;
-          textSpan.appendChild(mark);
-        }
-      });
-      
-      // Add closing quote
-      textSpan.appendChild(document.createTextNode('"'));
-    }
-    
-    const toggleBtn = document.createElement('button');
-    toggleBtn.className = 'tbc-excerpt-toggle';
-    toggleBtn.setAttribute('aria-label', 'Expand excerpt');
-    toggleBtn.setAttribute('aria-expanded', 'false');
-    toggleBtn.textContent = '▼';
-    
-    toggleBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      const isExpanded = container.classList.contains('expanded');
-      container.classList.toggle('expanded');
-      container.classList.toggle('collapsed');
-      toggleBtn.setAttribute('aria-expanded', !isExpanded);
-      toggleBtn.setAttribute('aria-label', isExpanded ? 'Expand excerpt' : 'Collapse excerpt');
-      toggleBtn.textContent = isExpanded ? '▼' : '▲';
-    });
-    
-    container.appendChild(textSpan);
-    container.appendChild(toggleBtn);
-    
-    return container;
   }
 
   /**
-   * Remove all excerpt elements and content-match classes
-   * Used when clearing search or toggling content search off
+   * Perform search using Pagefind
+   * Falls back to title-only search if Pagefind unavailable
+   * @param {string} query - Search query
    */
-  function removeAllExcerpts() {
-    const excerpts = document.querySelectorAll('.tbc-excerpt');
-    excerpts.forEach(excerpt => excerpt.remove());
-    
-    // Also remove content-match class from all posts
-    const contentMatches = document.querySelectorAll('.tbc-content-match');
-    contentMatches.forEach(el => el.classList.remove('tbc-content-match'));
+  async function performPagefindSearch(query) {
+    if (!pagefind) {
+      // Fallback to title-only TOC search
+      performTitleSearch(query);
+      return;
+    }
+
+    const resultsDiv = document.getElementById('tbc-search-results');
+    if (!resultsDiv) return;
+
+    try {
+      // Show loading state
+      resultsDiv.innerHTML = '<div class="tbc-search-loading">Searching...</div>';
+      resultsDiv.classList.remove('no-results');
+
+      // Perform debounced search
+      const search = await pagefind.debouncedSearch(query, {}, CONFIG.searchDebounce);
+      
+      // If null, a newer search superseded this one
+      if (search === null) return;
+
+      if (search.results.length === 0) {
+        resultsDiv.innerHTML = `<div class="tbc-search-no-results">No results for "${escapeHtml(query)}"</div>`;
+        resultsDiv.classList.add('no-results');
+        // Also hide topics
+        hideTopicsForSearch();
+        return;
+      }
+
+      // Load first 30 results for display
+      const maxResults = 30;
+      const resultsToLoad = search.results.slice(0, maxResults);
+      const loadedResults = await Promise.all(resultsToLoad.map(r => r.data()));
+
+      // Build results HTML
+      let html = `<div class="tbc-search-count">${search.results.length} result${search.results.length !== 1 ? 's' : ''}</div>`;
+      html += '<ul class="tbc-pagefind-results">';
+
+      for (const result of loadedResults) {
+        const title = result.meta?.title || 'Untitled';
+        const url = result.url;
+        // Pagefind provides excerpts with <mark> tags for highlighting
+        const excerpt = result.excerpt || '';
+        
+        html += `
+          <li class="tbc-pagefind-result">
+            <a href="${escapeHtml(url)}" class="tbc-pagefind-link">
+              <span class="tbc-pagefind-title">${escapeHtml(title)}</span>
+              ${excerpt ? `<span class="tbc-pagefind-excerpt">${excerpt}</span>` : ''}
+            </a>
+          </li>`;
+      }
+
+      html += '</ul>';
+
+      if (search.results.length > maxResults) {
+        html += `<div class="tbc-search-more">Showing ${maxResults} of ${search.results.length} results</div>`;
+      }
+
+      resultsDiv.innerHTML = html;
+      resultsDiv.classList.remove('no-results');
+      
+      // Hide topic navigation during search
+      hideTopicsForSearch();
+
+    } catch (error) {
+      console.error('Pagefind search error:', error);
+      resultsDiv.innerHTML = '<div class="tbc-search-error">Search error. Trying fallback...</div>';
+      // Fall back to title search
+      setTimeout(() => performTitleSearch(query), 100);
+    }
+  }
+
+  /**
+   * Hide topic navigation when showing Pagefind results
+   */
+  function hideTopicsForSearch() {
+    const topicsContainer = document.getElementById('tbc-topics-container');
+    if (topicsContainer) {
+      topicsContainer.style.display = 'none';
+    }
+  }
+
+  /**
+   * Show topic navigation (restore after clearing search)
+   */
+  function showTopicsAfterSearch() {
+    const topicsContainer = document.getElementById('tbc-topics-container');
+    if (topicsContainer) {
+      topicsContainer.style.display = '';
+    }
   }
 
   // ================================
@@ -363,129 +280,6 @@
     }
   }
 
-  async function loadSearchIndex() {
-    if (!CONFIG.enableContentSearch) {
-      return;
-    }
-
-    // Check cache first
-    try {
-      const cached = localStorage.getItem(CONFIG.storageKeys.searchIndex);
-      const cacheTime = localStorage.getItem(CONFIG.storageKeys.searchIndexTime);
-
-      if (cached && cacheTime) {
-        const cachedData = JSON.parse(cached);
-        const cacheTimeNum = Number.parseInt(cacheTime, 10);
-
-        if (Number.isFinite(cacheTimeNum) && cacheTimeNum >= 0) {
-          const age = Date.now() - cacheTimeNum;
-
-          // Validate cache structure
-          const isValid = cachedData &&
-            typeof cachedData === 'object' &&
-            typeof cachedData.version === 'string' &&
-            typeof cachedData.totalPosts === 'number' &&
-            Array.isArray(cachedData.posts);
-
-          // Use cache if valid and not expired
-          if (isValid && age >= 0 && age < CONFIG.searchCacheTime && cachedData.version === '1.0') {
-            console.log('Using cached search index');
-            state.searchIndex = cachedData;
-            state.searchIndexLoaded = true;
-            updateContentToggleState();
-            return;
-          }
-        } else {
-          console.warn('Ignoring search index cache due to invalid cache time value:', cacheTime);
-        }
-      }
-    } catch (e) {
-      console.warn('Failed to load cached search index');
-    }
-
-    // Fetch fresh index
-    const currentPath = window.location.pathname;
-    let basePath = '';
-
-    if (currentPath.includes('/a/') && !currentPath.endsWith('/a/') && !currentPath.endsWith('/a/index.html')) {
-      basePath = '';
-    } else if (currentPath.endsWith('/a/') || currentPath.endsWith('/a/index.html')) {
-      basePath = '';
-    } else if (currentPath === '/index.html' || currentPath === '/' || currentPath.match(/^\/\d{4}_/)) {
-      basePath = '';
-    } else {
-      basePath = 'a/';
-    }
-
-    try {
-      const url = basePath + CONFIG.searchIndexUrl;
-      const FETCH_TIMEOUT_MS = 10000;
-      const controller = new AbortController();
-      const { signal } = controller;
-      let timeoutId;
-
-      try {
-        timeoutId = window.setTimeout(() => {
-          controller.abort();
-        }, FETCH_TIMEOUT_MS);
-
-        const response = await fetch(url, { signal });
-
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`);
-        }
-
-        const index = await response.json();
-        state.searchIndex = index;
-        state.searchIndexLoaded = true;
-
-        // Cache it
-        try {
-          localStorage.setItem(CONFIG.storageKeys.searchIndex, JSON.stringify(index));
-          localStorage.setItem(CONFIG.storageKeys.searchIndexTime, Date.now().toString());
-        } catch (e) {
-          console.warn('Failed to cache search index');
-        }
-
-        console.log(`Search index loaded: ${index.totalPosts} posts`);
-        updateContentToggleState();
-      } finally {
-        if (timeoutId !== undefined) {
-          clearTimeout(timeoutId);
-        }
-      }
-    } catch (error) {
-      if (error.name === 'AbortError') {
-        console.error('Failed to load search index: request timed out');
-      } else {
-        console.error('Failed to load search index:', error);
-      }
-      state.searchIndexLoaded = false;
-      updateContentToggleState();
-    }
-  }
-
-  function updateContentToggleState() {
-    const toggle = document.getElementById('tbc-search-content-toggle');
-    if (!toggle) return;
-
-    if (state.searchIndexLoaded) {
-      toggle.disabled = false;
-      toggle.title = 'Search in post content as well as titles';
-      // Restore saved preference
-      const savedPref = localStorage.getItem(CONFIG.storageKeys.searchInContent);
-      if (savedPref === 'true') {
-        toggle.checked = true;
-        state.searchInContent = true;
-      }
-    } else {
-      toggle.disabled = true;
-      toggle.checked = false;
-      toggle.title = 'Search index not available';
-      state.searchInContent = false;
-    }
-  }
-
   // ================================
   // State Persistence
   // ================================
@@ -564,16 +358,10 @@
           <span class="tbc-search-icon">🔍</span>
           <input type="text" 
                  id="tbc-search-input" 
-                 placeholder="Search post titles..." 
+                 placeholder="Search posts..." 
                  autocomplete="off"
-                 aria-label="Search post titles">
+                 aria-label="Search posts">
           <button id="tbc-search-clear" class="hidden" aria-label="Clear search">×</button>
-        </div>
-        <div class="tbc-search-options">
-          <label class="tbc-search-toggle">
-            <input type="checkbox" id="tbc-search-content-toggle" disabled title="Loading search index...">
-            <span>Search in content</span>
-          </label>
         </div>
         <div id="tbc-search-results"></div>
       </div>
@@ -735,12 +523,10 @@
       renderSidebar();
       sidebar.classList.remove('loading');
 
-      // Load search index (don't block UI)
-      if (CONFIG.enableContentSearch) {
-        loadSearchIndex().catch(err => {
-          console.warn('Search index unavailable, content search disabled:', err);
-        });
-      }
+      // Initialize Pagefind (don't block UI)
+      initPagefind().catch(err => {
+        console.warn('Pagefind unavailable, using title-only search:', err);
+      });
     } catch (error) {
       renderError(error);
       sidebar.classList.remove('loading');
@@ -915,7 +701,6 @@
   function initSearch() {
     const input = document.getElementById('tbc-search-input');
     const clearBtn = document.getElementById('tbc-search-clear');
-    const contentToggle = document.getElementById('tbc-search-content-toggle');
     
     if (!input) return;
     
@@ -934,33 +719,9 @@
       resetSearch();
       input.focus();
     });
-
-    // Content search toggle handler
-    if (contentToggle) {
-      contentToggle.addEventListener('change', () => {
-        state.searchInContent = contentToggle.checked;
-        // Save preference
-        try {
-          localStorage.setItem(CONFIG.storageKeys.searchInContent, contentToggle.checked.toString());
-        } catch (e) {
-          // Ignore storage errors
-        }
-        
-        // Clean up content match indicators when disabling content search
-        if (!contentToggle.checked) {
-          removeAllExcerpts();
-        }
-        
-        // Re-run search with new mode
-        if (state.searchQuery) {
-          performSearch(state.searchQuery);
-        }
-      });
-    }
   }
 
   function performSearch(query) {
-    const resultsDiv = document.getElementById('tbc-search-results');
     query = query.toLowerCase().trim();
     
     if (!query) {
@@ -968,9 +729,9 @@
       return;
     }
     
-    // Use content search if enabled and index is loaded
-    if (state.searchInContent && state.searchIndexLoaded) {
-      performContentSearch(query);
+    // Use Pagefind for full-text search, fallback to title search
+    if (pagefind) {
+      performPagefindSearch(query);
     } else {
       performTitleSearch(query);
     }
@@ -1030,191 +791,16 @@
     });
     
     // Update results count
-    updateResultsCount(matchCount, resultsDiv, false);
+    updateResultsCount(matchCount, resultsDiv);
   }
 
-  function performContentSearch(query) {
-    const resultsDiv = document.getElementById('tbc-search-results');
-    const topics = document.querySelectorAll('.tbc-topic');
-    const posts = document.querySelectorAll('.tbc-post-link');
-    const matchingPosts = new Map(); // Changed from Set to Map for match metadata
-
-    // Track match type counts for result breakdown
-    let titleMatchCount = 0;
-    let contentOnlyMatchCount = 0;
-
-    // Search in index
-    if (state.searchIndex && state.searchIndex.posts) {
-      state.searchIndex.posts.forEach(post => {
-        const matchType = getMatchType(post, query);
-
-        if (matchType !== MATCH_TYPE.NONE) {
-          matchingPosts.set(post.file, {
-            matchType: matchType,
-            title: post.title,
-            excerpt: post.excerpt,
-            contentPreview: post.contentPreview
-          });
-          
-          if (matchType === MATCH_TYPE.CONTENT_ONLY) {
-            contentOnlyMatchCount++;
-          } else {
-            titleMatchCount++;
-          }
-        }
-      });
-    }
-
-    let matchCount = 0;
-
-    // Update DOM based on matches
-    posts.forEach(post => {
-      const href = post.getAttribute('href');
-      const matchData = matchingPosts.get(href);
-      const matches = !!matchData;
-
-      post.classList.toggle('tbc-search-no-match', !matches);
-
-      if (matches) {
-        matchCount++;
-
-        // Add content-match class for content-only matches
-        if (matchData.matchType === MATCH_TYPE.CONTENT_ONLY) {
-          post.classList.add('tbc-content-match');
-          
-          // Remove any existing excerpt
-          const existingExcerpt = post.parentElement.querySelector('.tbc-excerpt');
-          if (existingExcerpt) {
-            existingExcerpt.remove();
-          }
-          
-          // Generate and insert new excerpt
-          const excerptData = generateExcerptForDisplay(matchData, query);
-          if (excerptData) {
-            const excerptElement = createExcerptElement(excerptData, href);
-            post.parentElement.insertBefore(excerptElement, post.nextSibling);
-            // Add ARIA description to post link
-            post.setAttribute('aria-describedby', excerptElement.id);
-          }
-        } else {
-          post.classList.remove('tbc-content-match');
-          // Remove excerpt if match type changed
-          const existingExcerpt = post.parentElement.querySelector('.tbc-excerpt');
-          if (existingExcerpt) {
-            existingExcerpt.remove();
-          }
-          post.removeAttribute('aria-describedby');
-        }
-
-        // Highlight matching words in title
-        const title = post.textContent.toLowerCase();
-        const words = parseSearchWords(query);
-        const matchingWords = words.filter(w => title.includes(w));
-        if (matchingWords.length > 0) {
-          // Highlight first matching word (multi-word highlighting is a future enhancement)
-          highlightText(post, matchingWords[0]);
-        } else {
-          removeHighlight(post);
-        }
-
-        // Add highlight parameter to link for in-page highlighting
-        if (!post.dataset.originalHref) {
-          post.dataset.originalHref = href;
-        }
-        // Use window.location.href as base to resolve relative paths correctly
-        const url = new URL(href, window.location.href);
-        url.searchParams.set('highlight', query);
-        post.setAttribute('href', url.pathname + url.search);
-
-        const topic = post.closest('.tbc-topic');
-        if (topic) {
-          topic.classList.add('expanded');
-          state.expandedTopics.add(topic.dataset.topicId);
-        }
-      } else {
-        removeHighlight(post);
-        post.classList.remove('tbc-content-match'); // Clean up content match indicator
-        post.removeAttribute('aria-describedby');
-        // Remove any excerpt
-        const existingExcerpt = post.parentElement.querySelector('.tbc-excerpt');
-        if (existingExcerpt) {
-          existingExcerpt.remove();
-        }
-        // Restore original href
-        if (post.dataset.originalHref) {
-          post.setAttribute('href', post.dataset.originalHref);
-          delete post.dataset.originalHref;
-        }
-      }
-    });
-
-    // Handle topics
-    topics.forEach(topic => {
-      const topicTitle = topic.querySelector('.tbc-topic-title');
-      const topicTitleText = topicTitle ? topicTitle.textContent.toLowerCase() : '';
-      const words = parseSearchWords(query);
-      const topicMatches = words.length > 0 && containsAllWords(topicTitleText, words);
-      const hasVisiblePosts = topic.querySelector('.tbc-post-link:not(.tbc-search-no-match)');
-
-      if (topicMatches) {
-        topic.classList.remove('tbc-search-no-match');
-        topic.classList.add('expanded');
-        state.expandedTopics.add(topic.dataset.topicId);
-
-        // Show all posts in matching topic
-        topic.querySelectorAll('.tbc-post-link').forEach(p => {
-          if (p.classList.contains('tbc-search-no-match')) {
-            p.classList.remove('tbc-search-no-match');
-            matchCount++;
-          }
-        });
-
-        if (topicTitle) {
-          const matchingWords = words.filter(w => topicTitleText.includes(w));
-          if (matchingWords.length > 0) {
-            highlightText(topicTitle, matchingWords[0]);
-          }
-        }
-      } else {
-        topic.classList.toggle('tbc-search-no-match', !hasVisiblePosts);
-        if (topicTitle) removeHighlight(topicTitle);
-      }
-    });
-
-    updateResultsCountWithBreakdown(matchCount, titleMatchCount, contentOnlyMatchCount, resultsDiv);
-  }
-
-  /**
-   * Update search results count with match type breakdown
-   * @param {number} matchCount - Total visible match count
-   * @param {number} titleCount - Matches in title (including BOTH)
-   * @param {number} contentOnlyCount - Matches in content only
-   * @param {HTMLElement} resultsDiv - Results count element
-   */
-  function updateResultsCountWithBreakdown(matchCount, titleCount, contentOnlyCount, resultsDiv) {
-    if (!resultsDiv) return;
-    
-    if (matchCount === 0) {
-      resultsDiv.textContent = 'No posts found';
-      resultsDiv.classList.add('no-results');
-    } else if (contentOnlyCount === 0) {
-      resultsDiv.textContent = `${matchCount} result${matchCount === 1 ? '' : 's'}`;
-      resultsDiv.classList.remove('no-results');
-    } else {
-      resultsDiv.innerHTML = `${matchCount} result${matchCount === 1 ? '' : 's'} ` +
-        `<span class="tbc-result-breakdown">(${titleCount} in title, ${contentOnlyCount} in content)</span>`;
-      resultsDiv.classList.remove('no-results');
-    }
-  }
-
-  function updateResultsCount(matchCount, resultsDiv, isContentSearch) {
+  function updateResultsCount(matchCount, resultsDiv) {
     if (resultsDiv) {
       if (matchCount === 0) {
         resultsDiv.textContent = 'No posts found';
         resultsDiv.classList.add('no-results');
       } else {
-        const mode = isContentSearch ? ' (title + content)' : '';
-        resultsDiv.textContent = `${matchCount} result${matchCount === 1 ? '' : 's'}${mode}`;
+        resultsDiv.textContent = `${matchCount} result${matchCount === 1 ? '' : 's'}`;
         resultsDiv.classList.remove('no-results');
       }
     }
@@ -1225,18 +811,12 @@
     const topics = document.querySelectorAll('.tbc-topic');
     const posts = document.querySelectorAll('.tbc-post-link');
     
-    // Remove all excerpts and content match indicators
-    removeAllExcerpts();
+    // Show topics again (hidden during Pagefind search)
+    showTopicsAfterSearch();
     
     posts.forEach(post => {
       post.classList.remove('tbc-search-no-match');
       removeHighlight(post);
-      post.removeAttribute('aria-describedby');
-      // Restore original href if modified by content search
-      if (post.dataset.originalHref) {
-        post.setAttribute('href', post.dataset.originalHref);
-        delete post.dataset.originalHref;
-      }
     });
     
     topics.forEach(topic => {
@@ -1246,7 +826,7 @@
     });
     
     if (resultsDiv) {
-      resultsDiv.textContent = '';
+      resultsDiv.innerHTML = '';
       resultsDiv.classList.remove('no-results');
     }
   }
