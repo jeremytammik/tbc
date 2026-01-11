@@ -166,10 +166,36 @@
       textSpan.classList.add('tbc-excerpt-lowercase');
     }
     
-    // Highlight the search term within the excerpt (escapeRegex already exists below)
-    const regex = new RegExp(`(${escapeRegex(excerptData.query)})`, 'gi');
-    const safeExcerpt = escapeHtml(excerptData.text);
-    textSpan.innerHTML = '"' + safeExcerpt.replace(regex, '<mark>$1</mark>') + '"';
+    // Highlight the search term within the excerpt using DOM nodes to avoid breaking HTML entities
+    const query = excerptData.query;
+    if (!query) {
+      // No query to highlight; just render the excerpt text with quotes
+      textSpan.textContent = `"${excerptData.text}"`;
+    } else {
+      const regex = new RegExp(`(${escapeRegex(query)})`, 'gi');
+      const parts = excerptData.text.split(regex);
+      
+      // Add opening quote
+      textSpan.appendChild(document.createTextNode('"'));
+      
+      parts.forEach((part, index) => {
+        if (part === '') {
+          return;
+        }
+        if (index % 2 === 0) {
+          // Non-matching text segment
+          textSpan.appendChild(document.createTextNode(part));
+        } else {
+          // Matching segment: wrap in <mark>
+          const mark = document.createElement('mark');
+          mark.textContent = part;
+          textSpan.appendChild(mark);
+        }
+      });
+      
+      // Add closing quote
+      textSpan.appendChild(document.createTextNode('"'));
+    }
     
     const toggleBtn = document.createElement('button');
     toggleBtn.className = 'tbc-excerpt-toggle';
