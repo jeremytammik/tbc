@@ -358,33 +358,10 @@ def update_toc(filename, new_title=None, dry_run=False):
         return False
 
 
-def update_search_index(dry_run=False):
-    """Regenerate search index after updating a post.
-    
-    Args:
-        dry_run: If True, show preview without writing
-        
-    Returns:
-        bool: True if successful, False otherwise
-    """
-    if dry_run:
-        print("[DRY RUN] Would regenerate search index")
-        return True
-    
-    print("\nUpdating search index...")
-    try:
-        from build_search_index import SearchIndexBuilder
-        builder = SearchIndexBuilder()
-        builder.run()
-        return True
-    except ImportError as e:
-        print(f"Warning: Could not import search index builder: {e}")
-        print("Search index may be out of date")
-        return False
-    except Exception as e:
-        print(f"Warning: Failed to update search index: {e}")
-        print("Search index may be out of date")
-        return False
+# NOTE: The update_search_index function has been removed.
+# Search is now powered by Pagefind, which is automatically rebuilt
+# by the GitHub Actions workflow (.github/workflows/pagefind.yml)
+# when HTML files are pushed to gh-pages.
 
 
 def update_post(filename, title=None, date=None, categories=None, 
@@ -430,9 +407,8 @@ def update_post(filename, title=None, date=None, categories=None,
     if results['chrono']:
         update_all_posts_section(dry_run)
     
-    # Update search index when searchable metadata (currently the title) changes
-    if title:
-        update_search_index(dry_run)
+    # Note: Search index (Pagefind) is automatically rebuilt by GitHub Actions
+    # when HTML files are pushed to gh-pages. No local update needed.
     
     # Summary
     print()

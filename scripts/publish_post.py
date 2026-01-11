@@ -417,33 +417,10 @@ def update_all_posts_section(dry_run=False):
     return True
 
 
-def update_search_index(dry_run=False):
-    """Regenerate search index after publishing a post.
-    
-    Args:
-        dry_run: If True, show preview without writing
-        
-    Returns:
-        bool: True if successful, False otherwise
-    """
-    if dry_run:
-        print("[DRY RUN] Would regenerate search index")
-        return True
-    
-    print("\nUpdating search index...")
-    try:
-        from build_search_index import SearchIndexBuilder
-        builder = SearchIndexBuilder()
-        builder.run()
-        return True
-    except ImportError as e:
-        print(f"Warning: Could not import search index builder: {e}")
-        print("Search index may be out of date")
-        return False
-    except Exception as e:
-        print(f"Warning: Failed to update search index: {e}")
-        print("Search index may be out of date")
-        return False
+# NOTE: The update_search_index function has been removed.
+# Search is now powered by Pagefind, which is automatically rebuilt
+# by the GitHub Actions workflow (.github/workflows/pagefind.yml)
+# when HTML files are pushed to gh-pages.
 
 
 def publish_post(md_file, date=None, title=None, slug=None, 
@@ -526,12 +503,8 @@ def publish_post(md_file, date=None, title=None, slug=None,
     if update_toc_flag:
         update_all_posts_section(dry_run)
     
-    # Update search index
-    # Note: Search index updates are intentionally tied to TOC/data updates,
-    # so we reuse update_toc_flag here. If this coupling changes in the future,
-    # introduce a dedicated flag for search index updates.
-    if update_toc_flag:
-        update_search_index(dry_run)
+    # Note: Search index (Pagefind) is automatically rebuilt by GitHub Actions
+    # when HTML files are pushed to gh-pages. No local update needed.
     
     # Update homepage stats
     if update_stats:

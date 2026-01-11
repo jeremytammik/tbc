@@ -1,7 +1,19 @@
 #!/usr/bin/env python3
 """
-build_search_index.py - Generate search index for content search
+build_search_index.py - DEPRECATED
 
+NOTE: This script is DEPRECATED as of January 2026.
+Search functionality is now handled by Pagefind (https://pagefind.app/).
+The Pagefind index is automatically built by the GitHub Actions workflow
+(.github/workflows/pagefind.yml) when HTML files are pushed to gh-pages.
+
+To build the Pagefind index locally for testing:
+    npx pagefind --site a --output-path a/pagefind
+
+The old JSON search index (a/toc/search-index.json) is no longer used
+and can be deleted.
+
+Original description:
 This script scans all HTML blog posts and generates a JSON search index
 containing post metadata and content excerpts for client-side full-text search.
 
@@ -21,8 +33,18 @@ Date: January 10, 2026
 import json
 import re
 import sys
+import warnings
 from datetime import datetime
 from pathlib import Path
+
+# Show deprecation warning
+warnings.warn(
+    "build_search_index.py is deprecated. "
+    "Search is now powered by Pagefind. "
+    "The index is built automatically by GitHub Actions when HTML files change.",
+    DeprecationWarning,
+    stacklevel=2
+)
 
 try:
     from bs4 import BeautifulSoup
