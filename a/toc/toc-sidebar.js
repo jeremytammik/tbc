@@ -56,24 +56,22 @@
 
   /**
    * Get base path for Pagefind assets based on current page location
-   * @returns {string} Absolute path starting with /
+   * Works for both GitHub Pages (/tbc/a/...) and local server (/a/...)
+   * @returns {string} Base path ending with /a/
    */
   function getPagefindBasePath() {
     const currentPath = window.location.pathname;
     
-    // Check if we're at a post page (####_*.htm or ####_*.html)
-    // This works for both /a/0001_welcome.htm and /0001_welcome.htm
-    if (currentPath.match(/\/?\d{4}_[^/]+\.html?$/)) {
-      return '/';  // Root level (for local Pagefind server)
+    // Find the /a/ directory in the path to handle both:
+    // - GitHub Pages: /tbc/a/index.html -> /tbc/a/
+    // - Local server: /a/index.html -> /a/
+    const aIndex = currentPath.indexOf('/a/');
+    if (aIndex !== -1) {
+      return currentPath.substring(0, aIndex + 3); // Include '/a/'
     }
     
-    // If we're in /a/ directory on the full site
-    if (currentPath.includes('/a/')) {
-      return '/a/';
-    }
-    
-    // Root level
-    return '/';
+    // Fallback for root level access
+    return '/a/';
   }
 
   /**
