@@ -66,17 +66,43 @@
   });
 
   /**
+   * Parse search query into individual words
+   * Filters out empty strings and trims whitespace
+   * @param {string} query - Search query (already lowercase)
+   * @returns {string[]} Array of non-empty words
+   */
+  function parseSearchWords(query) {
+    if (!query || typeof query !== 'string') return [];
+    return query.trim().split(/\s+/).filter(word => word.length > 0);
+  }
+
+  /**
+   * Check if text contains all search words (AND logic)
+   * @param {string} text - Text to search (should be lowercase for content)
+   * @param {string[]} words - Array of search words (lowercase)
+   * @returns {boolean} True if ALL words are found
+   */
+  function containsAllWords(text, words) {
+    if (!text || !words || words.length === 0) return false;
+    return words.every(word => text.includes(word));
+  }
+
+  /**
    * Determine the type of match for a post against a search query
+   * Supports multi-word queries with AND logic (all words must match)
    * @param {Object} post - Post object with title and contentPreview
-   * @param {string} query - Lowercase search query
+   * @param {string} query - Lowercase search query (may contain multiple words)
    * @returns {number} MATCH_TYPE value
    */
   function getMatchType(post, query) {
-    const titleMatch = post.title && post.title.toLowerCase().includes(query);
-    // contentPreview is stored in lowercase in the search index (see spec),
-    // and `query` is already lowercase, so we can compare directly.
-    const contentMatch = post.contentPreview &&
-      post.contentPreview.includes(query);
+    const words = parseSearchWords(query);
+    if (words.length === 0) return MATCH_TYPE.NONE;
+    
+    const titleLower = post.title ? post.title.toLowerCase() : '';
+    const titleMatch = containsAllWords(titleLower, words);
+    
+    // contentPreview is stored in lowercase in the search index
+    const contentMatch = containsAllWords(post.contentPreview, words);
     
     if (titleMatch && contentMatch) return MATCH_TYPE.BOTH;
     if (titleMatch) return MATCH_TYPE.TITLE_ONLY;
@@ -85,51 +111,67 @@
   }
 
   /**
-   * Generate an excerpt showing context around the matched term
+   * Generate an excerpt showing context around matched terms
+   * For multi-word queries, centers on the first found word
    * Uses the proper-case 'excerpt' field for display when available,
    * falls back to 'contentPreview' for longer context.
    * 
    * @param {Object} postData - Post data with excerpt and contentPreview
-   * @param {string} query - Search query (lowercase)
+   * @param {string} query - Search query (lowercase, may be multi-word)
    * @param {number} maxLength - Maximum excerpt length (default 80)
    * @returns {Object|null} { text: string, query: string, isLowercase: boolean } or null
    */
   function generateExcerptForDisplay(postData, query, maxLength = 80) {
     if (!query || typeof query !== 'string' || query.length === 0) return null;
     
-    // Limit query length to prevent ReDoS
-    const safeQuery = query.substring(0, 100);
+    // Parse words and limit total length to prevent ReDoS
+    const words = parseSearchWords(query.substring(0, 100));
+    if (words.length === 0) return null;
     
-    // Prefer the proper-case excerpt field if it contains the match
     const excerpt = postData.excerpt || '';
     const contentPreview = postData.contentPreview || '';
     
-    // Check which field contains the match
-    const excerptHasMatch = excerpt.toLowerCase().includes(safeQuery);
-    const sourceText = excerptHasMatch ? excerpt : contentPreview;
+    // Check which source has matches
+    const excerptLower = excerpt.toLowerCase();
+    const excerptMatchCount = words.filter(w => excerptLower.includes(w)).length;
     
+    // contentPreview is already lowercase
+    const contentMatchCount = words.filter(w => contentPreview.includes(w)).length;
+    
+    // Prefer excerpt if it has any matches, otherwise use contentPreview
+    const sourceText = (excerptMatchCount > 0) ? excerpt : contentPreview;
     if (!sourceText || sourceText.length === 0) return null;
     
     const lowerSource = sourceText.toLowerCase();
-    const matchIndex = lowerSource.indexOf(safeQuery);
     
-    if (matchIndex === -1) return null;
+    // Find the first matching word and its position
+    let firstMatchIndex = -1;
+    let matchedWord = '';
+    for (const word of words) {
+      const idx = lowerSource.indexOf(word);
+      if (idx !== -1 && (firstMatchIndex === -1 || idx < firstMatchIndex)) {
+        firstMatchIndex = idx;
+        matchedWord = word;
+      }
+    }
     
-    // Calculate window around match
-    const halfWindow = Math.floor((maxLength - safeQuery.length) / 2);
-    let start = Math.max(0, matchIndex - halfWindow);
-    let end = Math.min(sourceText.length, matchIndex + safeQuery.length + halfWindow);
+    if (firstMatchIndex === -1) return null;
+    
+    // Calculate window around first match
+    const halfWindow = Math.floor((maxLength - matchedWord.length) / 2);
+    let start = Math.max(0, firstMatchIndex - halfWindow);
+    let end = Math.min(sourceText.length, firstMatchIndex + matchedWord.length + halfWindow);
     
     // Adjust to word boundaries (don't cut words in half)
     if (start > 0) {
       const spaceAfterStart = sourceText.indexOf(' ', start);
-      if (spaceAfterStart !== -1 && spaceAfterStart < matchIndex) {
+      if (spaceAfterStart !== -1 && spaceAfterStart < firstMatchIndex) {
         start = spaceAfterStart + 1;
       }
     }
     if (end < sourceText.length) {
       const spaceBeforeEnd = sourceText.lastIndexOf(' ', end);
-      if (spaceBeforeEnd > matchIndex + safeQuery.length) {
+      if (spaceBeforeEnd > firstMatchIndex + matchedWord.length) {
         end = spaceBeforeEnd;
       }
     }
@@ -142,8 +184,8 @@
     
     return {
       text: excerptText,
-      query: safeQuery,
-      isLowercase: !excerptHasMatch  // Flag if using lowercase contentPreview
+      query: matchedWord,  // First matched word for highlighting
+      isLowercase: excerptMatchCount === 0  // Flag if using lowercase contentPreview
     };
   }
 
@@ -1064,10 +1106,13 @@
           post.removeAttribute('aria-describedby');
         }
 
-        // Highlight only title (content not visible in sidebar)
+        // Highlight matching words in title
         const title = post.textContent.toLowerCase();
-        if (title.includes(query)) {
-          highlightText(post, query);
+        const words = parseSearchWords(query);
+        const matchingWords = words.filter(w => title.includes(w));
+        if (matchingWords.length > 0) {
+          // Highlight first matching word (multi-word highlighting is a future enhancement)
+          highlightText(post, matchingWords[0]);
         } else {
           removeHighlight(post);
         }
@@ -1106,7 +1151,8 @@
     topics.forEach(topic => {
       const topicTitle = topic.querySelector('.tbc-topic-title');
       const topicTitleText = topicTitle ? topicTitle.textContent.toLowerCase() : '';
-      const topicMatches = topicTitleText.includes(query);
+      const words = parseSearchWords(query);
+      const topicMatches = words.length > 0 && containsAllWords(topicTitleText, words);
       const hasVisiblePosts = topic.querySelector('.tbc-post-link:not(.tbc-search-no-match)');
 
       if (topicMatches) {
@@ -1122,7 +1168,12 @@
           }
         });
 
-        if (topicTitle) highlightText(topicTitle, query);
+        if (topicTitle) {
+          const matchingWords = words.filter(w => topicTitleText.includes(w));
+          if (matchingWords.length > 0) {
+            highlightText(topicTitle, matchingWords[0]);
+          }
+        }
       } else {
         topic.classList.toggle('tbc-search-no-match', !hasVisiblePosts);
         if (topicTitle) removeHighlight(topicTitle);

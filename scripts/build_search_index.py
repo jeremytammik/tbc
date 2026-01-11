@@ -35,24 +35,24 @@ except ImportError as exc:
 REPO_ROOT = Path(__file__).parent.parent
 POSTS_DIR = REPO_ROOT / "a"
 OUTPUT_FILE = POSTS_DIR / "toc" / "search-index.json"
-CHRONO_FILE = POSTS_DIR / "toc" / "chrono-data.json"
+TOC_FILE = POSTS_DIR / "toc" / "toc-data.json"
 
 # Index settings
 EXCERPT_LENGTH = 200  # Characters for human-readable excerpt
-CONTENT_PREVIEW_LENGTH = 800  # Characters for searchable content
+CONTENT_PREVIEW_LENGTH = 4000  # Characters for searchable content
 
 
 class SearchIndexBuilder:
     """Builds a search index from HTML blog posts."""
     
-    def __init__(self, posts_dir=POSTS_DIR, output_path=OUTPUT_FILE, chrono_path=CHRONO_FILE):
+    def __init__(self, posts_dir=POSTS_DIR, output_path=OUTPUT_FILE, toc_path=TOC_FILE):
         self.posts_dir = Path(posts_dir)
         self.output_path = Path(output_path)
-        self.chrono_path = Path(chrono_path)
+        self.toc_path = Path(toc_path)
         
     def get_post_files(self):
-        """Get all HTML post files matching the pattern ####_*.htm."""
-        pattern = re.compile(r'^\d{4}_.*\.htm$')
+        """Get all HTML post files matching the pattern ####_*.htm or ####_*.html."""
+        pattern = re.compile(r'^\d{4}_.*\.html?$')
         files = []
         
         for file in self.posts_dir.iterdir():
@@ -63,20 +63,21 @@ class SearchIndexBuilder:
         files.sort(key=lambda f: int(f.name[:4]))
         return files
     
-    def load_chrono_data(self):
-        """Load chrono-data.json for post metadata."""
-        if not self.chrono_path.exists():
-            print(f"Warning: {self.chrono_path} not found")
+    def load_toc_data(self):
+        """Load toc-data.json for post metadata."""
+        if not self.toc_path.exists():
+            print(f"Warning: {self.toc_path} not found")
             return {}
         
-        with open(self.chrono_path, 'r', encoding='utf-8') as f:
+        with open(self.toc_path, 'r', encoding='utf-8') as f:
             data = json.load(f)
         
-        # Build lookup by file name
+        # Build lookup by file name from topics
         lookup = {}
-        for year_data in data.get('years', []):
-            for month_data in year_data.get('months', []):
-                for post in month_data.get('posts', []):
+        for topic in data.get('topics', []):
+            for post in topic.get('posts', []):
+                # Avoid duplicates (same file can appear in multiple topics)
+                if post['file'] not in lookup:
                     lookup[post['file']] = post
         
         return lookup
@@ -179,7 +180,7 @@ class SearchIndexBuilder:
         print("Building search index...")
         
         # Load metadata
-        chrono_lookup = self.load_chrono_data()
+        toc_lookup = self.load_toc_data()
         
         # Get post files
         post_files = self.get_post_files()
@@ -195,8 +196,8 @@ class SearchIndexBuilder:
             filename = html_path.name
             post_num = int(filename[:4])
             
-            # Get metadata from chrono-data
-            meta = chrono_lookup.get(filename, {})
+            # Get metadata from toc-data
+            meta = toc_lookup.get(filename, {})
             title = meta.get('title', filename)
             
             # Extract content
