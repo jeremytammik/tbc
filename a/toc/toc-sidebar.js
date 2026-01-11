@@ -73,8 +73,10 @@
    */
   function getMatchType(post, query) {
     const titleMatch = post.title && post.title.toLowerCase().includes(query);
-    const contentMatch = post.contentPreview && 
-      post.contentPreview.toLowerCase().includes(query);
+    // contentPreview is stored in lowercase in the search index (see spec),
+    // and `query` is already lowercase, so we can compare directly.
+    const contentMatch = post.contentPreview &&
+      post.contentPreview.includes(query);
     
     if (titleMatch && contentMatch) return MATCH_TYPE.BOTH;
     if (titleMatch) return MATCH_TYPE.TITLE_ONLY;
