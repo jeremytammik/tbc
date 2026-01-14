@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-This is **The Building Coder** blog archive - a static site hosting 2,079 Revit API blog posts (2008-2025). It's a GitHub Pages site with offline-capable browsing, Pagefind search, and dual sidebar navigation (topics + chronological timeline).
+This is **The Building Coder** blog archive, a static web site hosting 2,078 historical Revit API blog posts from the years 2008-2025, and new ones added from 2026 onwards. It's a GitHub Pages site with offline-capable browsing, Pagefind search, and dual sidebar navigation (topics + chronological timeline).
 
 ## Architecture
 
