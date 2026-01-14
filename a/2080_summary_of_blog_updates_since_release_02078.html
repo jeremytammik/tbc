@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Building Coder</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="stylesheet" href="bc.css">
+    <link rel="stylesheet" href="google-code-prettify/prettify.css">
+    <script src="google-code-prettify/run_prettify.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #333;
+        }
+        a { color: #0066cc; }
+        img { max-width: 100%; height: auto; }
+        .nav { margin-bottom: 20px; padding: 10px; background: #f5f5f5; border-radius: 5px; }
+        .nav a { margin-right: 15px; }
+    </style>
+  <link rel="stylesheet" href="toc/toc-sidebar.css">
+</head>
+<body>
+    <div class="nav">
+        <a href="index.html">← Back to Index</a>
+    </div>
+    <article>
+<h3 id="summary-of-blog-updates-since-release-02078">Summary of Blog Updates Since Release 0.2078</h3>
+<p>The Building Coder has undergone a major transformation since release 0.2078.0 (August 2025). Here's what's new.</p>
+<h4 id="executive-summary">Executive Summary</h4>
+<p>The Building Coder blog has migrated from Typepad to a fully self-hosted GitHub Pages site. Key highlights:</p>
+<ul>
+<li><strong>Offline-capable</strong> — All 2,079 posts (2008-2025) work without internet</li>
+<li><strong>Dual navigation</strong> — 58 topic categories + chronological timeline sidebars</li>
+<li><strong>Pagefind search</strong> — Fast, sharded full-text search across 69,000+ words</li>
+<li><strong>Automated publishing</strong> — Push a Markdown draft and GitHub Actions does the rest</li>
+<li><strong>7 releases</strong> since August 2025, with version scheme change to the <code>1.x</code> era</li>
+</ul>
+<h4 id="contents">Contents</h4>
+<ul>
+<li><a href="#2">The Big Picture</a></li>
+<li><a href="#3">New Features</a></li>
+<li><a href="#4">Search Capabilities</a></li>
+<li><a href="#5">Publishing Workflow</a></li>
+<li><a href="#6">Release History</a></li>
+</ul>
+<h4 id="the-big-picture"><a name="2"></a> The Big Picture</h4>
+<p><strong>The Typepad era is over.</strong> The Building Coder is now a fully self-hosted static site on GitHub Pages with complete offline capability. All 2,079 blog posts from 2008-2025 are preserved and accessible without an internet connection.</p>
+<p>Key architectural changes:</p>
+<ul>
+<li><strong>13,500+ internal links</strong> converted from Typepad URLs to local file paths</li>
+<li><strong>2,066 HTML fragments</strong> wrapped with proper document structure</li>
+<li>All resources use relative paths for GitHub Pages compatibility</li>
+</ul>
+<h4 id="new-features"><a name="3"></a> New Features</h4>
+<p><strong>Wiki-Style TOC Sidebar</strong> — Navigate 2,079 posts via:</p>
+<ul>
+<li><strong>58 topic categories</strong> with 2,256 curated post links (left sidebar)</li>
+<li><strong>Chronological timeline</strong> organized by year/month (right sidebar)</li>
+<li><strong>Real-time search</strong> filtering across all content</li>
+<li><strong>Mobile responsive</strong> hamburger menu on smaller screens</li>
+</ul>
+<p><strong>Copy to Clipboard</strong> — Hover over any code block to copy with one click.</p>
+<p><strong>Mobile Bottom Sheet</strong> — Swipe-enabled chronological navigation on phones with three states: collapsed, years, and months.</p>
+<h4 id="search-capabilities"><a name="4"></a> Search Capabilities</h4>
+<p>The archive now features <strong>Pagefind</strong> search, replacing the previous 6.9MB custom index:</p>
+<ul>
+<li><strong>Sharded index</strong> — Loads only 50-100KB per query</li>
+<li><strong>69,042 unique words</strong> indexed across all posts</li>
+<li><strong>Multi-word AND search</strong> — All terms must match</li>
+<li><strong>In-page highlighting</strong> — Use <code>?highlight=term</code> URL parameter</li>
+<li><strong>Keyboard navigation</strong> — F3/Shift+F3 for next/prev match</li>
+<li><strong>Content match indicators</strong> with expandable excerpts</li>
+</ul>
+<h4 id="publishing-workflow"><a name="5"></a> Publishing Workflow</h4>
+<p>New posts can be added via GitHub Actions or local Python scripts:</p>
+<ol>
+<li>Create a Markdown draft in <code>a/drafts/</code> with YAML front matter</li>
+<li>Push to GitHub — the Action auto-publishes</li>
+<li>Optionally assign to a topic via the "Manage Topics" workflow</li>
+</ol>
+<p>Available scripts:</p>
+<ul>
+<li><code>publish_post.py</code> — Convert Markdown to HTML</li>
+<li><code>delete_post.py</code> — Remove posts from all indices</li>
+<li><code>update_post.py</code> — Modify published post metadata</li>
+<li><code>manage_topics.py</code> — Add/remove posts from topic categories</li>
+</ul>
+<h4 id="release-history"><a name="6"></a> Release History</h4>
+<table>
+<thead>
+<tr>
+<th>Release</th>
+<th>Date</th>
+<th>Summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0.2078.0</td>
+<td>Aug 29, 2025</td>
+<td>Last Typepad-era release (post 2078 by Pedro)</td>
+</tr>
+<tr>
+<td>1.2078.0</td>
+<td>Jan 5, 2026</td>
+<td>Complete re-architecture for GitHub Pages</td>
+</tr>
+<tr>
+<td>1.2078.1</td>
+<td>Jan 6, 2026</td>
+<td>Fixed faulty topic group links</td>
+</tr>
+<tr>
+<td>1.2079.0</td>
+<td>Jan 8, 2026</td>
+<td>First post (2079) in new era, content fixes</td>
+</tr>
+<tr>
+<td>1.2079.1</td>
+<td>Jan 10, 2026</td>
+<td>Content search functionality (WIP)</td>
+</tr>
+<tr>
+<td>1.2079.2</td>
+<td>Jan 13, 2026</td>
+<td>Content search completed</td>
+</tr>
+<tr>
+<td>1.2079.3</td>
+<td>Jan 14, 2026</td>
+<td>Contributions report and AI coding agent instructions</td>
+</tr>
+</tbody>
+</table>
+<p>The version scheme changed from <code>0.NNNN.x</code> (post count) to <code>1.NNNN.x</code> to mark the new self-hosted era.</p>
+    </article>
+    <div class="nav">
+        <a href="index.html">← Back to Index</a>
+    </div>
+<script src="toc/toc-sidebar.js"></script>
+<script src="toc/copy-code.js"></script>
+</body>
+</html>
