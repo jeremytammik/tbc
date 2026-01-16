@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Building Coder</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="stylesheet" href="bc.css">
+    <link rel="stylesheet" href="google-code-prettify/prettify.css">
+    <script src="google-code-prettify/run_prettify.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #333;
+        }
+        a { color: #0066cc; }
+        img { max-width: 100%; height: auto; }
+        .nav { margin-bottom: 20px; padding: 10px; background: #f5f5f5; border-radius: 5px; }
+        .nav a { margin-right: 15px; }
+    </style>
+  <link rel="stylesheet" href="toc/toc-sidebar.css">
+</head>
+<body>
+    <div class="nav">
+        <a href="index.html">← Back to Index</a>
+    </div>
+    <article>
+<h3 id="tbc-updates-in-2026">TBC Updates in 2026</h3>
+<p>As we recently shared,
+<a href="2079_new_year_new_home_for_the_building_coder.html">The Building Coder is now self-hosted</a>.
+You can access it directly 
+<a href="https://jeremytammik.github.io/tbc/a/index.html">on GitHub</a> 
+or run it locally on your own machine.</p>
+<p>This major transformation was made possible by the impressive work of 
+<a href="https://github.com/parametrix">Francis @parametrix Sebastian</a>.
+Francis very generously took the initiative to reinvigorate The Building Coder, migrating the architecture and providing the following summary and overview of the significant changes that have taken place behind the scenes.</p>
+<h4 id="executive-summary">Executive Summary</h4>
+<p>The Building Coder blog has migrated from Typepad to a fully self-hosted GitHub Pages site. 
+Key highlights:</p>
+<ul>
+<li>Offline-capable &ndash; All 2,079 posts (2008-2025) work without internet</li>
+<li>Dual navigation &ndash; 58 topic categories + chronological timeline sidebars</li>
+<li>Pagefind search &ndash; Fast, sharded full-text search across 69,000+ words</li>
+<li>Automated publishing &ndash; Push a Markdown draft and GitHub Actions does the rest</li>
+<li>Version 1.x for the new versions in the new era in 2026</li>
+</ul>
+<h4 id="contents">Contents</h4>
+<ul>
+<li><a href="#2">The Big Picture</a></li>
+<li><a href="#3">New Features</a></li>
+<li><a href="#4">Search Capabilities</a></li>
+<li><a href="#5">Publishing Workflow</a></li>
+<li><a href="#6">Release History</a></li>
+</ul>
+<h4 id="the-big-picture"><a name="2"></a> The Big Picture</h4>
+<p>The Typepad era is over. 
+The Building Coder is now a fully self-hosted static site on GitHub Pages with complete offline capability. 
+All 2,079 blog posts from 2008-2025 are preserved and accessible without an internet connection.</p>
+<p>Key architectural changes:</p>
+<ul>
+<li>Link Integrity: over 13,500 internal links converted from Typepad URLs to local file paths</li>
+<li>Structure: 2,066 HTML fragments wrapped in proper, modern document structure</li>
+<li>Portability: all resources now use relative paths, ensuring compatibility with GitHub Pages and local clones.</li>
+</ul>
+<h4 id="new-features"><a name="3"></a> New Features</h4>
+<ul>
+<li><strong>Wiki-Style TOC Sidebar</strong> navigation via sidebars and hamburger:
+        - Left Sidebar: 58 topic categories containing 2,256 curated post links
+        - Right Sidebar: chronological timeline organized by year and month
+        - Mobile Experience: responsive "hamburger" menu and swipe-enabled Bottom Sheet for chronological navigation on small device with three states: collapsed, years, and months.</li>
+<li><strong>Copy to Clipboard</strong> &ndash; hover over any code block to copy with one click.</li>
+<li><strong>Real-time search</strong> filtering across all content.</li>
+</ul>
+<h4 id="search-capabilities"><a name="4"></a> Search Capabilities</h4>
+<p>The archive now features <strong>Pagefind</strong> search, replacing the previous 6.9MB custom index:</p>
+<ul>
+<li>Sharded index &ndash; Loads only 50-100KB per query</li>
+<li>69,042 unique words indexed across all posts</li>
+<li>Multi-word AND search &ndash; All terms must match</li>
+<li>In-page highlighting &ndash; Use <code>?highlight=term</code> URL parameter</li>
+<li>Keyboard navigation &ndash; F3/Shift+F3 for next/prev match</li>
+<li>Content match indicators with expandable excerpts</li>
+</ul>
+<h4 id="publishing-workflow"><a name="5"></a> Publishing Workflow</h4>
+<p>New posts can be added via GitHub Actions or local Python scripts:</p>
+<ol>
+<li>Create a Markdown draft in <code>a/drafts/</code> with YAML front matter</li>
+<li>Push to GitHub &ndash; the Action auto-publishes</li>
+<li>Optionally assign to a topic via the "Manage Topics" workflow</li>
+</ol>
+<p>Available scripts:</p>
+<ul>
+<li><code>publish_post.py</code> &ndash; Convert Markdown to HTML</li>
+<li><code>delete_post.py</code> &ndash; Remove posts from all indices</li>
+<li><code>update_post.py</code> &ndash; Modify published post metadata</li>
+<li><code>manage_topics.py</code> &ndash; Add/remove posts from topic categories</li>
+</ul>
+<h4 id="release-history"><a name="6"></a> Release History</h4>
+<table>
+<thead>
+<tr>
+<th>Release</th>
+<th>Date</th>
+<th>Summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0.2078.0</td>
+<td>Aug 29, 2025</td>
+<td>Last Typepad-era release (post 2078 by Pedro)</td>
+</tr>
+<tr>
+<td>1.2078.0</td>
+<td>Jan 5, 2026</td>
+<td>Complete re-architecture for GitHub Pages</td>
+</tr>
+<tr>
+<td>1.2078.1</td>
+<td>Jan 6, 2026</td>
+<td>Fixed faulty topic group links</td>
+</tr>
+<tr>
+<td>1.2079.0</td>
+<td>Jan 8, 2026</td>
+<td>First post (2079) in new era, content fixes</td>
+</tr>
+<tr>
+<td>1.2079.1</td>
+<td>Jan 10, 2026</td>
+<td>Content search functionality (WIP)</td>
+</tr>
+<tr>
+<td>1.2079.2</td>
+<td>Jan 13, 2026</td>
+<td>Content search completed</td>
+</tr>
+<tr>
+<td>1.2079.3</td>
+<td>Jan 14, 2026</td>
+<td>Contributions report and AI coding agent instructions</td>
+</tr>
+</tbody>
+</table>
+<p>The version scheme changed from <code>0.NNNN.x</code> (post count) to <code>1.NNNN.x</code> to mark the new self-hosted era.</p>
+<p>Ever so many thanks to Francis for this great contribution!</p>
+<p>If you find any improvement to add yourself or issue to raise, please create 
+a <a href="https://github.com/jeremytammik/tbc/pulls">pull request</a> 
+or <a href="https://github.com/jeremytammik/tbc/issues">report it</a>. 
+Thank you!</p>
+<center>
+<img src="img/tbc_update_2026.jpg" alt="The Building Coder updates 2026" title="The Building Coder updates 2026" width="300"/>
+</center>
+    </article>
+    <div class="nav">
+        <a href="index.html">← Back to Index</a>
+    </div>
+<script src="toc/toc-sidebar.js"></script>
+<script src="toc/copy-code.js"></script>
+</body>
+</html>
