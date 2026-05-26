@@ -180,7 +180,7 @@ Method here:
 </pre>
 
 I added Håvard's method to the existing external
-command [CmdPartAtom](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdPartAtom.cs)
+command [CmdPartAtom](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdPartAtom.cs)
 in [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples) to try this out, in
 [release 2018.0.138.4](httpshttps://github.com/jeremytammik/the_building_coder_samples/releases/tag/2018.0.138.4), and cleaned up the existing code calling the built-in Revit API method `ExtractPartAtomFromFamilyFile` at the same time.
 
