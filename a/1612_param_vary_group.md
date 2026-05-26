@@ -182,6 +182,6 @@ Here is a code snippet providing enough to get the gist of how the above can be 
 
 I added Miro's method `SetInstanceParamVaryBetweenGroupsBehaviour` 
 to [The Building Coder samples release 2018.0.134.11](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2018.0.134.11) in
-the module [CmdCreateSharedParams.cs L441-L470](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdCreateSharedParams.cs#L441-L470).
+the module [CmdCreateSharedParams.cs L441-L470](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdCreateSharedParams.cs#L441-L470).
 
 Many thanks to Miro for raising this issue and sharing his approach to solve it!

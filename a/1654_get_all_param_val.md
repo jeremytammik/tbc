@@ -526,7 +526,7 @@ window (17 elements):
 ####<a name="11"></a>Download
 
 I added this code to the
-new [module CmdParamValuesForCats.cs](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdParamValuesForCats.cs)
+new [module CmdParamValuesForCats.cs](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdParamValuesForCats.cs)
 in [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples)
 [release 2019.0.140.0](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2019.0.140.0).
 

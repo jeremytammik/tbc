@@ -110,7 +110,7 @@ the [Revit Idea Station](http://www.autodesk.com/RevitIdeas).
 ####<a name="3"></a> Rebar Curves
 
 I recently implemented
-a new [external command `CmdRebarCurves`](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdRebarCurves.cs)
+a new [external command `CmdRebarCurves`](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdRebarCurves.cs)
 in [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples).
 
 It was originally intended to be used to simplify and minimise models for Forge processing.
@@ -154,7 +154,7 @@ P.S. I found another way to achieve what I want by translating the first rebar c
 **Answer:** Congratulations on solving the problem as described in your post scriptum.
 
 Take a look at the
-new [external command `CmdRebarCurves`](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdRebarCurves.cs)
+new [external command `CmdRebarCurves`](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdRebarCurves.cs)
 in [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples).
 
 It seems to be using the very same approach you describe.

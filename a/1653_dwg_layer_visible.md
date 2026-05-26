@@ -229,7 +229,7 @@ I copied the macro code to
 [release 2019.0.139.2](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2019.0.139.2)
 in
 order to format and preserve it for posterity in
-the [module CmdProcessVisibleDwg.cs](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdProcessVisibleDwg.cs).
+the [module CmdProcessVisibleDwg.cs](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdProcessVisibleDwg.cs).
 
 
 ####<a name="3"></a>Import Image Using Foreground Option

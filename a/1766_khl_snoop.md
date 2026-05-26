@@ -206,7 +206,7 @@ If these assumptions are correct, the final solution might look something like t
 </pre>
 
 For future reference, I also added this code to [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples) in
-the [CmdCollectorPerformance.cs module](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdCollectorPerformance.cs#L1223-L1240)
+the [CmdCollectorPerformance.cs module](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdCollectorPerformance.cs#L1223-L1240)
 
 Finally, you can use the built-in Revit macro IDE (integrated development environment) to convert this code from C# to Python, if you like.
 

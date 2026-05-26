@@ -299,7 +299,7 @@ I added it
 to [The Building Coder Samples](https://github.com/jeremytammik/the_building_coder_samples) 
 [release 2018.0.135.1](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2018.0.135.1)
 in the new module 
-[CmdFailureGatherer.cs](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdFailureGatherer.cs).
+[CmdFailureGatherer.cs](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdFailureGatherer.cs).
 
 In that command, I generate a warning by creating two overlapping walls:
 

@@ -79,7 +79,7 @@ I ported it to C# and added it
 to [The Building Coder Samples](https://github.com/jeremytammik/the_building_coder_samples) 
 [release 2018.0.135.2](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2018.0.135.2) and
 the extensive collection of filtered element examples in 
-the [module CmdCollectorPerformance.cs](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdCollectorPerformance.cs):
+the [module CmdCollectorPerformance.cs](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdCollectorPerformance.cs):
 
 <pre class="code">
   <span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>

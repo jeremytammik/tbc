@@ -78,7 +78,7 @@ in [lines 86-118](https://github.com/jeremytammik/AdnRevitApiLabsXtra/blob/maste
 For future reference, I implemented two new helper methods `FamilyFirstSymbolCategoryEquals` and `GetFamiliesOfCategory`
 in [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples) to
 demonstrate this, in the
-module [CmdCollectorPerformance.cs, lines 292-L330](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdCollectorPerformance.cs#L292-L330):
+module [CmdCollectorPerformance.cs, lines 292-L330](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdCollectorPerformance.cs#L292-L330):
 
 <pre class="code">
 <span style="color:blue;">static</span>&nbsp;<span style="color:blue;">bool</span>&nbsp;FamilyFirstSymbolCategoryEquals(

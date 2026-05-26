@@ -173,7 +173,7 @@ I hope this clarifies and all is now illuminated.
 #### <a name="7"></a>The Building Coder Samples CmdPlaceFamilyInstance
 
 I implemented
-the [external command CmdPlaceFamilyInstance](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdPlaceFamilyInstance.cs)
+the [external command CmdPlaceFamilyInstance](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdPlaceFamilyInstance.cs)
 in [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples) to
 exercise the `PromptForFamilyInstancePlacement` method when it was originally introduced.
 

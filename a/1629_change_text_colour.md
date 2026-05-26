@@ -141,7 +141,7 @@ Richard [@RPTHOMAS108](https://forums.autodesk.com/t5/user/viewprofilepage/user-
 Many thanks to Rudi and Richard for the helpful solutions!
 
 I added Rudi's utility function
-to [The Building Coder samples Util.cs module](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/Util.cs#L455-L488) like
+to [The Building Coder samples Util.cs module](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/Util.cs#L455-L488) like
 this:
 
 <pre class="code">
@@ -171,7 +171,7 @@ this:
 </pre>
 
 To test it, I added an additional transaction step
-to [CmdNewTextNote](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdNewTextNote.cs#L196-L216):
+to [CmdNewTextNote](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdNewTextNote.cs#L196-L216):
 
 <pre class="code">
 <span style="color:blue;">using</span>(&nbsp;<span style="color:#2b91af;">Transaction</span>&nbsp;t&nbsp;=&nbsp;<span style="color:blue;">new</span>&nbsp;<span style="color:#2b91af;">Transaction</span>(&nbsp;doc&nbsp;)&nbsp;)

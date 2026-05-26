@@ -15,7 +15,7 @@
 - connector neighbours
   https://forums.autodesk.com/t5/revit-api-forum/connector-neighbours/m-p/7816952
   https://github.com/geoffoverfield/RevitAPI_SystemSearch
-  https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/MepSystemSearch.cs
+  https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/MepSystemSearch.cs
 
 - connect into
   https://forums.autodesk.com/t5/revit-api-forum/connect-into/m-p/7834417
@@ -121,7 +121,7 @@ quick [Revit API SystemSearch repo](https://github.com/geoffoverfield/RevitAPI_S
 It's a pretty basic bit of source that I threw together real quick, but the general idea is there.  You'll definitely need to tweak it to meet your needs, but I hope it helps:
 
 It is now also included in [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples),
-in [the module MepSystemSearch.cs](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/MepSystemSearch.cs).
+in [the module MepSystemSearch.cs](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/MepSystemSearch.cs).
 
 You also need to be aware of the Revit SDK TraverseSystem sample. It determines the correct order of the individual system elements in the direction of the flow and stores the entire directed graph in XML.
 

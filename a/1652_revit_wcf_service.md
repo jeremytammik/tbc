@@ -352,7 +352,7 @@ It uses the built-in wall function parameter `FUNCTION_PARAM` to filter for exte
 
 I updated the code presented there and added it
 to [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples) for you,
-in the [CmdCollectorPerformance.cs module lines L293-L323](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdCollectorPerformance.cs#L293-L323).
+in the [CmdCollectorPerformance.cs module lines L293-L323](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdCollectorPerformance.cs#L293-L323).
 
 First, we implement a predicate method `IsExterior` that checks this parameter value to determine whether a wall type is exterior or not:
 

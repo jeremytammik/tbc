@@ -12,7 +12,7 @@
 - dimension segment endpoints
   13073404 [How to retrieve a Dimension's (segment) geometry ?] 
   https://forums.autodesk.com/t5/revit-api-forum/how-to-retrieve-a-dimension-s-segment-geometry/m-p/7145688
-  https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdGetDimensionPoints.cs
+  https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdGetDimensionPoints.cs
 
 Determining Dimension Segment Endoints #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/dimsegendpt
 
@@ -38,7 +38,7 @@ In summary, the solution looks like this:
 - In the case of multiple segments, use an analogue approach on each individual segment.
 
 I implemented and added a new external
-command [CmdGetDimensionPoints](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdGetDimensionPoints.cs)
+command [CmdGetDimensionPoints](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdGetDimensionPoints.cs)
 to [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples)
 I added it 
 to [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples)

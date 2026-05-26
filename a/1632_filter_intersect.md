@@ -253,7 +253,7 @@ You may want to try them out yourself:
 </pre>
 
 I implemented a new external
-command [CmdIntersectJunctionBox](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdIntersectJunctionBox.cs)
+command [CmdIntersectJunctionBox](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdIntersectJunctionBox.cs)
 in [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples) to try this out, in
 [release 2018.0.137.0](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2018.0.137.0).
 

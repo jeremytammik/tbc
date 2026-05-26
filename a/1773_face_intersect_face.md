@@ -121,7 +121,7 @@ When I run the code below in a view with a single wall and single floor, each fa
 I see the same behaviour in Revit 2019 as well.
 
 I added some code to The Building Coder samples
-in [CmdIntersectJunctionBox.cs](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdIntersectJunctionBox.cs#L27-L116) to
+in [CmdIntersectJunctionBox.cs](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdIntersectJunctionBox.cs#L27-L116) to
 test and report in more depth:
 
 <pre class="code">

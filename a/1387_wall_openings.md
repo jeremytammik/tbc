@@ -230,7 +230,7 @@ in [The Building Coder samples](https://github.com/jeremytammik/the_building_cod
 [release 2016.0.124.0](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2016.0.124.0).
 
 The external command name
-is [CmdWallOpenings](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdWallOpenings.cs).
+is [CmdWallOpenings](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdWallOpenings.cs).
 
 
 **Response:** Some corrections to my pseudocode:
@@ -335,7 +335,7 @@ Retrieve all the resulting intersection points, sort them by proximity, eliminat
 
 #### <a name="3"></a>CmdWallOpenings Implementation
 
-As said, I implemented and tested this algorithm in a new [external command CmdWallOpenings](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdWallOpenings.cs)
+As said, I implemented and tested this algorithm in a new [external command CmdWallOpenings](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdWallOpenings.cs)
 in [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples).
 
 I cleaned it up a bit more, and the version presented below is

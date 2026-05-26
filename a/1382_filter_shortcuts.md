@@ -117,7 +117,7 @@ the [collector benchmark](0333_collector_benchmark.htm) in 2010.
 You can find more examples by searching the Internet for CmdCollectorPerformance, optionally adding 'revit api' or 'building coder'.
 
 They refer to
-the [CmdCollectorPerformance.cs module](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdCollectorPerformance.cs)
+the [CmdCollectorPerformance.cs module](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdCollectorPerformance.cs)
 in [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples).
 
 Your question 2 regarding the optional use of `ToElements` is answered in my discussion of [ToElementIds performance](0872_toelementids_perf.htm).
@@ -140,7 +140,7 @@ For the sake of completeness, see [below](#3) for more on the topic of the diffe
 
 An interesting specialised topic is how to convert from .NET post-process filtering to built-in Revit filtering in order to optimise performance. One typical situation in which the .NET filtering may seem easier to implement is when checking for specific element parameter values.
 
-The collector performance samples pointed to above provide several samples of avoiding that by setting up appropriate element parameter filters instead, e.g., to [filter for elements in a specific view having a specific phase](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdCollectorPerformance.cs#L148-L200).
+The collector performance samples pointed to above provide several samples of avoiding that by setting up appropriate element parameter filters instead, e.g., to [filter for elements in a specific view having a specific phase](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdCollectorPerformance.cs#L148-L200).
 
 Please also explore and understand the related discussion
 on [FindElement and collector

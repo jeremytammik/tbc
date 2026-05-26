@@ -175,7 +175,7 @@ While reading the input vertices one by one, I put them into a dictionary equipp
 If a new vertex is very close to an existing one, my comparison operator considers the two vertices to be equal, so I ignore it and use the existing one instead.
 
 The `GetVertices` method
-in [The Building Coder samples CmdNestedInstanceGeo.cs](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdNestedInstanceGeo.cs#L30-L85) does
+in [The Building Coder samples CmdNestedInstanceGeo.cs](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdNestedInstanceGeo.cs#L30-L85) does
 something similar using an `XyzEqualityComparer`.
 
 You would simply have to replace the face vertex index of any ignored vertex by the index of its replacement.

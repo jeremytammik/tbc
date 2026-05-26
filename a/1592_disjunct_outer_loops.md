@@ -340,6 +340,6 @@ I've tested this solution on some interesting slab shapes shown below and result
  
 I added the latter 
 to [The Building Coder samples release 2018.0.134.4](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2018.0.134.4)
-module [CmdSlabBoundaryArea.cs L29-L176](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdSlabBoundaryArea.cs#L29-L176).
+module [CmdSlabBoundaryArea.cs L29-L176](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdSlabBoundaryArea.cs#L29-L176).
  
 Many thanks to Richard for implementing, testing and sharing this improved solution!
