@@ -331,7 +331,7 @@ Instead of using `C.Evaluate` twenty times over, I call the curve `Tessellate` m
  
 I added them
 to [The Building Coder samples release 2018.0.134.3](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2018.0.134.3)
-module [CmdSlabBoundaryArea.cs L29-L102](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdSlabBoundaryArea.cs#L29-L102).
+module [CmdSlabBoundaryArea.cs L29-L102](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdSlabBoundaryArea.cs#L29-L102).
  
 Many thanks to Richard for implementing, testing and sharing this simple approach!
 

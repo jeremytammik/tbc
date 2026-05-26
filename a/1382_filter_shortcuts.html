@@ -126,7 +126,7 @@ I arrived back safe and sound in Switzerland after the exciting week at Autodesk
 the <a href="0333_collector_benchmark.htm">collector benchmark</a> in 2010.</p>
 <p>You can find more examples by searching the Internet for CmdCollectorPerformance, optionally adding 'revit api' or 'building coder'.</p>
 <p>They refer to
-the <a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdCollectorPerformance.cs">CmdCollectorPerformance.cs module</a>
+the <a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdCollectorPerformance.cs">CmdCollectorPerformance.cs module</a>
 in <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a>.</p>
 <p>Your question 2 regarding the optional use of <code>ToElements</code> is answered in my discussion of <a href="0872_toelementids_perf.htm">ToElementIds performance</a>.</p>
 <p>In short, you should avoid it unless you really need it.</p>
@@ -139,7 +139,7 @@ in which case <code>ToElementIds</code> can come in handy.</p>
 <p>If you say that you found LINQ to be incredibly fast, you will be happy to hear that the Revit filtered element collectors are at least twice as fast, in the worst case.</p>
 <p>For the sake of completeness, see <a href="#3">below</a> for more on the topic of the different Revit API filter types and quick versus slow ones.</p>
 <p>An interesting specialised topic is how to convert from .NET post-process filtering to built-in Revit filtering in order to optimise performance. One typical situation in which the .NET filtering may seem easier to implement is when checking for specific element parameter values.</p>
-<p>The collector performance samples pointed to above provide several samples of avoiding that by setting up appropriate element parameter filters instead, e.g., to <a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdCollectorPerformance.cs#L148-L200">filter for elements in a specific view having a specific phase</a>.</p>
+<p>The collector performance samples pointed to above provide several samples of avoiding that by setting up appropriate element parameter filters instead, e.g., to <a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdCollectorPerformance.cs#L148-L200">filter for elements in a specific view having a specific phase</a>.</p>
 <p>Please also explore and understand the related discussion
 on <a href="0832_find_element_optimise.htm">FindElement and collector
 optimisation</a>.</p>

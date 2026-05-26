@@ -46,7 +46,7 @@ I am not completely successful, though, I'm afraid.
 
 Very kindly, Alexander [@aignatovich](https://forums.autodesk.com/t5/user/viewprofilepage/user-id/1257478) [@CADBIMDeveloper](https://github.com/CADBIMDeveloper) Ignatovich, aka Александр Игнатович,
 provided us all with a gift for the day in the form of a new external
-command [CmdElectricalLoad](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdElectricalLoad.cs) that he submitted 
+command [CmdElectricalLoad](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdElectricalLoad.cs) that he submitted 
 to [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples)
 in [pull request #12](https://github.com/jeremytammik/the_building_coder_samples/pull/12), saying:
 

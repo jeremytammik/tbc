@@ -140,7 +140,7 @@ Is there are right way to achieve this with the Revit API?</p>
 <p>However, there may be many possibilities to optimise your code.
 The Building Coder provides various utility functions that may help.
 For instance, to <a href="1538_fam_bb_aec_hack.html#3">determine the bounding box of an entire family</a>.
-Many more in <a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/Util.cs">The Building Coder samples <code>Util</code> module</a>.
+Many more in <a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/Util.cs">The Building Coder samples <code>Util</code> module</a>.
 Search there for "bounding box".
 I am sure they can be further optimised as well for your case.
 For instance, you may be able to extract all the <code>X</code> coordinates from all the individual elements' bounding box <code>Max</code> values and use a generic <code>Max</code> function to determine their maximum in one single call instead of comparing them one by one.
@@ -457,7 +457,7 @@ When there is a line penetrating the plane, I guess there is an intersection poi
 the <a href="https://www.revitapidocs.com/2020/3513f5e2-a274-4f60-4d8f-78145930a9e3.htm"><code>Face</code> <code>Intersect</code> method taking a <code>Curve</code> argument</a>.</p>
 <p>I do not understand why you prefer to ask this question here instead of searching for these results yourself.</p>
 <p>It took me much longer to write them down than to find them.</p>
-<p>I even went ahead and implemented a <a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/Util.cs#L638-L681">line-plane intersection method <code>LinePlaneIntersection</code></a> for
+<p>I even went ahead and implemented a <a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/Util.cs#L638-L681">line-plane intersection method <code>LinePlaneIntersection</code></a> for
 you in The Building Coder samples.</p>
 <p>Here is the code:</p>
 <pre class="code">

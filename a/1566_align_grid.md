@@ -12,7 +12,7 @@
 - rotate grid to horizontal or vertical
   13048285 [Grids Off-Axis]
   https://forums.autodesk.com/t5/revit-api-forum/grids-off-axis/m-p/7129065
-  https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdSetGridEndpoint.cs
+  https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdSetGridEndpoint.cs
 
 Aligning a Slightly Off-Axis Grid using #RevitAPI @AutodeskRevit #bim #dynamobim @AutodeskForge #ForgeDevCon http://bit.ly/aligngrid
 
@@ -131,7 +131,7 @@ Many thanks to Fair59 for this efficient solution!
 
 I added it 
 to [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples)
-module [CmdSetGridEndpoint.cs](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdSetGridEndpoint.cs)
+module [CmdSetGridEndpoint.cs](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdSetGridEndpoint.cs)
 in [release 2018.0.133.1](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2018.0.133.1),
 cf. the [diff to the previous version](https://github.com/jeremytammik/the_building_coder_samples/compare/2018.0.133.0...2018.0.133.1).
 

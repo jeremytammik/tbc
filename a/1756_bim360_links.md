@@ -184,7 +184,7 @@ Many thanks to Eason for this research and clear explanation!
 I added this sample code
 to [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples)
 as a new external
-command [CmdBim360Links ](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdBim360Links.cs)
+command [CmdBim360Links ](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdBim360Links.cs)
 in [release 2020.0.146.0](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2020.0.146.0)
 
 

@@ -203,7 +203,7 @@ I added this code in the original and updated forms
 to [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples).
 
 Here is the [diff between the two](https://github.com/jeremytammik/the_building_coder_samples/commit/fea7381f51b660fc9b5660c2e64f548623b11d8b).
-and the [current implementation code](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdCreateSharedParams.cs#L547-L584).
+and the [current implementation code](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdCreateSharedParams.cs#L547-L584).
 
 Please equip your code with a little benchmark timer stopwatch and let us know whether this helps and how it affects the processing time required before and after making this modification.
 

@@ -156,7 +156,7 @@ In your case, that might look like this:
 I added this code
 to [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples)
 [release 2016.0.126.3](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2016.0.126.3),
-in the module [CmdMepElementShape.cs, in lines 721-745](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdMepElementShape.cs#L721-L745).
+in the module [CmdMepElementShape.cs, in lines 721-745](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdMepElementShape.cs#L721-L745).
 
 Here is the result of a test run on the first two elements in this sequence of rectangular ducts and transitions:
 

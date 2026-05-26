@@ -18,7 +18,7 @@ Below is the utility function I use to achieve this. Note this works for any ele
 ...
 The category filter is used to eliminate any element not of the desired category before using the slower parameter filter to find the desired element. It is probably possible to speed this up further with clever usage of filters, but I have found that it is plenty fast enough for me in practice.
 Colin Stark
-Thank you for that, Colin! I added it to [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples) [CmdViewsShowingElements](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdViewsShowingElements.cs), described in the discussion of [Determining Views Showing an Element](1504_views_showing_element.html).
+Thank you for that, Colin! I added it to [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples) [CmdViewsShowingElements](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdViewsShowingElements.cs), described in the discussion of [Determining Views Showing an Element](1504_views_showing_element.html).
 
 - CmdViewsShowingElements
   - [Determine Views Displaying Given Element](1158_views_displaying_elem.htm#6)
@@ -103,7 +103,7 @@ Colin Stark answered that succinctly, saying:
 > The category filter is used to eliminate any element not of the desired category before using the slower parameter filter to find the desired element. It is probably possible to speed this up further with clever usage of filters, but I have found that it is plenty fast enough for me in practice.
  
 I added Colin's code to [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples)
-module [CmdViewsShowingElement](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdViewsShowingElements.cs).
+module [CmdViewsShowingElement](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdViewsShowingElements.cs).
 
 <pre class="code">
 &nbsp;&nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>

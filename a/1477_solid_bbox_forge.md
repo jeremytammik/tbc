@@ -149,7 +149,7 @@ Many thanks to Owen for sharing this solution and putting together such a nice r
 I added `CreateSolidFromBoundingBox` as a new utility method 
 to [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples)
 [release 2017.0.130.2](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2017.0.130.2) in
-the module [Util.cs](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/Util.cs#L404-L453),
+the module [Util.cs](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/Util.cs#L404-L453),
 with [these diffs to the previous release](https://github.com/jeremytammik/the_building_coder_samples/compare/2017.0.130.1...2017.0.130.2).
 
 

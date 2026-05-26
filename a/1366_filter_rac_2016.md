@@ -91,7 +91,7 @@ But simply how to set/get could be nice...
 Have you looked at [The Building Coder](https://github.com/jeremytammik/the_building_coder_samples) samples?
 
 Especially,
-the [CmdCollectorPerformance module](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdCollectorPerformance.cs) provides
+the [CmdCollectorPerformance module](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdCollectorPerformance.cs) provides
 a large number of such samples and probably covers all of the examples you list.
 
 Please let me know if anything is missing.
