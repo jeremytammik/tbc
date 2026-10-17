@@ -88,7 +88,7 @@ on <a href="https://forums.autodesk.com/t5/revit-api-forum/how-to-create-a-sweep
 <p><strong>Answer:</strong> Every loop needs to be a separate <code>CurveArray</code>!</p>
 <p>I added Frank's correction to the test code provided and integrated it
 into <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a> 
-module <a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdNewSweptBlend.cs">CmdNewSweptBlend.cs</a>:</p>
+module <a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdNewSweptBlend.cs">CmdNewSweptBlend.cs</a>:</p>
 <pre class="code">
 &nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:#2b91af;">Sweep</span>&nbsp;CreateSweepWithMultipleLoops(
 &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#2b91af;">Document</span>&nbsp;doc&nbsp;)

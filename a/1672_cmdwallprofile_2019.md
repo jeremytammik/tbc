@@ -65,7 +65,7 @@ on the [get wall profile error](https://forums.autodesk.com/t5/revit-api-forum/g
 
 
 **Question:** I got an error testing
-the [CmdWallProfile external command](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdWallProfile.cs):
+the [CmdWallProfile external command](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdWallProfile.cs):
 
 <center>
 <img src="img/exception_in_getWallFace.jpg" alt="Exception in getWallFace" width="685"/>

@@ -78,7 +78,7 @@ The API calls are driven by Harry's C# .NET Revit API macro `CreateFaceWallsAndM
 
 Here is the code copied from Harry's post and added
 to [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples)
-in [lines 414-473 of CmdFaceWall.cs](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdFaceWall.cs#L414-L473):
+in [lines 414-473 of CmdFaceWall.cs](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdFaceWall.cs#L414-L473):
 
 <pre class="code">
 <span style="color:blue;">#region</span>&nbsp;CreateFaceWallsAndMassFloors

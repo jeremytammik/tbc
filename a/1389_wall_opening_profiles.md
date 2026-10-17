@@ -88,7 +88,7 @@ That is a false assumption, as proven by the later answer by Scott Wilson, who v
 #### <a name="4"></a>CmdGetWallOpeningProfiles
 
 Seeing as I already implemented a command for the ray tracing approach, I went ahead and added this alternative of Scott's as well as another external
-command [CmdWallOpeningProfiles](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdWallOpeningProfiles.cs) to
+command [CmdWallOpeningProfiles](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdWallOpeningProfiles.cs) to
 [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples).
 
 I tested both Scott's original Revit 2015 implementation and its new incarnation in Revit 2016.
@@ -331,7 +331,7 @@ The command executes, generates the model lines representing the opening face ed
 </center>
 
 As said, this code is provided by the external
-command [CmdWallOpeningProfiles](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdWallOpeningProfiles.cs) in
+command [CmdWallOpeningProfiles](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdWallOpeningProfiles.cs) in
 [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples),
 and the version presented above is
 [release 2016.0.126.1](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2016.0.126.1).

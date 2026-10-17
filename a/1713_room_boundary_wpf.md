@@ -46,7 +46,7 @@ A Forge BIM surface classification tool requires room boundaries to display them
 
 One simple way to obtain them via the Revit API is demonstrated
 by [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples) in
-the [external command `CmdListAllRooms`](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdListAllRooms.cs).
+the [external command `CmdListAllRooms`](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdListAllRooms.cs).
 
 It was originally presented in 2011, and enhanced in some further discussions:
 

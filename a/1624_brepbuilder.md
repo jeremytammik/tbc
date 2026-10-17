@@ -325,4 +325,4 @@ Many thanks to my colleagues Ryuji Ogasawara, Angel Velez, Boris Shafiro and Joh
 I added it 
 to [The Building Coder Samples](https://github.com/jeremytammik/the_building_coder_samples) 
 [release 2018.0.136.0](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2018.0.136.0) in
-the new [module CmdBrepBuilder.cs](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdBrepBuilder.cs).
+the new [module CmdBrepBuilder.cs](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdBrepBuilder.cs).

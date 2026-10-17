@@ -72,7 +72,7 @@ I tried orienting the two inner loops both clockwise and counterclockwise, but n
 
 I added Frank's correction to the test code provided and integrated it
 into [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples) 
-module [CmdNewSweptBlend.cs](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdNewSweptBlend.cs):
+module [CmdNewSweptBlend.cs](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdNewSweptBlend.cs):
 
 <pre class="code">
 &nbsp;&nbsp;<span style="color:blue;">public</span>&nbsp;<span style="color:#2b91af;">Sweep</span>&nbsp;CreateSweepWithMultipleLoops(

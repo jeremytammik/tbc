@@ -152,7 +152,7 @@ Then the snippet above can be cut down to something like this:
 For future reference, I added this example code snippet
 to [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples)
 in the method `IterateOverCollector` in the
-module [CmdCollectorPerformance.cs](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdCollectorPerformance.cs),
+module [CmdCollectorPerformance.cs](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdCollectorPerformance.cs),
 currently at line 299.
 
 

@@ -121,7 +121,7 @@ the Revit API getting started material *(link unavailable)* and
 also demonstrated in [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples).
 
 For instance, in the latter, you can check out
-the [various element selection utility methods](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/Util.cs#L1227-L1365) and
+the [various element selection utility methods](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/Util.cs#L1227-L1365) and
 examine how they are used in the sample commands.
 
 Once you have found a usage pattern that you like in some sample command, search for the description of it
@@ -135,7 +135,7 @@ Set it up to retrieve rebar elements only, and add a filter for the column solid
 - [Using intersection filter with linked file](1639_linked_inters_filt.html)
 
 [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples)
-includes some examples of using a solid intersection filter, e.g., the [`GetInstancesIntersectingElement` method](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdCollectorPerformance.cs#L1294-L1430) showing
+includes some examples of using a solid intersection filter, e.g., the [`GetInstancesIntersectingElement` method](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdCollectorPerformance.cs#L1294-L1430) showing
 how to retrieve family instances intersecting a given BIM element:
 
 <pre class="code">

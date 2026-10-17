@@ -132,7 +132,7 @@ to Alexander [@aignatovich](https://forums.autodesk.com/t5/user/viewprofilepage/
 By the way, I added this method 
 to [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples),
 which heretofore lacked any example at all of using the relatively new family instance `GetReferences` method, in
-the [module `CmdDimensionInstanceOrigin.cs`](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdDimensionInstanceOrigin.cs).
+the [module `CmdDimensionInstanceOrigin.cs`](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdDimensionInstanceOrigin.cs).
 
 
 ####<a name="4"></a> Accessing the Revit Ribbon Icons

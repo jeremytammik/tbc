@@ -166,8 +166,8 @@ address questions related to determining a bounding box for selected elements or
 
 <p>Check it out live 
 in <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a>
-<a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/Util.cs">Util.cs utility class</a>, currently
-in <a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/Util.cs#L1275-L1305">lines 1275-1305</a>.</p>
+<a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/Util.cs">Util.cs utility class</a>, currently
+in <a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/Util.cs#L1275-L1305">lines 1275-1305</a>.</p>
 <p>Here follow some usage examples.</p>
 <h4><a name="7"></a>Bounding Box and Lower Left Corner of Rooms</h4>
 <p>Question on <a href="http://forums.autodesk.com/t5/revit-api/how-to-generate-x-and-y-axes-of-rooms-in-the-revit-api-in/m-p/6452079">how to generate x and y-axes of rooms in the Revit API in millimetres</a>:</p>
@@ -197,7 +197,7 @@ in <a href="https://github.com/jeremytammik/the_building_coder_samples/blob/mast
 <p>Third, you might also be able to use the room bounding box. That would be simpler still, but maybe less precise.</p>
 <p>I implemented the second option for you
 in <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a>, in the
-module <a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdListAllRooms.cs">CmdListAllRooms.cs</a>.</p>
+module <a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdListAllRooms.cs">CmdListAllRooms.cs</a>.</p>
 <p>In it, I iterate over all the room boundary segments, tessellate them, and use the resulting points to generate an accurate 2D bounding box for the room:</p>
 <pre class="code">
 &nbsp;&nbsp;<span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>

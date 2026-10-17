@@ -72,5 +72,5 @@ The main point is this: we need to find the panel-wall which corresponds to the 
 
 I added this code in the method `GetCurtainWallPanelGeometry` 
 to [The Building Coder samples release 2018.0.134.6](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2018.0.134.6)
-module [CmdCurtainWallGeom.cs L35-L66](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdCurtainWallGeom.cs#L35-L66).
+module [CmdCurtainWallGeom.cs L35-L66](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdCurtainWallGeom.cs#L35-L66).
  

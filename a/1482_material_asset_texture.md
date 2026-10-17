@@ -145,7 +145,7 @@ I hope this helps.
 
 I extracted the development team code from their macro and added it
 to [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples)
-module [CmdGetMaterials.cs](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdGetMaterials.cs#L64-L652)
+module [CmdGetMaterials.cs](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdGetMaterials.cs#L64-L652)
 in [release 2017.0.130.4](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2017.0.130.4), cf.
 the [diff](https://github.com/jeremytammik/the_building_coder_samples/compare/2017.0.130.3...2017.0.130.4).
 

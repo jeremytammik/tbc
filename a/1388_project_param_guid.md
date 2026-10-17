@@ -566,7 +566,7 @@ It provides an interesting and important read, with quite extensive documentatio
 
 I integrated CoderBoy's code
 into [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples)
-[release 2016.0.125.2](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2016.0.125.2), in the module [CmdProjectParameterGuids](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdProjectParameterGuids.cs).
+[release 2016.0.125.2](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2016.0.125.2), in the module [CmdProjectParameterGuids](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdProjectParameterGuids.cs).
 
 
 #### <a name="5"></a>Discussion

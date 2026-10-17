@@ -171,7 +171,7 @@ be <a href="1154_directshape_min_size.htm">at least about 2 mm apart</a>.</p>
 <p>While reading the input vertices one by one, I put them into a dictionary equipped with an <code>XYZ</code> comparison operator.</p>
 <p>If a new vertex is very close to an existing one, my comparison operator considers the two vertices to be equal, so I ignore it and use the existing one instead.</p>
 <p>The <code>GetVertices</code> method
-in <a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdNestedInstanceGeo.cs#L30-L85">The Building Coder samples CmdNestedInstanceGeo.cs</a> does
+in <a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdNestedInstanceGeo.cs#L30-L85">The Building Coder samples CmdNestedInstanceGeo.cs</a> does
 something similar using an <code>XyzEqualityComparer</code>.</p>
 <p>You would simply have to replace the face vertex index of any ignored vertex by the index of its replacement.</p>
 <p>There is also an <code>Appliation.MinimumThickness</code> property. It says in

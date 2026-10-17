@@ -163,7 +163,7 @@ It moves the grid endpoints vertically, so you need to select a vertically orien
 I added Ryuji's sample as a new external command
 to [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples)
 [release 2018.0.133.0](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2018.0.133.0) in the
-module [CmdSetGridEndpoint.cs](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdSetGridEndpoint.cs).
+module [CmdSetGridEndpoint.cs](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdSetGridEndpoint.cs).
 
 Here are the isolated grids in *rac_basic_sample.rvt*:
 

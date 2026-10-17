@@ -180,7 +180,7 @@ once again showing the use of simple snooping to discover what is going on under
 I bring in one family instance based on the selected model line.
 I have an issue placing another family instance in the project based on a selected edge in the already placed family instance.
 It is placed in opposite orientation (it seems rotated).
-I used code for `GetInstanceEdgeFromSymbolRef` from [The Building Coder samples CmdDimensionInstanceOrigin module](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdDimensionInstanceOrigin.cs) to select the reference edge for placing the second family instance.
+I used code for `GetInstanceEdgeFromSymbolRef` from [The Building Coder samples CmdDimensionInstanceOrigin module](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdDimensionInstanceOrigin.cs) to select the reference edge for placing the second family instance.
 Points of the selected edge are correct as per code in above link.
 But the orientation of the selected geometry seems to be wrong. 
 

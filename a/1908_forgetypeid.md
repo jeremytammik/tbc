@@ -179,7 +179,7 @@ This was discussed and resolved in the StackOverflow question
 on [Autodesk Forge returning odd measurement data](https://stackoverflow.com/questions/63992151/autodesk-forge-is-returning-odd-measurement-data)
 
 I ended up implementing
-the [method `ListForgeTypeIds` in The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/Util.cs#L1306-L1367) to help resolve the issue.
+the [method `ListForgeTypeIds` in The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/Util.cs#L1306-L1367) to help resolve the issue.
 
 I also shared this in the discussion 
 on [DisplayUnitType in Revit 2022](https://forums.autodesk.com/t5/revit-api-forum/displayunittype-in-revit-2022/m-p/10320697).

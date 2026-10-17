@@ -61,7 +61,7 @@ This fits in well with the growing interest in direct shapes, as you can observe
 the DirectShape topic group *(link unavailable)*.
 
 I implemented a new external
-command [CmdFlatten](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdFlatten.cs)
+command [CmdFlatten](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdFlatten.cs)
 in [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples) to
 test and demonstrate this functionality.
 
@@ -182,7 +182,7 @@ The family instances get lost by the conversion in its current implementation:
 If you wish to retain family instances, you should probably explore their geometry in a little bit more detail, e.g., to extract all the solids they contain and convert them individually.
 
 The current version is provided in the
-module [CmdFlatten.cs](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdFlatten.cs)
+module [CmdFlatten.cs](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdFlatten.cs)
 in [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples)
 [release 2016.0.123.0](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2016.0.123.0).
 

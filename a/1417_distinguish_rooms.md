@@ -144,7 +144,7 @@ Here is the final solution implementing your suggestion:
 Jeremy adds: I added Miro's test methods as `DistinguishRoomsDraft` and `DistinguishRoom`
 to [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples)
 [release 2016.0.126.8](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2016.0.126.8) in
-the module [CmdListAllRooms.cs](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdListAllRooms.cs#L30-L110).
+the module [CmdListAllRooms.cs](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdListAllRooms.cs#L30-L110).
 
 Many thanks to Miro and Diane for the interesting question, research and answer.
 

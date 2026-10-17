@@ -318,7 +318,7 @@ Storing `Point3D` instances in a hashset will give you your distinct set of poin
 </pre>
 
 Yet another solution to address this directly is to define a comparer class for native Revit API `Connector` objects, such as the `ConnectorXyzComparer` one provided in
-at [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples) [Util.cs  module](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/Util.cs#L1439-L1465):
+at [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples) [Util.cs  module](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/Util.cs#L1439-L1465):
 
 <pre class="code">
 <span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>

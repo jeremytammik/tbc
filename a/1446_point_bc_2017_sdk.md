@@ -184,4 +184,4 @@ I added it
 to [The Building Coder Samples](https://github.com/jeremytammik/the_building_coder_samples) 
 [release 2017.0.127.5](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2017.0.127.5)
 in the module 
-[CmdNewLineLoad.cs](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdNewLineLoad.cs#L30-L77).
+[CmdNewLineLoad.cs](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdNewLineLoad.cs#L30-L77).

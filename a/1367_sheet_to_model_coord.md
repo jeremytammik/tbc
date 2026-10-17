@@ -66,7 +66,7 @@ Paolo Serra, Technical BIM Consultant at Autodesk in Milano, provides a nice exa
 
 **Jeremy says:**
 I implemented a new external
-command [CmdSheetToModel](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdSheetToModel.cs)
+command [CmdSheetToModel](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdSheetToModel.cs)
 in [The Building Coder](https://github.com/jeremytammik/the_building_coder_samples) samples
 version [2016.0.121.0](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2016.0.121.0) to
 host and test Paolo's code.
@@ -99,7 +99,7 @@ The generated test notes on each DWFX arc look like this:
 </center>
 
 As said, I implemented a new external
-command [CmdSheetToModel](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdSheetToModel.cs)
+command [CmdSheetToModel](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdSheetToModel.cs)
 in [The Building Coder](https://github.com/jeremytammik/the_building_coder_samples) samples
 version [2016.0.121.0](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2016.0.121.0) to implement and test this.
 
@@ -295,6 +295,6 @@ This is a known gap tracked as an enhancement request in the change request REVI
 Thank you very much, Paolo and Miro, for sharing these important insights and samples!
 
 I just added Miro's sample code to
-the module [CmdSheetToModel](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdSheetToModel.cs) as well,
+the module [CmdSheetToModel](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdSheetToModel.cs) as well,
 in [The Building Coder](https://github.com/jeremytammik/the_building_coder_samples) samples
 version [2016.0.121.1](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2016.0.121.1).

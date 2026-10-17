@@ -107,7 +107,7 @@ Many thanks to Adam and Wolfgang for sharing this solution!
 I added it
 to [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples)
 [release 2017.0.130.1](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2017.0.130.1) in
-the module [CmdPreprocessFailure.cs](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdPreprocessFailure.cs#L44-L67).
+the module [CmdPreprocessFailure.cs](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdPreprocessFailure.cs#L44-L67).
 
 
 #### <a name="3"></a>Roomedit3dv3 Transform Viewer Extension

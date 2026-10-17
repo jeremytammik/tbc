@@ -152,7 +152,7 @@ the <span class="unavailable-link">'temporary transaction trick'</span>.</li>
 <p>One approach to achieve that might be to query each wall for its geometry or location curve, extract all their vertices, and construct a bounding box from them.</p>
 <p>However, querying a Revit element for its bounding box is much faster and more efficient than accessing and analysing its geometry or location curve.</p>
 <p>Moreover, <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a>
-<a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/Util.cs"><code>Util</code> class</a> already
+<a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/Util.cs"><code>Util</code> class</a> already
 implements a bounding box extension method <code>ExpandToContain</code> that we can use here, which expands a given bounding box to encompass another one:</p>
 <pre class="code">
 <span style="color:blue;">public</span>&nbsp;<span style="color:blue;">static</span>&nbsp;<span style="color:blue;">class</span>&nbsp;<span style="color:#2b91af;">JtBoundingBoxXyzExtensionMethods</span>

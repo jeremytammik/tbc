@@ -121,7 +121,7 @@ Is there are right way to achieve this with the Revit API?
 However, there may be many possibilities to optimise your code.
 The Building Coder provides various utility functions that may help.
 For instance, to [determine the bounding box of an entire family](1538_fam_bb_aec_hack.html#3).
-Many more in [The Building Coder samples `Util` module](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/Util.cs).
+Many more in [The Building Coder samples `Util` module](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/Util.cs).
 Search there for "bounding box".
 I am sure they can be further optimised as well for your case.
 For instance, you may be able to extract all the `X` coordinates from all the individual elements' bounding box `Max` values and use a generic `Max` function to determine their maximum in one single call instead of comparing them one by one.
@@ -461,7 +461,7 @@ I do not understand why you prefer to ask this question here instead of searchin
 
 It took me much longer to write them down than to find them.
 
-I even went ahead and implemented a [line-plane intersection method `LinePlaneIntersection`](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/Util.cs#L638-L681) for
+I even went ahead and implemented a [line-plane intersection method `LinePlaneIntersection`](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/Util.cs#L638-L681) for
 you in The Building Coder samples.
 
 Here is the code:

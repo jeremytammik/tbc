@@ -206,7 +206,7 @@ Austin shared his version of the broken command, plus his new working solution.
 
 I added them both 
 to [The Building Coder Samples](https://github.com/jeremytammik/the_building_coder_samples)
-[module `CmdDeleteUnusedRefPlanes.cs`](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdDeleteUnusedRefPlanes.cs).
+[module `CmdDeleteUnusedRefPlanes.cs`](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdDeleteUnusedRefPlanes.cs).
 
 Yet again, I discovered a couple of optimisation possibilities that I very frequently keep pointing out and also added to Austin's code:
 

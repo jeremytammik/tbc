@@ -150,7 +150,7 @@ Here are some simplistic examples of defining canonical forms for real numbers, 
 
 Most of these are implemented
 in [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples)
-[Util module](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/Util.cs).
+[Util module](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/Util.cs).
 
 
 I'll leave it up to your imagination to improve these and define canonical keys for more complex data as required.

@@ -260,7 +260,7 @@ should provide all you need.
 
 The code is included in
 [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples)
-[module CmdSheetSize.cs](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdSheetSize.cs).
+[module CmdSheetSize.cs](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdSheetSize.cs).
 
 The title block instances are family instance elements.
 You can access the title block element using a filtered element collector, e.g.:

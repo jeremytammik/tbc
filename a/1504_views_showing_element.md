@@ -66,7 +66,7 @@ This one, we can answer, and already have, including a dedicated external comman
 - [Determine Views Displaying Given Element](1158_views_displaying_elem.htm#6)
 - [Revision help: which views show this object?](http://forums.autodesk.com/t5/Revit-API/Revision-help-which-views-show-this-object/m-p/5029772)
 - [The Building Coder samples GitHub repository](https://github.com/jeremytammik/the_building_coder_samples)
-    - [`CmdViewsShowingElements`](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdViewsShowingElements.cs)
+    - [`CmdViewsShowingElements`](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdViewsShowingElements.cs)
     
 
 ####<a name="4"></a>Response
@@ -370,5 +370,5 @@ Here are some pretty old and rudimentary introductions to the topics that you as
 I added Erik's `View` extension method `IntersectsBoundingBox` 
 to [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples)
 [release 2017.0.131.3](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2017.0.131.3) in the
-module [CmdViewsShowingElements.cs](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdViewsShowingElements.cs),
+module [CmdViewsShowingElements.cs](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdViewsShowingElements.cs),
 in case anyone else would like to play with it.

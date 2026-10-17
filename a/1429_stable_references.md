@@ -363,7 +363,7 @@ Many thanks to Scott for all his research, creating, sharing, documenting this, 
 P.S. I added Scott's sample code
 to [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples)
 [release 2016.0.127.3](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2016.0.127.3) in the
-module [CmdDimensionInstanceOrigin.cs](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdDimensionInstanceOrigin.cs#L27-L251).
+module [CmdDimensionInstanceOrigin.cs](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdDimensionInstanceOrigin.cs#L27-L251).
 
 #### <a name="5"></a>Importance of Setting the Detail Level
 

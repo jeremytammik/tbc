@@ -125,10 +125,10 @@ The Building Coder provides a number of samples, e.g.:
 - [Generating a MidCurve Between Two Curve Elements](0999_midcurve.htm)
 
 A `Creator` model curve helper class is also included in [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples),
-in the module [Creator.cs](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/Creator.cs).
+in the module [Creator.cs](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/Creator.cs).
 
 Furthermore, the `CmdDetailCurves` sample command shows how to create detail lines, in the
-module [CmdDetailCurves.cs](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdDetailCurves.cs).
+module [CmdDetailCurves.cs](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdDetailCurves.cs).
 
 The GitHub repository master branch is always up to date, and previous versions of the Revit API are supported by
 different [releases](https://github.com/jeremytammik/the_building_coder_samples/releases).

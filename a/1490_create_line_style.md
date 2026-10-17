@@ -194,6 +194,6 @@ Here is a macro that creates and sets up a new Line Style:
 I added Scott's code 
 to [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples) 
 [release 2017.0.131.0](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2017.0.130.4) 
-in the new module [CmdCreateLineStyle.cs](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdCreateLineStyle.cs).
+in the new module [CmdCreateLineStyle.cs](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdCreateLineStyle.cs).
 
 Thank you very much, Scott, for pointing out and demonstrating this important enhancement!

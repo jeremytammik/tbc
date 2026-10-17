@@ -284,4 +284,4 @@ Thanks to Jim for sharing these snippets!
 
 I also added them 
 to [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples)
-[release 2017.0.131.1](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2017.0.131.1) in the module  [CmdColumnRound.cs](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdColumnRound.cs#L30-L104), cf. the [diff from the previous release](https://github.com/jeremytammik/the_building_coder_samples/compare/2017.0.131.0...2017.0.131.1).
+[release 2017.0.131.1](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2017.0.131.1) in the module  [CmdColumnRound.cs](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdColumnRound.cs#L30-L104), cf. the [diff from the previous release](https://github.com/jeremytammik/the_building_coder_samples/compare/2017.0.131.0...2017.0.131.1).

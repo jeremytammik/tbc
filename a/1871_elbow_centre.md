@@ -212,7 +212,7 @@ I implemented a geometrical solution for you based on the elbow connectors and t
 
 - [Connector Origin](https://www.revitapidocs.com/2020/28a9cf5e-9191-f9ce-74c8-622a681201f6.htm)
 - [CoordinateSystem property returning a Transform object](https://www.revitapidocs.com/2020/cb6d725d-654a-f6f3-fed0-96cc618a42f1.htm)
-- [New `GetElbowConnectors` and `GetElbowCentre` methods in The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdRectDuctCorners.cs#L240-L319) 
+- [New `GetElbowConnectors` and `GetElbowCentre` methods in The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdRectDuctCorners.cs#L240-L319) 
 
 <pre class="code">
   <span style="color:gray;">///</span><span style="color:green;">&nbsp;</span><span style="color:gray;">&lt;</span><span style="color:gray;">summary</span><span style="color:gray;">&gt;</span>

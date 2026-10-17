@@ -263,7 +263,7 @@ and [may cause a significant inefficiency](0832_find_element_optimise.htm).
  
 Check out the examples provided
 by [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples) in
-the [module CmdCollectorPerformance.cs](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdCollectorPerformance.cs)
+the [module CmdCollectorPerformance.cs](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdCollectorPerformance.cs)
  
 You could filter for families first, then determine their types, and then the instances referring to those.
  
@@ -315,7 +315,7 @@ Here are the two functions using LINQ post-processing that I now added to The Bu
 
 Implementing dedicated parameter filters for the family and type name would be much more efficient, and would avoid Revit having to marshal and send across to .NET all the data for the instances or types that do not match the desired criteria.
 
-The code region to [retrieve named family symbols](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdCollectorPerformance.cs#L1039-L1101) demonstrates several different approaches using both LINQ and the more efficient parameter filter.
+The code region to [retrieve named family symbols](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdCollectorPerformance.cs#L1039-L1101) demonstrates several different approaches using both LINQ and the more efficient parameter filter.
  
 You can implement similar code to retrieve family instances instead of symbols.
  

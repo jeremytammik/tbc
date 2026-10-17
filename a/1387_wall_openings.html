@@ -225,7 +225,7 @@ List<WallOpening2D> GetWallOpenings(
 in <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a>
 <a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2016.0.124.0">release 2016.0.124.0</a>.</p>
 <p>The external command name
-is <a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdWallOpenings.cs">CmdWallOpenings</a>.</p>
+is <a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdWallOpenings.cs">CmdWallOpenings</a>.</p>
 <p><strong>Response:</strong> Some corrections to my pseudocode:</p>
 <ul>
 <li>You are right about the view3D. I'm using the 2D view to get the elevation of the view range cut plane. For the ReferenceIntersector, I'm using the standard 3D view (just make sure it does not have an active section box and that all relevant elements are visible).</li>
@@ -316,7 +316,7 @@ Note the username suffix and the lowercase "d".</p>
 <p>Define a parameter specifying the minimum opening size, and then fan a comb up the entire wall side.</p>
 <p>Retrieve all the resulting intersection points, sort them by proximity, eliminate duplicates, and Bob's your uncle.</p>
 <h4><a name="3"></a>CmdWallOpenings Implementation</h4>
-<p>As said, I implemented and tested this algorithm in a new <a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdWallOpenings.cs">external command CmdWallOpenings</a>
+<p>As said, I implemented and tested this algorithm in a new <a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdWallOpenings.cs">external command CmdWallOpenings</a>
 in <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a>
 <a href="https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2016.0.124.0">release 2016.0.124.0</a>.</p>
 <p>I only performed minimal testing of it on these three different walls:</p>

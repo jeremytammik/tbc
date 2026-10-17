@@ -120,7 +120,7 @@ change the colour of a selected element in the current view like this:
 </pre>
 
 This code now lives in the 
-new [sample command `CmdChangeElementColor`](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdChangeElementColor.cs)
+new [sample command `CmdChangeElementColor`](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdChangeElementColor.cs)
 in [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples).
 
 ####<a name="3"></a> Assign new Material to an Element

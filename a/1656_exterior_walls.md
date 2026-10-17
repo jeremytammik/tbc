@@ -173,7 +173,7 @@ One approach to achieve that might be to query each wall for its geometry or loc
 However, querying a Revit element for its bounding box is much faster and more efficient than accessing and analysing its geometry or location curve.
 
 Moreover, [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples)
-[`Util` class](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/Util.cs) already
+[`Util` class](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/Util.cs) already
 implements a bounding box extension method `ExpandToContain` that we can use here, which expands a given bounding box to encompass another one:
 
 <pre class="code">

@@ -83,7 +83,7 @@ on [mirroring in a new family and changing active view](0488_mirror_in_new_famil
 > As you can see on reading the final solution carefully, you can use the `ShowElements` method to change the active view and even switch it between the family and project documents. The official Revit 2011 API does not provide any method to switch the active view, but using `ShowElements` can be used to create a workaround for that."
 
 I implemented a new external
-command [CmdSwitchDoc](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdSwitchDoc.cs)
+command [CmdSwitchDoc](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdSwitchDoc.cs)
 in [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples) to try this out, in
 [release 2018.0.138.1](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2018.0.138.1).
 

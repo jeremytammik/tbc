@@ -241,7 +241,7 @@ to <a href="1382_filter_shortcuts.html">apply all quick filters first</a>.</p>
 and <a href="0832_find_element_optimise.htm">may cause a significant inefficiency</a>.</p>
 <p>Check out the examples provided
 by <a href="https://github.com/jeremytammik/the_building_coder_samples">The Building Coder samples</a> in
-the <a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdCollectorPerformance.cs">module CmdCollectorPerformance.cs</a></p>
+the <a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdCollectorPerformance.cs">module CmdCollectorPerformance.cs</a></p>
 <p>You could filter for families first, then determine their types, and then the instances referring to those.</p>
 <p>In fact, the CmdCollectorPerformance.cs module includes code demonstrating that approach.</p>
 <p>However, since the elements you are after in the end are the instances, it makes sense to filter for those right away, and then eliminate the ones that don't match the expected family.</p>
@@ -287,7 +287,7 @@ the <a href="https://github.com/jeremytammik/the_building_coder_samples/blob/mas
 </pre>
 
 <p>Implementing dedicated parameter filters for the family and type name would be much more efficient, and would avoid Revit having to marshal and send across to .NET all the data for the instances or types that do not match the desired criteria.</p>
-<p>The code region to <a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdCollectorPerformance.cs#L1039-L1101">retrieve named family symbols</a> demonstrates several different approaches using both LINQ and the more efficient parameter filter.</p>
+<p>The code region to <a href="https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdCollectorPerformance.cs#L1039-L1101">retrieve named family symbols</a> demonstrates several different approaches using both LINQ and the more efficient parameter filter.</p>
 <p>You can implement similar code to retrieve family instances instead of symbols.</p>
     </article>
     <div class="nav">

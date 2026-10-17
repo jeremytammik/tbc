@@ -90,7 +90,7 @@ Actually, a reference to `RevitAPIMacrosInterop.dll` solved the problem at last 
 
 **Jeremy says:** Look
 at [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples)
-new [CmdDeleteMacros.cs module](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdDeleteMacros.cs)
+new [CmdDeleteMacros.cs module](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdDeleteMacros.cs)
 in [release 2017.0.129.0](https://github.com/jeremytammik/the_building_coder_samples/releases/tag/2017.0.129.0).
 
 Just as Revitalizer suggests, I was forced to add references to `RevitAPIMacros.dll` and `RevitAPIUIMacros.dll` in The Building Coder samples Visual Studio project specifically for this command.

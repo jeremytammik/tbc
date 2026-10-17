@@ -160,8 +160,8 @@ In order to help address these, I started off by implementing two `ExpandToConta
 
 Check it out live 
 in [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples)
-[Util.cs utility class](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/Util.cs), currently
-in [lines 1275-1305](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/Util.cs#L1275-L1305).
+[Util.cs utility class](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/Util.cs), currently
+in [lines 1275-1305](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/Util.cs#L1275-L1305).
 
 Here follow some usage examples.
 
@@ -212,7 +212,7 @@ Third, you might also be able to use the room bounding box. That would be simple
 
 I implemented the second option for you
 in [The Building Coder samples](https://github.com/jeremytammik/the_building_coder_samples), in the
-module [CmdListAllRooms.cs](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdListAllRooms.cs).
+module [CmdListAllRooms.cs](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdListAllRooms.cs).
 
 In it, I iterate over all the room boundary segments, tessellate them, and use the resulting points to generate an accurate 2D bounding box for the room:
  

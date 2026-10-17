@@ -108,7 +108,7 @@ a [parameter filter to compare the family name](1659_param_filter.html#3).
 That discussion does not show how to actually implement the parameter filter.
 
 I therefore cleaned up The Building Coder sample code
-demonstrating [retrieving named family symbols using either LINQ or a parameter filter](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/BuildingCoder/CmdCollectorPerformance.cs#L1203-L1255) for
+demonstrating [retrieving named family symbols using either LINQ or a parameter filter](https://github.com/jeremytammik/the_building_coder_samples/blob/master/BuildingCoder/CmdCollectorPerformance.cs#L1203-L1255) for
 you to illustrate how to do that:
 
 <pre class="code">
